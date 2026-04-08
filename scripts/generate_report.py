@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-AAna v2.3 每日选股报告
+AAna v2.3 每日选股报告 + 复盘评分
 迭代优化：
 - v2.1: 技术指标增强（均线、量比、MACD信号）
 - v2.2: 基本面筛选（PE/PB/ROE/股息率）
 - v2.3: 智能筛选+风险评估
+- v2.4: 复盘评分报告（17:00）
 """
 import os
 import sys
 import json
 import subprocess
+import argparse
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -21,8 +23,29 @@ REPORT_DIR = os.path.expanduser("~/code/AAna")
 def get_today_str():
     return datetime.now().strftime("%Y-%m-%d")
 
-def get_report_filename():
-    return f"{REPORT_DIR}/{get_today_str()}-选股报告.md"
+def get_yesterday_str():
+    from datetime import timedelta
+    return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+def get_report_filename(report_type='选股报告'):
+    return f"{REPORT_DIR}/{get_today_str()}-{report_type}.md"
+
+def get_morning_snapshot_filename():
+    """获取今日早盘快照文件名（9:00AM生成）"""
+    today = get_today_str()
+    return f"{REPORT_DIR}/.snapshot_{today}_09_00.json"
+
+def save_morning_snapshot(prices):
+    """保存早盘快照（9:00AM），用于收盘后复盘对比"""
+    snap_file = get_morning_snapshot_filename()
+    if not os.path.exists(snap_file):
+        with open(snap_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                'version': '2.4',
+                'timestamp': datetime.now().isoformat(),
+                'prices': prices,
+            }, f, ensure_ascii=False, indent=2)
+        print(f"[AAna] 早盘快照已保存: {snap_file}")
 
 # ============================================
 # v2.1: 技术指标评分
@@ -464,9 +487,13 @@ def generate_report():
     
     # 保存数据
     data_file = f"{REPORT_DIR}/stock_data.json"
+
+    # v2.4: 保存早盘快照（仅在9:00左右首次保存，避免17:00覆盖）
+    save_morning_snapshot(prices)
+
     with open(data_file, "w", encoding="utf-8") as f:
         json.dump({
-            'version': '2.3',
+            'version': '2.4',
             'timestamp': datetime.now().isoformat(),
             'prices': prices,
         }, f, ensure_ascii=False, indent=2)
@@ -483,5 +510,179 @@ def generate_report():
     
     return filename
 
+# ============================================
+# v2.4: 复盘评分报告
+# ============================================
+def generate_review_report():
+    """生成每日复盘评分报告：对比早盘预测与收盘实际表现"""
+    today = get_today_str()
+    snap_file = get_morning_snapshot_filename()
+    filename = get_report_filename('复盘评分')
+
+    print(f"[AAna v2.4] 生成 {today} 复盘评分报告...")
+
+    # 读取早盘快照
+    if not os.path.exists(snap_file):
+        print(f"[AAna] 早盘快照不存在: {snap_file}，跳过复盘报告")
+        return None
+
+    with open(snap_file, 'r', encoding='utf-8') as f:
+        morning_data = json.load(f)
+
+    morning_prices = morning_data.get('prices', {})
+    if not morning_prices:
+        print("[AAna] 早盘快照数据为空，跳过复盘报告")
+        return None
+
+    # 获取今日收盘数据
+    all_codes = list(morning_prices.keys())
+    print(f"[AAna] 获取 {len(all_codes)} 只股票收盘数据...")
+    current_prices = get_stock_data_sina(all_codes)
+
+    # 获取指数数据
+    try:
+        index_map = {
+            '000001': '上证指数',
+            '399001': '深证成指',
+            '399006': '创业板指',
+            '000688': '科创50',
+        }
+        index_codes = list(index_map.keys())
+        index_data = get_stock_data_sina(index_codes)
+    except Exception as e:
+        print(f"[AAna] 指数数据获取失败: {e}")
+        index_data = {}
+
+    # ===== 板块评级定义 =====
+    stock_pool = {
+        'ai_chip': {'name': 'AI算力/芯片', 'codes': ['688256', '688041', '300308', '300502', '688474']},
+        'robot': {'name': '人形机器人', 'codes': ['603667', '300892', '002836', '300503', '002230']},
+        'semi': {'name': '半导体设备', 'codes': ['688012', '688396', '600703', '002049']},
+        'energy': {'name': '储能/绿电', 'codes': ['300750', '002594', '688390']},
+        'ai_app': {'name': 'AI应用', 'codes': ['300496', '688787']},
+    }
+
+    # ===== 生成复盘内容 =====
+    content = f"""# AAna每日选股复盘评分 — {today}
+
+> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}（Asia/Shanghai）
+> 对比基准：今日 09:00 选股报告
+
+---
+
+## 一、大盘环境对比
+
+| 指标 | 早盘参考 | 今日收盘 | 涨跌幅 |
+|------|---------|---------|--------|
+"""
+
+    index_rows = []
+    for code, name in index_map.items():
+        info = current_prices.get(code, {})
+        price = info.get('price', 0)
+        change = info.get('change_pct', 0)
+        if price > 0:
+            emoji = '🔴' if change > 0 else '🟢'
+            index_rows.append(f"| {name} | - | {price} | {emoji} {change:+.2f}% |")
+
+    if index_rows:
+        content += '\n'.join(index_rows) + '\n'
+    else:
+        content += '| 数据获取失败 | - | - | - |\n'
+
+    content += '\n---\n\n## 二、推荐个股表现复盘\n\n'
+
+    # 收集所有推荐股票
+    all_review_stocks = []
+    for cat_id, cat in stock_pool.items():
+        for code in cat['codes']:
+            morn = morning_prices.get(code, {})
+            curr = current_prices.get(code, {})
+            if not morn or not curr:
+                continue
+
+            morn_price = morn.get('price', 0)
+            curr_price = curr.get('price', 0)
+            if morn_price <= 0 or curr_price <= 0:
+                continue
+
+            morn_change = morn.get('change_pct', 0)
+            curr_change = curr.get('change_pct', 0)
+            actual_diff = curr_change - morn_change  # 实际涨跌幅变化
+
+            morn_score = morn.get('综合评分', 0)
+            morn_rating = morn.get('评级', '')
+            name = curr.get('name', code)
+
+            # 评估预测准确性
+            if abs(actual_diff) < 1:
+                eval_emoji = '✅'
+                eval_text = '预测准确'
+            elif abs(actual_diff) < 3:
+                eval_emoji = '⚠️'
+                eval_text = '小幅偏差'
+            else:
+                eval_emoji = '❌'
+                eval_text = '偏差较大'
+
+            all_review_stocks.append({
+                'name': name,
+                'code': code,
+                'cat_name': cat['name'],
+                'morn_price': morn_price,
+                'curr_price': curr_price,
+                'morn_change': morn_change,
+                'curr_change': curr_change,
+                'morn_score': morn_score,
+                'morn_rating': morn_rating,
+                'actual_diff': actual_diff,
+                'eval_emoji': eval_emoji,
+                'eval_text': eval_text,
+            })
+
+    # 按预测评分排序
+    all_review_stocks.sort(key=lambda x: x['morn_score'], reverse=True)
+
+    content += '| 股票 | 代码 | 早盘关注价 | 早盘涨幅 | 收盘价 | 收盘涨幅 | 预测评分 | 评价 |\n'
+    content += '|:----:|:----:|:--------:|:-------:|:------:|:-------:|:-------:|:----:|\n'
+
+    hit_count = 0
+    for s in all_review_stocks:
+        content += f"| {s['name']} | {s['code']} | {s['morn_price']:.2f} | {s['morn_change']:+.1f}% | {s['curr_price']:.2f} | {s['curr_change']:+.1f}% | {s['morn_score']} | {s['eval_emoji']} {s['eval_text']} |\n"
+        if s['eval_emoji'] == '✅':
+            hit_count += 1
+
+    total = len(all_review_stocks)
+    hit_rate = hit_count / total * 100 if total > 0 else 0
+
+    content += f"""\n**命中率：{hit_count}/{total} ({hit_rate:.0f}%）**\n\n---\n\n## 三、综合评分\n\n| 评估项 | 结果 |\n|:------:|:----:|\n| 大盘方向 | {'预测正确' if index_rows and float(index_rows[0].split('|')[3].split()[0].replace('🔴','').replace('🟢','').replace(' ','')) > 0 else '待观察'} |\n| 个股命中率 | {hit_count}/{total} ({hit_rate:.0f}%) |\n| 报告版本 | AAna v2.4 |\n\n---\n\n*AAna v2.4 复盘评分 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n"""
+
+    # 保存报告
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+    print(f"[AAna] 复盘评分报告已生成: {filename}")
+
+    # Git push
+    try:
+        os.chdir(PROJECT_DIR)
+        subprocess.run(['git', 'add', '.'], check=True, capture_output=True)
+        subprocess.run(['git', 'commit', '-m', f'feat: add {today} review report (auto)'], check=True, capture_output=True)
+        subprocess.run(['git', 'push', 'origin', 'main'], check=True, capture_output=True)
+        print(f"[AAna] 复盘报告已推送 GitHub")
+    except subprocess.CalledProcessError as e:
+        print(f"[AAna] Git 失败: {e}")
+
+    return filename
+
 if __name__ == "__main__":
-    generate_report()
+    parser = argparse.ArgumentParser(description='AAna 报告生成器')
+    parser.add_argument('--type', '-t', default='selection',
+                        choices=['selection', 'review', 'both'],
+                        help='selection=选股报告, review=复盘评分, both=两者都生成')
+    args = parser.parse_args()
+
+    if args.type in ('selection', 'both'):
+        generate_report()
+    if args.type in ('review', 'both'):
+        generate_review_report()
