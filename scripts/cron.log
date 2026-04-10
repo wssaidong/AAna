@@ -94,3 +94,7 @@ To github.com:wssaidong/AAna.git
 [AAna] 报告已生成: /Users/cai/code/AAna/2026-04-10-选股报告.md
 [AAna] 早盘快照已保存: /Users/cai/code/AAna/.snapshot_2026-04-10_09_00.json
 [AAna] Git 失败: Command '['git', 'push', 'origin', 'main']' returned non-zero exit status 128.
+[AAna v2.3] 生成 2026-04-10 选股报告...
+[AAna] 获取 19 只股票数据...
+[AAna] 报告已生成: /Users/cai/code/AAna/2026-04-10-选股报告.md
+[AAna] Git 失败: Command '['git', 'push', 'origin', 'main']' returned non-zero exit status 128.
