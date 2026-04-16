@@ -48,6 +48,26 @@ def save_morning_snapshot(prices):
         print(f"[AAna] 早盘快照已保存: {snap_file}")
 
 # ============================================
+# Git pull: 每次运行前拉取最新代码
+# ============================================
+def git_pull():
+    """每次生成报告前拉取 AAna 最新代码，确保使用最新规则"""
+    try:
+        result = subprocess.run(
+            ['git', 'pull', 'origin', 'main'],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            print(f"[AAna] Git pull: {result.stdout.strip()}")
+        elif result.returncode != 0:
+            print(f"[AAna] Git pull 失败: {result.stderr.strip()}")
+    except Exception as e:
+        print(f"[AAna] Git pull 异常: {e}")
+
+# ============================================
 # v2.1: 技术指标评分
 # ============================================
 def calculate_technical_score(info):
@@ -678,6 +698,9 @@ if __name__ == "__main__":
                         choices=['selection', 'review', 'both'],
                         help='selection=选股报告, review=复盘评分, both=两者都生成')
     args = parser.parse_args()
+
+    # 每次运行前拉取最新代码
+    git_pull()
 
     if args.type in ('selection', 'both'):
         generate_report()
