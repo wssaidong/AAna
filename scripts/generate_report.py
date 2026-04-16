@@ -184,54 +184,67 @@ def get评级(综合评分):
 # 数据获取
 # ============================================
 def get_stock_data_sina(codes):
-    """使用新浪财经API获取股票数据"""
+    """使用东方财富API获取股票/指数数据（替换新浪，因新浪接口不稳定）"""
     import requests
     
     results = {}
     
-    def format_code(code):
-        if code.startswith('6') or code.startswith('9'):
-            return f'sh{code}'
-        return f'sz{code}'
+    # 指数的market判断（东方财富 secid格式）
+    INDEX_MARKET = {
+        '000001': '1',  # 上证指数
+        '000688': '1',  # 科创50
+        '399001': '0',  # 深证成指
+        '399006': '0',  # 创业板指
+    }
     
-    formatted = [format_code(c) for c in codes]
-    url = f'http://hq.sinajs.cn/list={",".join(formatted)}'
+    def get_market(code):
+        """判断市场: 1=上海, 0=深圳"""
+        if code in INDEX_MARKET:
+            return INDEX_MARKET[code]
+        if code.startswith('6') or code.startswith('9'):
+            return '1'
+        return '0'
+    
+    # 批量获取（东方财富支持多个secid）
+    secids = [f"{get_market(c)}.{c}" for c in codes]
+    fields = 'f43,f44,f45,f46,f47,f48,f57,f58,f60'
+    url = f'https://push2.eastmoney.com/api/qt/ulist.np/get?secids={",".join(secids)}&fields={fields}&fltt=2&invt=2'
+    
     headers = {
         'User-Agent': 'Mozilla/5.0',
-        'Referer': 'http://finance.sina.com.cn'
+        'Referer': 'https://finance.eastmoney.com/'
     }
     
     try:
         resp = requests.get(url, headers=headers, timeout=10)
-        resp.encoding = 'gbk'
+        data = resp.json()
         
-        lines = resp.text.strip().split('\n')
-        for i, line in enumerate(lines):
-            if '=' not in line:
-                continue
-            code = codes[i] if i < len(codes) else ''
-            parts = line.split('=')[1].strip('";\n ').split(',')
-            
-            if len(parts) < 10:
+        if data.get('data'):
+            for item in data['data']:
+                code = str(item.get('f57', ''))
+                price = item.get('f43', 0)  # 当前价（分）
+                price = price / 100.0 if price else 0
+                yesterday_close = item.get('f44', 0)
+                yesterday_close = yesterday_close / 100.0 if yesterday_close else 0
+                change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
+                amount = item.get('f48', 0)  # 成交额（元）
+                
+                results[code] = {
+                    'code': code,
+                    'name': item.get('f58', ''),
+                    'price': price,
+                    'change_pct': change_pct,
+                    'amount': amount,
+                    'yesterday_close': yesterday_close,
+                }
+        
+        # 补全没有返回的股票
+        for code in codes:
+            if code not in results:
                 results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
-                continue
-            
-            name = parts[0]
-            yesterday_close = float(parts[2]) if parts[2] else 0
-            price = float(parts[3]) if parts[3] else 0
-            change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
-            amount = float(parts[9]) if parts[9] else 0
-            
-            results[code] = {
-                'code': code,
-                'name': name,
-                'price': price,
-                'change_pct': change_pct,
-                'amount': amount * 10000,  # 转换为元
-                'yesterday_close': yesterday_close,
-            }
+                
     except Exception as e:
-        print(f"新浪API失败: {e}")
+        print(f"东方财富API失败: {e}")
         for code in codes:
             results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
     
