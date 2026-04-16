@@ -184,107 +184,48 @@ def get评级(综合评分):
 # 数据获取
 # ============================================
 def get_stock_data_sina(codes):
-    """使用东方财富+新浪双保险获取股票/指数数据"""
+    """使用新浪财经API获取股票/指数数据"""
     import requests
     
     results = {}
-    
-    # 指数的market判断（东方财富 secid格式）
-    INDEX_MARKET = {
-        '000001': '1',  # 上证指数
-        '000688': '1',  # 科创50
-        '399001': '0',  # 深证成指
-        '399006': '0',  # 创业板指
-    }
-    
-    def get_market_em(code):
-        """判断市场: 1=上海, 0=深圳"""
-        if code in INDEX_MARKET:
-            return INDEX_MARKET[code]
-        if code.startswith('6') or code.startswith('9'):
-            return '1'
-        return '0'
     
     def get_market_sina(code):
         if code.startswith('6') or code.startswith('9'):
             return f'sh{code}'
         return f'sz{code}'
     
-    # ========== 方法1: 东方财富 ulist ==========
     try:
-        secids = [f"{get_market_em(c)}.{c}" for c in codes]
-        fields = 'f43,f44,f57,f58'
-        url = f'https://push2.eastmoney.com/api/qt/ulist.np/get?secids={",".join(secids)}&fields={fields}&fltt=2&invt=2'
+        formatted = [get_market_sina(c) for c in codes]
+        url = f'http://hq.sinajs.cn/list={",".join(formatted)}'
         headers = {
             'User-Agent': 'Mozilla/5.0',
-            'Referer': 'https://finance.eastmoney.com/'
+            'Referer': 'http://finance.sina.com.cn'
         }
         resp = requests.get(url, headers=headers, timeout=10)
-        data = resp.json()
-        
-        if isinstance(data, dict) and data.get('data') and isinstance(data['data'], dict):
-            diff = data['data'].get('diff', [])
-            if diff and isinstance(diff, list):
-                for item in diff:
-                    if isinstance(item, dict) and item.get('f57') not in ('-', '', None):
-                        code = str(item['f57'])
-                        price = item.get('f43', 0)
-                        if isinstance(price, (int, float)) and price > 0:
-                            price = price / 100.0
-                        else:
-                            price = 0
-                        yesterday_close = item.get('f44', 0)
-                        if isinstance(yesterday_close, (int, float)) and yesterday_close > 0:
-                            yesterday_close = yesterday_close / 100.0
-                        else:
-                            yesterday_close = 0
-                        change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
-                        results[code] = {
-                            'code': code,
-                            'name': item.get('f58', ''),
-                            'price': price,
-                            'change_pct': change_pct,
-                            'amount': 0,
-                            'yesterday_close': yesterday_close,
-                        }
-        em_success = len(results) > 0
-    except Exception as e:
-        em_success = False
-    
-    # ========== 方法2: 新浪备援 ==========
-    if len(results) < len(codes) // 2:  # 如果东方财富数据太少，用新浪
-        try:
-            formatted = [get_market_sina(c) for c in codes]
-            url = f'http://hq.sinajs.cn/list={",".join(formatted)}'
-            headers = {
-                'User-Agent': 'Mozilla/5.0',
-                'Referer': 'http://finance.sina.com.cn'
+        resp.encoding = 'gbk'
+        lines = resp.text.strip().split('\n')
+        for i, line in enumerate(lines):
+            if '=' not in line:
+                continue
+            code = codes[i] if i < len(codes) else ''
+            parts = line.split('=')[1].strip('";\n ').split(',')
+            if len(parts) < 10:
+                continue
+            name = parts[0]
+            yesterday_close = float(parts[2]) if parts[2] else 0
+            price = float(parts[3]) if parts[3] else 0
+            change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
+            amount = float(parts[9]) if parts[9] else 0
+            results[code] = {
+                'code': code,
+                'name': name,
+                'price': price,
+                'change_pct': change_pct,
+                'amount': amount * 10000,
+                'yesterday_close': yesterday_close,
             }
-            resp = requests.get(url, headers=headers, timeout=10)
-            resp.encoding = 'gbk'
-            lines = resp.text.strip().split('\n')
-            for i, line in enumerate(lines):
-                if '=' not in line:
-                    continue
-                code = codes[i] if i < len(codes) else ''
-                parts = line.split('=')[1].strip('";\n ').split(',')
-                if len(parts) < 10:
-                    continue
-                name = parts[0]
-                yesterday_close = float(parts[2]) if parts[2] else 0
-                price = float(parts[3]) if parts[3] else 0
-                change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
-                amount = float(parts[9]) if parts[9] else 0
-                results[code] = {
-                    'code': code,
-                    'name': name,
-                    'price': price,
-                    'change_pct': change_pct,
-                    'amount': amount * 10000,
-                    'yesterday_close': yesterday_close,
-                }
-        except Exception as e:
-            print(f"新浪API也失败了: {e}")
+    except Exception as e:
+        print(f"新浪API失败: {e}")
     
     # 补全没有返回的股票
     for code in codes:
