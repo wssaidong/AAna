@@ -62,3 +62,19 @@ SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
     global STOCK_POOL_inv
     ^
 SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
+  File "/Users/cai/code/AAna/agents/premarket_agent.py", line 264
+    global STOCK_POOL_inv
+    ^
+SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
+  File "/Users/cai/code/AAna/agents/premarket_agent.py", line 264
+    global STOCK_POOL_inv
+    ^
+SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
+  File "/Users/cai/code/AAna/agents/premarket_agent.py", line 264
+    global STOCK_POOL_inv
+    ^
+SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
+  File "/Users/cai/code/AAna/agents/premarket_agent.py", line 264
+    global STOCK_POOL_inv
+    ^
+SyntaxError: name 'STOCK_POOL_inv' is used prior to global declaration
