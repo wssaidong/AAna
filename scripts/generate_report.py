@@ -374,44 +374,40 @@ def generate_report():
     today = get_today_str()
     filename = get_report_filename()
     
-    print(f"[AAna v2.3] 生成 {today} 选股报告...")
+    print(f"[AAna v2.4] 生成 {today} 动态选股报告...")
     
-    # 股票池（按板块分类）
+    # ============================================
+    # 动态获取股票池（从东方财富）
+    # ============================================
+    import sys, os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from dynamic_stocks import get_dynamic_stock_pool
+    
+    dynamic_stocks = get_dynamic_stock_pool()
+    print(f"[AAna] 动态股票池: {len(dynamic_stocks)} 只")
+    
+    # 将动态股票转换为 stock_pool 格式（按涨幅分类）
     stock_pool = {
-        'ai_chip': {
-            'name': 'AI算力/芯片',
-            'codes': ['688256', '688041', '300308', '300502', '688474'],
-            'logic': 'DeepSeek带动算力需求爆发',
-            'risk_level': '高',
-            'stop_loss': '-8%',
-        },
-        'robot': {
-            'name': '人形机器人',
-            'codes': ['603667', '300892', '002836', '300503', '002230'],
-            'logic': '特斯拉Optimus Q1发布+政策扶持',
+        'high_rise': {
+            'name': '🚀 强势股',
+            'codes': [s['code'] for s in dynamic_stocks[:10]],
+            'logic': '今日强势上涨+放量',
             'risk_level': '高',
             'stop_loss': '-5%',
         },
-        'semi': {
-            'name': '半导体设备',
-            'codes': ['688012', '688396', '600703', '002049'],
-            'logic': 'AI芯片国产替代+政策驱动',
-            'risk_level': '中',
-            'stop_loss': '-10%',
+        'active': {
+            'name': '⚡ 活跃股',
+            'codes': [s['code'] for s in dynamic_stocks[10:25]],
+            'logic': '量比放大+趋势良好',
+            'risk_level': '中高',
+            'stop_loss': '-6%',
         },
-        'energy': {
-            'name': '储能/绿电',
-            'codes': ['300750', '002594', '688390'],
-            'logic': '碳中和+装机旺季',
+        'potential': {
+            'name': '💡 潜力股',
+            'codes': [s['code'] for s in dynamic_stocks[25:40]],
+            'logic': '温和上涨+缩量整理',
             'risk_level': '中',
             'stop_loss': '-8%',
-        },
-        'ai_app': {
-            'name': 'AI应用',
-            'codes': ['300496', '688787'],
-            'logic': '端侧AI+智能汽车',
-            'risk_level': '中',
-            'stop_loss': '-10%',
         },
     }
     
