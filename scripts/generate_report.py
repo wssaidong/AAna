@@ -358,7 +358,12 @@ def generate_report():
             info['评级'] = 评级
             info['emoji'] = get_sector_emoji(info.get('name', ''))
             
-            if info.get('price', 0) > 0:
+            price = info.get('price', 0)
+            if price <= 0:
+                continue
+            # 股价过滤：仅保留 20-80 元之间的股票
+            if not (20 <= price <= 80):
+                continue
                 cat['stocks'].append(info)
         
         # 按综合评分排序
