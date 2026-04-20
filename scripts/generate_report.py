@@ -364,7 +364,7 @@ def generate_report():
             # 股价过滤：仅保留 20-80 元之间的股票
             if not (20 <= price <= 80):
                 continue
-                cat['stocks'].append(info)
+            cat['stocks'].append(info)
         
         # 按综合评分排序
         cat['stocks'].sort(key=lambda x: x['综合评分'], reverse=True)
