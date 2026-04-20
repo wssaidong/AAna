@@ -21,7 +21,12 @@ PROJECT_DIR = os.path.expanduser("~/code/AAna")
 REPORT_DIR = os.path.expanduser("~/code/AAna")
 
 def get_today_str():
-    return datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now()
+    # 22点后生成次日报告
+    if now.hour >= 22:
+        from datetime import timedelta
+        return (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    return now.strftime("%Y-%m-%d")
 
 def get_yesterday_str():
     from datetime import timedelta
