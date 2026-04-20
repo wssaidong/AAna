@@ -57,50 +57,70 @@ def save_morning_snapshot(prices):
 # Git pull: 每次运行前拉取最新代码
 # ============================================
 def get_historical_kline(code, count=60):
-    """获取新浪财经历史 K 线"""
+    """获取历史 K 线 - 使用 BaoStock"""
     try:
-        sina_code = f"sh{code}" if code.startswith("6") else f"sz{code}"
-        url = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData"
-        params = {
-            'symbol': sina_code,
-            'scale': 240,
-            'ma': 5,
-            'datalen': count,
-        }
-        headers = {
-            'Referer': 'http://finance.sina.com.cn',
-            'User-Agent': 'Mozilla/5.0',
-        }
-        resp = requests.get(url, params=params, headers=headers, timeout=5)
-        return resp.json()
-    except:
+        import baostock as bs
+        bs.login()
+        
+        # BaoStock format
+        bs_code = f"sh.{code}" if code.startswith("6") else f"sz.{code}"
+        rs = bs.query_history_k_data_plus(
+            bs_code,
+            "date,open,high,low,close,volume",
+            start_date='2024-01-01',  # 提前获取足够历史数据
+            end_date='2026-04-20',
+            frequency="d"
+        )
+        
+        data = []
+        while rs.next():
+            data.append(rs.get_row_data())
+        bs.logout()
+        
+        if data:
+            return data[-count:]  # 返回最近 count 条
+        return None
+    except Exception as e:
+        print(f"[BaoStock] Error for {code}: {e}")
         return None
 
 def calculate_ema(data, period):
-    """计算 EMA"""
+    """计算 EMA - data 可以是 list 或 dict"""
     if len(data) < period:
         return None
+    # 如果是 dict，提取 close 值
+    if isinstance(data[0], dict):
+        data = [float(d['close']) for d in data]
     k = 2 / (period + 1)
     ema_val = data[0]
     for d in data[1:]:
         ema_val = d * k + ema_val * (1 - k)
     return ema_val
 
+def get_close_list(kline):
+    """从 kline 提取 close 列表 - 支持 BaoStock list 或 Sina dict"""
+    if not kline:
+        return []
+    if isinstance(kline[0], dict):
+        return [float(d['close']) for d in kline]
+    else:  # BaoStock list format
+        return [float(d[4]) for d in kline]  # index 4 = close
+
 def check_均线多头(kline):
     """均线多头: MA5 > MA10 > MA20"""
-    if not kline or len(kline) < 25:
+    closes = get_close_list(kline)
+    if len(closes) < 25:
         return False
-    closes = [float(d['close']) for d in kline]
     ma5 = sum(closes[-5:]) / 5
     ma10 = sum(closes[-10:]) / 10
-    ma20 = sum(closes[-20:]) / 20 if len(closes) >= 20 else ma10
+    ma20 = sum(closes[-20:]) / 20
     return ma5 > ma10 > ma20
 
 def check_MACD金叉(kline):
     """MACD 金叉"""
-    if not kline or len(kline) < 35:
+    closes = get_close_list(kline)
+    if len(closes) < 35:
         return False
-    closes = [float(d['close']) for d in kline]
     for i in range(26, len(closes)):
         ema12 = calculate_ema(closes[:i+1], 12)
         ema26 = calculate_ema(closes[:i+1], 26)

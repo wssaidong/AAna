@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """
 AAna v2.5 动态选股模块
-使用新浪财经 API 获取实时行情，筛选符合条件的股票
+使用新浪财经获取实时涨幅榜，筛选符合条件的股票
 """
 import requests
 import json
-import pandas as pd
-from datetime import datetime
 
 def get_sina_top_gainers(num=200):
     """从新浪财经获取A股涨幅榜"""
@@ -51,15 +49,11 @@ def filter_stocks(raw_stocks):
         if change_pct < 0 or change_pct > 9.8:
             continue
         
-        # 获取量比（需要单独查询）
-        vol_ratio = float(s.get('volume', 0))  # Sina doesn't have volume ratio in this API
-        
         filtered.append({
             'code': str(code).zfill(6),
             'name': name,
             'price': price,
             'change_pct': change_pct,
-            'vol_ratio': vol_ratio,
         })
     
     # 按涨幅排序
@@ -83,7 +77,6 @@ def get_dynamic_stock_pool():
         filtered = filter_stocks(raw_stocks)
         print(f"[AAna] 筛选后: {len(filtered)} 只")
         
-        # 返回 Top 50
         return filtered[:50]
         
     except Exception as e:
