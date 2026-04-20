@@ -518,7 +518,8 @@ def generate_report():
 """
     
     for i, stock in enumerate(all_stocks[:10], 1):
-        content += f"| {i} | {stock['emoji']}{stock['name']} | {stock['code']} | {format_price(stock['price'])} | {format_change(stock['change_pct'])} | {stock['tech_score']} | **{stock['综合评分']}** | {stock['评级']} | {stock['风险等级']} |\n"
+        signals = ''.join(stock.get('signals', []) or ['-'])
+        content += f"| {i} | {stock['emoji']}{stock['name']} | {stock['code']} | {format_price(stock['price'])} | {format_change(stock['change_pct'])} | {stock['tech_score']} | **{stock['综合评分']}** | {signals} | {stock['风险等级']} |\n"
     
     # 按板块展示
     for cat_id, cat in stock_pool.items():
