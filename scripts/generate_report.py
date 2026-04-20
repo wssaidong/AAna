@@ -16,6 +16,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from datetime import datetime
+import requests
 
 PROJECT_DIR = os.path.expanduser("~/code/AAna")
 REPORT_DIR = os.path.expanduser("~/code/AAna")
@@ -55,8 +56,92 @@ def save_morning_snapshot(prices):
 # ============================================
 # Git pull: 每次运行前拉取最新代码
 # ============================================
+def get_historical_kline(code, count=60):
+    """获取新浪财经历史 K 线"""
+    try:
+        sina_code = f"sh{code}" if code.startswith("6") else f"sz{code}"
+        url = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData"
+        params = {
+            'symbol': sina_code,
+            'scale': 240,
+            'ma': 5,
+            'datalen': count,
+        }
+        headers = {
+            'Referer': 'http://finance.sina.com.cn',
+            'User-Agent': 'Mozilla/5.0',
+        }
+        resp = requests.get(url, params=params, headers=headers, timeout=5)
+        return resp.json()
+    except:
+        return None
+
+def calculate_ema(data, period):
+    """计算 EMA"""
+    if len(data) < period:
+        return None
+    k = 2 / (period + 1)
+    ema_val = data[0]
+    for d in data[1:]:
+        ema_val = d * k + ema_val * (1 - k)
+    return ema_val
+
+def check_均线多头(kline):
+    """均线多头: MA5 > MA10 > MA20"""
+    if not kline or len(kline) < 25:
+        return False
+    closes = [float(d['close']) for d in kline]
+    ma5 = sum(closes[-5:]) / 5
+    ma10 = sum(closes[-10:]) / 10
+    ma20 = sum(closes[-20:]) / 20 if len(closes) >= 20 else ma10
+    return ma5 > ma10 > ma20
+
+def check_MACD金叉(kline):
+    """MACD 金叉"""
+    if not kline or len(kline) < 35:
+        return False
+    closes = [float(d['close']) for d in kline]
+    for i in range(26, len(closes)):
+        ema12 = calculate_ema(closes[:i+1], 12)
+        ema26 = calculate_ema(closes[:i+1], 26)
+        if ema12 and ema26:
+            dif = ema12 - ema26
+            dif_prev = calculate_ema(closes[:i], 12) - calculate_ema(closes[:i], 26)
+            if dif > 0 and dif_prev <= 0:
+                return True
+    return False
+
+def calculate_enhanced_tech_score(info, kline):
+    """增强版技术评分"""
+    score = 50
+    change_pct = info.get('change_pct', 0)
+    vol_ratio = info.get('volume_ratio', 1) or 1
+    
+    # 涨幅
+    if change_pct >= 9.5: score += 10
+    elif change_pct > 5: score += 2
+    elif change_pct > 0: score += 3
+    elif change_pct > -2: score += 5
+    elif change_pct > -5: score += 8
+    
+    # 量比
+    if vol_ratio > 3: score += 8
+    elif vol_ratio > 2: score += 5
+    elif vol_ratio > 1.5: score += 3
+    elif vol_ratio > 1: score += 1
+    
+    # 均线多头
+    if check_均线多头(kline): score += 15
+    
+    # MACD金叉
+    if check_MACD金叉(kline): score += 10
+    
+    return max(0, min(100, score))
+
 def git_pull():
     """每次生成报告前拉取 AAna 最新代码，确保使用最新规则"""
+
+
     try:
         result = subprocess.run(
             ['git', 'pull', 'origin', 'main'],
@@ -348,12 +433,22 @@ def generate_report():
             info['code'] = code
             info['category'] = cat_id
             
-            # 计算评分
-            tech_score = calculate_technical_score(info)
+            # 获取历史 K 线
+            kline = get_historical_kline(code, count=60)
+            
+            # 计算评分（使用增强版）
+            tech_score = calculate_enhanced_tech_score(info, kline)
             fund_score = calculate_fundamental_score(code, info.get('change_pct', 0))
             综合评分 = calculate综合评分(info, cat_id, tech_score)
             风险等级, 止损位 = get风险等级(综合评分, tech_score)
             评级 = get评级(综合评分)
+            
+            # 技术信号
+            signals = []
+            if kline:
+                if check_均线多头(kline): signals.append('MA多头')
+                if check_MACD金叉(kline): signals.append('MACD金叉')
+            info['signals'] = signals
             
             info['tech_score'] = tech_score
             info['fund_score'] = fund_score
@@ -418,7 +513,7 @@ def generate_report():
     # Top 10
     content += """### 🏆 重点关注 Top 10
 
-| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 评级 | 风险 |
+| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |
 |:----:|:----:|:----:|:----:|:------:|:------:|:--------:|:----:|:----:|
 """
     

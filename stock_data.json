@@ -1,6 +1,6 @@
 {
   "version": "2.4",
-  "timestamp": "2026-04-21T00:24:11.548423",
+  "timestamp": "2026-04-21T00:38:24.566661",
   "prices": {
     "688256": {
       "code": "688256",
@@ -10,11 +10,15 @@
       "amount": 102241773130000.0,
       "yesterday_close": 1334.0,
       "category": "ai_chip",
-      "tech_score": 68,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
       "fund_score": 55,
-      "综合评分": 66,
-      "风险等级": "🟡 中高风险",
-      "止损位": "-6%",
+      "综合评分": 72,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
       "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "💻"
     },
@@ -26,11 +30,15 @@
       "amount": 73786008810000.0,
       "yesterday_close": 260.0,
       "category": "ai_chip",
-      "tech_score": 68,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
       "fund_score": 55,
-      "综合评分": 66,
-      "风险等级": "🟡 中高风险",
-      "止损位": "-6%",
+      "综合评分": 72,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
       "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "💻"
     },
@@ -42,11 +50,15 @@
       "amount": 233570637723700.0,
       "yesterday_close": 851.0,
       "category": "ai_chip",
-      "tech_score": 78,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 80,
       "fund_score": 53,
-      "综合评分": 71,
-      "风险等级": "🟡 中风险",
-      "止损位": "-8%",
+      "综合评分": 72,
+      "风险等级": "🟢 低风险",
+      "止损位": "-10%",
       "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "💻"
     },
@@ -58,11 +70,15 @@
       "amount": 200411194885400.0,
       "yesterday_close": 589.0,
       "category": "ai_chip",
-      "tech_score": 78,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 80,
       "fund_score": 53,
-      "综合评分": 71,
-      "风险等级": "🟡 中风险",
-      "止损位": "-8%",
+      "综合评分": 72,
+      "风险等级": "🟢 低风险",
+      "止损位": "-10%",
       "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "💻"
     },
@@ -74,9 +90,12 @@
       "amount": 13963405090000.0,
       "yesterday_close": 70.55,
       "category": "robot",
-      "tech_score": 78,
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 70,
       "fund_score": 52,
-      "综合评分": 70,
+      "综合评分": 66,
       "风险等级": "🟡 中风险",
       "止损位": "-8%",
       "评级": "⭐⭐⭐ 谨慎推荐",
@@ -90,9 +109,12 @@
       "amount": 448803160000.0,
       "yesterday_close": 28.47,
       "category": "robot",
-      "tech_score": 78,
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 70,
       "fund_score": 53,
-      "综合评分": 71,
+      "综合评分": 66,
       "风险等级": "🟡 中风险",
       "止损位": "-8%",
       "评级": "⭐⭐⭐ 谨慎推荐",
@@ -106,12 +128,13 @@
       "amount": 295119440100.0,
       "yesterday_close": 12.92,
       "category": "robot",
-      "tech_score": 78,
+      "signals": [],
+      "tech_score": 55,
       "fund_score": 50,
-      "综合评分": 70,
-      "风险等级": "🟡 中风险",
-      "止损位": "-8%",
-      "评级": "⭐⭐⭐ 谨慎推荐",
+      "综合评分": 57,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
       "emoji": "📊"
     },
     "300503": {
@@ -122,12 +145,16 @@
       "amount": 17044892316000.0,
       "yesterday_close": 59.29,
       "category": "robot",
-      "tech_score": 63,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
       "fund_score": 53,
-      "综合评分": 62,
-      "风险等级": "🟡 中高风险",
-      "止损位": "-6%",
-      "评级": "⭐⭐ 观察",
+      "综合评分": 71,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "🤖"
     },
     "002230": {
@@ -138,6 +165,9 @@
       "amount": 21206364226400.0,
       "yesterday_close": 48.24,
       "category": "robot",
+      "signals": [
+        "MA多头"
+      ],
       "tech_score": 68,
       "fund_score": 50,
       "综合评分": 64,
@@ -154,9 +184,12 @@
       "amount": 35443813310000.0,
       "yesterday_close": 314.0,
       "category": "semi",
-      "tech_score": 78,
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 70,
       "fund_score": 55,
-      "综合评分": 70,
+      "综合评分": 65,
       "风险等级": "🟡 中风险",
       "止损位": "-8%",
       "评级": "⭐⭐⭐ 谨慎推荐",
@@ -170,6 +203,9 @@
       "amount": 16865194820000.0,
       "yesterday_close": 49.25,
       "category": "semi",
+      "signals": [
+        "MA多头"
+      ],
       "tech_score": 68,
       "fund_score": 55,
       "综合评分": 64,
@@ -186,9 +222,12 @@
       "amount": 59589715530000.0,
       "yesterday_close": 13.34,
       "category": "semi",
-      "tech_score": 68,
+      "signals": [
+        "MACD金叉"
+      ],
+      "tech_score": 63,
       "fund_score": 52,
-      "综合评分": 62,
+      "综合评分": 59,
       "风险等级": "🟡 中高风险",
       "止损位": "-6%",
       "评级": "⭐⭐ 观察",
@@ -202,6 +241,9 @@
       "amount": 12343827904100.0,
       "yesterday_close": 72.89,
       "category": "semi",
+      "signals": [
+        "MA多头"
+      ],
       "tech_score": 68,
       "fund_score": 50,
       "综合评分": 62,
@@ -218,11 +260,15 @@
       "amount": 227680288499400.0,
       "yesterday_close": 444.2,
       "category": "energy",
-      "tech_score": 78,
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 83,
       "fund_score": 53,
-      "综合评分": 67,
-      "风险等级": "🟡 中风险",
-      "止损位": "-8%",
+      "综合评分": 70,
+      "风险等级": "🟢 低风险",
+      "止损位": "-10%",
       "评级": "⭐⭐⭐ 谨慎推荐",
       "emoji": "🔋"
     },
@@ -234,12 +280,15 @@
       "amount": 39572130432700.0,
       "yesterday_close": 103.78,
       "category": "energy",
-      "tech_score": 78,
+      "signals": [
+        "MACD金叉"
+      ],
+      "tech_score": 65,
       "fund_score": 50,
-      "综合评分": 66,
-      "风险等级": "🟡 中风险",
-      "止损位": "-8%",
-      "评级": "⭐⭐⭐ 谨慎推荐",
+      "综合评分": 59,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
       "emoji": "🔋"
     },
     "688390": {
@@ -250,12 +299,13 @@
       "amount": 9692017350000.0,
       "yesterday_close": 87.34,
       "category": "energy",
-      "tech_score": 68,
+      "signals": [],
+      "tech_score": 53,
       "fund_score": 55,
-      "综合评分": 62,
+      "综合评分": 53,
       "风险等级": "🟡 中高风险",
       "止损位": "-6%",
-      "评级": "⭐⭐ 观察",
+      "评级": "⭐ 不推荐",
       "emoji": "🔋"
     },
     "300496": {
@@ -266,6 +316,9 @@
       "amount": 6662870881500.0,
       "yesterday_close": 61.34,
       "category": "ai_app",
+      "signals": [
+        "MA多头"
+      ],
       "tech_score": 68,
       "fund_score": 53,
       "综合评分": 61,
@@ -282,9 +335,12 @@
       "amount": 3974003980000.0,
       "yesterday_close": 134.33,
       "category": "ai_app",
-      "tech_score": 68,
+      "signals": [
+        "MACD金叉"
+      ],
+      "tech_score": 63,
       "fund_score": 55,
-      "综合评分": 62,
+      "综合评分": 59,
       "风险等级": "🟡 中高风险",
       "止损位": "-6%",
       "评级": "⭐⭐ 观察",
@@ -297,12 +353,13 @@
       "change_pct": 0,
       "amount": 0,
       "category": "ai_chip",
-      "tech_score": 45,
+      "signals": [],
+      "tech_score": 55,
       "fund_score": 55,
-      "综合评分": 52,
+      "综合评分": 58,
       "风险等级": "🟡 中高风险",
       "止损位": "-6%",
-      "评级": "⭐ 不推荐",
+      "评级": "⭐⭐ 观察",
       "emoji": "📊"
     }
   }
