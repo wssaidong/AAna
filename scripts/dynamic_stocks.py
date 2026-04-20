@@ -1,100 +1,100 @@
 #!/usr/bin/env python3
 """
-AAna v2.4 动态选股 - 直接从东方财富获取股票池
+AAna v2.5 动态选股模块
+使用新浪财经 API 获取实时行情，筛选符合条件的股票
 """
 import requests
 import json
+import pandas as pd
+from datetime import datetime
 
-def get_eastmoney_headers():
-    return {
-        'User-Agent': 'Mozilla/5.0',
-        'Referer': 'https://quote.eastmoney.com/',
-    }
-
-def fetch_dynamic_stocks(page=1, pages=5):
-    """从东方财富获取动态股票池"""
-    all_stocks = []
+def get_sina_top_gainers(num=200):
+    """从新浪财经获取A股涨幅榜"""
+    url = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
+    headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'http://finance.sina.com.cn'}
     
-    for p in range(1, pages + 1):
-        url = "https://44.push2.eastmoney.com/api/qt/clist/get"
+    all_stocks = []
+    for page in range(1, 6):  # 5 pages = 200 stocks
         params = {
-            'pn': p,
-            'pz': 200,
-            'po': 1,
-            'np': 1,
-            'ut': 'bd1d9ddb04089700cf9c27f6f7426281',
-            'fltt': 2,
-            'invt': 2,
-            'fid': 'f3',
-            'fs': 'm:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23',  # 沪深主板+创业板+科创板
-            'fields': 'f2,f3,f12,f14,f62,f204',
+            'page': page, 'num': 40, 'sort': 'changepercent', 'asc': 0,
+            'node': 'hs_a', 'symbol': '', '_s_r_a': 'page'
         }
-        
         try:
-            resp = requests.get(url, params=params, headers=get_eastmoney_headers(), timeout=10)
-            data = resp.json()
-            items = data.get('data', {}).get('diff', [])
-            if not items:
+            resp = requests.get(url, params=params, headers=headers, timeout=10)
+            data = json.loads(resp.text)
+            if not data:
                 break
-            all_stocks.extend(items)
+            all_stocks.extend(data)
         except Exception as e:
-            print(f"[AAna] 东方财富API失败: {e}")
+            print(f"[Sina] Page {page} failed: {e}")
             break
     
     return all_stocks
 
-def filter_stocks(items):
-    """过滤符合条件的股票"""
+def filter_stocks(raw_stocks):
+    """过滤股票：价格20-80元、涨幅0-9.8%、排除ST/新股"""
     filtered = []
-    for item in items:
-        code = str(item.get('f12', ''))
-        price = item.get('f2', 0)
-        change = item.get('f3', 0)
-        vol_ratio = item.get('f62', 0) or 0
+    for s in raw_stocks:
+        code = s.get('code', '')
+        name = s.get('name', '')
+        price = float(s.get('trade', 0))
+        change_pct = float(s.get('changepercent', 0))
         
-        # 排除ST、新股、价格异常
-        if code.startswith(('8', '9')):
+        # 排除新股、北交所、ST
+        if code.startswith(('N', 'C', 'n', 'c', 'bj', '8', '9')):
             continue
+        if name.startswith(('N', 'C', 'n', 'c', '*', 'S')):
+            continue
+        # 价格/涨幅过滤
         if price < 20 or price > 80:
             continue
-        # 只选涨幅 0-9% (排除涨停)
-        if change <= 0 or change >= 9.8:
-            continue
-        # 量比 > 1.5
-        if vol_ratio < 1.5:
+        if change_pct < 0 or change_pct > 9.8:
             continue
         
+        # 获取量比（需要单独查询）
+        vol_ratio = float(s.get('volume', 0))  # Sina doesn't have volume ratio in this API
+        
         filtered.append({
-            'code': code,
-            'name': item.get('f14', ''),
+            'code': str(code).zfill(6),
+            'name': name,
             'price': price,
-            'change_pct': change,
+            'change_pct': change_pct,
             'vol_ratio': vol_ratio,
-            'turnover': item.get('f204', 0) or 0,
         })
-    
-    return filtered
-
-def get_dynamic_stock_pool():
-    """获取动态股票池"""
-    print("[AAna] 从东方财富获取动态股票池...")
-    items = fetch_dynamic_stocks(pages=5)
-    print(f"[AAna] 获取到 {len(items)} 只候选股票")
-    
-    filtered = filter_stocks(items)
-    print(f"[AAna] 动态筛选后: {len(filtered)} 只")
     
     # 按涨幅排序
     filtered.sort(key=lambda x: x['change_pct'], reverse=True)
+    return filtered
+
+def get_dynamic_stock_pool():
+    """
+    主函数：从新浪获取动态股票池
+    返回最多50只符合条件的股票
+    """
+    print("[AAna] 从新浪财经获取动态股票池...")
     
-    return filtered[:50]  # 最多50只
+    try:
+        raw_stocks = get_sina_top_gainers(200)
+        print(f"[AAna] 获取原始数据: {len(raw_stocks)} 只")
+        
+        if not raw_stocks:
+            return []
+        
+        filtered = filter_stocks(raw_stocks)
+        print(f"[AAna] 筛选后: {len(filtered)} 只")
+        
+        # 返回 Top 50
+        return filtered[:50]
+        
+    except Exception as e:
+        print(f"[AAna] 获取失败: {e}")
+        return []
 
 if __name__ == '__main__':
     stocks = get_dynamic_stock_pool()
-    print(f"\n动态选股池: {len(stocks)} 只")
-    for s in stocks[:10]:
-        print(f"  {s['name']}({s['code']}): ¥{s['price']} {s['change_pct']}%")
-    
-    # 保存
-    with open('dynamic_stocks.json', 'w') as f:
-        json.dump(stocks, f, ensure_ascii=False, indent=2)
+    if stocks:
+        print(f"\n动态选股 Top 20:")
+        for i, s in enumerate(stocks[:20], 1):
+            print(f"  {i}. {s['name']}({s['code']}): ¥{s['price']:.2f} {s['change_pct']:+.2f}%")
+    else:
+        print("未能获取动态股票池")
