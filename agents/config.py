@@ -13,7 +13,7 @@ STATE_DIR = os.path.expanduser("~/code/AAna/state")
 STOCK_POOL = {
     'ai_chip': {
         'name': 'AI算力/芯片',
-        'codes': ['688256', '688041', '300308', '300502', '688474'],
+        'codes': ['300308', '300502', '300223', '300604'],
         'logic': 'DeepSeek带动算力需求爆发',
         'risk_level': '高',
         'stop_loss': '-8%',
@@ -27,21 +27,21 @@ STOCK_POOL = {
     },
     'semi': {
         'name': '半导体设备',
-        'codes': ['688012', '688396', '600703', '002049'],
+        'codes': ['600703', '002049', '600584'],
         'logic': 'AI芯片国产替代+政策驱动',
         'risk_level': '中',
         'stop_loss': '-10%',
     },
     'energy': {
         'name': '储能/绿电',
-        'codes': ['300750', '002594', '688390'],
+        'codes': ['300750', '002594', '002459'],
         'logic': '碳中和+装机旺季',
         'risk_level': '中',
         'stop_loss': '-8%',
     },
     'ai_app': {
         'name': 'AI应用',
-        'codes': ['300496', '688787'],
+        'codes': ['300496', '002415'],
         'logic': '端侧AI+智能汽车',
         'risk_level': '中',
         'stop_loss': '-10%',

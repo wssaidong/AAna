@@ -170,7 +170,7 @@ def save_report(report_type, content):
         filename = f"{today}_11{28}_午盘总结.md"
     elif report_type == '尾盘分析':
         subdir = os.path.join(REPORTS_DIR, '盘中')
-        filename = f"{today}_14{40}_尾盘分析.md"
+        filename = f"{today}_14_45_尾盘推荐.md"
     elif report_type == '复盘评分':
         subdir = os.path.join(REPORTS_DIR, '复盘')
         filename = f"{today}_21{45}_复盘评分.md"

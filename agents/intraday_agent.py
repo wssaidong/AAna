@@ -307,7 +307,7 @@ def midday_summary():
 def afternoon_analysis():
     """14:40 尾盘分析"""
     log("="*50)
-    log("📊 14:40 尾盘分析")
+    log("📊 14:45 尾盘推荐")
     
     today = get_today_str()
     all_codes = get_all_codes()
@@ -362,25 +362,44 @@ def afternoon_analysis():
     
     sector_perf.sort(key=lambda x: x['avg_change'], reverse=True)
     
-    # 重点关注个股
-    focus_stocks = []
+    # 强势股：涨幅>2% 且强于大盘
+    strong_stocks = []
+    # 超跌股：跌幅>4% 且弱于大盘（相对超跌）
+    pullback_stocks = []
+    
     for cat_id, cat in STOCK_POOL.items():
         for code in cat['codes']:
             info = prices.get(code, {})
             if info.get('price', 0) > 0:
                 change = info['change_pct']
-                # 尾盘强势股或回调到位股
-                if change > 3 or change < -5:
-                    focus_stocks.append({
+                rel_change = change - avg_change  # 相对大盘强弱
+                if change > 2 and rel_change > 1:
+                    strong_stocks.append({
                         'name': info['name'],
                         'code': code,
                         'category': cat['name'],
                         'change': change,
+                        'rel_change': rel_change,
                         'price': info['price'],
-                        'stop_loss': cat['stop_loss']
+                        'stop_loss': cat['stop_loss'],
+                        'risk': cat['risk_level'],
+                        'logic': cat['logic'],
+                    })
+                elif change < -4 and rel_change < -2:
+                    pullback_stocks.append({
+                        'name': info['name'],
+                        'code': code,
+                        'category': cat['name'],
+                        'change': change,
+                        'rel_change': rel_change,
+                        'price': info['price'],
+                        'stop_loss': cat['stop_loss'],
+                        'risk': cat['risk_level'],
+                        'logic': cat['logic'],
                     })
     
-    focus_stocks.sort(key=lambda x: x['change'], reverse=True)
+    strong_stocks.sort(key=lambda x: x['change'], reverse=True)
+    pullback_stocks.sort(key=lambda x: x['change'])  # 跌幅大的排前面
     
     # 明日操作建议
     if avg_change > 1:
@@ -390,8 +409,8 @@ def afternoon_analysis():
     else:
         tomorrow_advice = "**谨慎信号：** 明日观望为主，等待企稳"
     
-    # 生成尾盘分析
-    content = f"""# A股尾盘分析 — {today} 14:40
+    # 生成尾盘分析（含推荐）
+    content = f"""# A股尾盘推荐 — {today} 14:45
 
 > 📊 盘中子Agent | 生成时间: {datetime.now().strftime('%H:%M:%S')}
 
@@ -427,26 +446,30 @@ def afternoon_analysis():
     
     content += f"""
 
-## 三、异动个股
+## 三、尾盘股票推荐
 
 """
     
-    if focus_stocks:
-        content += "| 股票 | 代码 | 板块 | 收盘涨幅 | 操作建议 |\n"
-        content += "|:----:|:----:|:----:|:--------:|:----:|\n"
-        
-        for s in focus_stocks[:8]:
-            emoji = "🔴" if s['change'] > 0 else "🟢"
-            if s['change'] > 5:
-                advice = "⚠️ 明日高开需谨慎"
-            elif s['change'] > 0:
-                advice = "✅ 继续持有"
-            else:
-                advice = f"📝 止损位: {s['stop_loss']}"
-            
-            content += f"| {get_sector_emoji(s['name'])}{s['name']} | {s['code']} | {s['category']} | {emoji} {s['change']:+.2f}% | {advice} |\n"
-    else:
-        content += "今日无明显异动个股\n"
+    if strong_stocks:
+        content += "**🚀 强势股（涨幅>2%且强于大盘）**\n"
+        content += "| 股票 | 代码 | 涨跌幅 | 强弱 | 板块 | 止损 |\n"
+        content += "|:----:|:----:|:--------:|:----:|:----:|:----:|\n"
+        for s in strong_stocks[:8]:
+            emoji = "🔴"
+            content += f"| {get_sector_emoji(s['name'])}{s['name']} | {s['code']} | {emoji} {s['change']:+.2f}% | {s['rel_change']:+.2f}% | {s['category']} | {s['stop_loss']} |\n"
+        content += "\n"
+    
+    if pullback_stocks:
+        content += "**📉 超跌关注（跌幅>4%且弱于大盘）**\n"
+        content += "| 股票 | 代码 | 涨跌幅 | 强弱 | 板块 | 止损 |\n"
+        content += "|:----:|:----:|:--------:|:----:|:----:|:----:|\n"
+        for s in pullback_stocks[:8]:
+            emoji = "🟢"
+            content += f"| {get_sector_emoji(s['name'])}{s['name']} | {s['code']} | {emoji} {s['change']:+.2f}% | {s['rel_change']:+.2f}% | {s['category']} | {s['stop_loss']} |\n"
+        content += "\n"
+    
+    if not strong_stocks and not pullback_stocks:
+        content += "今日无符合条件个股（涨跌幅未达到筛选标准）\n"
     
     content += f"""
 
@@ -484,7 +507,8 @@ def afternoon_analysis():
         'timestamp': datetime.now().isoformat(),
         'index_data': index_data,
         'sector_perf': sector_perf,
-        'focus_stocks': focus_stocks,
+        'strong_stocks': strong_stocks,
+        'pullback_stocks': pullback_stocks,
         'trend': trend
     })
     
@@ -506,7 +530,7 @@ def run():
     
     if hour == 11 and minute == 28:
         midday_summary()
-    elif hour == 14 and minute == 40:
+    elif hour == 14 and minute == 45:
         afternoon_analysis()
     elif 9 <= hour < 15:
         # 盘中每个30分钟监控一次
