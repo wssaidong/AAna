@@ -1,5 +1,780 @@
 {
   "version": "2.4",
-  "timestamp": "2026-04-21T09:15:34.335174",
-  "prices": {}
+  "timestamp": "2026-04-21T09:35:03.636956",
+  "prices": {
+    "300533": {
+      "code": "300533",
+      "name": "冰川网络",
+      "price": 27.63,
+      "change_pct": 8.437990580847718,
+      "amount": 1699104280200.0,
+      "yesterday_close": 25.48,
+      "category": "high_rise",
+      "signals": [],
+      "tech_score": 52,
+      "fund_score": 53,
+      "综合评分": 52,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐ 不推荐",
+      "emoji": "📊"
+    },
+    "002361": {
+      "code": "002361",
+      "name": "神剑股份",
+      "price": 22.27,
+      "change_pct": 7.949587978671841,
+      "amount": 19665657431100.0,
+      "yesterday_close": 20.63,
+      "category": "high_rise",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "603778": {
+      "code": "603778",
+      "name": "国晟科技",
+      "price": 28.68,
+      "change_pct": 7.496251874062969,
+      "amount": 6974456280000.0,
+      "yesterday_close": 26.68,
+      "category": "high_rise",
+      "signals": [
+        "MACD金叉"
+      ],
+      "tech_score": 62,
+      "fund_score": 52,
+      "综合评分": 57,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "001268": {
+      "code": "001268",
+      "name": "联合精密",
+      "price": 36.19,
+      "change_pct": 7.039337474120069,
+      "amount": 380689550000.0,
+      "yesterday_close": 33.81,
+      "category": "high_rise",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 67,
+      "fund_score": 50,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "301366": {
+      "code": "301366",
+      "name": "一博科技",
+      "price": 38.67,
+      "change_pct": 6.823204419889499,
+      "amount": 701598087600.0,
+      "yesterday_close": 36.2,
+      "category": "high_rise",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "002557": {
+      "code": "002557",
+      "name": "洽洽食品",
+      "price": 25.27,
+      "change_pct": 6.714527027027027,
+      "amount": 3197125323300.0,
+      "yesterday_close": 23.68,
+      "category": "high_rise",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "003018": {
+      "code": "003018",
+      "name": "金富科技",
+      "price": 45.92,
+      "change_pct": 6.444135373203526,
+      "amount": 2395309059800.0,
+      "yesterday_close": 43.14,
+      "category": "high_rise",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 67,
+      "fund_score": 50,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "603826": {
+      "code": "603826",
+      "name": "坤彩科技",
+      "price": 35.34,
+      "change_pct": 6.253758268190035,
+      "amount": 850586590000.0,
+      "yesterday_close": 33.26,
+      "category": "high_rise",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 67,
+      "fund_score": 52,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "300540": {
+      "code": "300540",
+      "name": "蜀道装备",
+      "price": 28.3,
+      "change_pct": 6.231231231231232,
+      "amount": 3815056608200.0,
+      "yesterday_close": 26.64,
+      "category": "high_rise",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "002957": {
+      "code": "002957",
+      "name": "科瑞技术",
+      "price": 51.0,
+      "change_pct": 6.338615512927438,
+      "amount": 3626243453000.0,
+      "yesterday_close": 47.96,
+      "category": "high_rise",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "603130": {
+      "code": "603130",
+      "name": "云中马",
+      "price": 47.16,
+      "change_pct": 6.025179856115108,
+      "amount": 743859740000.0,
+      "yesterday_close": 44.48,
+      "category": "active",
+      "signals": [],
+      "tech_score": 52,
+      "fund_score": 52,
+      "综合评分": 51,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐ 不推荐",
+      "emoji": "📊"
+    },
+    "605020": {
+      "code": "605020",
+      "name": "永和股份",
+      "price": 27.63,
+      "change_pct": 5.53857906799083,
+      "amount": 1307523120000.0,
+      "yesterday_close": 26.18,
+      "category": "active",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 67,
+      "fund_score": 52,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "002466": {
+      "code": "002466",
+      "name": "天齐锂业",
+      "price": 70.3,
+      "change_pct": 5.208021550434008,
+      "amount": 16922014685000.0,
+      "yesterday_close": 66.82,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301512": {
+      "code": "301512",
+      "name": "智信精密",
+      "price": 50.06,
+      "change_pct": 5.456077522645889,
+      "amount": 419912973500.0,
+      "yesterday_close": 47.47,
+      "category": "active",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 67,
+      "fund_score": 53,
+      "综合评分": 61,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "301290": {
+      "code": "301290",
+      "name": "东星医疗",
+      "price": 29.6,
+      "change_pct": 5.263157894736843,
+      "amount": 330125190000.0,
+      "yesterday_close": 28.12,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 77,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301055": {
+      "code": "301055",
+      "name": "张小泉",
+      "price": 32.63,
+      "change_pct": 4.416000000000008,
+      "amount": 711758332500.0,
+      "yesterday_close": 31.25,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "603699": {
+      "code": "603699",
+      "name": "纽威股份",
+      "price": 58.88,
+      "change_pct": 4.545454545454549,
+      "amount": 1311438670000.0,
+      "yesterday_close": 56.32,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301587": {
+      "code": "301587",
+      "name": "中瑞股份",
+      "price": 28.95,
+      "change_pct": 4.512635379061372,
+      "amount": 533784221599.99994,
+      "yesterday_close": 27.7,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "600520": {
+      "code": "600520",
+      "name": "三佳科技",
+      "price": 28.98,
+      "change_pct": 4.507753335737468,
+      "amount": 661730320000.0,
+      "yesterday_close": 27.73,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "603139": {
+      "code": "603139",
+      "name": "康惠股份",
+      "price": 33.98,
+      "change_pct": 4.425322679778727,
+      "amount": 457089140000.0,
+      "yesterday_close": 32.54,
+      "category": "active",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 52,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "603738": {
+      "code": "603738",
+      "name": "泰晶科技",
+      "price": 32.88,
+      "change_pct": 4.314720812182751,
+      "amount": 2883821580000.0,
+      "yesterday_close": 31.52,
+      "category": "active",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 52,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "301012": {
+      "code": "301012",
+      "name": "扬电科技",
+      "price": 37.3,
+      "change_pct": 4.277327369303869,
+      "amount": 1628281990800.0002,
+      "yesterday_close": 35.77,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "002938": {
+      "code": "002938",
+      "name": "鹏鼎控股",
+      "price": 68.63,
+      "change_pct": 4.190071352664325,
+      "amount": 3785499189300.0,
+      "yesterday_close": 65.87,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301408": {
+      "code": "301408",
+      "name": "华人健康",
+      "price": 21.55,
+      "change_pct": 3.955619874577908,
+      "amount": 1299572172600.0,
+      "yesterday_close": 20.73,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "600234": {
+      "code": "600234",
+      "name": "科新发展",
+      "price": 22.76,
+      "change_pct": 3.8795070743952595,
+      "amount": 1020061520000.0,
+      "yesterday_close": 21.91,
+      "category": "active",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "300940": {
+      "code": "300940",
+      "name": "南极光",
+      "price": 24.49,
+      "change_pct": 3.8592027141645473,
+      "amount": 314833537500.0,
+      "yesterday_close": 23.58,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 53,
+      "综合评分": 61,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "002991": {
+      "code": "002991",
+      "name": "甘源食品",
+      "price": 53.09,
+      "change_pct": 3.853677621283267,
+      "amount": 274848010000.0,
+      "yesterday_close": 51.12,
+      "category": "potential",
+      "signals": [],
+      "tech_score": 53,
+      "fund_score": 50,
+      "综合评分": 51,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐ 不推荐",
+      "emoji": "📊"
+    },
+    "300936": {
+      "code": "300936",
+      "name": "中英科技",
+      "price": 75.52,
+      "change_pct": 3.579755863393224,
+      "amount": 668968400000.0,
+      "yesterday_close": 72.91,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 53,
+      "综合评分": 61,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "300418": {
+      "code": "300418",
+      "name": "昆仑万维",
+      "price": 56.48,
+      "change_pct": 3.5190615835777024,
+      "amount": 10574518428600.0,
+      "yesterday_close": 54.56,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 53,
+      "综合评分": 61,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "300681": {
+      "code": "300681",
+      "name": "英搏尔",
+      "price": 30.46,
+      "change_pct": 3.5350101971447967,
+      "amount": 1015050344900.0,
+      "yesterday_close": 29.42,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301371": {
+      "code": "301371",
+      "name": "敷尔佳",
+      "price": 25.05,
+      "change_pct": 3.4696406443618337,
+      "amount": 342263155800.0,
+      "yesterday_close": 24.21,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 53,
+      "综合评分": 67,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "603538": {
+      "code": "603538",
+      "name": "美诺华",
+      "price": 53.28,
+      "change_pct": 3.637424625559239,
+      "amount": 3389721550000.0,
+      "yesterday_close": 51.41,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "605365": {
+      "code": "605365",
+      "name": "立达信",
+      "price": 26.0,
+      "change_pct": 3.4208432776451843,
+      "amount": 365637430000.0,
+      "yesterday_close": 25.14,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "301511": {
+      "code": "301511",
+      "name": "德福科技",
+      "price": 54.63,
+      "change_pct": 3.348467650397282,
+      "amount": 1941308036200.0,
+      "yesterday_close": 52.86,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 53,
+      "综合评分": 61,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "002810": {
+      "code": "002810",
+      "name": "山东赫达",
+      "price": 27.1,
+      "change_pct": 3.3956505150705856,
+      "amount": 504245664700.0,
+      "yesterday_close": 26.21,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 50,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "300720": {
+      "code": "300720",
+      "name": "海川智能",
+      "price": 66.11,
+      "change_pct": 3.2484772762767427,
+      "amount": 774077640000.0,
+      "yesterday_close": 64.03,
+      "category": "potential",
+      "signals": [],
+      "tech_score": 53,
+      "fund_score": 53,
+      "综合评分": 52,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐ 不推荐",
+      "emoji": "📊"
+    },
+    "603016": {
+      "code": "603016",
+      "name": "新宏泰",
+      "price": 51.83,
+      "change_pct": 3.2264489145588477,
+      "amount": 342514600000.0,
+      "yesterday_close": 50.21,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 52,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "002875": {
+      "code": "002875",
+      "name": "安奈儿",
+      "price": 23.44,
+      "change_pct": 3.214442976662265,
+      "amount": 404947320000.0,
+      "yesterday_close": 22.71,
+      "category": "potential",
+      "signals": [
+        "MA多头"
+      ],
+      "tech_score": 68,
+      "fund_score": 50,
+      "综合评分": 60,
+      "风险等级": "🟡 中高风险",
+      "止损位": "-6%",
+      "评级": "⭐⭐ 观察",
+      "emoji": "📊"
+    },
+    "002866": {
+      "code": "002866",
+      "name": "传艺科技",
+      "price": 27.47,
+      "change_pct": 3.1543372136687937,
+      "amount": 1960671280000.0,
+      "yesterday_close": 26.63,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    },
+    "001368": {
+      "code": "001368",
+      "name": "通达创智",
+      "price": 30.2,
+      "change_pct": 3.1420765027322344,
+      "amount": 157763750000.0,
+      "yesterday_close": 29.28,
+      "category": "potential",
+      "signals": [
+        "MA多头",
+        "MACD金叉"
+      ],
+      "tech_score": 78,
+      "fund_score": 50,
+      "综合评分": 66,
+      "风险等级": "🟡 中风险",
+      "止损位": "-8%",
+      "评级": "⭐⭐⭐ 谨慎推荐",
+      "emoji": "📊"
+    }
+  }
 }
