@@ -189,3 +189,69 @@ def save_report(report_type, content):
     
     print(f"[report] 已保存: {filepath}")
     return filepath
+
+# ============================================
+# 腾讯财经数据源（备用/增强）
+# ============================================
+def get_stock_data_tencent(codes):
+    """使用腾讯财经API获取股票数据（备用）"""
+    import requests
+    
+    results = {}
+    
+    def format_code(code):
+        if code.startswith('6') or code.startswith('9'):
+            return f'sh{code}'
+        return f'sz{code}'
+    
+    if not codes:
+        return results
+    
+    formatted = [format_code(c) for c in codes]
+    url = f'https://qt.gtimg.cn/q={",".join(formatted)}'
+    
+    try:
+        resp = requests.get(url, headers={'Referer': 'https://finance.qq.com'}, timeout=10)
+        resp.encoding = 'gbk'
+        
+        lines = resp.text.strip().split('\n')
+        for i, line in enumerate(lines):
+            if '"' not in line:
+                continue
+            code = codes[i] if i < len(codes) else ''
+            parts = line.split('"')[1].split('~')
+            
+            if len(parts) < 33:
+                results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
+                continue
+            
+            name = parts[1]
+            price = float(parts[3]) if parts[3] else 0
+            yesterday_close = float(parts[4]) if parts[4] else 0
+            change_pct = float(parts[32]) if parts[32] else 0
+            change_amt = float(parts[31]) if parts[31] else 0
+            vol = float(parts[36]) if parts[36] else 0
+            amount = float(parts[37]) if parts[37] else 0
+            high = float(parts[33]) if parts[33] else 0
+            low = float(parts[34]) if parts[34] else 0
+            date_str = parts[30] if len(parts) > 30 else ''
+            
+            results[code] = {
+                'code': code,
+                'name': name,
+                'price': price,
+                'yesterday_close': yesterday_close,
+                'change_pct': change_pct,
+                'change_amt': change_amt,
+                'vol': vol,
+                'amount': amount * 10000,
+                'high': high,
+                'low': low,
+                'date': date_str,
+            }
+    except Exception as e:
+        print(f"[data_utils] 腾讯API失败: {e}")
+        for code in codes:
+            results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
+    
+    return results
