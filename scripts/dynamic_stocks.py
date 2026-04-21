@@ -38,10 +38,12 @@ def filter_stocks(raw_stocks):
         price = float(s.get('trade', 0))
         change_pct = float(s.get('changepercent', 0))
         
-        # 排除新股、北交所、ST
+        # 排除新股、北交所、ST、科创板
         if code.startswith(('N', 'C', 'n', 'c', 'bj', '8', '9')):
             continue
         if name.startswith(('N', 'C', 'n', 'c', '*', 'S')):
+            continue
+        if code.startswith('688'):  # 科创板
             continue
         # 价格/涨幅过滤
         if price < 20 or price > 80:
