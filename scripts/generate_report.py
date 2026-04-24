@@ -692,16 +692,65 @@ def generate_review_report():
         print(f"[AAna] 指数数据获取失败: {e}")
         index_data = {}
 
-    # ===== 板块评级定义 =====
-    stock_pool = {
-        'ai_chip': {'name': 'AI算力/芯片', 'codes': ['300308', '300502', '300223', '300604']},
-        'robot': {'name': '人形机器人', 'codes': ['603667', '300892', '002836', '300503', '002230']},
-        'semi': {'name': '半导体设备', 'codes': ['600703', '002049', '600584']},
-        'energy': {'name': '储能/绿电', 'codes': ['300750', '002594', '002459']},
-        'ai_app': {'name': 'AI应用', 'codes': ['300496', '002415']},
-    }
+    # ===== 从早盘快照获取实际股票池 =====
+    # 选股报告用 dynamic_stocks，选股时已保存完整的 stock_pool 信息到快照
+    # 复盘时直接用快照中实际推荐的股票，不再用硬编码股票池
+    all_review_stocks = []
+    for code, morn in morning_prices.items():
+        curr = current_prices.get(code, {})
+        if not curr or curr.get('price', 0) <= 0:
+            continue
 
-    # ===== 生成复盘内容 =====
+        morn_price = morn.get('price', 0)
+        curr_price = curr.get('price', 0)
+        if morn_price <= 0:
+            continue
+
+        morn_change = morn.get('change_pct', 0)
+        curr_change = curr.get('change_pct', 0)
+        actual_diff = curr_change - morn_change  # 实际涨跌幅变化
+
+        morn_score = morn.get('综合评分', 0)
+        morn_rating = morn.get('评级', '')
+        cat_name = morn.get('category', '')
+        name = curr.get('name', code)
+
+        # 评估预测准确性
+        if abs(actual_diff) < 1:
+            eval_emoji = '✅'
+            eval_text = '预测准确'
+        elif abs(actual_diff) < 3:
+            eval_emoji = '⚠️'
+            eval_text = '小幅偏差'
+        else:
+            eval_emoji = '❌'
+            eval_text = '偏差较大'
+
+        all_review_stocks.append({
+            'name': name,
+            'code': code,
+            'cat_name': cat_name,
+            'morn_price': morn_price,
+            'curr_price': curr_price,
+            'morn_change': morn_change,
+            'curr_change': curr_change,
+            'morn_score': morn_score,
+            'morn_rating': morn_rating,
+            'actual_diff': actual_diff,
+            'eval_emoji': eval_emoji,
+            'eval_text': eval_text,
+        })
+
+    # ===== 生成报告内容 =====
+    index_rows = []
+    for code, name in index_map.items():
+        info = current_prices.get(code, {})
+        price = info.get('price', 0)
+        change = info.get('change_pct', 0)
+        if price > 0:
+            emoji = '🔴' if change > 0 else '🟢'
+            index_rows.append(f"| {name} | - | {price:.2f} | {emoji} {change:+.2f}% |")
+
     content = f"""# AAna每日选股复盘评分 — {today}
 
 > 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}（Asia/Shanghai）
@@ -714,70 +763,12 @@ def generate_review_report():
 | 指标 | 早盘参考 | 今日收盘 | 涨跌幅 |
 |------|---------|---------|--------|
 """
-
-    index_rows = []
-    for code, name in index_map.items():
-        info = current_prices.get(code, {})
-        price = info.get('price', 0)
-        change = info.get('change_pct', 0)
-        if price > 0:
-            emoji = '🔴' if change > 0 else '🟢'
-            index_rows.append(f"| {name} | - | {price} | {emoji} {change:+.2f}% |")
-
     if index_rows:
         content += '\n'.join(index_rows) + '\n'
     else:
         content += '| 数据获取失败 | - | - | - |\n'
 
     content += '\n---\n\n## 二、推荐个股表现复盘\n\n'
-
-    # 收集所有推荐股票
-    all_review_stocks = []
-    for cat_id, cat in stock_pool.items():
-        for code in cat['codes']:
-            morn = morning_prices.get(code, {})
-            curr = current_prices.get(code, {})
-            if not morn or not curr:
-                continue
-
-            morn_price = morn.get('price', 0)
-            curr_price = curr.get('price', 0)
-            if morn_price <= 0 or curr_price <= 0:
-                continue
-
-            morn_change = morn.get('change_pct', 0)
-            curr_change = curr.get('change_pct', 0)
-            actual_diff = curr_change - morn_change  # 实际涨跌幅变化
-
-            morn_score = morn.get('综合评分', 0)
-            morn_rating = morn.get('评级', '')
-            name = curr.get('name', code)
-
-            # 评估预测准确性
-            if abs(actual_diff) < 1:
-                eval_emoji = '✅'
-                eval_text = '预测准确'
-            elif abs(actual_diff) < 3:
-                eval_emoji = '⚠️'
-                eval_text = '小幅偏差'
-            else:
-                eval_emoji = '❌'
-                eval_text = '偏差较大'
-
-            all_review_stocks.append({
-                'name': name,
-                'code': code,
-                'cat_name': cat['name'],
-                'morn_price': morn_price,
-                'curr_price': curr_price,
-                'morn_change': morn_change,
-                'curr_change': curr_change,
-                'morn_score': morn_score,
-                'morn_rating': morn_rating,
-                'actual_diff': actual_diff,
-                'eval_emoji': eval_emoji,
-                'eval_text': eval_text,
-            })
 
     # 按预测评分排序
     all_review_stocks.sort(key=lambda x: x['morn_score'], reverse=True)
