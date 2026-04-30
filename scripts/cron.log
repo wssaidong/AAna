@@ -1086,3 +1086,70 @@ logout success!
 [AAna] 报告已生成: /Users/cai/code/AAna/2026-04-30-选股报告.md
 [AAna] 早盘快照已保存: /Users/cai/code/AAna/.snapshot_2026-04-30_09_00.json
 [AAna] 已推送 GitHub
+[AAna] Git pull: Already up to date.
+[AAna v2.4] 生成 2026-04-30 动态选股报告...
+[AAna] 从新浪财经获取动态股票池...
+[AAna] 获取原始数据: 200 只
+[AAna] 筛选后: 27 只
+[AAna] 动态股票池: 27 只
+[AAna] 获取 27 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 报告已生成: /Users/cai/code/AAna/2026-04-30-选股报告.md
+[AAna] 已推送 GitHub
+[AAna v2.4] 生成 2026-04-30 复盘评分报告...
+[AAna] 获取 23 只股票收盘数据...
+[AAna] 复盘评分报告已生成: /Users/cai/code/AAna/2026-04-30-复盘评分.md
+[AAna] 复盘报告已推送 GitHub
