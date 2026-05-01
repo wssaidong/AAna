@@ -447,3 +447,23 @@
 [report] 已保存: /Users/cai/code/AAna/reports/复盘/2026-04-30_2145_明日策略.md
 [report] 已保存: /Users/cai/code/AAna/reports/复盘/2026-04-30_2145_复盘评分.md
 [git] 已推送: feat: add 2026-04-30 tomorrow strategy and full review (auto)
+[2026-05-01 21:30:00] 🌙 复盘子Agent 启动
+[2026-05-01 21:30:00] ==================================================
+[2026-05-01 21:30:00] 📊 21:30 全天数据汇总
+[2026-05-01 21:30:07] 上涨: 0, 下跌: 0
+[2026-05-01 21:30:00] 🌙 复盘子Agent 启动
+[2026-05-01 21:30:00] ==================================================
+[2026-05-01 21:30:00] 📊 21:30 全天数据汇总
+[data_utils] 新浪API失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-05-01 21:30:07] 上涨: 0, 下跌: 0
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/agents/postmarket_agent.py", line 770, in <module>
+    run()
+  File "/Users/cai/code/AAna/agents/postmarket_agent.py", line 759, in run
+    data_summary()
+  File "/Users/cai/code/AAna/agents/postmarket_agent.py", line 125, in data_summary
+    log(f"最强板块: {sector_summary[0]['name'] if sector_summary else 'N/A'} {sector_summary[0]['avg_change']:+.2f}%")
+IndexError: list index out of range
+[2026-05-01 21:35:00] 🌙 复盘子Agent 启动
+[2026-05-01 21:35:00] ==================================================
+[2026-05-01 21:35:00] 📈 21:35 策略有效性分析
