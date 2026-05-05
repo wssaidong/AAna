@@ -182,6 +182,12 @@ def pre_market_briefing():
     # 按涨幅排序
     hot_sectors.sort(key=lambda x: x['avg_change'], reverse=True)
     
+    # 创建反向映射：板块名 -> 代码列表
+    STOCK_POOL_inv = {}
+    for cat_id, cat in STOCK_POOL.items():
+        for code in cat['codes']:
+            STOCK_POOL_inv.setdefault(cat['name'], []).append(code)
+
     # 生成简报
     content = f"""# A股盘前简报 — {today} 08:30
 
@@ -259,13 +265,6 @@ def pre_market_briefing():
 
 *🦞 AAna 盘前简报 v1.0 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
 """
-    
-    # 临时：创建反向映射
-    global STOCK_POOL_inv
-    STOCK_POOL_inv = {}
-    for cat_id, cat in STOCK_POOL.items():
-        for code in cat['codes']:
-            STOCK_POOL_inv.setdefault(cat['name'], []).append(code)
     
     filepath = save_report('早盘简报', content)
     
