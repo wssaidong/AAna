@@ -34,12 +34,13 @@ def get_yesterday_str():
     return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
 def get_report_filename(report_type='选股报告'):
-    return f"{REPORT_DIR}/{get_today_str()}-{report_type}.md"
+    today = get_today_str()
+    return f"{REPORT_DIR}/{today}/{today}_{report_type}.md"
 
 def get_morning_snapshot_filename():
     """获取今日早盘快照文件名（9:00AM生成）"""
     today = get_today_str()
-    return f"{REPORT_DIR}/.snapshot_{today}_09_00.json"
+    return f"{REPORT_DIR}/{today}/.snapshot_{today}_09_00.json"
 
 def save_morning_snapshot(prices):
     """保存早盘快照（9:00AM），用于收盘后复盘对比"""
@@ -619,6 +620,7 @@ def generate_report():
 """
     
     # 保存报告
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding="utf-8") as f:
         f.write(content)
     
@@ -788,6 +790,7 @@ def generate_review_report():
     content += f"""\n**命中率：{hit_count}/{total} ({hit_rate:.0f}%）**\n\n---\n\n## 三、综合评分\n\n| 评估项 | 结果 |\n|:------:|:----:|\n| 大盘方向 | {'预测正确' if index_rows and float(index_rows[0].split('|')[3].split()[0].replace('🔴','').replace('🟢','').replace(' ','')) > 0 else '待观察'} |\n| 个股命中率 | {hit_count}/{total} ({hit_rate:.0f}%) |\n| 报告版本 | AAna v2.4 |\n\n---\n\n*AAna v2.4 复盘评分 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n"""
 
     # 保存报告
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
 

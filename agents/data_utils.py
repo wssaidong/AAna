@@ -177,9 +177,9 @@ def save_report(report_type, content):
     elif report_type == '明日策略':
         subdir = os.path.join(REPORTS_DIR, '复盘')
         filename = f"{today}_21{45}_明日策略.md"
-    else:
-        subdir = REPORTS_DIR
-        filename = f"{today}_{report_type}.md"
+    # 通用报告（选股报告、策略分析、风险评估、周度总结等）：进入日期子目录
+    subdir = os.path.join(REPORTS_DIR, today)
+    filename = f"{today}_{report_type}.md"
     
     os.makedirs(subdir, exist_ok=True)
     filepath = os.path.join(subdir, filename)
