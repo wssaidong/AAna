@@ -2,13 +2,16 @@
 """
 AAna 滚动清理 - 只保留最近7天数据
 清理范围：
-  - state/                 → 只保留最近7天状态文件
-  - reports/               → 各子目录下只保留7天内报告
-  - *.md (根目录)          → 保留根目录的选股/复盘报告
+  - state/                         → 只保留最近7天状态文件
+  - reports/YYYY-MM-DD/{phase}/    → 按新目录规则，删除整个过期日期目录
+  - *.md (根目录)                  → 选股报告、复盘评分等旧格式
+新目录规则（save_report）：
+  reports/YYYY-MM-DD/{phase}/{time}_{type}.md
+  - 盘前/竞价/盘中/复盘
 """
 import os
 import sys
-import glob
+import re
 import logging
 from datetime import datetime, timedelta
 
@@ -26,16 +29,12 @@ def get_cutoff_date():
     return datetime.now() - timedelta(days=KEEP_DAYS)
 
 
-def parse_date_from_filename(filename, patterns):
-    """从文件名中提取日期，返回 datetime 或 None"""
-    basename = os.path.basename(filename)
-    for pattern in patterns:
-        try:
-            dt = datetime.strptime(basename, pattern)
-            return dt
-        except ValueError:
-            continue
-    return None
+def parse_date_from_dirname(dirname):
+    """从目录名提取 YYYY-MM-DD 日期"""
+    try:
+        return datetime.strptime(dirname, '%Y-%m-%d')
+    except ValueError:
+        return None
 
 
 def cleanup_state():
@@ -51,15 +50,7 @@ def cleanup_state():
         if os.path.isdir(fpath):
             continue
 
-        dt = parse_date_from_filename(fname, [
-            'postmarket_summary_%Y-%m-%d.json',
-            'premarket_briefing_%Y-%m-%d.json',
-            'premarket_selfcheck_%Y-%m-%d.json',
-            'close_snapshot_%Y-%m-%d.json',
-            'intraday_monitor_%Y-%m-%d.json',
-            'competitive_quote_%Y-%m-%d.json',
-        ])
-
+        dt = _parse_date_from_state_filename(fname)
         if dt is None:
             log.debug(f"跳过未知格式: {fname}")
             continue
@@ -71,58 +62,111 @@ def cleanup_state():
     return removed
 
 
+def _parse_date_from_state_filename(fname):
+    """从 state 文件名中解析日期"""
+    patterns = [
+        ('postmarket_summary_', '%Y-%m-%d'),
+        ('premarket_briefing_', '%Y-%m-%d'),
+        ('premarket_selfcheck_', '%Y-%m-%d'),
+        ('close_snapshot_', '%Y-%m-%d'),
+        ('intraday_monitor_', '%Y-%m-%d'),
+        ('competitive_quote_', '%Y-%m-%d'),
+    ]
+    for prefix, fmt in patterns:
+        if fname.startswith(prefix):
+            date_str = fname[len(prefix):].replace('.json', '')
+            try:
+                return datetime.strptime(date_str, fmt)
+            except ValueError:
+                return None
+    return None
+
+
 def cleanup_reports():
-    """清理 reports/ 各子目录，只保留7天内报告"""
+    """按新目录规则清理 reports/：
+    - reports/YYYY-MM-DD/    → 整个过期日期目录删除
+    - reports/YYYY-MM-DD/*   → 不再逐文件清理
+    旧格式（reports/复盘/, reports/盘中/ 等扁平结构）也一并清理
+    """
     cutoff = get_cutoff_date()
     removed = []
 
     if not os.path.exists(REPORTS_DIR):
         return removed
 
-    # 日期模式：YYYY-MM-DD 或 YYYY-MM
-    date_patterns = [
-        '%Y-%m-%d_%H%M_%s.md',   # 2026-05-06_2145_复盘评分.md
-        '%Y-%m-%d_%s.md',         # 2026-04-30_风险评估.md
-        '%Y-%m-%d_%s.md',         # 2026-05-05_周度总结.md
-    ]
+    # 1. 新格式：reports/YYYY-MM-DD/ 子目录
+    for dirname in os.listdir(REPORTS_DIR):
+        day_dir = os.path.join(REPORTS_DIR, dirname)
+        if not os.path.isdir(day_dir):
+            # 扁平目录（旧格式）或文件，跳过，由下面 2 处理
+            continue
 
-    # 遍历 reports 下所有子目录
-    for subdir, _, files in os.walk(REPORTS_DIR):
-        for fname in files:
+        dt = parse_date_from_dirname(dirname)
+        if dt is None:
+            # 非日期目录（如 复盘、盘中、盘前、竞价），跳过
+            log.debug(f"跳过非日期目录: {dirname}")
+            continue
+
+        if dt < cutoff:
+            # 删除整个日期目录
+            import shutil
+            shutil.rmtree(day_dir)
+            removed.append(f"reports/{dirname}/")
+            log.debug(f"已删除日期目录: {dirname}/")
+
+    # 2. 旧格式扁平目录清理（复盘、盘中、盘前、竞价）
+    old_flat_dirs = ['复盘', '盘中', '盘前', '竞价', '尾盘']
+    for flat_name in old_flat_dirs:
+        flat_dir = os.path.join(REPORTS_DIR, flat_name)
+        if not os.path.isdir(flat_dir):
+            continue
+
+        for fname in os.listdir(flat_dir):
+            fpath = os.path.join(flat_dir, fname)
+            if os.path.isdir(fpath):
+                continue
             if not fname.endswith('.md'):
                 continue
-            fpath = os.path.join(subdir, fname)
 
-            dt = parse_date_from_filename(fname, [
-                '%Y-%m-%d_%H%M_%s.md',   # 2026-05-06_2145_复盘评分.md
-                '%Y-%m-%d_%s.md',         # 2026-04-30_风险评估.md
-                '%Y-%m-%d_%s.md',         # 2026-05-05_周度总结.md
-            ])
-
-            if dt is None:
-                # 尝试更宽松的解析：从文件名中提取 YYYY-MM-DD
-                import re
-                m = re.search(r'(\d{4}-\d{2}-\d{2})', fname)
-                if m:
-                    try:
-                        dt = datetime.strptime(m.group(1), '%Y-%m-%d')
-                    except ValueError:
-                        log.debug(f"跳过未知格式: {fname}")
-                        continue
-                else:
-                    log.debug(f"跳过无日期文件: {fname}")
-                    continue
+            m = re.search(r'(\d{4}-\d{2}-\d{2})', fname)
+            if not m:
+                log.debug(f"跳过无日期文件: {fname}")
+                continue
+            try:
+                dt = datetime.strptime(m.group(1), '%Y-%m-%d')
+            except ValueError:
+                log.debug(f"日期解析失败: {fname}")
+                continue
 
             if dt < cutoff:
                 os.remove(fpath)
-                rel = fpath.replace(PROJECT_DIR + '/', '')
-                removed.append(rel)
+                removed.append(f"reports/{flat_name}/{fname}")
+
+    # 3. 旧格式扁平 .md 文件（直接在 reports/ 下的 策略分析/风险评估/周度总结）
+    for fname in os.listdir(REPORTS_DIR):
+        fpath = os.path.join(REPORTS_DIR, fname)
+        if os.path.isdir(fpath):
+            continue
+        if not fname.endswith('.md'):
+            continue
+
+        m = re.search(r'(\d{4}-\d{2}-\d{2})', fname)
+        if not m:
+            continue
+        try:
+            dt = datetime.strptime(m.group(1), '%Y-%m-%d')
+        except ValueError:
+            continue
+
+        if dt < cutoff:
+            os.remove(fpath)
+            removed.append(f"reports/{fname}")
 
     return removed
 
 
 def cleanup_root_reports():
-    """清理根目录的选股报告/复盘评分，只保留7天内"""
+    """清理根目录的旧格式选股报告/复盘评分，只保留7天内"""
     cutoff = get_cutoff_date()
     removed = []
 
@@ -131,8 +175,6 @@ def cleanup_root_reports():
             continue
         fpath = os.path.join(PROJECT_DIR, fname)
 
-        # 只处理明显的日期报告文件
-        import re
         m = re.search(r'(\d{4}-\d{2}-\d{2})-(选股报告|复盘评分)\.md', fname)
         if not m:
             continue
@@ -167,7 +209,7 @@ def run():
     all_removed.extend(root_removed)
 
     if all_removed:
-        log.info(f"✅ 已删除 {len(all_removed)} 个过期文件:")
+        log.info(f"✅ 已删除 {len(all_removed)} 个过期文件/目录:")
         for r in sorted(all_removed):
             log.info(f"   - {r}")
     else:
