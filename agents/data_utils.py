@@ -154,39 +154,43 @@ def git_commit_and_push(message, filepath=None):
 # 报告保存
 # ============================================
 def save_report(report_type, content):
-    """保存报告到文件"""
+    """保存报告到文件，按日期和Agent职责分类
+    结构: reports/YYYY-MM-DD/{phase}/{time}_{type}.md
+    - 盘前(07:00-09:28): 早盘简报、竞价推送  → reports/YYYY-MM-DD/盘前/
+    - 盘中(09:30-15:00): 午盘总结、尾盘推荐  → reports/YYYY-MM-DD/盘中/
+    - 复盘(21:00-21:45): 复盘评分、明日策略、策略分析、风险评估 → reports/YYYY-MM-DD/复盘/
+    - 竞价(09:15-09:25): 竞价推送(冗余保留) → reports/YYYY-MM-DD/竞价/
+    """
     from .config import REPORTS_DIR
     today = get_today_str()
     time_str = get_time_str().replace(':', '')[:-2]  # HHMM
-    
-    if report_type == '早盘简报':
-        subdir = os.path.join(REPORTS_DIR, '盘前')
-        filename = f"{today}_{time_str}_早盘简报.md"
-    elif report_type == '竞价推送':
-        subdir = os.path.join(REPORTS_DIR, '竞价')
-        filename = f"{today}_09{25}_竞价推送.md"
-    elif report_type == '午盘总结':
-        subdir = os.path.join(REPORTS_DIR, '盘中')
-        filename = f"{today}_11{28}_午盘总结.md"
-    elif report_type == '尾盘分析':
-        subdir = os.path.join(REPORTS_DIR, '盘中')
-        filename = f"{today}_14_45_尾盘推荐.md"
-    elif report_type == '复盘评分':
-        subdir = os.path.join(REPORTS_DIR, '复盘')
-        filename = f"{today}_21{45}_复盘评分.md"
-    elif report_type == '明日策略':
-        subdir = os.path.join(REPORTS_DIR, '复盘')
-        filename = f"{today}_21{45}_明日策略.md"
-    else:
-        subdir = REPORTS_DIR
-        filename = f"{today}_{report_type}.md"
-    
+
+    # 按报告类型映射到 phase 子目录
+    phase_map = {
+        '早盘简报':    '盘前',
+        '竞价推送':    '竞价',
+        '午盘总结':    '盘中',
+        '尾盘推荐':    '盘中',
+        '尾盘分析':    '盘中',
+        '复盘评分':    '复盘',
+        '明日策略':    '复盘',
+        '策略分析':    '复盘',
+        '风险评估':    '复盘',
+    }
+    phase = phase_map.get(report_type, '杂项')
+
+    # 构建路径: reports/YYYY-MM-DD/{phase}/
+    day_dir = os.path.join(REPORTS_DIR, today)
+    subdir = os.path.join(day_dir, phase)
     os.makedirs(subdir, exist_ok=True)
+
+    # 文件名保留时间戳便于追溯
+    filename = f"{today}_{time_str}_{report_type}.md"
     filepath = os.path.join(subdir, filename)
-    
+
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(content)
-    
+
     print(f"[report] 已保存: {filepath}")
     return filepath
 
