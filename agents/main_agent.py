@@ -11,10 +11,10 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.expanduser('~/code/AAna'))
 
 from datetime import datetime
-from agents.config import get_today_str, is_trading_day
+from agents.config import REPORTS_DIR, get_today_str, is_trading_day
 from agents.data_utils import git_commit_and_push
 
-LOG_FILE = os.path.expanduser('~/code/AAna/reports/main_agent.log')
+LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), 'main_agent.log')
 
 def log(msg):
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

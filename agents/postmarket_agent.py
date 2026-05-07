@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.expanduser('~/code/AAna'))
 
 from datetime import datetime
 from agents.config import (
-    PROJECT_DIR, STOCK_POOL, INDEX_CODES, get_today_str, get_time_str,
+    PROJECT_DIR, REPORTS_DIR, STOCK_POOL, INDEX_CODES, get_today_str, get_time_str,
     is_trading_day
 )
 from agents.data_utils import (
@@ -26,7 +26,7 @@ from agents.data_utils import (
     git_commit_and_push, save_report
 )
 
-LOG_FILE = os.path.expanduser('~/code/AAna/reports/复盘/postmarket.log')
+LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), '复盘', 'postmarket.log')
 
 def log(msg):
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
