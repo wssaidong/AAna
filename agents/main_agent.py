@@ -54,6 +54,10 @@ def run():
         log("复盘阶段，触发复盘子Agent")
         from agents.postmarket_agent import run as postmarket_run
         postmarket_run()
+        # 复盘结束后滚动清理旧数据
+        log("🧹 开始滚动清理...")
+        from agents.cleanup import run as cleanup_run
+        cleanup_run()
     else:
         log("非活跃时段，无需执行")
 
