@@ -19,7 +19,7 @@ from datetime import datetime
 import requests
 
 PROJECT_DIR = os.path.expanduser("~/code/AAna")
-REPORT_DIR = os.path.expanduser("~/code/AAna")
+REPORT_DIR = os.path.expanduser("~/code/AAna/reports")
 
 def get_today_str():
     now = datetime.now()
