@@ -1,0 +1,147 @@
+{
+  "timestamp": "2026-05-11T14:45:00.357003",
+  "data": {
+    "timestamp": "2026-05-11T14:45:00.356291",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 11.28,
+        "change": -0.1769911504424898
+      },
+      {
+        "name": "深证成指",
+        "price": 15878.181,
+        "change": 2.019969805568654
+      },
+      {
+        "name": "创业板指",
+        "price": 3922.547,
+        "change": 3.3302090972696354
+      },
+      {
+        "name": "科创50",
+        "price": 43.82,
+        "change": -3.692307692307692
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "AI算力/芯片",
+        "avg_change": 9.107452824240713,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "半导体设备",
+        "avg_change": 6.811543004446648,
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "储能/绿电",
+        "avg_change": 1.0359731764896403,
+        "logic": "碳中和+装机旺季"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": 0.693425625816601,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": -0.23547841026806396,
+        "logic": "端侧AI+智能汽车"
+      }
+    ],
+    "strong_stocks": [
+      {
+        "name": "长川科技",
+        "code": "300604",
+        "category": "AI算力/芯片",
+        "change": 19.998901159276965,
+        "rel_change": 19.628681144254937,
+        "price": 218.41,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "change": 10.009852216748765,
+        "rel_change": 9.639632201726739,
+        "price": 55.83,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "北京君正",
+        "code": "300223",
+        "category": "AI算力/芯片",
+        "change": 8.933373170002994,
+        "rel_change": 8.563153154980968,
+        "price": 145.84,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "半导体设备",
+        "change": 5.778179937952429,
+        "rel_change": 5.407959922930402,
+        "price": 81.83,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "中际旭创",
+        "code": "300308",
+        "category": "AI算力/芯片",
+        "change": 5.509029345372454,
+        "rel_change": 5.138809330350427,
+        "price": 934.81,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "昊志机电",
+        "code": "300503",
+        "category": "人形机器人",
+        "change": 5.2124397722295335,
+        "rel_change": 4.8422197572075065,
+        "price": 72.06,
+        "stop_loss": "-5%",
+        "risk": "高",
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "change": 4.646596858638749,
+        "rel_change": 4.276376843616722,
+        "price": 15.99,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "宁德时代",
+        "code": "300750",
+        "category": "储能/绿电",
+        "change": 2.329519450800917,
+        "rel_change": 1.95929943577889,
+        "price": 447.18,
+        "stop_loss": "-8%",
+        "risk": "中",
+        "logic": "碳中和+装机旺季"
+      }
+    ],
+    "pullback_stocks": [],
+    "trend": "➡️ 尾盘横盘整理"
+  }
+}
