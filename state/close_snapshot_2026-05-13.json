@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-05-13T14:45:00.595091",
+  "data": {
+    "timestamp": "2026-05-13T14:45:00.594703",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 11.16,
+        "change": -0.7999999999999988
+      },
+      {
+        "name": "深证成指",
+        "price": 16096.455,
+        "change": 1.7158632261102578
+      },
+      {
+        "name": "创业板指",
+        "price": 4041.561,
+        "change": 2.7111105237717443
+      },
+      {
+        "name": "科创50",
+        "price": 41.15,
+        "change": -3.335682405449851
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "AI算力/芯片",
+        "avg_change": 4.2262051793179864,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "半导体设备",
+        "avg_change": 2.566947510637194,
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": 1.1058070589557607,
+        "logic": "端侧AI+智能汽车"
+      },
+      {
+        "name": "储能/绿电",
+        "avg_change": 0.24750914583214687,
+        "logic": "碳中和+装机旺季"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": 0.04169443242191706,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      }
+    ],
+    "strong_stocks": [
+      {
+        "name": "新易盛",
+        "code": "300502",
+        "category": "AI算力/芯片",
+        "change": 6.244514953081753,
+        "rel_change": 6.1716921169737144,
+        "price": 629.52,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "长川科技",
+        "code": "300604",
+        "category": "AI算力/芯片",
+        "change": 6.1901633189412415,
+        "rel_change": 6.117340482833203,
+        "price": 226.27,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "change": 4.254163649529329,
+        "rel_change": 4.181340813421291,
+        "price": 57.59,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "中际旭创",
+        "code": "300308",
+        "category": "AI算力/芯片",
+        "change": 3.203371349423855,
+        "rel_change": 3.1305485133158166,
+        "price": 1050.6,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "半导体设备",
+        "change": 3.028018595300913,
+        "rel_change": 2.9551957591928746,
+        "price": 82.0,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "中科创达",
+        "code": "300496",
+        "category": "AI应用",
+        "change": 2.4430955993930183,
+        "rel_change": 2.37027276328498,
+        "price": 67.51,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "端侧AI+智能汽车"
+      }
+    ],
+    "pullback_stocks": [],
+    "trend": "➡️ 尾盘横盘整理"
+  }
+}
