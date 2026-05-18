@@ -27,6 +27,7 @@ from agents.data_utils import (
     format_price, format_change, save_state, load_state,
     git_commit_and_push, save_report, get_ths_hot, get_industry_ranking,
 )
+from analysis_tools.recommendation_tracker import save_recommendation
 
 LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), '盘前', 'premarket.log')
 
@@ -324,6 +325,43 @@ def pre_market_briefing():
         'hot_sectors': [(s['name'], s['avg_change']) for s in hot_sectors],
         'avg_index_change': avg_change
     })
+    
+    # ── 推荐记录写入追踪系统 ──
+    recommended_stocks = []
+    for sector in hot_sectors[:3]:  # 重点关注前3板块
+        for code in STOCK_POOL_inv.get(sector['name'], []):
+            info = prices.get(code, {})
+            if info.get('price', 0) > 0 and -5 <= info['change_pct'] <= 8:
+                expected_high = 5.0 if info['change_pct'] >= 0 else 1.0
+                expected_low = 1.0 if info['change_pct'] >= 0 else -3.0
+                recommended_stocks.append({
+                    "code": code,
+                    "name": info['name'],
+                    "sector": next((k for k, v in STOCK_POOL.items() if v['name'] == sector['name']), "unknown"),
+                    "sector_name": sector['name'],
+                    "reason": next((v['logic'] for k, v in STOCK_POOL.items() if v['name'] == sector['name']), ""),
+                    "expected_change": f"{expected_low:+.0f}~{expected_high:+.0f}%",
+                    "expected_high": expected_high,
+                    "expected_low": expected_low,
+                })
+    # 去重（同一股票多板块出现）
+    seen = set()
+    unique_recs = []
+    for r in recommended_stocks:
+        if r['code'] not in seen:
+            seen.add(r['code'])
+            unique_recs.append(r)
+    recommended_stocks = unique_recs
+    
+    save_recommendation(
+        date_str=today,
+        recommended_stocks=recommended_stocks,
+        market_prediction=f"{sentiment} {advice}",
+        focus_sectors=[s['name'] for s in hot_sectors[:3]],
+        sentiment=sentiment,
+    )
+    log(f"推荐记录已写入: {len(recommended_stocks)} 只股票")
+    # ── 推荐记录写入完毕 ──
     
     # Git
     git_commit_and_push(f"feat: add {today} pre-market briefing (auto)")

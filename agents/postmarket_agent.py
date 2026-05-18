@@ -25,6 +25,9 @@ from agents.data_utils import (
     format_price, format_change, save_state, load_state,
     git_commit_and_push, save_report
 )
+from analysis_tools.recommendation_tracker import (
+    evaluate_recommendations, update_stock_stats, generate_corrections,
+)
 
 LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), '复盘', 'postmarket.log')
 
@@ -112,7 +115,12 @@ def data_summary():
         'sector_summary': sector_summary,
         'top_stocks': all_stocks[:10],
         'bottom_stocks': all_stocks[-5:],
-        'total_count': len(all_stocks)
+        'total_count': len(all_stocks),
+        # 实际收盘价（供复盘评估用）
+        'actual_prices': {
+            code: {'close': info['price'], 'change_pct': info['change_pct'], 'name': info['name']}
+            for code, info in prices.items() if info.get('price', 0) > 0
+        }
     }
     
     save_state('postmarket_summary', summary_data)
@@ -218,32 +226,61 @@ def strategy_analysis():
             hit = "✅" if s['avg_change'] > 0 else "❌"
             content += f"| {s['name']} | {'强势' if s['avg_change'] > 1 else '震荡'} | {s['avg_change']:+.2f}% | {hit} |\n"
     
-    content += f"""
+# ── 推荐评估（新增追踪系统） ──
+    eval_result = evaluate_recommendations(today, data.get('actual_prices', {}))
+    if "error" not in eval_result:
+        stats = eval_result["stats"]
+        hit_rate = stats.get("hit_rate", 0)
+        # 合并到 market_score
+        rec_score = int(hit_rate)
+        market_score = (market_score * 0.7 + rec_score * 0.3)
+        log(f"推荐命中率: {hit_rate:.0f}% ({stats['hits']}/{stats['total']})")
+        # 更新个股/板块历史统计
+        update_stock_stats(today, eval_result)
+        rec_part = f"""
+### 个股命中率（推荐追踪系统）
 
-### 个股命中率
+| 指标 | 数值 |
+|:----:|:----:|
+| 推荐总数 | {stats['total']} |
+| 符合预期 | {stats['hits']} |
+| 超预期 | {stats['beat_expected']} |
+| 偏离预期 | {stats['miss_expected']} |
+| **命中率** | **{hit_rate:.0f}%** |
 
 """
-    
-    # 计算个股预测准确率
-    if top_stocks:
-        # 早盘推荐且收盘上涨的
-        recommended_up = [s for s in top_stocks if s['change'] > 0]
-        accuracy = len(recommended_up) / len(top_stocks) * 100 if top_stocks else 0
-        
-        content += f"| 指标 | 数值 |\n"
-        content += f"|:----:|:----:|\n"
-        content += f"| 推荐上涨 | {len(recommended_up)}/{len(top_stocks)} |\n"
-        content += f"| 命中率 | {accuracy:.0f}% |\n"
-    
+    else:
+        log(f"推荐评估: {eval_result.get('error')}")
+        rec_part = """
+### 个股命中率
+
+> 今日无推荐记录（或记录文件不存在）
+
+"""
+    content += rec_part
+
+    # ── 修正建议 ──
+    corrections_result = generate_corrections(today, eval_result)
+    corrections = corrections_result.get("corrections", [])
+    log(f"修正建议: {len(corrections)} 条")
+
     content += f"""
 
 ---
 
 ## 三、策略有效性总结
 
-**今日策略评分: {market_score}/100**
+**今日策略评分: {market_score:.0f}/100**
 
-| 等级 | 分数范围 | 说明 |
+"""
+
+    if corrections:
+        content += "### 修正建议\n\n"
+        for c in corrections:
+            content += f"**{c['type']}** {c['target']}\n> {c['issue']}\n> 操作: {c['action']}\n\n"
+
+    content += f"""
+|| 等级 | 分数范围 | 说明 |
 |:----:|:--------:|:----:|
 | 🏆 优秀 | 80-100 | 策略精准，有效规避风险 |
 | ✅ 良好 | 60-79 | 策略基本准确，可继续执行 |
@@ -254,7 +291,7 @@ def strategy_analysis():
 
 ---
 
-*📈 AAna 策略分析 v1.0 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+*📈 AAna 策略分析 v2.0 (推荐追踪系统) | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
 """
     
     filepath = save_report('策略分析', content)

@@ -40,17 +40,43 @@ def real_time_monitor():
     """实时监控（09:30-15:00定时检查）"""
     log("="*50)
     log("👁️ 盘中实时监控")
-    
+
     all_codes = get_all_codes()
-    prices = get_stock_data_sina(all_codes)
-    
+
+    # 优先用增强行情（腾讯，含PE/PB/涨跌停）
+    prices_enh = get_enhanced_quotes(all_codes)
+
+    # 降级到新浪实时价格（价格/涨跌幅实时性更强）
+    prices_sina = get_stock_data_sina(all_codes)
+
+    # 融合：价格用新浪（实时），估值用腾讯（含PE/PB/涨跌停）
+    prices = {}
+    for code in all_codes:
+        enh = prices_enh.get(code, {})
+        sn = prices_sina.get(code, {})
+        prices[code] = {
+            'name': enh.get('name') or sn.get('name', ''),
+            'price': sn.get('price') or enh.get('price', 0),
+            'change_pct': sn.get('change_pct') or enh.get('change_pct', 0),
+            'yesterday_close': sn.get('yesterday_close') or enh.get('yesterday_close'),
+            'open': sn.get('open') or enh.get('open'),
+            'high': sn.get('high') or enh.get('high'),
+            'low': sn.get('low') or enh.get('low'),
+            'amount': sn.get('amount') or enh.get('amount', 0),
+            'pe_ttm': enh.get('pe_ttm'),
+            'pb': enh.get('pb'),
+            'mcap_yi': enh.get('mcap_yi'),
+            'limit_up': enh.get('limit_up'),
+            'limit_down': enh.get('limit_down'),
+        }
+
     # 检查指数
     index_changes = {}
     for code, name in INDEX_CODES.items():
         info = prices.get(code, {})
         if info.get('price', 0) > 0:
             index_changes[code] = info['change_pct']
-    
+
     # 大盘状态
     if index_changes:
         avg_change = sum(index_changes.values()) / len(index_changes)
@@ -67,51 +93,77 @@ def real_time_monitor():
     else:
         status = "⚠️ 数据异常"
         avg_change = 0
-    
-    # 个股异动检测
+
+    # 个股异动检测（含涨跌停检测）
     alerts = []
     for cat_id, cat in STOCK_POOL.items():
         for code in cat['codes']:
             info = prices.get(code, {})
             if info.get('price', 0) > 0:
                 change = info['change_pct']
-                
-                # 异动条件
+                price = info['price']
+                limit_up = info.get('limit_up')
+                limit_down = info.get('limit_down')
+
+                # 涨跌停检测（精确匹配涨停价/跌停价）
+                if limit_up and limit_down:
+                    if abs(price - limit_up) < 0.01:
+                        alerts.append({
+                            'type': 'limit_up',
+                            'name': info['name'],
+                            'code': code,
+                            'change': change,
+                            'category': cat['name'],
+                            'msg': f'涨停！({limit_up})'
+                        })
+                        continue
+                    elif abs(price - limit_down) < 0.01:
+                        alerts.append({
+                            'type': 'limit_down',
+                            'name': info['name'],
+                            'code': code,
+                            'change': change,
+                            'category': cat['name'],
+                            'msg': f'跌停！({limit_down})'
+                        })
+                        continue
+
+                # 软阈值异动
                 if change > 9:
-                    alerts.append({
-                        'type': 'limit_up',
-                        'name': info['name'],
-                        'code': code,
-                        'change': change,
-                        'category': cat['name'],
-                        'msg': '涨停！注意获利了结风险'
-                    })
-                elif change < -9:
-                    alerts.append({
-                        'type': 'limit_down',
-                        'name': info['name'],
-                        'code': code,
-                        'change': change,
-                        'category': cat['name'],
-                        'msg': '跌停！谨慎抄底'
-                    })
-                elif change > 7:
                     alerts.append({
                         'type': 'surge',
                         'name': info['name'],
                         'code': code,
                         'change': change,
                         'category': cat['name'],
-                        'msg': '大涨，追高谨慎'
+                        'msg': '大涨！注意追高风险'
                     })
-                elif change < -7:
+                elif change < -9:
                     alerts.append({
                         'type': 'drop',
                         'name': info['name'],
                         'code': code,
                         'change': change,
                         'category': cat['name'],
-                        'msg': '大跌，留意止损'
+                        'msg': '大跌！留意止损'
+                    })
+                elif change > 7:
+                    alerts.append({
+                        'type': 'hot',
+                        'name': info['name'],
+                        'code': code,
+                        'change': change,
+                        'category': cat['name'],
+                        'msg': '强势拉升'
+                    })
+                elif change < -7:
+                    alerts.append({
+                        'type': 'weak',
+                        'name': info['name'],
+                        'code': code,
+                        'change': change,
+                        'category': cat['name'],
+                        'msg': '走弱，注意风险'
                     })
     
     # 按异动程度排序
