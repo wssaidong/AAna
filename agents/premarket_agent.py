@@ -25,7 +25,7 @@ from agents.config import (
 from agents.data_utils import (
     get_stock_data_sina, get_all_codes, get_sector_emoji,
     format_price, format_change, save_state, load_state,
-    git_commit_and_push, save_report
+    git_commit_and_push, save_report, get_ths_hot, get_industry_ranking,
 )
 
 LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), '盘前', 'premarket.log')
@@ -209,7 +209,34 @@ def pre_market_briefing():
 
 ---
 
-## 二、热点板块（按涨幅排序）
+## 二、同花顺热点题材（今日强势股归因）
+
+"""
+    # 同花顺热点题材
+    ths = get_ths_hot()
+    if ths.get('stocks'):
+        tag_freq = ths.get('tag_freq', {})
+        top_tags = sorted(tag_freq.items(), key=lambda x: x[1], reverse=True)[:10]
+        content += "| 题材标签 | 出现次数 | 强势股 |\n"
+        content += "|:--------:|:--------:|:------|\n"
+        for tag, cnt in top_tags:
+            # 找一只该标签的股票
+            sample = next((s for s in ths['stocks'] if tag in s.get('tags', [])), None)
+            stock_name = sample['name'] if sample else ''
+            content += f"| {tag} | ×{cnt} | {stock_name} |\n"
+        # 强势股一览
+        content += f"\n**今日强势股 TOP 8：**\n"
+        content += "| 股票 | 代码 | 涨幅 | 题材 |\n"
+        content += "|:----:|:----:|:----:|:----|\n"
+        for s in ths['stocks'][:8]:
+            content += f"| {s['name']} | {s['code']} | {s.get('zhangfu', 0):+.2f}% | {s['reason'][:30]} |\n"
+    else:
+        content += "（非交易时段或接口不可用，数据将在开盘后更新）\n"
+
+    content += f"""
+---
+
+## 三、热点板块（按涨幅排序）
 
 """
     
@@ -226,11 +253,33 @@ def pre_market_briefing():
         emoji = "🔴" if sector['avg_change'] > 0 else "🟢"
         content += f"| {sector['name']} | {emoji} {sector['avg_change']:+.2f}% | {sector['logic']} |\n"
     
+    # 行业板块对比
+    content += f"""
+---
+
+## 四、行业板块对比（东财100行业排名）
+
+"""
+    ind = get_industry_ranking(5)
+    if ind.get('top'):
+        content += "**涨幅前 5：**\n"
+        content += "| 排名 | 行业 | 涨跌幅 | 上涨数 | 领涨股 |\n"
+        content += "|:----:|:----:|:------:|:------:|:------|\n"
+        for i, s in enumerate(ind['top'][:5], 1):
+            content += f"| {i} | {s['name']} | 🔴{s['change_pct']:+.2f}% | {s['up_count']}只 | {s['leader']}({s['leader_change']:+.2f}%) |\n"
+        content += "\n**跌幅前 5：**\n"
+        content += "| 排名 | 行业 | 涨跌幅 | 上涨数 | 领跌股 |\n"
+        content += "|:----:|:----:|:------:|:------:|:------|\n"
+        for i, s in enumerate(ind['bottom'][:5], 1):
+            content += f"| {i} | {s['name']} | 🟢{s['change_pct']:+.2f}% | {s['up_count']}只 | {s['leader']}({s['leader_change']:+.2f}%) |\n"
+    else:
+        content += "（行业数据将在开盘后更新）\n"
+
     content += f"""
 
 ---
 
-## 三、操作建议
+## 五、操作建议
 
 {'**积极信号：** 可适当布局核心标的' if avg_change > 0 else '**注意风险：** 等待市场企稳'}
 
@@ -248,7 +297,7 @@ def pre_market_briefing():
 
 ---
 
-## 四、今日关注时间点
+## 六、今日关注时间点
 
 | 时间 | 任务 |
 |:----:|:----:|
@@ -263,7 +312,7 @@ def pre_market_briefing():
 
 ---
 
-*🦞 AAna 盘前简报 v1.0 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
+*🦞 AAna 盘前简报 v2.0 (a-stock-data增强) | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*
 """
     
     filepath = save_report('早盘简报', content)

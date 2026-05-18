@@ -14,60 +14,74 @@ from .config import PROJECT_DIR, get_today_str, get_time_str
 # 数据获取
 # ============================================
 def get_stock_data_sina(codes):
-    """使用新浪财经API获取股票数据"""
+    """
+    使用新浪财经API获取股票数据（已修正字段索引）。
+    返回字段：code, name, price(=昨收), yesterday_close(=今开), change_pct, amount
+    """
     import requests
-    
+
     results = {}
-    
+
     def format_code(code):
         if code.startswith('6') or code.startswith('9'):
             return f'sh{code}'
         return f'sz{code}'
-    
+
     if not codes:
         return results
-    
+
     formatted = [format_code(c) for c in codes]
     url = f'http://hq.sinajs.cn/list={",".join(formatted)}'
     headers = {
         'User-Agent': 'Mozilla/5.0',
         'Referer': 'http://finance.sina.com.cn'
     }
-    
+
+    def safe_float(val):
+        if not val or val == '--' or val == '-':
+            return 0.0
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return 0.0
+
     try:
         resp = requests.get(url, headers=headers, timeout=10)
         resp.encoding = 'gbk'
-        
+
         lines = resp.text.strip().split('\n')
         for i, line in enumerate(lines):
             if '=' not in line:
                 continue
             code = codes[i] if i < len(codes) else ''
             parts = line.split('=')[1].strip('";\n ').split(',')
-            
+
             if len(parts) < 10:
                 results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
                 continue
-            
+
             name = parts[0]
-            yesterday_close = float(parts[2]) if parts[2] else 0
-            price = float(parts[3]) if parts[3] else 0
-            change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
-            amount = float(parts[9]) if parts[9] else 0
-            
+            price = safe_float(parts[2])        # parts[2] = 当前价格/今收
+            yesterday_close = safe_float(parts[1])  # parts[1] = 昨日收盘
+            if price > 0 and yesterday_close > 0:
+                change_pct = round((price - yesterday_close) / yesterday_close * 100, 2)
+            else:
+                change_pct = 0
+            amount = safe_float(parts[9]) * 10000
+
             results[code] = {
                 'code': code,
                 'name': name,
                 'price': price,
                 'change_pct': change_pct,
-                'amount': amount * 10000,
+                'amount': amount,
                 'yesterday_close': yesterday_close,
             }
     except Exception as e:
         print(f"[data_utils] 新浪API失败: {e}")
         for code in codes:
             results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
-    
+
     return results
 
 
@@ -195,7 +209,56 @@ def save_report(report_type, content):
     return filepath
 
 # ============================================
-# 腾讯财经数据源（备用/增强）
+# 增强行情（腾讯+同花顺热点）
+# ============================================
+def get_enhanced_quotes(codes):
+    """
+    融合腾讯行情（含PE/PB/市值/涨跌停）和新浪实时价格。
+    返回: {code: {name, price, change_pct, pe_ttm, pb, mcap_yi, limit_up, limit_down, ...}}
+    零 akshare 依赖，直接 HTTP 调用。
+    """
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'analysis_tools'))
+    try:
+        from analysis_tools.data_sources import get_enhanced_quotes as _ds_quotes
+        return _ds_quotes(codes)
+    except Exception as e:
+        print(f"[data_utils] get_enhanced_quotes 失败: {e}")
+        return {}
+
+
+def get_ths_hot(date_str=None):
+    """
+    同花顺当日强势股 + 题材归因。
+    返回: {stocks: [{code, name, reason, zhangfu, huanshou, tags}, ...], total, tag_freq}
+    """
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'analysis_tools'))
+    try:
+        from analysis_tools.data_sources import ths_hot_reason
+        return ths_hot_reason(date_str)
+    except Exception as e:
+        print(f"[data_utils] get_ths_hot 失败: {e}")
+        return {"stocks": [], "total": 0, "tag_freq": {}}
+
+
+def get_industry_ranking(top_n=20):
+    """
+    东财行业板块涨跌幅排名。
+    返回: {top: [...], bottom: [...], total: int}
+    """
+    import sys, os
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'analysis_tools'))
+    try:
+        from analysis_tools.data_sources import industry_comparison
+        return industry_comparison(top_n)
+    except Exception as e:
+        print(f"[data_utils] get_industry_ranking 失败: {e}")
+        return {"top": [], "bottom": [], "total": 0}
+
+
+# ============================================
+# 腾讯财经数据源（备用）
 # ============================================
 def get_stock_data_tencent(codes):
     """使用腾讯财经API获取股票数据（备用）"""
