@@ -580,8 +580,10 @@ def main():
         # 同步到东方财富组合
         if EASTMONEY_ENABLED and top_stocks:
             codes = [s['code'] for s in top_stocks]
+            today_str = datetime.now().strftime("%Y%m%d")
+            group_name = f"pm_{today_str}"
             try:
-                success = eastmoney_portfolio.sync_portfolio_to_eastmoney(codes)
+                success = eastmoney_portfolio.sync_portfolio_to_eastmoney(codes, group_name=group_name)
                 if success:
                     print(f"\n✅ 已同步到东方财富组合")
             except Exception as e:
