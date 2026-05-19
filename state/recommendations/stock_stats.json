@@ -1,0 +1,171 @@
+{
+  "stocks": {
+    "600703": {
+      "name": "三安光电",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.5,
+          "hit": false,
+          "sector": "semi"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002049": {
+      "name": "紫光国微",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 1.01,
+          "hit": true,
+          "sector": "semi"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "600584": {
+      "name": "长电科技",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 2.5,
+          "hit": true,
+          "sector": "semi"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "603667": {
+      "name": "五洲新春",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.02,
+          "hit": false,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300892": {
+      "name": "品渥食品",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.23,
+          "hit": true,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002836": {
+      "name": "新宏泽",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.08,
+          "hit": false,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300503": {
+      "name": "昊志机电",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": -0.23,
+          "hit": false,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002230": {
+      "name": "科大讯飞",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.0,
+          "hit": false,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300750": {
+      "name": "宁德时代",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.33,
+          "hit": false,
+          "sector": "energy"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002594": {
+      "name": "比亚迪",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.0,
+          "hit": false,
+          "sector": "energy"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002459": {
+      "name": "晶澳科技",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "change": 0.0,
+          "hit": false,
+          "sector": "energy"
+        }
+      ],
+      "consecutive_bad": 0
+    }
+  },
+  "sectors": {
+    "semi": {
+      "name": "半导体设备",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "avg_change": 1.3366666666666667,
+          "hit_rate": 66.66666666666666
+        }
+      ]
+    },
+    "energy": {
+      "name": "储能/绿电",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "avg_change": 0.11,
+          "hit_rate": 0.0
+        }
+      ]
+    },
+    "robot": {
+      "name": "人形机器人",
+      "records": [
+        {
+          "date": "2026-05-19",
+          "avg_change": 0.02,
+          "hit_rate": 20.0
+        }
+      ]
+    }
+  },
+  "updated": [
+    "2026-05-19"
+  ]
+}
