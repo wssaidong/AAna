@@ -1,0 +1,230 @@
+{
+  "timestamp": "2026-05-19T09:28:00.365689",
+  "data": {
+    "timestamp": "2026-05-19T09:28:00.364941",
+    "stocks": [
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "price": 58.33,
+        "change": 2.5,
+        "amount": 1680079380000.0,
+        "logic": "AI芯片国产替代+政策驱动",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "北京君正",
+        "code": "300223",
+        "category": "AI算力/芯片",
+        "price": 137.81,
+        "change": 2.32,
+        "amount": 320403720000.0,
+        "logic": "DeepSeek带动算力需求爆发",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "中际旭创",
+        "code": "300308",
+        "category": "AI算力/芯片",
+        "price": 1045.0,
+        "change": 1.85,
+        "amount": 2996248320000.0,
+        "logic": "DeepSeek带动算力需求爆发",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "半导体设备",
+        "price": 78.33,
+        "change": 1.01,
+        "amount": 67856250000.0,
+        "logic": "AI芯片国产替代+政策驱动",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "price": 16.18,
+        "change": 0.5,
+        "amount": 193328800000.0,
+        "logic": "AI芯片国产替代+政策驱动",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "海康威视",
+        "code": "002415",
+        "category": "AI应用",
+        "price": 33.0,
+        "change": 0.46,
+        "amount": 85508550000.0,
+        "logic": "端侧AI+智能汽车",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "长川科技",
+        "code": "300604",
+        "category": "AI算力/芯片",
+        "price": 209.17,
+        "change": 0.33,
+        "amount": 362564110000.0,
+        "logic": "DeepSeek带动算力需求爆发",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "宁德时代",
+        "code": "300750",
+        "category": "储能/绿电",
+        "price": 417.23,
+        "change": 0.33,
+        "amount": 855424020000.0,
+        "logic": "碳中和+装机旺季",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "品渥食品",
+        "code": "300892",
+        "category": "人形机器人",
+        "price": 26.4,
+        "change": 0.23,
+        "amount": 79020000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      },
+      {
+        "name": "新宏泽",
+        "code": "002836",
+        "category": "人形机器人",
+        "price": 12.87,
+        "change": 0.08,
+        "amount": 565840000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      },
+      {
+        "name": "新易盛",
+        "code": "300502",
+        "category": "AI算力/芯片",
+        "price": 599.92,
+        "change": 0.07,
+        "amount": 1255433891000.0,
+        "logic": "DeepSeek带动算力需求爆发",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "五洲新春",
+        "code": "603667",
+        "category": "人形机器人",
+        "price": 85.0,
+        "change": 0.02,
+        "amount": 212110080000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      },
+      {
+        "name": "科大讯飞",
+        "code": "002230",
+        "category": "人形机器人",
+        "price": 48.71,
+        "change": 0.0,
+        "amount": 119924020000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      },
+      {
+        "name": "比亚迪",
+        "code": "002594",
+        "category": "储能/绿电",
+        "price": 94.51,
+        "change": 0.0,
+        "amount": 124495187700.0,
+        "logic": "碳中和+装机旺季",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "晶澳科技",
+        "code": "002459",
+        "category": "储能/绿电",
+        "price": 10.26,
+        "change": 0.0,
+        "amount": 14086980000.0,
+        "logic": "碳中和+装机旺季",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "中科创达",
+        "code": "300496",
+        "category": "AI应用",
+        "price": 67.56,
+        "change": -0.01,
+        "amount": 74448626000.0,
+        "logic": "端侧AI+智能汽车",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "昊志机电",
+        "code": "300503",
+        "category": "人形机器人",
+        "price": 69.93,
+        "change": -0.23,
+        "amount": 38970040000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      }
+    ],
+    "buy_candidates": [
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "price": 16.18,
+        "change": 0.5,
+        "amount": 193328800000.0,
+        "logic": "AI芯片国产替代+政策驱动",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "海康威视",
+        "code": "002415",
+        "category": "AI应用",
+        "price": 33.0,
+        "change": 0.46,
+        "amount": 85508550000.0,
+        "logic": "端侧AI+智能汽车",
+        "stop_loss": "-10%"
+      },
+      {
+        "name": "长川科技",
+        "code": "300604",
+        "category": "AI算力/芯片",
+        "price": 209.17,
+        "change": 0.33,
+        "amount": 362564110000.0,
+        "logic": "DeepSeek带动算力需求爆发",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "宁德时代",
+        "code": "300750",
+        "category": "储能/绿电",
+        "price": 417.23,
+        "change": 0.33,
+        "amount": 855424020000.0,
+        "logic": "碳中和+装机旺季",
+        "stop_loss": "-8%"
+      },
+      {
+        "name": "品渥食品",
+        "code": "300892",
+        "category": "人形机器人",
+        "price": 26.4,
+        "change": 0.23,
+        "amount": 79020000.0,
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "stop_loss": "-5%"
+      }
+    ]
+  }
+}
