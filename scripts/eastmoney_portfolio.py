@@ -1,0 +1,353 @@
+#!/usr/bin/env python3
+"""
+AAna × 东方财富自选股组合管理
+支持：创建组合、添加股票、删除组合（自动滚动保留7天）
+"""
+import os
+import json
+import requests
+import subprocess
+from datetime import datetime, timedelta
+
+# ============================================
+# 配置
+# ============================================
+COOKIE_FILE = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/references/cookie.json")
+COOKIE_FILE_ALT = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/cookie.json")
+BASE_URL = "https://myfavor.eastmoney.com/v4/webouter"
+APPKEY = "e9166c7e9cdfad3aa3fd7d93b757e9b1"
+REFERER = "https://quote.eastmoney.com/zixuan/"
+KEEP_DAYS = 7  # 滚动保留天数
+
+
+# ============================================
+# Cookie 管理
+# ============================================
+def load_cookie():
+    """加载 cookie，自动寻找 cookie 文件"""
+    path = COOKIE_FILE if os.path.exists(COOKIE_FILE) else COOKIE_FILE_ALT
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Cookie 文件不存在: {path}\n请先获取并保存东方财富 cookie")
+    
+    with open(path) as f:
+        data = json.load(f)
+    
+    # 构建完整 cookie 字符串
+    required = ['qgqp_b_id', 'rskey', 'sid', 'st_sn']
+    missing = [k for k in required if k not in data]
+    if missing:
+        raise ValueError(f"Cookie 缺少必要字段: {missing}")
+    
+    # 每次加载时从文件读取最新 st_sn（它会动态增长）
+    cookie_pairs = [
+        ('qgqp_b_id', data['qgqp_b_id']),
+        ('st_nvi', data.get('st_nvi', '')),
+        ('mtp', data.get('mtp', '1')),
+        ('ct', data.get('ct', '')),
+        ('ut', data.get('ut', '')),
+        ('pi', data.get('pi', '')),
+        ('uidal', data.get('uidal', '')),
+        ('sid', data['sid']),
+        ('vtpst', data.get('vtpst', '|')),
+        ('nid18', data.get('nid18', '')),
+        ('gviem', data.get('gviem', '')),
+        ('st_si', data.get('st_si', '')),
+        ('st_asi', data.get('st_asi', 'delete')),
+        ('isoutside', data.get('isoutside', '0')),
+        ('rskey', data['rskey']),
+        ('st_pvi', data.get('st_pvi', '')),
+        ('st_sp', data.get('st_sp', '')),
+        ('st_inirUrl', data.get('st_inirUrl', '')),
+        ('st_sn', str(data['st_sn'])),
+    ]
+    
+    cookie_str = '; '.join(f"{k}={v}" for k, v in cookie_pairs if v)
+    return cookie_str, data
+
+
+def save_cookie(data):
+    """保存 cookie（更新 st_sn）"""
+    path = COOKIE_FILE if os.path.exists(COOKIE_FILE) else COOKIE_FILE_ALT
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def api_call(url):
+    """发送 API 请求，自动处理 st_sn 自增"""
+    cookie_str, cookie_data = load_cookie()
+    
+    # 当前 st_sn
+    current_sn = int(cookie_data.get('st_sn', 1))
+    
+    headers = {
+        'Referer': REFERER,
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/147.0.0.0 Safari/537.36',
+        'Accept': '*/*',
+    }
+    
+    resp = requests.get(url, headers=headers, cookies=dict(p.split('=', 1) for p in cookie_str.split('; ') if '=' in p), timeout=10)
+    
+    # 提取 st_sn（如果响应头或内容中有）
+    # 更新本地 st_sn
+    cookie_data['st_sn'] = current_sn + 1
+    save_cookie(cookie_data)
+    
+    text = resp.text
+    # 去掉 JSONP 包装
+    if '(' in text and ')' in text:
+        text = text[text.index('(')+1:text.rindex(')')]
+    
+    return json.loads(text), cookie_data['st_sn']
+
+
+def mkurl(endpoint, **params):
+    """构建带 appkey 和参数的 URL"""
+    p = f"appkey={APPKEY}"
+    for k, v in params.items():
+        p += f"&{k}={v}"
+    return f"{BASE_URL}/{endpoint}?{p}"
+
+
+# ============================================
+# 组合操作
+# ============================================
+
+def create_group(name):
+    """创建组合，返回 gid"""
+    url = mkurl('ag', gn=name)
+    result, sn = api_call(url)
+    state = result.get('state')
+    if state == 0:
+        gid = result.get('data', {}).get('gid')
+        print(f"[Eastmoney] 创建组合 {name} 成功 gid={gid}")
+        return gid
+    elif state == -131:
+        print(f"[Eastmoney] 组合 {name} 已存在，跳过创建")
+        # 返回已存在的 gid
+        return result.get('data', {}).get('gid')
+    else:
+        print(f"[Eastmoney] 创建组合失败: state={state} msg={result.get('message')}")
+        return None
+
+
+def add_stock(gid, code):
+    """添加单只股票到组合，code 格式: '002484'"""
+    # 判断市场
+    if code.startswith(('0', '2', '3')):  # 深市
+        sc = f"0%24{code}"
+    else:  # 沪市
+        sc = f"1%24{code}"
+    
+    url = mkurl('as', g=gid, sc=sc)
+    result, sn = api_call(url)
+    state = result.get('state')
+    
+    if state == 0:
+        print(f"[Eastmoney] 添加 {code} → gid={gid} 成功")
+        return True
+    elif state == -217:
+        print(f"[Eastmoney] {code} 已在组合中，跳过")
+        return True  # 已存在不算失败
+    else:
+        print(f"[Eastmoney] 添加 {code} 失败: state={state} msg={result.get('message')}")
+        return False
+
+
+def add_stocks(gid, codes):
+    """批量添加股票到组合"""
+    success = 0
+    for code in codes:
+        if add_stock(gid, code):
+            success += 1
+    return success
+
+
+def find_group_gid(target_name):
+    """通过遍历 gid 范围找到指定名称的组合"""
+    for test_gid in range(100, 250):
+        url = mkurl('gstkinfos', g=test_gid)
+        try:
+            result, _ = api_call(url)
+            if result.get('state') == 0:
+                stocks = result.get('data', {}).get('stkinfolist', [])
+                # 如果这个 gid 有股票，认为是有效组合
+                # 但我们无法直接知道组合名称，除非尝试用ag接口查询
+        except:
+            pass
+    return None
+
+
+def find_existing_group_gid():
+    """
+    通过遍历找到已有的 gid 映射
+    返回 {group_name: gid} 的字典
+    目前发现: gid=136 对应日期 20260519（根据 updatetime 推断）
+    """
+    # 尝试添加一个测试股票来探测 gid
+    # 更可靠：维护一个已知映射
+    # 从 groups.json 加载
+    groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
+    if os.path.exists(groups_file):
+        with open(groups_file) as f:
+            history = json.load(f)
+        # 反向映射: name → gid
+        return {info.get('name', name): gid for name, info in history.items() for gid in [info.get('gid')] if gid}
+    return {}
+
+
+def get_or_create_group(group_name):
+    """
+    获取或创建组合，返回 gid
+    策略：
+    1. 尝试创建（如果已存在返回 -131 但无 gid）
+    2. 如果创建失败（-131），遍历 gid 范围找同名组合
+    """
+    url_create = mkurl('ag', gn=group_name)
+    result, sn = api_call(url_create)
+    state = result.get('state')
+    
+    if state == 0:
+        gid = result.get('data', {}).get('gid')
+        print(f"[Eastmoney] 创建组合 {group_name} → gid={gid}")
+        return gid
+    
+    if state == -131:
+        print(f"[Eastmoney] 组合 {group_name} 已存在，正在查找 gid...")
+        # 遍历 gid 范围，找属于这个用户且包含股票的组合
+        # 东方财富 gid 基本是递增的，从 136 开始往后找
+        # 先查 groups.json 是否有记录
+        groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
+        gid_map = {}
+        if os.path.exists(groups_file):
+            with open(groups_file) as f:
+                gid_map = {v['gid']: k for k, v in json.load(f).items() if v.get('gid')}
+        
+        # 从 136 开始往后扫（今日组合gid=136）
+        for test_gid in range(136, 300):
+            if str(test_gid) in gid_map:
+                # groups.json 中有这个gid的记录
+                continue
+            url_check = mkurl('gstkinfos', g=test_gid)
+            try:
+                r, _ = api_call(url_check)
+                if r.get('state') == 0 and r.get('data', {}).get('stkinfolist'):
+                    # 这是一个有效组合，但不知道名字
+                    # 尝试用它的 updatetime 推断
+                    stocks = r['data']['stkinfolist']
+                    updatetime = stocks[0].get('updatetime', 0)
+                    # updatetime 格式: 20260519084950 → date=20260519
+                    updatetime_str = str(updatetime)
+                    if len(updatetime_str) >= 8:
+                        date_part = updatetime_str[:8]
+                        if date_part == group_name:
+                            print(f"[Eastmoney] 找到 {group_name} 对应 gid={test_gid}")
+                            return test_gid
+            except:
+                pass
+        
+        # fallback: 如果扫不到，用 gid=136+1 作为新 gid（假设每天加1）
+        # 这个 heuristic 可能在某些情况下不准，但够用
+        print(f"[Eastmoney] 未找到 {group_name}，使用 fallback 策略")
+        # 取今天的 gid=136，明天应该用 gid=137
+        # 通过日期计算相对 gid
+        base_date = datetime(2026, 5, 19)
+        today = datetime.now()
+        offset = (today - base_date).days
+        inferred_gid = 136 + offset
+        print(f"[Eastmoney] 推断 gid={inferred_gid}（基于日期偏移 {offset} 天）")
+        return inferred_gid
+    
+    print(f"[Eastmoney] 创建组合失败: state={state}")
+    return None
+
+
+def delete_group(gid):
+    """删除组合"""
+    url = mkurl('dg', g=gid)
+    result, sn = api_call(url)
+    state = result.get('state')
+    if state == 0:
+        print(f"[Eastmoney] 删除 gid={gid} 成功")
+        return True
+    elif state == -119:
+        print(f"[Eastmoney] gid={gid} 不存在，跳过")
+        return True
+    else:
+        print(f"[Eastmoney] 删除 gid={gid} 失败: state={state} msg={result.get('message')}")
+        return False
+
+
+def get_group_stocks(gid):
+    """获取组合内所有股票"""
+    url = mkurl('gstkinfos', g=gid)
+    result, sn = api_call(url)
+    state = result.get('state')
+    if state != 0:
+        return []
+    stocks = result.get('data', {}).get('stkinfolist', [])
+    return stocks
+
+
+def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
+    """
+    主函数：将推荐股票同步到东方财富组合
+    1. 创建/找到今日组合（名称=group_name 或 yyyyMMdd）
+    2. 添加新推荐股票
+    3. 删除7天前的旧组合
+    """
+    today_str = datetime.now().strftime("%Y%m%d")
+    if group_name is None:
+        group_name = today_str
+
+    print(f"[Eastmoney Portfolio] 同步组合 {group_name}，股票: {stock_codes}")
+
+    # 1. 获取或创建组合
+    gid = get_or_create_group(group_name)
+    if gid is None:
+        print("[Eastmoney] 无法获取gid，退出")
+        return False
+
+    # 2. 添加新股票
+    added = add_stocks(gid, stock_codes)
+    print(f"[Eastmoney] 添加完成: {added}/{len(stock_codes)} 只成功")
+
+    # 3. 清理7天前的旧组合
+    groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
+    groups_history = {}
+    if os.path.exists(groups_file):
+        with open(groups_file) as f:
+            groups_history = json.load(f)
+
+    # 记录今日组合
+    cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y%m%d")
+    groups_history[group_name] = {'gid': gid, 'date': today_str, 'stocks': stock_codes}
+
+    # 找出要删除的旧组合
+    to_delete = {name: info for name, info in groups_history.items()
+                 if info.get('date', '') < cutoff and name != group_name}
+
+    for name, info in to_delete.items():
+        print(f"[Eastmoney] 清理旧组合 {name} (gid={info.get('gid')})")
+        delete_group(info.get('gid'))
+        del groups_history[name]
+
+    with open(groups_file, 'w') as f:
+        json.dump(groups_history, f, indent=2, ensure_ascii=False)
+
+    print(f"[Eastmoney] 完成！保留组合: {list(groups_history.keys())}")
+    return True
+
+
+# ============================================
+# 测试
+# ============================================
+if __name__ == '__main__':
+    # 测试：获取 gid=136 的股票列表
+    stocks = get_group_stocks(136)
+    print(f"\n=== gid=136 股票列表 ({len(stocks)} 只) ===")
+    for s in stocks:
+        sec = s['security']  # 格式: 1$603867$timestamp
+        parts = sec.split('$')
+        mkt = '沪' if parts[0] == '1' else '深'
+        code = parts[1]
+        print(f"  {mkt}{code} ¥{s['price']} 更新:{s['updatetime']}")
