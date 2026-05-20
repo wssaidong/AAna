@@ -8,6 +8,12 @@
           "change": 0.5,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-05-20",
+          "change": 1.51,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -20,6 +26,12 @@
           "change": 1.01,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-05-20",
+          "change": 1.28,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -30,6 +42,12 @@
         {
           "date": "2026-05-19",
           "change": 2.5,
+          "hit": true,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-05-20",
+          "change": 1.72,
           "hit": true,
           "sector": "semi"
         }
@@ -131,6 +149,78 @@
         }
       ],
       "consecutive_bad": 0
+    },
+    "300308": {
+      "name": "中际旭创",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": 1.07,
+          "hit": true,
+          "sector": "ai_chip"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300502": {
+      "name": "新易盛",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": -0.5,
+          "hit": false,
+          "sector": "ai_chip"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300223": {
+      "name": "北京君正",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": 0.0,
+          "hit": false,
+          "sector": "ai_chip"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300604": {
+      "name": "长川科技",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": -2.51,
+          "hit": false,
+          "sector": "ai_chip"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "300496": {
+      "name": "中科创达",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": 0.75,
+          "hit": true,
+          "sector": "ai_app"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "002415": {
+      "name": "海康威视",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "change": 0.09,
+          "hit": false,
+          "sector": "ai_app"
+        }
+      ],
+      "consecutive_bad": 0
     }
   },
   "sectors": {
@@ -141,6 +231,11 @@
           "date": "2026-05-19",
           "avg_change": 1.3366666666666667,
           "hit_rate": 66.66666666666666
+        },
+        {
+          "date": "2026-05-20",
+          "avg_change": 1.5033333333333332,
+          "hit_rate": 100.0
         }
       ]
     },
@@ -163,9 +258,30 @@
           "hit_rate": 20.0
         }
       ]
+    },
+    "ai_app": {
+      "name": "AI应用",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "avg_change": 0.42,
+          "hit_rate": 50.0
+        }
+      ]
+    },
+    "ai_chip": {
+      "name": "AI算力/芯片",
+      "records": [
+        {
+          "date": "2026-05-20",
+          "avg_change": -0.48499999999999993,
+          "hit_rate": 25.0
+        }
+      ]
     }
   },
   "updated": [
-    "2026-05-19"
+    "2026-05-19",
+    "2026-05-20"
   ]
 }
