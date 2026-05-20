@@ -1,0 +1,103 @@
+{
+  "date": "2026-05-20",
+  "market_prediction": "📈 偏暖 谨慎乐观，控制仓位",
+  "sentiment": "📈 偏暖",
+  "focus_sectors": [
+    "半导体设备",
+    "AI算力/芯片",
+    "AI应用"
+  ],
+  "recommended_stocks": [
+    {
+      "code": "600703",
+      "name": "三安光电",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002049",
+      "name": "紫光国微",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600584",
+      "name": "长电科技",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "300223",
+      "name": "北京君正",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "300604",
+      "name": "长川科技",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "300496",
+      "name": "中科创达",
+      "sector": "ai_app",
+      "sector_name": "AI应用",
+      "reason": "端侧AI+智能汽车",
+      "expected_change": "-3~+1%",
+      "expected_high": 1.0,
+      "expected_low": -3.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "sector": "ai_app",
+      "sector_name": "AI应用",
+      "reason": "端侧AI+智能汽车",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    }
+  ],
+  "created_at": "2026-05-20T08:30:00.844379"
+}
