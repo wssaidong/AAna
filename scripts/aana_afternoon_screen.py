@@ -380,7 +380,11 @@ def screen_afternoon_stocks():
         price = info.get('price', 0)
         if price < 20 or price > 80:
             continue
-        
+
+        # 过滤：科创板(688) + 创业板(300/301) — 用户要求不推荐
+        if code.startswith(('688', '8')) or code.startswith(('300', '301')):
+            continue
+
         # 过滤：涨跌范围（尾盘只买小幅回调或微涨，不追高）
         change_pct = info.get('change_pct', 0)
         if change_pct < -8 or change_pct > 9:  # 跌停/涨停排除
@@ -581,7 +585,7 @@ def main():
         if EASTMONEY_ENABLED and top_stocks:
             codes = [s['code'] for s in top_stocks]
             today_str = datetime.now().strftime("%Y%m%d")
-            group_name = f"pm_{today_str}"
+            group_name = today_str  # 东方财富组合名禁止中文/下划线/emoji
             try:
                 success = eastmoney_portfolio.sync_portfolio_to_eastmoney(codes, group_name=group_name)
                 if success:
