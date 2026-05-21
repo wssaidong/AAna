@@ -243,13 +243,13 @@ def calculate_fundamental_score(code, change_pct):
     """
     score = 50
     
-    # 1. 板块风险调整
+    # 板块风险调整（科创板/创业板高风险，反向操作）
     if code.startswith('688'):  # 科创板
-        score += 5  # 高风险但也有高收益
+        score -= 10  # 高风险
     elif code.startswith('30'):  # 创业板
-        score += 3
+        score -= 8
     elif code.startswith('6'):  # 沪市主板
-        score += 2
+        score += 5
     
     # 2. 股价位置（高价股 vs 低价股）
     price = 0  # will be passed from info
@@ -276,11 +276,13 @@ def calculate综合评分(info, category, tech_score):
     elif category == 'semi':
         fund_score += 5  # 政策支持
     
-    # 科创/创业加成
+    # 科创/创业扣除
     if code.startswith('688'):
-        fund_score += 3
+        fund_score -= 8
     elif code.startswith('30'):
-        fund_score += 2
+        fund_score -= 5
+    elif code.startswith('6'):
+        fund_score += 5
     
     # 综合评分
     综合评分 = tech_score * 0.6 + fund_score * 0.4
@@ -476,6 +478,9 @@ def generate_report():
             
             price = info.get('price', 0)
             if price <= 0:
+                continue
+            # 过滤科创板(688/8)和创业板(300/301)
+            if code.startswith('688') or code.startswith('8') or code.startswith('300') or code.startswith('301'):
                 continue
             # 股价过滤：仅保留 20-80 元之间的股票
             if not (20 <= price <= 80):
