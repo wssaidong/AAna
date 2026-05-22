@@ -3562,3 +3562,13 @@ logout success!
 [AAna] 获取 26 只股票收盘数据...
 [AAna] 复盘评分报告已生成: /Users/cai/code/AAna/reports/2026-05-21-复盘评分.md
 [AAna] 复盘报告已推送 GitHub
+[AAna] Git pull: Already up to date.
+[AAna v2.4] 生成 2026-05-22 动态选股报告...
+[AAna] 从新浪财经获取动态股票池...
+[Sina] Page 1 failed: Expecting value: line 1 column 1 (char 0)
+[AAna] 获取原始数据: 0 只
+[AAna] 动态股票池: 0 只
+[AAna] 获取 0 只股票数据...
+[AAna] 报告已生成: /Users/cai/code/AAna/reports/2026-05-22-选股报告.md
+[AAna] 早盘快照已保存: /Users/cai/code/AAna/reports/.snapshot_2026-05-22_09_00.json
+[AAna] 已推送 GitHub
