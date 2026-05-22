@@ -288,6 +288,58 @@ def get_group_stocks(gid):
     return stocks
 
 
+def get_snapshot_top10(date_str=None):
+    """
+    从每日选股报告 .md 文件解析 Top 10 精选个股（按综合评分排序）
+    date_str: yyyy-MM-dd 格式，默认为昨天
+    """
+    import re
+
+    if date_str is None:
+        date_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+
+    report_md = f"/Users/cai/code/AAna/reports/{date_str}-选股报告.md"
+
+    if not os.path.exists(report_md):
+        print(f"[Eastmoney] 报告不存在: {report_md}")
+        return []
+
+    with open(report_md) as f:
+        content = f.read()
+
+    # 解析 Markdown 表格中的 Top 10（"重点关注 Top 10" 章节之后）
+    # 表格格式: | 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |
+    top10 = []
+    in_top10_section = False
+    for line in content.split('\n'):
+        if '重点关注 Top 10' in line or '🏆 重点关注' in line:
+            in_top10_section = True
+            continue
+        if in_top10_section and line.startswith('|') and '|' in line.strip() and not line.strip().startswith('|:'):
+            # 跳过表头行
+            if '排名' in line or '代码' in line:
+                continue
+            parts = [p.strip() for p in line.split('|')]
+            if len(parts) >= 4:
+                # parts: ['', '1', '📊name', 'code', ...]
+                code = None
+                for p in parts:
+                    # 代码是纯数字或6位字符串
+                    if p and re.match(r'^\d{6}$', p):
+                        code = p
+                        break
+                if code:
+                    top10.append(code)
+                    if len(top10) >= 10:
+                        break
+        elif in_top10_section and line.startswith('## '):
+            # 进入下一章节，停止解析
+            break
+
+    print(f"[Eastmoney] 报告 Top10: {top10}")
+    return top10
+
+
 def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
     """
     主函数：将推荐股票同步到东方财富组合

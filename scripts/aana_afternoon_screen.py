@@ -581,15 +581,19 @@ def main():
             print(f"  {i}. {s['name']}({s['code']}) ¥{s['price']:.2f} {s['change_pct']:+.2f}% RSI={s.get('rsi','N/A')} 量比={s.get('vol_ratio','N/A')}x 评分={s['score']} {s['risk']}")
             print(f"     理由: 止损¥{s['stop_loss']} 目标¥{s['target_price']}")
 
-        # 同步到东方财富组合
-        if EASTMONEY_ENABLED and top_stocks:
-            codes = [s['code'] for s in top_stocks]
-            today_str = datetime.now().strftime("%Y%m%d")
-            group_name = today_str  # 东方财富组合名禁止中文/下划线/emoji
+        # 同步到东方财富组合（改用每日报告 Top10 精选个股）
+        if EASTMONEY_ENABLED:
             try:
-                success = eastmoney_portfolio.sync_portfolio_to_eastmoney(codes, group_name=group_name)
-                if success:
-                    print(f"\n✅ 已同步到东方财富组合")
+                from eastmoney_portfolio import get_snapshot_top10, sync_portfolio_to_eastmoney
+                today_str = datetime.now().strftime("%Y%m%d")
+                today_date = datetime.now().strftime("%Y-%m-%d")
+                codes = get_snapshot_top10(today_date)
+                if codes:
+                    success = sync_portfolio_to_eastmoney(codes, group_name=today_str)
+                    if success:
+                        print(f"\n✅ 已同步 Top10 精选到东方财富组合")
+                else:
+                    print(f"\n⚠️ 快照无数据，跳过东方财富同步")
             except Exception as e:
                 print(f"\n⚠️ 东方财富同步失败: {e}")
     else:
