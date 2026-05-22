@@ -22,6 +22,7 @@ classifiers = [
 
 dependencies = [
     "akshare>=1.14.0",
+    "backtrader>=1.9.0",
     "pandas>=2.0.0",
     "requests>=2.31.0",
 ]
@@ -43,7 +44,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["agents*", "analysis_tools*", "data*", "scripts*"]
+include = ["agents*", "analysis_tools*", "backtest*", "data*", "scripts*"]
 
 [tool.black]
 line-length = 100
