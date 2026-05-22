@@ -11,6 +11,7 @@ data/
 ├── tracking/                # 每日追踪快照 JSON
 ├── summaries/               # 每日综合报告 JSON
 │   └── YYYY-MM-DD.json
+├── portfolio.json           # 实盘组合持久化
 └── index.json               # 数据索引（按日期快速查找）
 """
 
@@ -233,3 +234,17 @@ def migrate_from_state():
             )
             if ok: imported += 1
     return imported
+
+
+# ── 实盘组合 ────────────────────────────────────────────────────────────────
+from data.portfolio import PortfolioTracker, Position, Trade, PortfolioState
+
+__all__ = [
+    "append_recommendation", "append_recommendations_batch",
+    "append_tracking",
+    "save_recommendation_snapshot", "save_tracking_snapshot", "save_summary",
+    "get_recommendations_by_date", "get_tracking_by_date",
+    "get_all_recommendations", "get_stock_history", "get_win_rate",
+    "migrate_from_state",
+    "PortfolioTracker", "Position", "Trade", "PortfolioState",
+]

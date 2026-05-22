@@ -321,11 +321,14 @@ class BacktestEngine:
         initial_cash: float = 100_000,
         commission: float = 0.001,
         strategy_params: Optional[Dict[str, Any]] = None,
+        benchmark: bool = False,
     ):
         self.initial_cash = initial_cash
         self.commission = commission
         self.strategy_params = strategy_params or {}
+        self.benchmark = benchmark
         self._data_feeds: Dict[str, bt.feeds.PandasData] = {}
+        self._benchmark_df = None  # 沪深300数据缓存
 
     # ── 数据加载 ─────────────────────────────────────────────
 
@@ -446,6 +449,30 @@ class BacktestEngine:
         df = pd.DataFrame(rows)
         return df if not df.empty else None
 
+    def _fetch_benchmark(self, start, end):
+        """使用 akshare 获取沪深300（000300）日线数据"""
+        try:
+            import akshare as ak
+            import pandas as pd
+
+            s = _parse_date(start) or datetime(2020, 1, 1)
+            e = _parse_date(end) or datetime.today()
+            df = ak.stock_zh_index_daily(symbol="000300")
+            if df is None or df.empty:
+                return None
+
+            # 过滤日期范围
+            df["date"] = pd.to_datetime(df["date"])
+            df = df[(df["date"] >= s) & (df["date"] <= e)].copy()
+            if df.empty:
+                return None
+
+            df = df.rename(columns={"date": "Date", "open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+            df = df.sort_values("Date").reset_index(drop=True)
+            return df[["Date", "Open", "High", "Low", "Close", "Volume"]]
+        except Exception:
+            return None
+
     # ── 运行 ─────────────────────────────────────────────────
 
     def run(self) -> Dict[str, Any]:
@@ -455,7 +482,10 @@ class BacktestEngine:
           initial_cash, final_value, total_return_pct,
           total_trades, win_trades, loss_trades,
           win_rate, avg_hold_days,
-          trades: [{date, code, entry_price, exit_price, pnl_pct, hold_days}, ...]
+          trades: [...],
+          random_avg_return_pct,   # benchmark=True 时
+          benchmark_return_pct,    # benchmark=True 时
+          market_regime,           # benchmark=True 时
         }
         """
         cerebro = bt.Cerebro()
@@ -480,7 +510,7 @@ class BacktestEngine:
         if not trades:
             final_value = cerebro.broker.getvalue()
             total_return_pct = (final_value - self.initial_cash) / self.initial_cash * 100
-            return dict(
+            result = dict(
                 initial_cash=self.initial_cash,
                 final_value=round(final_value, 2),
                 total_return_pct=round(total_return_pct, 2),
@@ -491,6 +521,11 @@ class BacktestEngine:
                 avg_hold_days=0,
                 trades=[],
             )
+            if self.benchmark:
+                result["random_avg_return_pct"] = 0
+                result["benchmark_return_pct"] = 0
+                result["market_regime"] = "unknown"
+            return result
 
         pnls = [t["pnl_pct"] for t in trades]
         wins = [p for p in pnls if p > 0]
@@ -500,7 +535,7 @@ class BacktestEngine:
         final_value = cerebro.broker.getvalue()
         total_return_pct = (final_value - self.initial_cash) / self.initial_cash * 100
 
-        return dict(
+        result = dict(
             initial_cash=self.initial_cash,
             final_value=round(final_value, 2),
             total_return_pct=round(total_return_pct, 2),
@@ -511,3 +546,116 @@ class BacktestEngine:
             avg_hold_days=round(sum(hold_days_list) / len(hold_days_list), 1) if hold_days_list else 0,
             trades=trades,
         )
+
+        # ── benchmark=True 时计算沪深300基准 + 随机基准 + 市场环境 ──
+        if self.benchmark:
+            # 获取回测区间（从已加载数据的日期范围）
+            dates = []
+            for code, df in [(code, self._data_feeds[code].dataname) for code in self._data_feeds]:
+                if "Date" in df.columns:
+                    dates.extend(df["Date"].tolist())
+            if dates:
+                start_date = min(dates)
+                end_date = max(dates)
+            else:
+                start_date = end_date = None
+
+            # 沪深300基准收益率
+            benchmark_return_pct = 0.0
+            if start_date and end_date:
+                bm_df = self._fetch_benchmark(start_date, end_date)
+                if bm_df is not None and len(bm_df) >= 2:
+                    first_close = bm_df.iloc[0]["Close"]
+                    last_close = bm_df.iloc[-1]["Close"]
+                    benchmark_return_pct = (last_close - first_close) / first_close * 100
+
+            # 随机基准：多次模拟求均值
+            random_avg_return_pct = self._run_random()
+
+            # 市场环境判断
+            if benchmark_return_pct > 15:
+                market_regime = "bull"
+            elif benchmark_return_pct < -15:
+                market_regime = "bear"
+            else:
+                market_regime = "sideways"
+
+            result["random_avg_return_pct"] = round(random_avg_return_pct, 2)
+            result["benchmark_return_pct"] = round(benchmark_return_pct, 2)
+            result["market_regime"] = market_regime
+
+        return result
+
+    def _run_random(self, simulations: int = 50) -> float:
+        """
+        随机策略基准：每次随机选一只股票，5%概率买入，持有5天后卖出。
+        返回多次模拟的平均收益率。
+        """
+        if not self._data_feeds:
+            return 0.0
+
+        codes = list(self._data_feeds.keys())
+        total_return = 0.0
+
+        for _ in range(simulations):
+            cerebro = bt.Cerebro()
+            cerebro.broker.setcash(self.initial_cash)
+            cerebro.broker.setcommission(self.commission)
+
+            for code, datafeed in self._data_feeds.items():
+                cerebro.adddata(datafeed)
+
+            cerebro.addstrategy(RandomStrategy)
+            cerebro.run(runonce=False)
+
+            final_value = cerebro.broker.getvalue()
+            ret = (final_value - self.initial_cash) / self.initial_cash * 100
+            total_return += ret
+
+        return total_return / simulations
+
+
+# ── 随机基准策略 ──────────────────────────────────────────────
+
+class RandomStrategy(Strategy):
+    """
+    随机买入策略（用于基准对比）：
+    - 每次只持有 1 只股票
+    - 每天有 5% 概率随机买入（若当前空仓）
+    - 持有 5 天后强制卖出
+    """
+    params = dict(buy_prob=0.05, hold_days=5)
+
+    def __init__(self):
+        self.order = None
+        self.hold_counter = 0
+        self.trade_log = []
+
+    def next(self):
+        if self.order:
+            return
+
+        dt = self.datas[0].datetime.date(0)
+        close = self.datas[0].close[0]
+
+        # 计数持有
+        if self.position.size > 0:
+            self.hold_counter += 1
+            if self.hold_counter >= self.p.hold_days:
+                self.order = self.close()
+                pnl = (close - self.position.price) / self.position.price * 100
+                self.trade_log.append({
+                    "date": str(dt),
+                    "pnl_pct": round(pnl, 2),
+                    "hold_days": self.hold_counter,
+                })
+                self.hold_counter = 0
+                return
+
+        # 5% 概率随机买入（仅在空仓时）
+        if self.position.size == 0:
+            import random
+            if random.random() < self.p.buy_prob:
+                self.order = self.buy()
+                self.hold_counter = 0
+

@@ -149,9 +149,9 @@ class TechnicalStrategy(BaseStrategy):
 
 class ValueStrategy(BaseStrategy):
     """
-    价值策略（需要财务数据，暂用 PE/PB 代理）
-    因子：PE（5-25 区间佳）、PB（<5 佳）
-    注：需要传入财务数据字典 {'pe': x, 'pb': y}
+    价值策略（基本面 + 技术面综合评分）
+    基本面评分 0-40（PE/PB/ROE/增速），技术面评分 0-100
+    综合评分 = 技术面 * 0.6 + 基本面 * 0.4
     """
 
     name = "价值策略"
@@ -159,16 +159,44 @@ class ValueStrategy(BaseStrategy):
     def score(self, code: str, klines: List[Dict[str, Any]],
               tech: Dict[str, Any] = None,
               financials: Dict[str, float] = None) -> float:
+        tech = tech or _get_qs().technical(code)
+        price = tech.get('price')
+
+        # ── 基本面评分 0-40 ──────────────────────────
+        if financials and all(k in financials for k in ('pe', 'pb', 'roe')):
+            pe = financials.get('pe')
+            pb = financials.get('pb')
+            roe = financials.get('roe')
+            # 用 financials 中的增速（如果有）
+            rev_g = financials.get('revenue_growth')
+            prof_g = financials.get('profit_growth')
+            best_g = max(rev_g, prof_g) if (rev_g is not None and prof_g is not None) else (rev_g or prof_g)
+            from data.fundamentals import FundamentalService
+            fs = FundamentalService()
+            fund_score = (
+                fs._pe_score(pe)
+                + fs._pb_score(pb)
+                + fs._roe_score(roe)
+                + fs._growth_score(best_g)
+            )
+        else:
+            # 未传入 financials，从 tushare 实时获取
+            from data.fundamentals import FundamentalService
+            fs = FundamentalService()
+            fund_score = fs.get_score(code)
+            if fund_score is None:  # 无token或网络失败，使用中性基准
+                fund_score = 20.0
+
+        # ── 技术面评分 0-100 ──────────────────────────
         pe = (financials or {}).get('pe')
         pb = (financials or {}).get('pb')
-        price = tech.get('price') if tech else None
-
         pe_score = self._check_range(pe, 5, 60) * 40 if pe else 20  # 权重 40
         pb_score = self._check_range(pb, 1, 10) * 30 if pb else 15  # 权重 30
-        # 价格适中（太高的价格本身是风险）
         price_score = self._check_range(price, 5, 100) * 30 if price else 15
+        tech_score = min(100, pe_score + pb_score + price_score)
 
-        return round(min(100, pe_score + pb_score + price_score), 1)
+        # ── 综合评分 ─────────────────────────────────
+        return round(min(100, tech_score * 0.6 + fund_score * 0.4), 1)
 
 
 class CompositeStrategy:
