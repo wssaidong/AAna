@@ -18,13 +18,14 @@ import os
 import sys
 import warnings
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, Type
+from typing import List, Dict, Any, Optional
 
 import backtrader as bt
 from backtrader import Strategy
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data.quotes import QuoteService
+from strategies import MomentumStrategy, TechnicalStrategy, CompositeStrategy
 
 warnings.filterwarnings("ignore")
 
@@ -44,11 +45,6 @@ def _parse_date(value: Any) -> Optional[datetime]:
             except ValueError:
                 pass
     return None
-
-
-def _is_trading_day(dt: datetime) -> bool:
-    """简单判断是否为 A 股交易日（周一~五，排除少量节假日）"""
-    return dt.weekday() < 5
 
 
 # ── Backtrader DataFeed ────────────────────────────────────────

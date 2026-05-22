@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # ── 被测模块导入 ─────────────────────────────────────────────
 
-from backtest.engine import _parse_date, _is_trading_day
-from backtest.runner import _next_trading_day, load_recommendations, run
+from backtest.engine import _parse_date
+from backtest.runner import _is_trading_day, _next_trading_day, load_recommendations, run
 
 
 # ── 工具函数测试 ─────────────────────────────────────────────
