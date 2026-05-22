@@ -21,6 +21,9 @@ sys.path.insert(0, os.path.join(AANA_DIR, "scripts"))
 
 from datetime import datetime, timedelta
 
+# 文件持久化层
+from data import append_recommendations_batch
+
 # 东方财富组合同步（可选，无cookie时静默跳过）
 try:
     import eastmoney_portfolio
@@ -558,7 +561,12 @@ def main():
     
     # 生成报告
     filename, top_stocks = generate_report(stocks, index_data)
-    
+
+    # 持久化到 data/ 层
+    if top_stocks:
+        persisted = append_recommendations_batch(top_stocks)
+        print(f"[AAna 尾盘] data/ 层已记录 {persisted} 条推荐")
+
     # 输出到控制台
     print("\n" + "="*70)
     print(f"📋 尾盘选股建议 {get_today_str()} {datetime.now().strftime('%H:%M')}")
