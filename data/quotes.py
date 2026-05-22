@@ -63,13 +63,13 @@ def _sf(v, default=None) -> Optional[float]:
 
 
 def _prefix(code: str) -> str:
-    """6位代码 → sh/sz 前缀"""
-    c = code.strip()
-    if c.startswith(('6', '9')):
-        return 'sh' + c
+    """6位代码 → sh/sz/bj 前缀"""
+    c = code.strip()  # 先去除首尾空格
+    if c.startswith('6') or c.startswith('9'):
+        return 'sh' + c  # 上海主板 + 科创板（688）
     if c.startswith('8'):
-        return 'bj' + c
-    return 'sz' + c
+        return 'bj' + c  # 北交所
+    return 'sz' + c     # 深圳主板+创业板
 
 
 # ── 主服务类 ───────────────────────────────────────────────

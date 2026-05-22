@@ -25,12 +25,6 @@ from backtrader import Strategy
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data.quotes import QuoteService
-from strategies import (
-    MomentumStrategy,
-    TechnicalStrategy,
-    CompositeStrategy,
-    quick_score,
-)
 
 warnings.filterwarnings("ignore")
 
@@ -108,6 +102,7 @@ class ScoreSignalStrategy(Strategy):
         self.buy_date = None
         self.buy_price = None
         self.hold_counter = 0
+        self.trade_log = []  # 交易记录，供 BacktestEngine.run() 收集
 
         # 策略实例（用于评分）
         if self.p.strategy_type == "momentum":
@@ -126,25 +121,21 @@ class ScoreSignalStrategy(Strategy):
 
     def score(self) -> float:
         """
-        计算当前 bar 的策略评分（调用 strategies/）。
-        使用前 N 条 K 线计算技术指标。
+        计算当前 bar 的策略评分 — 完全基于 backtrader 本地 bar 数据，
+        不发送任何网络请求，避免数据穿越（look-ahead bias）。
         """
-        # backtrader 的 self.datas[0] 是当前数据
-        # 我们取 lookback 条历史 K 线（不含当前，以后者为准避免 lookahead）
         bar_count = len(self.datas[0])
         if bar_count < 20:
             return 0  # 数据太少不打分
 
-        # 收集前 lookback 条 K 线数据（open/high/low/close/vol）
+        # 收集前 lookback 条历史 K 线（不含当前 bar）
         lookback = min(self.p.lookback, bar_count - 1)
         klines = []
         for i in range(lookback, 0, -1):
             try:
                 d = self.datas[0]
-                date_i = bt.date2num(d.datetime[-i]) if hasattr(d, "datetime") else None
                 klines.append(
                     dict(
-                        date=date_i,
                         open=float(d.open[-i]),
                         high=float(d.high[-i]),
                         low=float(d.low[-i]),
@@ -158,28 +149,93 @@ class ScoreSignalStrategy(Strategy):
         if len(klines) < 10:
             return 0
 
-        # 用 strategies/ 的 quick_score 评分（内部会调用 QuoteService）
-        # 但 backtrader 已经在循环中，我们需要直接调用策略
-        code = self.datas[0]._name or ""
+        closes = [k["close"] for k in klines]
+        vols = [k["vol"] for k in klines]
+        current_close = float(self.datas[0].close[0])
+        current_open = float(self.datas[0].open[0])
 
-        try:
-            result = quick_score(code, strategy=self.p.strategy_type)
-            return result.get("composite", result.get("score", 0))
-        except Exception:
-            # 兜底：用简单动量
-            closes = [k["close"] for k in klines]
-            if len(closes) < 5:
-                return 0
-            gain = (closes[-1] - closes[-5]) / closes[-5] * 100 if closes[-5] else 0
-            rsi = self._simple_rsi(closes)
-            return min(100, max(0, 50 + gain + rsi * 0.3))
+        # ── 技术指标计算（纯本地）────────────────────────────
+
+        # MA
+        ma5 = sum(closes[-5:]) / 5 if len(closes) >= 5 else None
+        ma10 = sum(closes[-10:]) / 10 if len(closes) >= 10 else None
+        ma20 = sum(closes[-20:]) / 20 if len(closes) >= 20 else None
+        ma60 = sum(closes[-60:]) / 60 if len(closes) >= 60 else None
+
+        # RSI
+        rsi = self._simple_rsi(closes)
+
+        # MACD（DIF/DEA/柱）
+        dif, dea = self._simple_macd(closes)
+        macd_hist = (dif - dea) * 2 if (dif is not None and dea is not None) else 0
+
+        # 量比
+        vol_ratio = None
+        if len(vols) >= 6:
+            avg5 = sum(vols[-6:-1]) / 5
+            vol_ratio = vols[-1] / avg5 if avg5 else None
+
+        # 涨跌幅
+        prev_close = closes[-2] if len(closes) >= 2 else current_close
+        change_pct = (current_close - prev_close) / prev_close * 100 if prev_close else 0
+
+        # ── 策略评分（复制 strategies/ 的评分逻辑）──────────
+
+        if self.p.strategy_type == "momentum":
+            return self._score_momentum(rsi, change_pct, ma5, current_close)
+        elif self.p.strategy_type == "technical":
+            return self._score_technical(ma5, ma10, ma20, macd_hist, vol_ratio, current_close, current_open)
+        else:  # composite
+            m = self._score_momentum(rsi, change_pct, ma5, current_close)
+            t = self._score_technical(ma5, ma10, ma20, macd_hist, vol_ratio, current_close, current_open)
+            return round(0.4 * m + 0.6 * t, 1)
+
+    def _score_momentum(self, rsi, change_pct, ma5, price) -> float:
+        rsi_score = self._check_range(rsi, 30, 70) * 40 if rsi else 20
+        gain_score = self._check_range(change_pct, -3, 8) * 30
+        ma_score = 30 if (ma5 and price > ma5) else 0
+        return round(min(100, rsi_score + gain_score + ma_score), 1)
+
+    def _score_technical(self, ma5, ma10, ma20, macd_hist, vol_ratio, price, open_p) -> float:
+        if all([ma5, ma10, ma20]) and ma5 > ma10 > ma20:
+            ma_score = 35
+        elif all([ma5, ma10]) and ma5 > ma10:
+            ma_score = 20
+        else:
+            ma_score = 0
+        macd_score = 25 if (macd_hist is not None and macd_hist > 0) else 0
+        if vol_ratio and vol_ratio > 1.2:
+            vol_score = 20
+        elif vol_ratio and vol_ratio > 0.8:
+            vol_score = 12
+        else:
+            vol_score = 0
+        yang_score = 20 if (price > open_p) else 0
+        return round(min(100, ma_score + macd_score + vol_score + yang_score), 1)
+
+    def _simple_macd(self, closes: List[float], fast: int = 12, slow: int = 26, signal: int = 9):
+        """返回 (dif, dea) 或 (None, None)"""
+        if len(closes) < slow + 1:
+            return None, None
+        ema_fast = self._ema(closes, fast)
+        ema_slow = self._ema(closes, slow)
+        dif = ema_fast - ema_slow
+        # DEA = EMA(DIF, 9)，简化用 DIF * 0.8 近似
+        dea = dif * 0.8
+        return dif, dea
+
+    def _ema(self, data: List[float], period: int) -> float:
+        k = 2 / (period + 1)
+        e = data[0]
+        for v in data[1:]:
+            e = v * k + e * (1 - k)
+        return e
 
     def _simple_rsi(self, closes: List[float], period: int = 14) -> float:
         """简化 RSI 计算"""
         if len(closes) < period + 1:
             return 50
-        gains = []
-        losses = []
+        gains, losses = [], []
         for i in range(len(closes) - period, len(closes)):
             delta = closes[i] - closes[i - 1]
             if delta > 0:
@@ -205,7 +261,16 @@ class ScoreSignalStrategy(Strategy):
             pnl_pct = (close - self.buy_price) / self.buy_price * 100
             if pnl_pct <= self.p.stop_loss_pct:
                 self.order = self.close()
-                self.log(f"止损卖出 {dt} 亏損 {pnl_pct:.1f}%")
+                self.log(f"止损卖出 {dt} 亏损 {pnl_pct:.1f}%")
+                self.trade_log.append({
+                    "date": str(self.buy_date),
+                    "code": self.datas[0]._name,
+                    "entry_price": round(self.buy_price, 2),
+                    "exit_price": round(close, 2),
+                    "pnl_pct": round(pnl_pct, 2),
+                    "hold_days": self.hold_counter,
+                    "exit_reason": "stop_loss",
+                })
                 self.buy_price = None
                 self.buy_date = None
                 self.hold_counter = 0
@@ -218,6 +283,15 @@ class ScoreSignalStrategy(Strategy):
                 self.order = self.close()
                 pnl = (close - self.buy_price) / self.buy_price * 100
                 self.log(f"到期卖出 {dt} 持有{self.hold_counter}天 收益{pnl:.1f}%")
+                self.trade_log.append({
+                    "date": str(self.buy_date),
+                    "code": self.datas[0]._name,
+                    "entry_price": round(self.buy_price, 2),
+                    "exit_price": round(close, 2),
+                    "pnl_pct": round(pnl, 2),
+                    "hold_days": self.hold_counter,
+                    "exit_reason": "hold_expire",
+                })
                 self.buy_price = None
                 self.buy_date = None
                 self.hold_counter = 0
@@ -256,7 +330,6 @@ class BacktestEngine:
         self.commission = commission
         self.strategy_params = strategy_params or {}
         self._data_feeds: Dict[str, bt.feeds.PandasData] = {}
-        self._results: Dict[str, Any] = {}
 
     # ── 数据加载 ─────────────────────────────────────────────
 
@@ -272,8 +345,8 @@ class BacktestEngine:
 
         source：
           'akshare' — 前复权日线（推荐，数据质量高）
-          'sina'    — 新浪实时（仅适合单次/近期）
-          'tencent' — 腾讯 K 线（仅适合单次/近期）
+          'sina'    — 新浪实时（近期，fallback）
+          'tencent' — 腾讯 K 线（近期，fallback）
         """
         df = self._fetch_df(code, start, end, source)
         if df is None or df.empty:
@@ -285,17 +358,17 @@ class BacktestEngine:
     def _fetch_df(
         self,
         code: str,
-        start: str | datetime | None,
-        end: str | datetime | None,
+        start,
+        end,
         source: str,
     ):
         """调用对应数据源获取 DataFrame"""
         if source == "akshare":
             return self._fetch_akshare(code, start, end)
         elif source == "sina":
-            return self._fetch_sina(code, end)
+            return self._fetch_sina(code)
         elif source == "tencent":
-            return self._fetch_tencent(code, end)
+            return self._fetch_tencent(code)
         return None
 
     def _fetch_akshare(
@@ -306,21 +379,19 @@ class BacktestEngine:
             import akshare as ak
             import pandas as pd
 
-            symbol = code if code.startswith("6") else f"{code}.SZ"
             s = _parse_date(start) or datetime(2020, 1, 1)
             e = _parse_date(end) or datetime.today()
-
+            prefix = "sh" if code.startswith("6") else "sz"
             df = ak.stock_zh_a_hist(
-                symbol=("sh" + code if code.startswith("6") else "sz" + code),
+                symbol=prefix + code,
                 period="daily",
                 start_date=s.strftime("%Y%m%d"),
                 end_date=e.strftime("%Y%m%d"),
-                adjust="qfq",  # 前复权
+                adjust="qfq",
             )
             if df is None or df.empty:
                 return None
 
-            # 字段映射
             rename = {
                 "日期": "Date",
                 "开盘": "Open",
@@ -330,21 +401,19 @@ class BacktestEngine:
                 "成交量": "Volume",
             }
             df = df.rename(columns=rename)
-            # 过滤不需要的列
             for col in ["成交额", "涨跌幅", "涨跌额", "换手率"]:
                 if col in df.columns:
                     df = df.drop(columns=[col])
             df["Date"] = pd.to_datetime(df["Date"])
-            # 只保留标准列
             cols = [c for c in ["Date", "Open", "High", "Low", "Close", "Volume"] if c in df.columns]
             return df[cols]
-        except Exception as e:
+        except Exception:
             return None
 
-    def _fetch_sina(self, code: str, end):
+    def _fetch_sina(self, code: str):
         """使用新浪 K 线（近期，fallback）"""
         qs = QuoteService()
-        kl = qs.kline(code, count=500, end=end)
+        kl = qs.kline(code, count=500)
         if not kl:
             return None
         import pandas as pd
@@ -361,10 +430,10 @@ class BacktestEngine:
         df = pd.DataFrame(rows)
         return df if not df.empty else None
 
-    def _fetch_tencent(self, code: str, end):
+    def _fetch_tencent(self, code: str):
         """使用腾讯 K 线（近期，fallback）"""
         qs = QuoteService()
-        kl = qs.kline(code, count=500, end=end)
+        kl = qs.kline(code, count=500)
         if not kl:
             return None
         import pandas as pd
@@ -400,41 +469,7 @@ class BacktestEngine:
         for code, datafeed in self._data_feeds.items():
             cerebro.adddata(datafeed)
 
-        # 收集交易记录
-        trades = []
-
-        class TradeCollector(Strategy):
-            def __init__(self):
-                self.trades = []
-                self.buy_price = None
-                self.buy_date = None
-                self.hold_days = 0
-
-            def next(self):
-                for d in self.datas:
-                    pos = self.getposition(d)
-                    if not pos.size and self.buy_price is not None:
-                        # 已卖出，记录
-                        exit_price = d.close[0]
-                        pnl = (exit_price - self.buy_price) / self.buy_price * 100
-                        self.trades.append(
-                            dict(
-                                date=self.buy_date,
-                                code=d._name,
-                                entry_price=self.buy_price,
-                                exit_price=exit_price,
-                                pnl_pct=round(pnl, 2),
-                                hold_days=self.hold_days,
-                            )
-                        )
-                        self.buy_price = None
-                        self.buy_date = None
-                        self.hold_days = 0
-
-                    elif pos.size > 0:
-                        self.hold_days += 1
-
-        # 用 ScoreSignalStrategy 运行
+        # 添加策略并收集交易记录
         cerebro.addstrategy(
             ScoreSignalStrategy,
             **self.strategy_params,
@@ -443,6 +478,29 @@ class BacktestEngine:
         results = cerebro.run()
         strat = results[0]
 
+        # 从策略实例收集交易
+        trades = getattr(strat, "trade_log", [])
+
+        if not trades:
+            final_value = cerebro.broker.getvalue()
+            total_return_pct = (final_value - self.initial_cash) / self.initial_cash * 100
+            return dict(
+                initial_cash=self.initial_cash,
+                final_value=round(final_value, 2),
+                total_return_pct=round(total_return_pct, 2),
+                total_trades=0,
+                win_trades=0,
+                loss_trades=0,
+                win_rate=0,
+                avg_hold_days=0,
+                trades=[],
+            )
+
+        pnls = [t["pnl_pct"] for t in trades]
+        wins = [p for p in pnls if p > 0]
+        losses = [p for p in pnls if p <= 0]
+        hold_days_list = [t.get("hold_days", 0) for t in trades]
+
         final_value = cerebro.broker.getvalue()
         total_return_pct = (final_value - self.initial_cash) / self.initial_cash * 100
 
@@ -450,10 +508,10 @@ class BacktestEngine:
             initial_cash=self.initial_cash,
             final_value=round(final_value, 2),
             total_return_pct=round(total_return_pct, 2),
-            total_trades=0,
-            win_trades=0,
-            loss_trades=0,
-            win_rate=0,
-            avg_hold_days=0,
-            trades=[],
+            total_trades=len(trades),
+            win_trades=len(wins),
+            loss_trades=len(losses),
+            win_rate=round(len(wins) / len(trades) * 100, 1) if trades else 0,
+            avg_hold_days=round(sum(hold_days_list) / len(hold_days_list), 1) if hold_days_list else 0,
+            trades=trades,
         )

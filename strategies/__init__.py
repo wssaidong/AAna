@@ -24,9 +24,16 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from data.quotes import QuoteService
 
-qs = QuoteService()
+# 延迟实例化，避免模块加载时立即发起网络请求
+_qs = None
+
+def _get_qs():
+    global _qs
+    if _qs is None:
+        from data.quotes import QuoteService
+        _qs = QuoteService()
+    return _qs
 
 
 class BaseStrategy(ABC):
@@ -70,12 +77,11 @@ class MomentumStrategy(BaseStrategy):
 
     def score(self, code: str, klines: List[Dict[str, Any]],
               tech: Dict[str, Any] = None) -> float:
-        tech = tech or qs.technical(code)
+        tech = tech or _get_qs().technical(code)
         rsi = tech.get('rsi')
         change_pct = tech.get('change_pct', 0)
         ma5 = tech.get('ma5') or 0
         price = tech.get('price') or 0
-        closes = [k['close'] for k in klines]
 
         # RSI 评分：40-65 最佳
         rsi_score = self._check_range(rsi, 30, 70) * 40  # 权重 40
@@ -103,7 +109,7 @@ class TechnicalStrategy(BaseStrategy):
 
     def score(self, code: str, klines: List[Dict[str, Any]],
               tech: Dict[str, Any] = None) -> float:
-        tech = tech or qs.technical(code)
+        tech = tech or _get_qs().technical(code)
         closes = [k['close'] for k in klines]
         if not closes:
             return 0
@@ -111,11 +117,10 @@ class TechnicalStrategy(BaseStrategy):
         ma5 = tech.get('ma5')
         ma10 = tech.get('ma10')
         ma20 = tech.get('ma20')
-        price = tech.get('price') or closes[-1]
+        close_p = tech.get('close') or closes[-1]
         macd_hist = tech.get('macd_hist')
         vol_ratio = tech.get('vol_ratio')
         open_p = tech.get('open') or klines[-1].get('open')
-        close_p = tech.get('close') or klines[-1].get('close')
 
         # 均线多头（MA5 > MA10 > MA20）
         if all([ma5, ma10, ma20]) and ma5 > ma10 > ma20:
@@ -202,10 +207,10 @@ def quick_score(code: str,
     快速评分：获取K线+技术指标，统一打分
     strategy: 'momentum' | 'technical' | 'value' | 'composite'
     """
-    klines = qs.kline(code, count=60)
+    klines = _get_qs().kline(code, count=60)
     if not klines:
         return {'code': code, 'error': '无法获取K线数据'}
-    tech = qs.technical(code)
+    tech = _get_qs().technical(code)
 
     strat_map = {
         'momentum': MomentumStrategy(),
