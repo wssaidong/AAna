@@ -1,1 +1,49 @@
-.snapshot_*
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific — do NOT commit
+dynamic_stocks.json       # 持仓/自选敏感数据
+stock_data.json           # 实时行情数据
+cookie.json               # 第三方 cookie/token
+references/cookie.json    # 东方财富 cookie
+*.log                     # 运行日志
+cron.log
+postmarket.log
+
+# Snapshots (auto-generated, heavy)
+.snapshot_*.json
+
+# State (runtime — commit only if needed for debugging)
+state/competitive_quote_*.json
+state/intraday_monitor_*.json
+state/premarket_*.json
+reports/*/main_agent.log
+reports/*/postmarket.log
+reports/*/premarket.log
+
+# Data (runtime — managed by data/ layer)
+data/recommendations.csv
+data/tracking.csv
+data/summaries/
+data/tracking/
+data/recommendations.csv
+data/tracking.csv
+pycache
