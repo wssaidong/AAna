@@ -19,7 +19,7 @@ AANA_DIR = os.path.expanduser("~/code/AAna")
 sys.path.insert(0, AANA_DIR)
 sys.path.insert(0, os.path.join(AANA_DIR, "scripts"))
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # 东方财富组合同步（可选，无cookie时静默跳过）
 try:
@@ -336,46 +336,35 @@ def screen_afternoon_stocks():
     
     print(f"[AAna 尾盘] {datetime.now().strftime('%H:%M:%S')} 开始尾盘选股...")
     
-    # 1. 获取股票池（用新浪涨幅榜，比固定股票池更有时效性）
-    dynamic_stocks = get_dynamic_stock_pool()
-    if not dynamic_stocks:
-        print("[AAna 尾盘] 获取股票池失败，使用备用池")
-        # 备用：直接用东方财富热门股票
-        import requests
-        try:
-            url = "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=50&po=1&np=1&ut=bd1d9ddb04089700cf9c27f6f7426281&fltt=2&invt=2&fid=f3&fs=m:0+t:6,m:0+t:13,m:0+t:80,m:1+t:2,m:1+t:23&fields=f12,f14,f3,f5,f6"
-            resp = requests.get(url, timeout=10)
-            data = resp.json()
-            raw = data.get('data', {}).get('diff', [])
-            for item in raw:
-                code = str(item.get('f12', '')).zfill(6)
-                dynamic_stocks.append({
-                    'code': code,
-                    'name': item.get('f14', ''),
-                    'price': item.get('f3', 0),
-                    'change_pct': item.get('f3', 0),
-                })
-        except Exception as e:
-            print(f"[AAna 尾盘] 备用池失败: {e}")
-    
-    # 取前50只
-    codes = [s['code'] for s in dynamic_stocks[:50]]
-    print(f"[AAna 尾盘] 候选股票: {len(codes)} 只")
-    
+    # 1. 获取候选股票池（优先用今日选股报告 Top10，次用昨日快照）
+    candidate_codes = []
+    from eastmoney_portfolio import get_snapshot_top10
+
+    # 尝试今日选股报告（盘中版，已含技术评分）
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    candidate_codes = get_snapshot_top10(today_str)
+
+    # 如果今日报告为空（数据源失败），尝试昨日快照
+    if not candidate_codes:
+        yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        candidate_codes = get_snapshot_top10(yesterday_str)
+
+    if not candidate_codes:
+        print("[AAna 尾盘] 候选股票池为空，跳过尾盘选股")
+        return []
+
+    print(f"[AAna 尾盘] 候选股票: {candidate_codes}")
+
     # 2. 获取实时行情
-    prices = get_stock_data_sina(codes)
-    
+    prices = get_stock_data_sina(candidate_codes)
+
     # 3. 逐只评分
     results = []
-    for stock in dynamic_stocks[:50]:
-        code = stock['code']
+    for code in candidate_codes:
         info = prices.get(code, {})
         if not info or info.get('price', 0) <= 0:
             continue
-        
-        info['name'] = stock['name']
-        info['code'] = code
-        
+
         # 过滤：价格区间
         price = info.get('price', 0)
         if price < 20 or price > 80:
@@ -391,16 +380,16 @@ def screen_afternoon_stocks():
             continue
         if change_pct > 5:  # 尾盘策略：涨幅>5%不追高
             continue
-        
+
         # 获取K线（30天）
         klines = get_tencent_kline(code, count=30)
-        
+
         # 评分
         score, scored_info = score_afternoon_stock(info, klines)
-        
+
         if score >= 60:  # 只保留60分以上的
             results.append(scored_info)
-    
+
     # 4. 排序
     results.sort(key=lambda x: x['score'], reverse=True)
     

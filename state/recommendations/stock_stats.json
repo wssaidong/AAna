@@ -86,6 +86,12 @@
           "change": -0.12,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-22",
+          "change": 0.4,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -102,6 +108,12 @@
         {
           "date": "2026-05-21",
           "change": 0.0,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -0.69,
           "hit": false,
           "sector": "robot"
         }
@@ -122,6 +134,12 @@
           "change": -0.16,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -1.48,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -140,9 +158,15 @@
           "change": -1.96,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-22",
+          "change": 0.0,
+          "hit": true,
+          "sector": "robot"
         }
       ],
-      "consecutive_bad": 2
+      "consecutive_bad": 0
     },
     "002230": {
       "name": "科大讯飞",
@@ -157,6 +181,12 @@
           "date": "2026-05-21",
           "change": -0.52,
           "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -0.8,
+          "hit": true,
           "sector": "robot"
         }
       ],
@@ -176,6 +206,12 @@
           "change": -1.22,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -0.74,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -194,6 +230,12 @@
           "change": -0.05,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -0.04,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -211,6 +253,12 @@
           "date": "2026-05-21",
           "change": -0.3,
           "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -1.02,
+          "hit": true,
           "sector": "energy"
         }
       ],
@@ -272,6 +320,12 @@
           "change": 0.75,
           "hit": true,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -1.37,
+          "hit": true,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -283,6 +337,12 @@
           "date": "2026-05-20",
           "change": 0.09,
           "hit": false,
+          "sector": "ai_app"
+        },
+        {
+          "date": "2026-05-22",
+          "change": -0.53,
+          "hit": true,
           "sector": "ai_app"
         }
       ],
@@ -322,6 +382,11 @@
           "date": "2026-05-21",
           "avg_change": -0.5233333333333333,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-05-22",
+          "avg_change": -0.6,
+          "hit_rate": 100.0
         }
       ]
     },
@@ -337,6 +402,11 @@
           "date": "2026-05-21",
           "avg_change": -0.552,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-05-22",
+          "avg_change": -0.514,
+          "hit_rate": 80.0
         }
       ]
     },
@@ -347,6 +417,11 @@
           "date": "2026-05-20",
           "avg_change": 0.42,
           "hit_rate": 50.0
+        },
+        {
+          "date": "2026-05-22",
+          "avg_change": -0.9500000000000001,
+          "hit_rate": 100.0
         }
       ]
     },
@@ -364,6 +439,7 @@
   "updated": [
     "2026-05-19",
     "2026-05-20",
-    "2026-05-21"
+    "2026-05-21",
+    "2026-05-22"
   ]
 }
