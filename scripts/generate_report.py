@@ -14,6 +14,7 @@ import json
 import subprocess
 import argparse
 import warnings
+from pathlib import Path
 warnings.filterwarnings('ignore')
 
 from datetime import datetime
@@ -620,10 +621,20 @@ def generate_report():
         sentiment_section = "## 一、大盘概览\n\n"
 
     pos_ratio_str = "{:.0f}%".format(position_ratio * 100) if NEW_MODULES else "50%"
+    # ── 关键价位：上证指数当前价格/涨跌幅 ───────────────────
+    sh_price = prices.get('000001', {}).get('price') or 0
+    sh_change = prices.get('000001', {}).get('change_pct', 0)
     header = (
         "# A股选股报告 — {} v2.5\n\n".format(today) +
         "> AAna 智能选股系统 v2.5 | 仅供参考，不构成投资建议\n"
         "> **生成时间：** {}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +
+        "> **情绪评分：** {}（{}）| **上证指数：** {} {:+.2f}% | **建议仓位：** {}\n\n".format(
+            sentiment_score,
+            sentiment.get('label', '未知') if NEW_MODULES else '未知',
+            format_price(sh_price) if sh_price > 0 else '数据待获取',
+            sh_change,
+            pos_ratio_str
+        ) +
         "> **评分体系：** 技术面{} + 基本面{} + 资金流向{}\n\n".format(
             "{:.0%}".format(WEIGHT_TECH),
             "{:.0%}".format(WEIGHT_FUND),
@@ -637,9 +648,9 @@ def generate_report():
             prices.get('000001', {}).get('price') or '数据待获取',
             '\U0001f534 上涨' if prices.get('000001', {}).get('change_pct', 0) > 0 else '\U0001f7e2 下跌'
         ) +
-        "| 深证成指 | 同上 | - |\n"
-        "| 创业板 | 同上 | - |\n"
-        "| 科创50 | 同上 | - |\n\n"
+        "| 深证成指 | - | - |\n"
+        "| 创业板 | - | - |\n"
+        "| 科创50 | - | - |\n\n"
         "**市场情绪：** {} | **建议仓位：** {}\n\n".format(
             sentiment.get('label', '乐观') if NEW_MODULES else '乐观',
             pos_ratio_str
@@ -713,12 +724,13 @@ def generate_report():
             "> 逻辑：{} | 风险等级：{} | 建议止损：{}\n\n".format(
                 cat['logic'], cat['risk_level'], cat['stop_loss']
             ) +
-            "| 股票 | 代码 | 最新价 | 涨跌幅 | 技术分 | 综合分 | 评级 |\n"
-            "|:----:|:----:|:------:|:------:|:------:|:------:|:----:|\n"
+            "| 股票 | 代码 | 最新价 | 涨跌幅 | 技术分 | 综合分 | 评级 | 推荐理由 |\n"
+            "|:----:|:----:|:------:|:------:|:------:|:------:|:----:|:------:|\n"
         )
         for stock in cat['stocks']:
+            reason = cat.get('logic', '-')
             content += (
-                "| {}{} | {} | {} | {} | {} | **{}** | {} |\n".format(
+                "| {}{} | {} | {} | {} | {} | **{}** | {} | {} |\n".format(
                     stock['emoji'],
                     stock['name'],
                     stock['code'],
@@ -726,7 +738,8 @@ def generate_report():
                     format_change(stock['change_pct']),
                     stock.get('tech_score', 0),
                     stock['\u7efc\u5408\u8bc4\u5206'],
-                    stock['\u8bc4\u7ea7']
+                    stock['\u8bc4\u7ea7'],
+                    reason
                 )
             )
 
@@ -764,21 +777,23 @@ def generate_report():
     content += (
         "\n---\n\n"
         "## 五、风险提示\n\n"
-        "\u26a0\ufe0f **免责声明**：本报告仅供参考，不构成投资建议\n\n"
+        "⚠️ **免责声明**：本报告仅供参考，不构成投资建议\n\n"
         "| 风险类型 | 说明 | 应对 |\n"
         "|:--------:|:----:|:----:|\n"
         "| 追高风险 | 涨停或大涨>7%个股容易回调 | 勿追高，等回调 |\n"
-        "| 止损风险 | 严格执行止损线 | 建议{}强制止损 |\n".format(stop_loss_rule) +
+        "| 止损风险 | 严格执行止损线 | 建议{}强制止损 |\n"
         "| 流动性风险 | 成交额<1千万谨慎 | 回避 |\n"
         "| 风格切换 | 热点板块可能轮动 | 分散持仓 |\n\n"
-        "**止损原则：** {} 必须止损，不可恋战\n\n".format(stop_loss_rule) +
+        "**止损原则：** {} 必须止损，不可恋战\n\n"
         "---\n\n"
         "## 六、评分系统说明（v2.5）\n\n"
+    ).format(stop_loss_rule)
+    content += (
         "| 维度 | 权重 | 评分要素 |\n"
         "|:----:|:----:|:--------|\n"
-        "| 技术面 | {:.0%} | 涨跌幅、量比、均线位置 |\n".format(WEIGHT_TECH if NEW_MODULES else 0.6) +
-        "| 基本面 | {:.0%} | 板块、股价位置、流动性 |\n".format(WEIGHT_FUND if NEW_MODULES else 0.4) +
-        "| 资金流向 | {:.0%} | 东方财富主力净流入 |\n".format(WEIGHT_MONEYFLOW if NEW_MODULES else 0.0) +
+        "| 技术面 | {:.0%} | 涨跌幅、量比、均线位置 |\n"
+        "| 基本面 | {:.0%} | 板块、股价位置、流动性 |\n"
+        "| 资金流向 | {:.0%} | 东方财富主力净流入 |\n"
         "\n"
         "**技术分计算：**\n"
         "- 回调-3%~0%：+12分（最佳买点区）\n"
@@ -786,8 +801,88 @@ def generate_report():
         "- 温和上涨0~5%：+10分\n"
         "- 涨停>9%：-15分（风险大）\n\n"
         "---\n\n"
+        "## 七、本周操作回顾\n\n"
+    ).format(WEIGHT_TECH if NEW_MODULES else 0.6, WEIGHT_FUND if NEW_MODULES else 0.4, WEIGHT_MONEYFLOW if NEW_MODULES else 0.0)
+
+    # ── 读取 paper_trading 持仓 ─────────────────────────────────
+    paper_positions = []
+    paper_init_cash = 100000
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent / "data"))
+        from paper_trading import _load
+        d = _load()
+        paper_init_cash = d.get("init_cash", 100000)
+        positions = d.get("positions", {})
+        snapshots = d.get("daily_snapshots", [])
+        for code, pos in positions.items():
+            current_price = 0
+            unreal_pnl = 0
+            unreal_pct = 0
+            if snapshots:
+                latest = snapshots[-1]
+                ps = next((p for p in latest.get("positions", []) if p["code"] == code), None)
+                if ps:
+                    current_price = ps.get("current_price", 0)
+                    unreal_pnl = ps.get("unreal_pnl", 0)
+                    unreal_pct = ps.get("unreal_pct", 0)
+            paper_positions.append({
+                "code": code,
+                "name": pos.get("name", code),
+                "shares": pos.get("shares", 0),
+                "entry_price": pos.get("entry_price", 0),
+                "current_price": current_price,
+                "unreal_pnl": unreal_pnl,
+                "unreal_pct": unreal_pct,
+                "days_held": (datetime.now() - datetime.strptime(pos.get("entry_date", datetime.now().strftime("%Y-%m-%d")), "%Y-%m-%d")).days,
+            })
+    except Exception as e:
+        print(f"[AAna] 模拟交易数据读取失败: {e}")
+
+    if paper_positions:
+        realized = 0
+        unrealized = sum(p["unreal_pnl"] for p in paper_positions)
+        total_pnl = realized + unrealized
+        total_pnl_pct = total_pnl / paper_init_cash * 100
+        content += (
+            "| 股票 | 代码 | 持仓天数 | 成本价 | 现价 | 浮盈 | 浮盈% |\n"
+            "|:----:|:----:|:------:|:------:|:----:|:----:|:----:|\n"
+        )
+        for p in paper_positions:
+            entry_str = format_price(p["entry_price"])
+            curr_str = format_price(p["current_price"]) if p["current_price"] > 0 else "（休市）"
+            content += (
+                "| {}{} | {} | {}天 | {} | {} | {:+.2f} | {:+.2f}% |\n".format(
+                    get_sector_emoji(p["name"]),
+                    p["name"],
+                    p["code"],
+                    p["days_held"],
+                    entry_str,
+                    curr_str,
+                    p["unreal_pnl"],
+                    p["unreal_pct"],
+                )
+            )
+        content += "\n"
+        content += (
+            "> **模拟仓汇总：** 初始资金 {:,.0f} | 累计收益 {:+.2f}（{:+.2f}%）| "
+            "持仓 {} 只\n\n".format(
+                paper_init_cash, total_pnl, total_pnl_pct, len(paper_positions)
+            )
+        )
+    else:
+        content += "*本周暂无模拟交易持仓*\n\n"
+
+    content += (
+        "---\n\n"
         "*AAna v2.5 | china-stock-analysis 集成 | {}*\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     )
+
+    # ========== 保存报告 ==========
+    os.makedirs(REPORT_DIR, exist_ok=True)
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f"[AAna] 选股报告已生成: {filename}")
+
 def generate_review_report():
     """生成每日复盘评分报告 + 模拟交易结算"""
     today = get_today_str()
@@ -900,9 +995,11 @@ def generate_review_report():
     if NEW_MODULES:
         try:
             from data import mark_to_market, auto_stop_loss, auto_take_profit_trail, paper_summary
-            mark_to_market(current_prices)
-            auto_stop_loss(current_prices)
-            auto_take_profit_trail(current_prices)
+            today_str = get_today_str()
+            quotes = {code: info.get('price', 0) for code, info in current_prices.items()}
+            mark_to_market(today_str, quotes)
+            auto_stop_loss(today_str, quotes)
+            auto_take_profit_trail(today_str, quotes)
             ps = paper_summary()
             paper_pnl = ps.get('total_pnl', 0)
             print(f"[\u6a21\u62df\u4ea4\u6613] \u4f53\u7ecf\u6536\u76ca: {paper_pnl:+.2f}")

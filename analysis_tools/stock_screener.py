@@ -119,6 +119,19 @@ class StockScreener:
             print(f"获取自定义股票数据失败: {e}")
             return pd.DataFrame()
 
+    def _is_banned_board(self, code: str) -> bool:
+        """检查是否属于不推荐的板块（科创板688/8开头、创业板300/301开头）"""
+        if not code:
+            return False
+        code_str = str(code)
+        # 科创板: 688开头 或 8开头（老代码）
+        if code_str.startswith('688') or code_str.startswith('8'):
+            return True
+        # 创业板: 300开头 或 301开头
+        if code_str.startswith('300') or code_str.startswith('301'):
+            return True
+        return False
+
     def _apply_numeric_filter(self, df: pd.DataFrame, column: str,
                                min_val: float = None, max_val: float = None) -> pd.DataFrame:
         """应用数值筛选条件"""
@@ -142,6 +155,14 @@ class StockScreener:
     def apply_filters(self, df: pd.DataFrame, filters: Dict) -> pd.DataFrame:
         """应用筛选条件"""
         filtered = df.copy()
+
+        # 科创板/创业板过滤（默认排除）
+        if filters.get('exclude_banned_board', True):
+            before_count = len(filtered)
+            filtered = filtered[~filtered['代码'].apply(self._is_banned_board)]
+            after_count = len(filtered)
+            if before_count > after_count:
+                print(f"  排除科创板/创业板: {before_count - after_count} 只")
 
         # PE筛选
         filtered = self._apply_numeric_filter(
@@ -169,6 +190,34 @@ class StockScreener:
             max_val=filters.get('debt_ratio_max')
         )
 
+        # 量比筛选（异动检测）
+        if filters.get('volume_ratio_min') is not None or filters.get('volume_ratio_max') is not None:
+            filtered = self._apply_numeric_filter(
+                filtered, '量比',
+                min_val=filters.get('volume_ratio_min'),
+                max_val=filters.get('volume_ratio_max')
+            )
+
+        # 主力净流入占比筛选
+        if filters.get('main_net_ratio_min') is not None or filters.get('main_net_ratio_max') is not None:
+            main_col = self._find_column(filtered, ['主力净流入占比', '主力净流入占总成交额比例'])
+            if main_col:
+                filtered = self._apply_numeric_filter(
+                    filtered, main_col,
+                    min_val=filters.get('main_net_ratio_min'),
+                    max_val=filters.get('main_net_ratio_max')
+                )
+
+        # RSI极端值筛选
+        if filters.get('rsi_max') is not None:
+            rsi_col = self._find_column(filtered, ['RSI', 'RSI_14'])
+            if rsi_col:
+                filtered = self._apply_numeric_filter(filtered, rsi_col, max_val=filters['rsi_max'])
+        if filters.get('rsi_min') is not None:
+            rsi_col = self._find_column(filtered, ['RSI', 'RSI_14'])
+            if rsi_col:
+                filtered = self._apply_numeric_filter(filtered, rsi_col, min_val=filters['rsi_min'])
+
         # 总市值筛选（转换为亿）
         if '总市值' in filtered.columns:
             if filters.get('market_cap_min') is not None or filters.get('market_cap_max') is not None:
@@ -185,8 +234,36 @@ class StockScreener:
         """从行中获取数值，无效返回 NaN"""
         return pd.to_numeric(row.get(column, np.nan), errors='coerce')
 
-    def calculate_score(self, row: pd.Series) -> float:
-        """计算综合评分 (0-100)"""
+    def calculate_score(self, row: pd.Series, weights: Dict = None) -> float:
+        """计算综合评分 (0-100)
+        
+        Args:
+            row: 股票数据行
+            weights: 评分权重配置，格式:
+                {
+                    'pe': 15,      # PE权重（默认15）
+                    'pb': 10,      # PB权重（默认10）
+                    'roe': 15,     # ROE权重（默认15）
+                    'change': 5,   # 涨跌幅权重（默认5）
+                    'volume_ratio': 5,   # 量比权重（新增）
+                    'main_net_ratio': 5, # 主力净流入占比权重（新增）
+                    'rsi': 5              # RSI权重（新增）
+                }
+        """
+        # 默认权重
+        default_weights = {
+            'pe': 15,
+            'pb': 10,
+            'roe': 15,
+            'change': 5,
+            'volume_ratio': 5,
+            'main_net_ratio': 5,
+            'rsi': 5
+        }
+        if weights:
+            default_weights.update(weights)
+        w = default_weights
+
         score = 50
 
         try:
@@ -194,23 +271,23 @@ class StockScreener:
             pe = self._get_numeric_value(row, '市盈率-动态')
             if not np.isnan(pe) and pe > 0:
                 if pe < 10:
-                    score += 15
+                    score += w['pe']
                 elif pe < 15:
-                    score += 10
+                    score += w['pe'] * 0.7
                 elif pe < 20:
-                    score += 5
+                    score += w['pe'] * 0.3
                 elif pe > 50:
-                    score -= 10
+                    score -= w['pe'] * 0.7
 
             # PB评分
             pb = self._get_numeric_value(row, '市净率')
             if not np.isnan(pb) and pb > 0:
                 if 0.5 < pb < 1.5:
-                    score += 10
+                    score += w['pb']
                 elif 1.5 <= pb < 3:
-                    score += 5
+                    score += w['pb'] * 0.5
                 elif pb > 5:
-                    score -= 5
+                    score -= w['pb'] * 0.5
 
             # ROE评分
             roe_col = self._find_column(row.index.to_frame(), ['净资产收益率', 'ROE', '加权净资产收益率'])
@@ -218,21 +295,55 @@ class StockScreener:
                 roe = self._get_numeric_value(row, roe_col)
                 if not np.isnan(roe):
                     if roe > 20:
-                        score += 15
+                        score += w['roe']
                     elif roe > 15:
-                        score += 10
+                        score += w['roe'] * 0.7
                     elif roe > 10:
-                        score += 5
+                        score += w['roe'] * 0.3
                     elif roe < 5:
-                        score -= 5
+                        score -= w['roe'] * 0.3
 
             # 涨跌幅评分 (下跌可能是机会)
             change = self._get_numeric_value(row, '涨跌幅')
             if not np.isnan(change):
                 if -5 < change < 0:
-                    score += 3
+                    score += w['change'] * 0.6
                 elif change < -5:
-                    score += 5
+                    score += w['change']
+
+            # 量比评分（异动检测，越高可能越活跃）
+            volume_ratio = self._get_numeric_value(row, '量比')
+            if not np.isnan(volume_ratio):
+                if 1.5 <= volume_ratio <= 3:
+                    score += w['volume_ratio'] * 0.5
+                elif volume_ratio > 3:
+                    score += w['volume_ratio'] * 0.8
+                elif volume_ratio < 0.5:
+                    score -= w['volume_ratio'] * 0.3
+
+            # 主力净流入占比评分
+            main_col = self._find_column(row.index.to_frame(), ['主力净流入占比', '主力净流入占总成交额比例'])
+            if main_col:
+                main_net_ratio = self._get_numeric_value(row, main_col)
+                if not np.isnan(main_net_ratio):
+                    if main_net_ratio > 10:
+                        score += w['main_net_ratio']
+                    elif main_net_ratio > 5:
+                        score += w['main_net_ratio'] * 0.6
+                    elif main_net_ratio < -10:
+                        score -= w['main_net_ratio'] * 0.5
+
+            # RSI评分（极端值过滤参考）
+            rsi_col = self._find_column(row.index.to_frame(), ['RSI', 'RSI_14'])
+            if rsi_col:
+                rsi = self._get_numeric_value(row, rsi_col)
+                if not np.isnan(rsi):
+                    if 40 <= rsi <= 60:
+                        score += w['rsi'] * 0.3  # 中性区间
+                    elif rsi < 30:
+                        score += w['rsi'] * 0.5  # 超卖，可能是机会
+                    elif rsi > 70:
+                        score -= w['rsi'] * 0.3  # 超买，风险
 
         except Exception:
             pass
@@ -240,8 +351,21 @@ class StockScreener:
         return max(0, min(100, score))
 
     def screen(self, scope: str = "hs300", filters: Dict = None,
-              sort_by: str = "score", top_n: int = None) -> List[Dict]:
-        """执行筛选"""
+              sort_by: str = "score", top_n: int = None,
+              score_weights: Dict = None) -> List[Dict]:
+        """执行筛选
+        
+        Args:
+            scope: 筛选范围
+            filters: 筛选条件字典
+            sort_by: 排序方式
+            top_n: 返回前N只股票
+            score_weights: 评分权重配置，格式:
+                {
+                    'pe': 15, 'pb': 10, 'roe': 15, 'change': 5,
+                    'volume_ratio': 5, 'main_net_ratio': 5, 'rsi': 5
+                }
+        """
         # 加载数据
         if scope.startswith("custom:"):
             codes = scope.replace("custom:", "").split(",")
@@ -260,7 +384,7 @@ class StockScreener:
             return []
 
         # 计算评分
-        df['评分'] = df.apply(self.calculate_score, axis=1)
+        df['评分'] = df.apply(lambda row: self.calculate_score(row, score_weights), axis=1)
 
         # 排序
         if sort_by == "score":
@@ -316,13 +440,25 @@ def main():
                        help="排序方式")
     parser.add_argument("--top", type=int, default=50, help="返回前N只股票")
     parser.add_argument("--output", type=str, help="输出文件路径 (JSON)")
+    parser.add_argument("--volume-ratio-min", type=float, help="最小量比（异动检测）")
+    parser.add_argument("--volume-ratio-max", type=float, help="最大量比")
+    parser.add_argument("--main-net-ratio-min", type=float, help="最小主力净流入占比 (%%)")
+    parser.add_argument("--main-net-ratio-max", type=float, help="最大主力净流入占比 (%%)")
+    parser.add_argument("--rsi-min", type=float, help="最小RSI")
+    parser.add_argument("--rsi-max", type=float, help="最大RSI")
+    parser.add_argument("--include-banned-board", action="store_true",
+                       help="包含科创板/创业板（默认排除）")
+    parser.add_argument("--weights", type=str, help="评分权重JSON字符串，格式: {\"pe\":15,\"pb\":10,...}")
 
     args = parser.parse_args()
 
     # 构建筛选条件
     filter_keys = [
         'pe_max', 'pe_min', 'pb_max', 'pb_min', 'roe_min',
-        'debt_ratio_max', 'dividend_min', 'market_cap_min', 'market_cap_max'
+        'debt_ratio_max', 'dividend_min', 'market_cap_min', 'market_cap_max',
+        'volume_ratio_min', 'volume_ratio_max',
+        'main_net_ratio_min', 'main_net_ratio_max',
+        'rsi_min', 'rsi_max'
     ]
     filters = {
         k: getattr(args, k.replace('-', '_'))
@@ -330,13 +466,26 @@ def main():
         if getattr(args, k.replace('-', '_')) is not None
     }
 
+    # 科创板/创业板过滤（默认排除）
+    filters['exclude_banned_board'] = not args.include_banned_board
+
+    # 评分权重
+    score_weights = None
+    if args.weights:
+        try:
+            score_weights = json.loads(args.weights)
+        except json.JSONDecodeError:
+            print("警告: 权重JSON格式错误，将使用默认权重")
+            score_weights = None
+
     # 执行筛选
     screener = StockScreener()
     results = screener.screen(
         scope=args.scope,
         filters=filters if filters else None,
         sort_by=args.sort_by,
-        top_n=args.top
+        top_n=args.top,
+        score_weights=score_weights
     )
 
     # 输出结果

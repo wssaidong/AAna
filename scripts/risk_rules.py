@@ -10,6 +10,7 @@ AAna v2.5 风控规则硬化模块
 
 from datetime import datetime
 from typing import Optional
+import csv, pathlib
 
 # ── 硬规则常量 ──────────────────────────────────────────────────
 
@@ -25,6 +26,15 @@ POSITION_RULES = {
 
 # 单股最大仓位（总资金的%）
 MAX_SINGLE_POSITION_PCT = 0.20   # 不超过20%
+
+# 大盘情绪联动仓位（冰点/分歧/亢奋）
+SENTIMENT_POSITION_RULES = {
+    "冰点": 1.00,    # 情绪极低，满仓进场
+    "分歧": 0.60,    # 情绪分化，半仓以下
+    "亢奋": 0.30,    # 情绪高涨，轻仓试单
+    "回暖": 0.70,    # 正常回暖，正常仓
+    "空仓": 0.00,    # 建议空仓
+}
 
 # 止损规则
 STOP_LOSS_PCT = 0.03            # 买入后 -3% 强制止损
@@ -63,6 +73,60 @@ def get_position_ratio(sentiment_score: int) -> float:
         return POSITION_RULES["极低仓"]
     else:
         return POSITION_RULES["空仓观望"]
+
+
+def get_sentiment_position_ratio(sentiment_label: str) -> float:
+    """
+    根据大盘情绪标签返回仓位比例（冰点100%/分歧60%/亢奋30%）
+    向后兼容：若标签不在字典中，使用默认值 0.50
+    """
+    return SENTIMENT_POSITION_RULES.get(sentiment_label, 0.50)
+
+
+def check_concentration_risk(positions: dict, total_capital: float) -> list:
+    """
+    检查持仓集中度风险
+    positions: {code: {'shares': int, 'current_price': float}}
+    total_capital: 总资金
+    返回触发集中的股票列表 [{'code': str, 'ratio': float, 'reason': str}]
+    """
+    triggered = []
+    for code, pos in positions.items():
+        value = pos['current_price'] * pos['shares']
+        ratio = value / total_capital
+        if ratio > MAX_SINGLE_POSITION_PCT:
+            triggered.append({
+                'code': code,
+                'ratio': round(ratio * 100, 2),
+                'reason': f"持仓集中度{ratio*100:.1f}%>20%"
+            })
+    return triggered
+
+
+_STOP_LOSS_LOG = pathlib.Path(__file__).parent.parent / "data" / "stop_loss_log.csv"
+_STOP_LOSS_LOG_FIELDS = ["datetime", "code", "entry_price", "exit_price", "loss_pct", "action", "reason"]
+
+
+def log_stop_loss(code: str, entry_price: float, exit_price: float,
+                  loss_pct: float, action: str, reason: str) -> None:
+    """
+    追加止损日志到 data/stop_loss_log.csv
+    """
+    _STOP_LOSS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    file_exists = _STOP_LOSS_LOG.exists()
+    with open(_STOP_LOSS_LOG, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=_STOP_LOSS_LOG_FIELDS)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow({
+            "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "code": code,
+            "entry_price": entry_price,
+            "exit_price": exit_price,
+            "loss_pct": round(loss_pct * 100, 2),
+            "action": action,
+            "reason": reason,
+        })
 
 
 def filter_stock_basic(code: str, name: str, price: float,
@@ -265,10 +329,14 @@ class RiskManager:
 
         # 硬止损 -5%
         if loss_pct <= -STOP_LOSS_HARD_PCT:
+            log_stop_loss(code="", entry_price=entry_price, exit_price=current_price,
+                          loss_pct=loss_pct, action="清仓", reason=f"硬止损{loss_pct*100:.1f}%")
             return "清仓", f"跌幅{loss_pct*100:.1f}%触发硬止损-5%", round(current_price * 0.995, 2)
 
         # 软止损 -3%
         if loss_pct <= -STOP_LOSS_PCT:
+            log_stop_loss(code="", entry_price=entry_price, exit_price=current_price,
+                          loss_pct=loss_pct, action="止损", reason=f"软止损{loss_pct*100:.1f}%")
             return "止损", f"跌幅{loss_pct*100:.1f}%触发软止损-3%", round(current_price * 0.99, 2)
 
         # 移动止盈
@@ -279,6 +347,38 @@ class RiskManager:
                 return "止盈", f"从高点回落至触发线({trail_price})，盈利{profit_pct*100:.1f}%", round(current_price * 0.99, 2)
 
         return "持有", f"现价{current_price}在成本价{entry_price:.2f}上方", current_price
+
+    def check_risk(self, positions: dict, total_capital: float) -> dict:
+        """
+        综合性风控检查（向后兼容）
+        返回 {'pass': bool, 'alerts': list, 'actions': list}
+        alerts: 警告信息列表
+        actions: 需要执行的止损/降仓动作
+        """
+        alerts = []
+        actions = []
+
+        # 1) 持仓集中度检查
+        concentration = check_concentration_risk(positions, total_capital)
+        for item in concentration:
+            alerts.append(f"[集中度警告] {item['code']} 持仓{item['ratio']}% > 20%")
+
+        # 2) 大盘情绪联动仓位（基于当前 sentiment label）
+        sentiment_label = self.sentiment.get('label', '正常')
+        sentiment_pos = get_sentiment_position_ratio(sentiment_label)
+        if sentiment_pos == 0.0:
+            alerts.append(f"[仓位警告] 大盘情绪「{sentiment_label}」建议空仓")
+        elif sentiment_pos <= 0.30:
+            alerts.append(f"[仓位警告] 大盘情绪「{sentiment_label}」建议轻仓{sentiment_pos*100:.0f}%")
+
+        return {
+            'pass': len(concentration) == 0 and sentiment_pos > 0,
+            'alerts': alerts,
+            'actions': actions,
+            'concentration_risk': concentration,
+            'sentiment_position_ratio': sentiment_pos,
+            'sentiment_label': sentiment_label,
+        }
 
 
 # ── 报告辅助 ───────────────────────────────────────────────────

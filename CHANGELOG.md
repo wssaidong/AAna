@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `backtest/optimizer.py` — 回测优化工具
+  - `HoldDaysScanner` — 最优持有天数扫描（遍历 5/10/15/20/30 天，找出收益率最高的持有天数）
+  - `StopLossComparator` — 止损条件回测对比（带止损 -5% vs 不带止损，输出对比表）
 - `backtest/` — 回测引擎，基于 backtrader
   - `backtest/engine.py` — BacktestEngine + ScoreSignalStrategy（将 strategies/ 评分转为买卖信号）
   - `backtest/runner.py` — 命令行回测入口，读取 recommendations.csv 按推荐日次日买入、持有N天卖出

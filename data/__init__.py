@@ -244,6 +244,12 @@ from data.paper_trading import (
     summary as paper_summary,
     sync_from_recommendations,
 )
+from scripts.risk_rules import (
+    check_concentration_risk,
+    get_sentiment_position_ratio,
+    log_stop_loss,
+    SENTIMENT_POSITION_RULES,
+)
 
 __all__ = [
     "append_recommendation", "append_recommendations_batch",
@@ -256,4 +262,6 @@ __all__ = [
     "record_buy", "record_sell", "mark_to_market",
     "auto_stop_loss", "auto_take_profit_trail",
     "paper_summary", "sync_from_recommendations",
+    "check_concentration_risk", "get_sentiment_position_ratio",
+    "log_stop_loss", "SENTIMENT_POSITION_RULES",
 ]

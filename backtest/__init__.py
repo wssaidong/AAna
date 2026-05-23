@@ -25,5 +25,13 @@ backtest/ — AAna 回测引擎
 
 from .engine import BacktestEngine, ScoreSignalStrategy
 from .runner import run, load_recommendations
+from .optimizer import HoldDaysScanner, StopLossComparator
 
-__all__ = ["BacktestEngine", "ScoreSignalStrategy", "run", "load_recommendations"]
+__all__ = [
+    "BacktestEngine",
+    "ScoreSignalStrategy",
+    "run",
+    "load_recommendations",
+    "HoldDaysScanner",
+    "StopLossComparator",
+]

@@ -135,6 +135,143 @@ python agents/postmarket_agent.py
 
 ---
 
+## v2.6 新功能
+
+### 1) stock_screener 新参数用法
+
+v2.6 新增 **量比筛选**、**主力净流入占比筛选**、**RSI极端值过滤**、**自定义评分权重** 等参数：
+
+```bash
+# 量比筛选：找出量比 > 2 的异动股
+python -m analysis_tools.stock_screener \
+  --scope hs300 \
+  --volume-ratio-min 2 \
+  --top 20
+
+# 主力净流入占比 + RSI 过滤
+python -m analysis_tools.stock_screener \
+  --scope all \
+  --main-net-ratio-min 5 \
+  --rsi-max 70 \
+  --top 30
+
+# 自定义评分权重（PE权重降低，量比/资金流权重提高）
+python -m analysis_tools.stock_screener \
+  --scope zz500 \
+  --weights '{"pe":10,"pb":5,"roe":10,"change":5,"volume_ratio":10,"main_net_ratio":10,"rsi":10}' \
+  --top 20
+```
+
+**支持参数：**
+
+| 参数 | 说明 | 示例 |
+|:----:|:----:|:-----|
+| `--volume-ratio-min/max` | 量比筛选 | `--volume-ratio-min 1.5` |
+| `--main-net-ratio-min/max` | 主力净流入占比(%) | `--main-net-ratio-min 5` |
+| `--rsi-min/max` | RSI极端值过滤 | `--rsi-max 70` |
+| `--include-banned-board` | 包含科创/创业板（默认排除） | `--include-banned-board` |
+| `--weights` | JSON评分权重 | `--weights '{"pe":15}'` |
+
+---
+
+### 2) generate_report 新增「本周操作回顾」
+
+generate_report 在选股报告末尾自动生成 **本周操作回顾**（Section 七），读取 `data/paper_trading.json` 中的模拟持仓数据，展示：
+
+- 当前持仓：股票名称、代码、持仓天数、成本价、现价、浮盈/浮盈%
+- 汇总：初始资金、累计收益（含收益率）、持仓只数
+
+```
+| 股票 | 代码 | 持仓天数 | 成本价 | 现价 | 浮盈 | 浮盈% |
+|:----:|:----:|:------:|:------:|:----:|:----:|:----:|
+| 🧠科大讯飞 | 002230 | 3天 | ¥45.20 | ¥47.50 | +230 | +1.02% |
+
+> **模拟仓汇总：** 初始资金 100,000 | 累计收益 +230.00（+0.23%）| 持仓 1 只
+```
+
+> 注意：`data/paper_trading.json` 由 `data/paper_trading.py` 模拟交易模块管理，需先运行过模拟下单才会显示持仓。
+
+---
+
+### 3) HoldDaysScanner 用法示例
+
+最优持有天数扫描器，对同一批股票遍历 `hold_days ∈ {5, 10, 15, 20, 30}`，输出各天数的总收益率、交易次数、胜率、最大回撤对比表：
+
+```python
+from backtest.optimizer import HoldDaysScanner
+
+# 扫描最优持有天数
+scanner = HoldDaysScanner(
+    codes=["603906", "605566", "000001"],
+    start="20250101",
+    end="20250601"
+)
+result = scanner.scan()       # 执行扫描
+scanner.print_summary()       # 打印 Markdown 对比表
+
+# 获取最优持有天数
+best = scanner.best_hold_days()
+print(f"最优持有天数: {best} 天")
+```
+
+**输出示例：**
+
+```
+### 📊 最优持有天数扫描结果（代码: ['603906', ...]，区间: 20250101~20250601）
+
+| hold_days | 总收益率(%) | 交易次数 | 胜率(%) | 平均持仓天 | 最大回撤(%) |
+|------------|------------|----------|---------|------------|------------|
+|          5 |      12.34 |       20 |    65.0 |       5.0  |      -3.21  |
+|         10 |      18.76 |       15 |    70.2 |      10.0  |      -4.15  |
+|         15 |      22.11 |       12 |    72.5 |      15.0  |      -5.02  |
+|         20 |      19.33 |       10 |    68.0 |      20.0  |      -6.10  |
+|         30 |      15.82 |        8 |    65.0 |      30.0  |      -7.50  |
+
+✅ 最优持有天数：**15 天**（总收益率 22.11%）
+```
+
+---
+
+### 4) StopLossComparator 用法示例
+
+止损条件回测对比器，同一参数下对比「带止损（-5%）」vs「不带止损（stop_loss_pct=0）」两种策略表现：
+
+```python
+from backtest.optimizer import StopLossComparator
+
+# 止损条件回测对比
+comparator = StopLossComparator(
+    codes=["603906", "605566"],
+    start="20250101",
+    end="20250601",
+    hold_days=5
+)
+result = comparator.compare()       # 执行两组回测
+comparator.print_summary()          # 打印对比表
+
+# 查看结果
+print(f"带止损总收益率: {result['with_stop_loss']['total_return_pct']}%")
+print(f"不带止损总收益率: {result['without_stop_loss']['total_return_pct']}%")
+```
+
+**输出示例：**
+
+```
+### 🔍 止损条件回测对比（代码: ['603906', ...]，持仓: 5天，区间: 20250101~20250601）
+
+| 指标         | 带止损(-5%)  | 不带止损     |
+|--------------|-------------|-------------|
+| 总收益率(%)  |       18.76 |       15.32  |
+| 交易次数     |           15 |           12  |
+| 胜率(%)      |        70.2 |        68.0  |
+| 平均持仓天   |        10.1 |        10.0  |
+| 最大回撤(%)  |        -4.15|        -6.10  |
+
+✅ 带止损总收益率更高，领先 3.44 个百分点
+```
+
+---
+
 ## 技术栈
 
 - **语言**：Python 3.9+

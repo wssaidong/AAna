@@ -181,6 +181,57 @@ class PortfolioTracker:
         self.states.append(state)
         return state
 
+    def check_risk(self, sentiment: dict = None) -> dict:
+        """
+        集成风控规则检查（新规则：持仓集中度 + 大盘情绪联动仓位）
+        自动从 risk_rules 导入并调用
+        返回 {'pass': bool, 'alerts': list, 'actions': list}
+        """
+        try:
+            from scripts.risk_rules import (
+                check_concentration_risk,
+                get_sentiment_position_ratio,
+                log_stop_loss,
+                STOP_LOSS_PCT,
+                STOP_LOSS_HARD_PCT,
+            )
+        except ImportError:
+            return {'pass': True, 'alerts': [], 'actions': [], 'error': 'risk_rules not found'}
+
+        sentiment = sentiment or {}
+        sentiment_label = sentiment.get('label', '正常')
+        sentiment_pos = get_sentiment_position_ratio(sentiment_label)
+
+        # 构建 positions dict（适配 risk_rules 格式）
+        positions_dict = {
+            code: {'shares': p.shares, 'current_price': p.current_price}
+            for code, p in self.positions.items()
+        }
+        total_capital = self.states[-1].total_value if self.states else self.initial_cash
+
+        alerts = []
+        actions = []
+
+        # 1) 持仓集中度检查
+        concentration = check_concentration_risk(positions_dict, total_capital)
+        for item in concentration:
+            alerts.append(f"[集中度警告] {item['code']} 持仓{item['ratio']}% > 20%")
+
+        # 2) 大盘情绪仓位联动
+        if sentiment_pos == 0.0:
+            alerts.append(f"[仓位警告] 大盘情绪「{sentiment_label}」建议空仓")
+        elif sentiment_pos <= 0.30:
+            alerts.append(f"[仓位警告] 大盘情绪「{sentiment_label}」建议轻仓{sentiment_pos*100:.0f}%")
+
+        return {
+            'pass': len(concentration) == 0 and sentiment_pos > 0,
+            'alerts': alerts,
+            'actions': actions,
+            'concentration_risk': concentration,
+            'sentiment_position_ratio': sentiment_pos,
+            'sentiment_label': sentiment_label,
+        }
+
     # ── 持久化 ─────────────────────────────────────────────────────────────────
 
     def _serialize(self) -> dict:

@@ -52,6 +52,18 @@ def _req(url: str, params=None, headers=None, timeout=TIMEOUT) -> Optional[reque
         return None
 
 
+def _retry_req(url: str, params=None, headers=None, timeout=TIMEOUT,
+               retries: int = 2, backoff: float = 0.5) -> Optional[requests.Response]:
+    """带指数退避重试的请求封装."""
+    for attempt in range(retries + 1):
+        resp = _req(url, params, headers, timeout)
+        if resp is not None and resp.status_code == 200:
+            return resp
+        if attempt < retries:
+            time.sleep(backoff * (2 ** attempt))
+    return None
+
+
 def _sf(v, default=None) -> Optional[float]:
     """安全转 float"""
     if v is None or v == '' or v == '--' or v == '-':
@@ -207,7 +219,7 @@ class QuoteService:
     def _sina_quote(self, codes: List[str]) -> Dict[str, Dict[str, Any]]:
         try:
             joined = ','.join(_prefix(c) for c in codes)
-            r = _req(SINA_HQ + joined)
+            r = _retry_req(SINA_HQ + joined)
             if not r:
                 return {}
             text = r.text.encode('gbk').decode('gbk') if r.content else ""
@@ -244,7 +256,7 @@ class QuoteService:
     def _tencent_quote(self, codes: List[str]) -> Dict[str, Dict[str, Any]]:
         try:
             joined = ','.join(_prefix(c) for c in codes)
-            r = _req(TENCENT_QT + joined)
+            r = _retry_req(TENCENT_QT + joined)
             if not r:
                 return {}
             text = r.text
@@ -277,7 +289,7 @@ class QuoteService:
             mkt = 'sh' if code.startswith(('6', '9')) else 'sz'
             url = TENCENT_KL
             params = {"param": f"{mkt}{code},day,,,{count},{adjust}"}
-            r = _req(url, params)
+            r = _retry_req(url, params)
             if not r:
                 return []
             text = r.text.strip()
@@ -305,7 +317,7 @@ class QuoteService:
                 "symbol": _prefix(code), "scale": 240,  # 240分钟=日K
                 "ma": "no", "datalen": count
             }
-            r = _req(url, params)
+            r = _retry_req(url, params)
             if not r:
                 return []
             data = r.json()
@@ -328,7 +340,7 @@ class QuoteService:
                 "fs": "m:90+t:2",
                 "fields": "f2,f3,f4,f12,f14"
             }
-            r = _req(url, params)
+            r = _retry_req(url, params)
             if not r:
                 return []
             d = r.json().get('data', {}).get('diff', [])
@@ -345,7 +357,7 @@ class QuoteService:
         try:
             dt = date_str or datetime.now().strftime('%Y-%m-%d')
             url = THS_HOT + f"date/{dt}/orderby/date/orderway/desc/charset/GBK/"
-            r = _req(url, headers={"Referer": "http://zx.10jqka.com.cn/"})
+            r = _retry_req(url, headers={"Referer": "http://zx.10jqka.com.cn/"})
             if not r:
                 return []
             data = r.json().get('data', []) or []
@@ -364,5 +376,30 @@ class QuoteService:
         return self._ths_hot()
 
     def _em_hot_fallback(self, date_str: str = None) -> List[Dict[str, Any]]:
-        """东财热点股备用"""
-        return []  # 占位，后续可扩展
+        """东财热点股备用（强势股API）"""
+        try:
+            dt = date_str or datetime.now().strftime('%Y%m%d')
+            url = EM_DATACENTER
+            params = {
+                "sortColumns": "SECURITY_CODE",
+                "sortTypes": "1",
+                "pageSize": 20,
+                "pageNumber": 1,
+                "reportName": "RPT_HOT_A",
+                "columns": "ALL",
+                "filter": f'(TRADE_DATE%3D%27{dt}%27)',
+            }
+            r = _retry_req(url, params)
+            if not r:
+                return []
+            d = r.json().get('result', {}).get('data', []) or []
+            return [
+                {'code': str(h.get('SECURITY_CODE', '')),
+                 'name': h.get('SECURITY_NAME', ''),
+                 'change_pct': _sf(h.get('CHANGE_RATE')),
+                 'reason': h.get('HOT_REASON', ''),
+                 'source': 'em_hot'}
+                for h in d if h.get('SECURITY_CODE')
+            ]
+        except Exception:
+            return []

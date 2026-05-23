@@ -3597,3 +3597,18 @@ logout success!
 [AAna] 报告已生成: /Users/cai/code/AAna/reports/2026-05-23-选股报告.md
 [AAna] 早盘快照已保存: /Users/cai/code/AAna/reports/.snapshot_2026-05-23_09_00.json
 [AAna] 已推送 GitHub
+[AAna] Git pull: Already up to date.
+[AAna v2.5] 生成 2026-05-23 动态选股报告...
+[情绪] 涨跌停统计失败: 'NoneType' object has no attribute 'get'
+[情绪] 涨停:10 跌停:3 上证:-98.05%
+[情绪] 冰点 | 涨停10 跌停3 平均涨跌-98.05%
+[AAna] 动态股票池: 1 只
+[资金流] 获取失败: 'NoneType' object has no attribute 'get'
+[资金流] 获取 1 只资金数据
+[AAna] 获取 1 只股票数据...
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna v2.5] 生成 2026-05-23 复盘评分报告...
+[AAna] 获取 1 只股票收盘数据...
+[模拟交易] No module named 'data'
+[AAna] 复盘评分报告已生成: /Users/cai/code/AAna/reports/2026-05-23-复盘评分.md
+[AAna] 复盘报告已推送 GitHub
