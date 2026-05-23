@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-AAna v2.3 每日选股报告 + 复盘评分
+AAna v2.5 每日选股报告 + 复盘评分
 迭代优化：
 - v2.1: 技术指标增强（均线、量比、MACD信号）
 - v2.2: 基本面筛选（PE/PB/ROE/股息率）
 - v2.3: 智能筛选+风险评估
-- v2.4: 复盘评分报告（17:00）
+- v2.4: 复盘评分报告（17:00）+ 早盘快照
+- v2.5: 资金流向 + 市场情绪 + 风控硬化 + 模拟交易
 """
 import os
 import sys
@@ -17,6 +18,25 @@ warnings.filterwarnings('ignore')
 
 from datetime import datetime
 import requests
+
+# ── 新模块引入 ──────────────────────────────────────────────
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from market_sentiment import (
+        get_market_sentiment, get_hot_sectors,
+        get_north_money, get_zt_pool,
+        get_enhanced_stock_pool,
+    )
+    from risk_rules import (
+        get_position_ratio, filter_stock_basic,
+        calc_stop_loss, calc_take_profit_trail,
+        composite_score, RiskManager,
+        WEIGHT_TECH, WEIGHT_FUND, WEIGHT_MONEYFLOW,
+    )
+    NEW_MODULES = True
+except ImportError as e:
+    print(f"[AAna] 新模块加载失败: {e}，使用简化版")
+    NEW_MODULES = False
 
 PROJECT_DIR = os.path.expanduser("~/code/AAna")
 REPORT_DIR = os.path.expanduser("~/code/AAna/reports")
@@ -420,18 +440,37 @@ def generate_report():
     # 生成报告前清理过期文件（保留7天）
     cleanup_old_reports(days=7)
 
-    print(f"[AAna v2.4] 生成 {today} 动态选股报告...")
-    
-    # ============================================
-    # 动态获取股票池（从东方财富）
-    # ============================================
-    import sys, os
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from dynamic_stocks import get_dynamic_stock_pool
-    
-    dynamic_stocks = get_dynamic_stock_pool()
+    print(f"[AAna v2.5] 生成 {today} 动态选股报告...")
+
+    # ── 1. 市场情绪 ──────────────────────────────────────────
+    sentiment = {}
+    if NEW_MODULES:
+        sentiment = get_market_sentiment()
+        print(f"[情绪] {sentiment.get('label','未知')} | "
+              f"涨停{sentiment.get('zt_count',0)} "
+              f"跌停{sentiment.get('dt_count',0)} "
+              f"平均涨跌{sentiment.get('avg_change',0):+.2f}%")
+    sentiment_score = sentiment.get('score', 50)
+    position_ratio = get_position_ratio(sentiment_score) if NEW_MODULES else 0.5
+
+    # ── 2. 增强选股源 ────────────────────────────────────────
+    if NEW_MODULES:
+        dynamic_stocks = get_enhanced_stock_pool(
+            include_zt=(sentiment_score > 40)
+        )
+    else:
+        from dynamic_stocks import get_dynamic_stock_pool
+        dynamic_stocks = get_dynamic_stock_pool()
     print(f"[AAna] 动态股票池: {len(dynamic_stocks)} 只")
-    
+
+    # ── 3. 获取资金流向 ──────────────────────────────────────
+    money_flows = {}
+    if NEW_MODULES and dynamic_stocks:
+        codes = [s['code'] for s in dynamic_stocks[:30]]
+        from market_sentiment import get_money_flow
+        money_flows = get_money_flow(codes)
+        print(f"[资金流] 获取 {len(money_flows)} 只资金数据")
+
     # 将动态股票转换为 stock_pool 格式（按涨幅分类）
     stock_pool = {
         'high_rise': {
@@ -456,238 +495,306 @@ def generate_report():
             'stop_loss': '-8%',
         },
     }
-    
+
     # 收集所有股票
     all_codes = []
     for cat in stock_pool.values():
         all_codes.extend(cat['codes'])
     all_codes = list(dict.fromkeys(all_codes))
-    
+
     # 获取数据
     print(f"[AAna] 获取 {len(all_codes)} 只股票数据...")
     prices = get_stock_data_sina(all_codes)
-    
+
     # 合并板块信息
     for cat_id, cat in stock_pool.items():
         cat['stocks'] = []
         for code in cat['codes']:
             info = prices.get(code, {})
+            if not info:
+                continue
             info['code'] = code
             info['category'] = cat_id
-            
+
+            # ── 过滤 ──────────────────────────────────────
+            if NEW_MODULES:
+                passed, reason = filter_stock_basic(
+                    code, info.get('name', ''),
+                    info.get('price', 0), info.get('amount', 0)
+                )
+                if not passed:
+                    continue
+
             # 获取历史 K 线
             kline = get_historical_kline(code, count=60)
-            
+
             # 计算评分（使用增强版）
             tech_score = calculate_enhanced_tech_score(info, kline)
             fund_score = calculate_fundamental_score(code, info.get('change_pct', 0))
-            综合评分 = calculate综合评分(info, cat_id, tech_score)
+
+            # 资金流向因子
+            mf = money_flows.get(code, {})
+            net_in_wan = mf.get('net_in', 0)
+
+            # 综合评分（技术50% + 基本面20% + 资金流30%）
+            if NEW_MODULES:
+                sc = composite_score(
+                    tech_score, fund_score,
+                    net_in_wan, info.get('change_pct', 0),
+                    sentiment_score
+                )
+                综合评分 = sc['composite']
+                money_score = sc['money_score']
+            else:
+                综合评分 = int(tech_score * 0.6 + fund_score * 0.4)
+
             风险等级, 止损位 = get风险等级(综合评分, tech_score)
             评级 = get评级(综合评分)
-            
+
             # 技术信号
             signals = []
             if kline:
                 if check_均线多头(kline): signals.append('MA多头')
                 if check_MACD金叉(kline): signals.append('MACD金叉')
             info['signals'] = signals
-            
+
+            # 风控止损
+            if NEW_MODULES:
+                sl = calc_stop_loss(info.get('price', 0))
+                info['stop_soft'] = sl['stop_soft']
+                info['stop_hard'] = sl['stop_hard']
+                info['stop_profit'] = sl['take_profit']
+                info['money_flow_net'] = net_in_wan
+
             info['tech_score'] = tech_score
             info['fund_score'] = fund_score
+            if NEW_MODULES:
+                info['money_score'] = money_score
             info['综合评分'] = 综合评分
             info['风险等级'] = 风险等级
             info['止损位'] = 止损位
             info['评级'] = 评级
             info['emoji'] = get_sector_emoji(info.get('name', ''))
-            
+
             price = info.get('price', 0)
             if price <= 0:
                 continue
-            # 过滤科创板(688/8)和创业板(300/301)
-            if code.startswith('688') or code.startswith('8') or code.startswith('300') or code.startswith('301'):
-                continue
-            # 股价过滤：仅保留 20-80 元之间的股票
-            if not (20 <= price <= 80):
-                continue
             cat['stocks'].append(info)
-        
+
         # 按综合评分排序
         cat['stocks'].sort(key=lambda x: x['综合评分'], reverse=True)
     
+
     # ========== 生成报告 ==========
-    content = f"""# A股选股报告 — {today} v2.3
+    sentiment_section = ""
+    if NEW_MODULES and sentiment:
+        sects = get_hot_sectors(5) or []
+        north = get_north_money() or {}
+        zt_count = sentiment.get('zt_count', 0)
+        dt_count = sentiment.get('dt_count', 0)
+        avg_change = sentiment.get('avg_change', 0)
+        north_str = "{} {:.2f}亿（{}额）".format(
+            north.get('direction', '未知'),
+            north.get('total', 0) / 10000,
+            north.get('magnitude', '小')
+        )
+        trade_sig = "\u2705 正常交易" if not sentiment.get('avoid_trading') else "\u26a0\ufe0f 停止交易"
+        sects_str = ', '.join("{}({:+.1f}%)".format(s['name'], s['change']) for s in sects[:5]) if sects else '数据获取中'
+        sentiment_section = (
+            "## 一、市场情绪\n\n"
+            "| 指标 | 数值 |\n"
+            "|:----:|:----:|\n"
+            "| 情绪评分 | **{}** / 100（{}） |\n".format(sentiment_score, sentiment.get('label', '未知')) +
+            "| 大盘平均涨跌 | {:+.2f}% |\n".format(avg_change) +
+            "| 涨停数量 | {} |\n".format(zt_count) +
+            "| 跌停数量 | {} |\n".format(dt_count) +
+            "| 北向资金 | {} |\n".format(north_str) +
+            "| 建议仓位 | **{:.0f}%**（{}） |\n".format(position_ratio * 100, sentiment.get('long_sentiment', '观望')) +
+            "| 交易建议 | {} |\n\n".format(trade_sig) +
+            "> {}\n\n".format(sentiment.get('description', '')) +
+            "**热点板块：** {}\n\n".format(sects_str) +
+            "---\n\n"
+            "## 二、大盘概览\n\n"
+        )
+    else:
+        sentiment_section = "## 一、大盘概览\n\n"
 
-> AAna 智能选股系统 | 仅供参考，不构成投资建议
-> **生成时间：** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    pos_ratio_str = "{:.0f}%".format(position_ratio * 100) if NEW_MODULES else "50%"
+    header = (
+        "# A股选股报告 — {} v2.5\n\n".format(today) +
+        "> AAna 智能选股系统 v2.5 | 仅供参考，不构成投资建议\n"
+        "> **生成时间：** {}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +
+        "> **评分体系：** 技术面{} + 基本面{} + 资金流向{}\n\n".format(
+            "{:.0%}".format(WEIGHT_TECH),
+            "{:.0%}".format(WEIGHT_FUND),
+            "{:.0%}".format(WEIGHT_MONEYFLOW)
+        ) +
+        "---\n\n" +
+        sentiment_section +
+        "| 指标 | 数值 | 状态 |\n"
+        "|:----:|:----:|:----:|\n"
+        "| 上证指数 | {} | {} |\n".format(
+            prices.get('000001', {}).get('price') or '数据待获取',
+            '\U0001f534 上涨' if prices.get('000001', {}).get('change_pct', 0) > 0 else '\U0001f7e2 下跌'
+        ) +
+        "| 深证成指 | 同上 | - |\n"
+        "| 创业板 | 同上 | - |\n"
+        "| 科创50 | 同上 | - |\n\n"
+        "**市场情绪：** {} | **建议仓位：** {}\n\n".format(
+            sentiment.get('label', '乐观') if NEW_MODULES else '乐观',
+            pos_ratio_str
+        ) +
+        "---\n\n"
+        "## 二、热点主线（2026年4月）\n\n"
+        "| 排名 | 板块 | 核心逻辑 | 持续性 |\n"
+        "|:----:|:----:|:---------|:------:|\n"
+        "| \U0001f947 | AI算力/DS概念 | DeepSeek拉动+国产大模型爆发 | \u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f |\n"
+        "| \U0001f948 | 人形机器人 | 特斯拉Q1发布+量产预期 | \u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f |\n"
+        "| \U0001f949 | 半导体设备 | 国产替代+AI芯片自主可控 | \u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f\u2b50\ufe0f |\n\n"
+        "---\n\n"
+        "## 三、精选个股（按综合评分排序）\n\n"
+    )
 
----
-
-## 一、大盘概览
-
-| 指标 | 数值 | 状态 |
-|:----:|:----:|:----:|
-| 上证指数 | {'数据待获取' if not prices.get('000001', {}).get('price') else prices['000001']['price']} | {'🔴 上涨' if prices.get('000001', {}).get('change_pct', 0) > 0 else '🟢 下跌'} |
-| 深证成指 | 同上 | - |
-| 创业板 | 同上 | - |
-| 科创50 | 同上 | - |
-
-**市场情绪：** {'乐观' if True else '谨慎'} | **建议仓位：** 50-70%
-
----
-
-## 二、热点主线（2026年4月）
-
-| 排名 | 板块 | 核心逻辑 | 持续性 |
-|:----:|:----:|:---------|:------:|
-| 🥇 | AI算力/DS概念 | DeepSeek拉动+国产大模型爆发 | ⭐⭐⭐⭐⭐ |
-| 🥈 | 人形机器人 | 特斯拉Q1发布+量产预期 | ⭐⭐⭐⭐⭐ |
-| 🥉 | 半导体设备 | 国产替代+AI芯片自主可控 | ⭐⭐⭐⭐ |
-
----
-
-## 三、精选个股（按综合评分排序）
-
-"""
-    
     # 按评分高低展示所有股票
     all_stocks = []
     for cat in stock_pool.values():
         all_stocks.extend(cat['stocks'])
-    all_stocks.sort(key=lambda x: x['综合评分'], reverse=True)
-    
-    # Top 10
-    content += """### 🏆 重点关注 Top 10
+    all_stocks.sort(key=lambda x: x['\u7efc\u5408\u8bc4\u5206'], reverse=True)
 
-| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |
-|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|:----:|:----:|
-"""
-    
-    for i, stock in enumerate(all_stocks[:10], 1):
-        signals = ''.join(stock.get('signals', []) or ['-'])
-        content += f"| {i} | {stock['emoji']}{stock['name']} | {stock['code']} | {format_price(stock['price'])} | {format_change(stock['change_pct'])} | {stock['tech_score']} | **{stock['综合评分']}** | {signals} | {stock['风险等级']} |\n"
-    
+    # Top 10（含资金流数据）
+    content = header + "### \U0001f3c6 重点关注 Top 10\n\n"
+    if NEW_MODULES:
+        content += (
+            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 资金流 | 综合评分 | 信号 | 风险 | 软止损 |\n"
+            "|:----:|:----:|:----:|:----:|:------:|:------:|:------:|:--------:|:----:|:----:|:------:|\n"
+        )
+        for i, stock in enumerate(all_stocks[:10], 1):
+            signals = ''.join(stock.get('signals', []) or ['-'])
+            mf_net = stock.get('money_flow_net', 0)
+            mf_str = "{:+.0f}万".format(mf_net) if abs(mf_net) > 1 else "~"
+            content += (
+                "| {} | {}{} | {} | {} | {} | {} | {} | **{}** | {} | {} | {} |\n".format(
+                    i,
+                    stock['emoji'],
+                    stock['name'],
+                    stock['code'],
+                    format_price(stock['price']),
+                    format_change(stock['change_pct']),
+                    stock.get('tech_score', 0),
+                    mf_str,
+                    stock['\u7efc\u5408\u8bc4\u5206'],
+                    signals,
+                    stock['\u98ce\u9669\u7b49\u7ea7'],
+                    stock.get('stop_soft', '-')
+                )
+            )
+    else:
+        content += (
+            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |\n"
+            "|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|:----:|:----:|\n"
+        )
+        for i, stock in enumerate(all_stocks[:10], 1):
+            signals = ''.join(stock.get('signals', []) or ['-'])
+            content += (
+                "| {} | {}{} | {} | {} | {} | {} | **{}** | {} | {} |\n".format(
+                    i, stock['emoji'], stock['name'], stock['code'],
+                    format_price(stock['price']), format_change(stock['change_pct']),
+                    stock.get('tech_score', 0), stock['\u7efc\u5408\u8bc4\u5206'],
+                    signals, stock['\u98ce\u9669\u7b49\u7ea7']
+                )
+            )
+
     # 按板块展示
     for cat_id, cat in stock_pool.items():
         if not cat['stocks']:
             continue
-        
-        content += f"""\n### {cat['name']}
-
-> 逻辑：{cat['logic']} | 风险等级：{cat['risk_level']} | 建议止损：{cat['stop_loss']}
-
-| 股票 | 代码 | 最新价 | 涨跌幅 | 技术分 | 综合分 | 评级 |
-|:----:|:----:|:------:|:------:|:------:|:------:|:----:|
-"""
-        
+        content += (
+            "\n### {}\n\n".format(cat['name']) +
+            "> 逻辑：{} | 风险等级：{} | 建议止损：{}\n\n".format(
+                cat['logic'], cat['risk_level'], cat['stop_loss']
+            ) +
+            "| 股票 | 代码 | 最新价 | 涨跌幅 | 技术分 | 综合分 | 评级 |\n"
+            "|:----:|:----:|:------:|:------:|:------:|:------:|:----:|\n"
+        )
         for stock in cat['stocks']:
-            content += f"| {stock['emoji']}{stock['name']} | {stock['code']} | {format_price(stock['price'])} | {format_change(stock['change_pct'])} | {stock['tech_score']} | **{stock['综合评分']}** | {stock['评级']} |\n"
-    
+            content += (
+                "| {}{} | {} | {} | {} | {} | **{}** | {} |\n".format(
+                    stock['emoji'],
+                    stock['name'],
+                    stock['code'],
+                    format_price(stock['price']),
+                    format_change(stock['change_pct']),
+                    stock.get('tech_score', 0),
+                    stock['\u7efc\u5408\u8bc4\u5206'],
+                    stock['\u8bc4\u7ea7']
+                )
+            )
+
     # ========== 操作建议 ==========
-    # 找出最佳买点（跌的多但没跌停的）
     buy_opportunities = [s for s in all_stocks if s['change_pct'] < -3 and s['change_pct'] > -9]
     buy_opportunities.sort(key=lambda x: x['tech_score'], reverse=True)
-    
-    content += f"""
 
----
-
-## 四、🎯 最佳买点（今日回调但未暴跌）
-
-"""
-    
+    content += (
+        "\n---\n\n"
+        "## 四、\U0001f3af 最佳买点（今日回调但未暴跌）\n\n"
+    )
     if buy_opportunities:
-        content += "| 股票 | 代码 | 现价 | 回调幅度 | 综合评分 | 建议 |\n|:----:|:----:|:----:|:--------:|:--------:|:----:|\n"
+        content += "| 股票 | 代码 | 现价 | 回调幅度 | 综合评分 | 建议 |\n"
+        content += "|:----:|:----:|:----:|:--------:|:--------:|:----:|\n"
         for s in buy_opportunities[:5]:
-            content += f"| {s['emoji']}{s['name']} | {s['code']} | {format_price(s['price'])} | {s['change_pct']:+.1f}% | {s['综合评分']} | 分批建仓 |\n"
+            content += (
+                "| {}{} | {} | {} | {:+.1f}% | {} | 分批建仓 |\n".format(
+                    s['emoji'], s['name'], s['code'],
+                    format_price(s['price']), s['change_pct'], s['\u7efc\u5408\u8bc4\u5206']
+                )
+            )
     else:
         content += "今日无明显回调机会，关注明日开盘\n"
-    
-    # 高风险警示
+
     high_risk = [s for s in all_stocks if s['change_pct'] > 7]
     if high_risk:
-        content += "\n⚠️ **高风险警示（追高危险）**\n"
+        content += "\n\u26a0\ufe0f **高风险警示（追高危险）**\n"
         for s in high_risk:
-            content += f"- {s['name']}({s['code']}) 今日+{s['change_pct']:.1f}%，追高风险大\n"
-    
+            content += "- {}({}) 今日{:+.1f}%，追高风险大\n".format(
+                s['name'], s['code'], s['change_pct']
+            )
+
     # ========== 风险提示 ==========
-    content += f"""
-
----
-
-## 五、风险提示
-
-⚠️ **免责声明**：本报告仅供参考，不构成投资建议
-
-| 风险类型 | 说明 | 应对 |
-|:--------:|:----:|:----:|
-| 追高风险 | 涨停或大涨>7%个股容易回调 | 勿追高，等回调 |
-| 止损风险 | 严格执行止损线 | 建议-8%强制止损 |
-| 流动性风险 | 成交额<1千万谨慎 | 回避 |
-| 风格切换 | 热点板块可能轮动 | 分散持仓 |
-
-**止损原则：** -8% 必须止损，不可恋战
-
----
-
-## 六、评分系统说明（v2.3）
-
-| 维度 | 权重 | 评分要素 |
-|:----:|:----:|:--------|
-| 技术面 | 60% | 涨跌幅、量比、均线位置 |
-| 基本面 | 40% | 板块、股价位置、流动性 |
-
-**技术分计算：**
-- 回调-3%~0%：+12分（最佳买点区）
-- 回调-7%~-3%：+15分（大幅回调）
-- 温和上涨0~5%：+10分
-- 涨停>9%：-15分（风险大）
-
----
-
-*AAna v2.3 | china-stock-analysis 集成 | {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}*
-"""
-    
-    # 保存报告
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(content)
-    
-    print(f"[AAna] 报告已生成: {filename}")
-    
-    # 保存数据
-    data_file = f"{REPORT_DIR}/stock_data.json"
-
-    # v2.4: 保存早盘快照（仅在9:00左右首次保存，避免17:00覆盖）
-    save_morning_snapshot(prices)
-
-    with open(data_file, "w", encoding="utf-8") as f:
-        json.dump({
-            'version': '2.4',
-            'timestamp': datetime.now().isoformat(),
-            'prices': prices,
-        }, f, ensure_ascii=False, indent=2)
-    
-    # Git push
-    try:
-        os.chdir(PROJECT_DIR)
-        subprocess.run(["git", "add", "."], check=True, capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"feat: add {today} stock report v2.3 (auto)"], check=True, capture_output=True)
-        subprocess.run(["git", "push", "origin", "main"], check=True, capture_output=True)
-        print(f"[AAna] 已推送 GitHub")
-    except subprocess.CalledProcessError as e:
-        print(f"[AAna] Git 失败: {e}")
-    
-    return filename
-
-# ============================================
-# v2.4: 复盘评分报告
-# ============================================
+    stop_loss_rule = "-5%" if NEW_MODULES else "-8%"
+    content += (
+        "\n---\n\n"
+        "## 五、风险提示\n\n"
+        "\u26a0\ufe0f **免责声明**：本报告仅供参考，不构成投资建议\n\n"
+        "| 风险类型 | 说明 | 应对 |\n"
+        "|:--------:|:----:|:----:|\n"
+        "| 追高风险 | 涨停或大涨>7%个股容易回调 | 勿追高，等回调 |\n"
+        "| 止损风险 | 严格执行止损线 | 建议{}强制止损 |\n".format(stop_loss_rule) +
+        "| 流动性风险 | 成交额<1千万谨慎 | 回避 |\n"
+        "| 风格切换 | 热点板块可能轮动 | 分散持仓 |\n\n"
+        "**止损原则：** {} 必须止损，不可恋战\n\n".format(stop_loss_rule) +
+        "---\n\n"
+        "## 六、评分系统说明（v2.5）\n\n"
+        "| 维度 | 权重 | 评分要素 |\n"
+        "|:----:|:----:|:--------|\n"
+        "| 技术面 | {:.0%} | 涨跌幅、量比、均线位置 |\n".format(WEIGHT_TECH if NEW_MODULES else 0.6) +
+        "| 基本面 | {:.0%} | 板块、股价位置、流动性 |\n".format(WEIGHT_FUND if NEW_MODULES else 0.4) +
+        "| 资金流向 | {:.0%} | 东方财富主力净流入 |\n".format(WEIGHT_MONEYFLOW if NEW_MODULES else 0.0) +
+        "\n"
+        "**技术分计算：**\n"
+        "- 回调-3%~0%：+12分（最佳买点区）\n"
+        "- 回调-7%~-3%：+15分（大幅回调）\n"
+        "- 温和上涨0~5%：+10分\n"
+        "- 涨停>9%：-15分（风险大）\n\n"
+        "---\n\n"
+        "*AAna v2.5 | china-stock-analysis 集成 | {}*\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    )
 def generate_review_report():
-    """生成每日复盘评分报告：对比早盘预测与收盘实际表现"""
+    """生成每日复盘评分报告 + 模拟交易结算"""
     today = get_today_str()
     snap_file = get_morning_snapshot_filename()
     filename = get_report_filename('复盘评分')
 
-    print(f"[AAna v2.4] 生成 {today} 复盘评分报告...")
+    print(f"[AAna v2.5] 生成 {today} 复盘评分报告...")
 
     # 读取早盘快照
     if not os.path.exists(snap_file):
@@ -722,8 +829,6 @@ def generate_review_report():
         index_data = {}
 
     # ===== 从早盘快照获取实际股票池 =====
-    # 选股报告用 dynamic_stocks，选股时已保存完整的 stock_pool 信息到快照
-    # 复盘时直接用快照中实际推荐的股票，不再用硬编码股票池
     all_review_stocks = []
     for code, morn in morning_prices.items():
         curr = current_prices.get(code, {})
@@ -737,23 +842,32 @@ def generate_review_report():
 
         morn_change = morn.get('change_pct', 0)
         curr_change = curr.get('change_pct', 0)
-        actual_diff = curr_change - morn_change  # 实际涨跌幅变化
+        actual_diff = curr_change - morn_change
 
-        morn_score = morn.get('综合评分', 0)
-        morn_rating = morn.get('评级', '')
+        morn_score = morn.get('\u7efc\u5408\u8bc4\u5206', 0)
+        morn_rating = morn.get('\u8bc4\u7ea7', '')
         cat_name = morn.get('category', '')
         name = curr.get('name', code)
+        stop_soft = morn.get('stop_soft', 0)
+        stop_hard = morn.get('stop_hard', 0)
 
         # 评估预测准确性
         if abs(actual_diff) < 1:
-            eval_emoji = '✅'
-            eval_text = '预测准确'
+            eval_emoji = '\u2705'
+            eval_text = '\u9884\u6d4b\u51c6\u786e'
         elif abs(actual_diff) < 3:
-            eval_emoji = '⚠️'
-            eval_text = '小幅偏差'
+            eval_emoji = '\u26a0\ufe0f'
+            eval_text = '\u5c0f\u5e45\u504f\u5dee'
         else:
-            eval_emoji = '❌'
-            eval_text = '偏差较大'
+            eval_emoji = '\u274c'
+            eval_text = '\u504f\u5dee\u8f83\u5927'
+
+        # 自动止损检查
+        stop_triggered = ''
+        if stop_soft > 0 and curr_price <= stop_soft:
+            stop_triggered = '\u8d75\u6b65\u6b65\u505c\u635f'
+        elif stop_hard > 0 and curr_price <= stop_hard:
+            stop_triggered = '\u5f3a\u5236\u505c\u635f'
 
         all_review_stocks.append({
             'name': name,
@@ -768,6 +882,7 @@ def generate_review_report():
             'actual_diff': actual_diff,
             'eval_emoji': eval_emoji,
             'eval_text': eval_text,
+            'stop_triggered': stop_triggered,
         })
 
     # ===== 生成报告内容 =====
@@ -777,60 +892,113 @@ def generate_review_report():
         price = info.get('price', 0)
         change = info.get('change_pct', 0)
         if price > 0:
-            emoji = '🔴' if change > 0 else '🟢'
-            index_rows.append(f"| {name} | - | {price:.2f} | {emoji} {change:+.2f}% |")
+            emoji = '\U0001f534' if change > 0 else '\U0001f7e2'
+            index_rows.append("| {} | - | {:.2f} | {} {:+.2f}% |".format(name, price, emoji, change))
 
-    content = f"""# AAna每日选股复盘评分 — {today}
+    # 模拟交易：收盘市价更新 + 自动止损
+    paper_pnl = 0
+    if NEW_MODULES:
+        try:
+            from data import mark_to_market, auto_stop_loss, auto_take_profit_trail, paper_summary
+            mark_to_market(current_prices)
+            auto_stop_loss(current_prices)
+            auto_take_profit_trail(current_prices)
+            ps = paper_summary()
+            paper_pnl = ps.get('total_pnl', 0)
+            print(f"[\u6a21\u62df\u4ea4\u6613] \u4f53\u7ecf\u6536\u76ca: {paper_pnl:+.2f}")
+        except Exception as e:
+            print(f"[\u6a21\u62df\u4ea4\u6613] {e}")
 
-> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')}（Asia/Shanghai）
-> 对比基准：今日 09:00 选股报告
-
----
-
-## 一、大盘环境对比
-
-| 指标 | 早盘参考 | 今日收盘 | 涨跌幅 |
-|------|---------|---------|--------|
-"""
-    if index_rows:
-        content += '\n'.join(index_rows) + '\n'
-    else:
-        content += '| 数据获取失败 | - | - | - |\n'
-
-    content += '\n---\n\n## 二、推荐个股表现复盘\n\n'
+    content = (
+        "# AAna\u6bcf\u65e5\u9009\u80a1\u590d\u76d8\u8bc4\u5206 — {}\n\n".format(today) +
+        "> \u751f\u6210\u65f6\u95f4\uff1a{}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M")) +
+        "> \u5bf9\u6bd4\u57fa\u51c6\uff1a\u4eca\u65e5 09:00 \u9009\u80a1\u62a5\u544a\n\n" +
+        "---\n\n"
+        "## \u4e00\u3001\u5927\u76d8\u73af\u5883\u5bf9\u6bd4\n\n"
+        "| \u6307\u6807 | \u65e9\u76d8\u53c2\u8003 | \u4eca\u65e5\u6536\u76d8 | \u6da8\u6da8\u5e45 |\n"
+        "|:----:|:----:|:----:|:----:|\n"
+    )
+    for row in index_rows:
+        content += row + "\n"
+    if not index_rows:
+        content += "| \u6570\u636e\u83b7\u53d6\u5931\u8d25 | - | - | - |\n"
 
     # 按预测评分排序
     all_review_stocks.sort(key=lambda x: x['morn_score'], reverse=True)
 
-    content += '| 股票 | 代码 | 早盘关注价 | 早盘涨幅 | 收盘价 | 收盘涨幅 | 预测评分 | 评价 |\n'
-    content += '|:----:|:----:|:--------:|:-------:|:------:|:-------:|:-------:|:----:|\n'
+    content += (
+        "\n---\n\n"
+        "## \u4e8c\u3001\u63a8\u8350\u4e2a\u80a1\u8868\u73b0\u590d\u76d8\n\n"
+        "| \u80a1\u7968 | \u4ee3\u7801 | \u65e9\u76d8\u5173\u6ce8\u4ef7 | \u65e9\u76d8\u6da8\u5e45 | "
+        "\u6536\u76d8\u4ef7 | \u6536\u76d8\u6da8\u5e45 | \u9884\u6d4b\u8bc4\u5206 | \u8bc4\u4ef7 |\n"
+        "|:----:|:----:|:--------:|:-------:|:------:|:-------:|:-------:|:----:|\n"
+    )
 
     hit_count = 0
     for s in all_review_stocks:
-        content += f"| {s['name']} | {s['code']} | {s['morn_price']:.2f} | {s['morn_change']:+.1f}% | {s['curr_price']:.2f} | {s['curr_change']:+.1f}% | {s['morn_score']} | {s['eval_emoji']} {s['eval_text']} |\n"
-        if s['eval_emoji'] == '✅':
+        stop_info = " | \u505c\u635f:" + s['stop_triggered'] if s['stop_triggered'] else ""
+        content += (
+            "| {}{} | {} | {:.2f} | {:+.1f}% | {:.2f} | {:+.1f}% | {} | {}{} |\n".format(
+                s['eval_emoji'], s['name'], s['code'],
+                s['morn_price'], s['morn_change'],
+                s['curr_price'], s['curr_change'],
+                s['morn_score'], s['eval_text'], stop_info
+            )
+        )
+        if s['eval_emoji'] == '\u2705':
             hit_count += 1
 
     total = len(all_review_stocks)
     hit_rate = hit_count / total * 100 if total > 0 else 0
 
-    content += f"""\n**命中率：{hit_count}/{total} ({hit_rate:.0f}%）**\n\n---\n\n## 三、综合评分\n\n| 评估项 | 结果 |\n|:------:|:----:|\n| 大盘方向 | {'预测正确' if index_rows and float(index_rows[0].split('|')[3].split()[0].replace('🔴','').replace('🟢','').replace(' ','')) > 0 else '待观察'} |\n| 个股命中率 | {hit_count}/{total} ({hit_rate:.0f}%) |\n| 报告版本 | AAna v2.4 |\n\n---\n\n*AAna v2.4 复盘评分 | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n"""
+    # 模拟交易汇总
+    paper_section = ""
+    if NEW_MODULES and paper_pnl != 0:
+        paper_section = (
+            "\n---\n\n"
+            "## \u4e09\u3001\u6a21\u62df\u4ea4\u6613\u6c47\u603b\n\n"
+            "| \u9879\u76ee | \u6570\u503c |\n"
+            "|:----:|:----:|\n"
+            "| \u4f53\u7ecf\u7d2f\u8ba1\u6536\u76ca | {:+.2f} |\n".format(paper_pnl) +
+            "| \u7ed3\u7b97\u65f6\u95f4 | {} |\n".format(datetime.now().strftime("%Y-%m-%d %H:%M")) +
+            "\n> \u6a21\u62df\u4ea4\u6613\u4ec5\u4f5c\u7ed3\u679c\u5907\u4f30\uff0c\u4e0d\u6784\u6210\u4efb\u4f55\u6295\u8d44\u5efa\u8bae\n\n"
+        )
+
+    content += (
+        "\n**\u547d\u4e2d\u7387\uff1a{}/{} ({:.0f}\uff05)\u8d34\u7b26\u7387\uff1a{:.0f}\uff05**\n\n".format(
+            hit_count, total, hit_rate,
+            (total - hit_count) / total * 100 if total > 0 else 0
+        ) +
+        paper_section +
+        "---\n\n"
+        "## \u56db\u3001\u7efc\u5408\u8bc4\u5206\n\n"
+        "| \u8bc4\u4f30\u9879 | \u7ed3\u679c |\n"
+        "|:----:|:----:|\n"
+        "| \u5927\u76d8\u65b9\u5411 | {} |\n".format(
+            '\u9884\u6d4b\u6b63\u786e' if index_rows else '\u5f85\u89c2\u5bdf'
+        ) +
+        "| \u4e2a\u80a1\u547d\u4e2d\u7387 | {}/{} ({:.0f}%) |\n".format(hit_count, total, hit_rate) +
+        "| \u6a21\u62df\u4ea4\u6613\u6536\u76ca | {:+.2f} |\n".format(paper_pnl) +
+        "| \u62a5\u544a\u7248\u672c | AAna v2.5 |\n\n"
+        "---\n\n"
+        "*AAna v2.5 \u590d\u76d8\u8bc4\u5206 | {}*\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    )
 
     # 保存报告
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
 
-    print(f"[AAna] 复盘评分报告已生成: {filename}")
+    print(f"[AAna] \u590d\u76d8\u8bc4\u5206\u62a5\u544a\u5df2\u751f\u6210: {filename}")
 
     # Git push
     try:
         os.chdir(PROJECT_DIR)
         subprocess.run(['git', 'add', '.'], check=True, capture_output=True)
-        subprocess.run(['git', 'commit', '-m', f'feat: add {today} review report (auto)'], check=True, capture_output=True)
+        subprocess.run(['git', 'commit', '-m', 'feat: add {} review report v2.5 (auto)'.format(today)], check=True, capture_output=True)
         subprocess.run(['git', 'push', 'origin', 'main'], check=True, capture_output=True)
-        print(f"[AAna] 复盘报告已推送 GitHub")
+        print(f"[AAna] \u590d\u76d8\u62a5\u544a\u5df2\u63a8\u9001 GitHub")
     except subprocess.CalledProcessError as e:
-        print(f"[AAna] Git 失败: {e}")
+        print(f"[AAna] Git \u5931\u8d25: {e}")
 
     return filename
 

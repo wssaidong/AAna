@@ -31,6 +31,15 @@ try:
 except ImportError:
     EASTMONEY_ENABLED = False
 
+# ── 新模块引入（v2.5）───────────────────────────────────────
+sys.path.insert(0, os.path.join(AANA_DIR, "scripts"))
+try:
+    from market_sentiment import get_market_sentiment, get_hot_sectors
+    from risk_rules import calc_stop_loss, get_position_ratio
+    AFTER_NEW = True
+except ImportError:
+    AFTER_NEW = False
+
 # ============================================
 # 数据获取
 # ============================================
@@ -433,13 +442,13 @@ def cleanup_old_reports(days=7):
 
 
 def generate_report(stocks, index_data=None):
-    """生成尾盘选股报告"""
+    """生成尾盘选股报告 v2.5"""
     today = get_today_str()
     now = datetime.now()
 
     report_dir = os.path.expanduser("~/code/AAna/reports")
     os.makedirs(report_dir, exist_ok=True)
-    filename = f"{report_dir}/{today}-尾盘选股.md"
+    filename = "{}/{}-尾盘选股.md".format(report_dir, today)
 
     # 生成报告前清理过期文件（保留7天）
     cleanup_old_reports(days=7)
@@ -449,39 +458,51 @@ def generate_report(stocks, index_data=None):
     avg_change = 0
     if index_data:
         avg_change = sum(i['change'] for i in index_data) / len(index_data)
-    
-    content = f"""# A股尾盘选股建议 — {today} {now.strftime('%H:%M')}
 
-> AAna 尾盘策略 v1.0 | 仅供参考，不构成投资建议
-> **生成时间：** {now.strftime('%Y-%m-%d %H:%M:%S')}（收盘前15分钟）
+    # 热点板块
+    hot_sects = []
+    if AFTER_NEW:
+        try:
+            hot_sects = get_hot_sectors(3) or []
+        except Exception:
+            pass
+    hot_str = " | ".join("{}({:+.1f}%)".format(s['name'], s['change']) for s in hot_sects[:3])
 
----
-
-## 一、大盘环境
-
-"""
+    content = (
+        "# A股尾盘选股建议 — {} {}\n\n".format(today, now.strftime('%H:%M')) +
+        "> AAna 尾盘策略 v2.5 | 仅供参考，不构成投资建议\n"
+        "> **生成时间：** {}\n".format(now.strftime('%Y-%m-%d %H:%M:%S')) +
+        "> **情绪评分：** {} | **建议仓位：** {:.0f}%\n\n".format(
+            sentiment_label, position_ratio * 100
+        ) +
+        "---\n\n"
+        "## 一、大盘环境 + 情绪\n\n"
+        "| 指标 | 涨跌幅 | 状态 |\n"
+        "|:----:|:------:|:----:|\n"
+    )
     if index_data:
-        content += "| 指数 | 涨跌幅 | 状态 |\n|:----:|:------:|:----:|\n"
         for idx in index_data:
-            emoji = "🔴" if idx['change'] > 0 else "🟢"
-            content += f"| {idx['name']} | {emoji} {idx['change']:+.2f}% | {'上涨' if idx['change'] > 0 else '下跌'} |\n"
+            emoji = "\U0001f534" if idx['change'] > 0 else "\U0001f7e2"
+            content += "| {} | {} {:+.2f}% | {} |\n".format(
+                idx['name'], emoji, idx['change'],
+                '上涨' if idx['change'] > 0 else '下跌'
+            )
     else:
-        content += "> 大盘数据获取失败\n"
-    
-    content += f"""
-**市场情绪：** {market_status} | **平均涨跌：** {avg_change:+.2f}%
+        content += "| 大盘数据获取失败 | - | - |\n"
+    content += "\n**市场情绪：** {} | **平均涨跌：** {:+.2f}%".format(market_status, avg_change)
+    if hot_str:
+        content += " | **热点：** {}".format(hot_str)
+    content += "\n\n---\n\n"
 
----
 
-## 二、尾盘买入信号（14:45）
-
-> 策略说明：尾盘买入选当日小幅回调的强势股
-> - 当日回调 -3%~0% 且价格仍在均线上方
-> - RSI 40-60（不超买也不超卖）
-> - 量比正常（0.5~1.5x）
-> - 均线多头排列
-
-"""
+    content += (
+        "> \u7b56\u7565\u8bf4\u660e\uff1a\u5c3f\u76d8\u4e70\u5165\u5f53\u65e5\u5c0f\u5e45\u56de\u8c03\u7684\u5f3a\u52bf\u80a1\n"
+        "> - \u5f53\u65e5\u56de\u8c03 -3%~0% \u4e14\u4ef7\u683c\u4ecd\u5728\u5747\u7ebf\u4e0a\u65b9\n"
+        "> - RSI 40-60\uff08\u4e0d\u8d85\u4e70\u4e5f\u4e0d\u8d85\u5356\uff09\n"
+        "> - \u91cf\u6bd4\u6b63\u5e38\uff080.5~1.5x\uff09\n"
+        "> - \u5747\u7ebf\u591a\u5934\u6392\u5217\n"
+        "\n"
+    )
     
     if stocks:
         content += "| 排名 | 股票 | 代码 | 现价 | 今日涨跌 | RSI | 量比 | 均线 | MACD | 评分 | 风险 | 止损价 | 目标价 |\n"
@@ -566,6 +587,21 @@ def generate_report(stocks, index_data=None):
 # ============================================
 
 def main():
+    # ── 市场情绪（v2.5）─────────────────────────────────────
+    sentiment_label = '乐观'
+    sentiment_score = 50
+    position_ratio = 0.5
+    if AFTER_NEW:
+        sent = get_market_sentiment()
+        sentiment_label = sent.get('label', '乐观')
+        sentiment_score = sent.get('score', 50)
+        position_ratio = get_position_ratio(sentiment_score)
+        print("[情绪] {} | 涨停{} 跌停{} | 建议仓位{:.0f}%".format(
+            sentiment_label,
+            sent.get('zt_count', 0), sent.get('dt_count', 0),
+            position_ratio * 100
+        ))
+
     # 获取大盘指数
     index_codes = ['000001', '399001', '399006', '000688']
     index_names = {'000001': '上证指数', '399001': '深证成指', '399006': '创业板', '000688': '科创50'}

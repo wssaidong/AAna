@@ -238,6 +238,12 @@ def migrate_from_state():
 
 # ── 实盘组合 ────────────────────────────────────────────────────────────────
 from data.portfolio import PortfolioTracker, Position, Trade, PortfolioState
+from data.paper_trading import (
+    record_buy, record_sell, mark_to_market,
+    auto_stop_loss, auto_take_profit_trail,
+    summary as paper_summary,
+    sync_from_recommendations,
+)
 
 __all__ = [
     "append_recommendation", "append_recommendations_batch",
@@ -247,4 +253,7 @@ __all__ = [
     "get_all_recommendations", "get_stock_history", "get_win_rate",
     "migrate_from_state",
     "PortfolioTracker", "Position", "Trade", "PortfolioState",
+    "record_buy", "record_sell", "mark_to_market",
+    "auto_stop_loss", "auto_take_profit_trail",
+    "paper_summary", "sync_from_recommendations",
 ]
