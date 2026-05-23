@@ -36,6 +36,27 @@ def get_yesterday_str():
 def get_report_filename(report_type='选股报告'):
     return f"{REPORT_DIR}/{get_today_str()}-{report_type}.md"
 
+def cleanup_old_reports(days=7):
+    """清理超过 days 天的旧报告（选股报告、尾盘选股、快快照）"""
+    import glob, time
+    cutoff = time.time() - days * 86400
+    patterns = [
+        f"{REPORT_DIR}/*-选股报告.md",
+        f"{REPORT_DIR}/*尾盘选股.md",
+        f"{REPORT_DIR}/.snapshot_*.json",
+        f"{REPORT_DIR}/盘中/*.log",
+        f"{REPORT_DIR}/盘前/*.log",
+    ]
+    removed = 0
+    for pat in patterns:
+        for path in glob.glob(pat):
+            if os.path.isfile(path) and os.path.getmtime(path) < cutoff:
+                os.remove(path)
+                removed += 1
+                print(f"[AAna] 清理过期报告: {os.path.basename(path)}")
+    if removed:
+        print(f"[AAna] 共清理 {removed} 个过期文件")
+
 def get_morning_snapshot_filename():
     """获取今日早盘快照文件名（9:00AM生成）"""
     today = get_today_str()
@@ -395,7 +416,10 @@ def get_sector_emoji(name):
 def generate_report():
     today = get_today_str()
     filename = get_report_filename()
-    
+
+    # 生成报告前清理过期文件（保留7天）
+    cleanup_old_reports(days=7)
+
     print(f"[AAna v2.4] 生成 {today} 动态选股报告...")
     
     # ============================================

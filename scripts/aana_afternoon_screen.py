@@ -411,15 +411,39 @@ def format_change(c):
     return f"{emoji} {c:+.2f}%"
 
 
+def cleanup_old_reports(days=7):
+    """清理超过 days 天的旧报告"""
+    import glob, time
+    report_dir = os.path.expanduser("~/code/AAna/reports")
+    cutoff = time.time() - days * 86400
+    patterns = [
+        f"{report_dir}/*-选股报告.md",
+        f"{report_dir}/*尾盘选股.md",
+        f"{report_dir}/.snapshot_*.json",
+    ]
+    removed = 0
+    for pat in patterns:
+        for path in glob.glob(pat):
+            if os.path.isfile(path) and os.path.getmtime(path) < cutoff:
+                os.remove(path)
+                removed += 1
+                print(f"[AAna] 清理过期报告: {os.path.basename(path)}")
+    if removed:
+        print(f"[AAna] 共清理 {removed} 个过期文件")
+
+
 def generate_report(stocks, index_data=None):
     """生成尾盘选股报告"""
     today = get_today_str()
     now = datetime.now()
-    
+
     report_dir = os.path.expanduser("~/code/AAna/reports")
     os.makedirs(report_dir, exist_ok=True)
     filename = f"{report_dir}/{today}-尾盘选股.md"
-    
+
+    # 生成报告前清理过期文件（保留7天）
+    cleanup_old_reports(days=7)
+
     # 大盘状态
     market_status = "乐观" if index_data and any(i['change'] > 0 for i in index_data) else "谨慎"
     avg_change = 0
