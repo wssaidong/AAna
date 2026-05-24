@@ -105,9 +105,9 @@ def real_time_monitor():
                 limit_up = info.get('limit_up')
                 limit_down = info.get('limit_down')
 
-                # 涨跌停检测（精确匹配涨停价/跌停价）
+                # 涨跌停检测（使用相对误差判断）
                 if limit_up and limit_down:
-                    if abs(price - limit_up) < 0.01:
+                    if limit_up > 0 and abs(price - limit_up) / limit_up < 0.001:
                         alerts.append({
                             'type': 'limit_up',
                             'name': info['name'],

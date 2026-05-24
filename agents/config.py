@@ -111,6 +111,8 @@ def is_trading_day():
     """简单判断是否是交易日（周一到周五）
     注意：此函数不校验节假日（如春节、国庆等），仅基于星期判断。
     实际生产环境应调用 akshare 的 is_trading_day() 或接入交易日历API获取准确结果。
+    节假日包括但不限于：元旦、春节、清明、劳动节、端午、中秋、国庆等法定假日。
+    建议使用 akshare.is_trading_day() 或维护一份准确的交易日历表。
     """
     weekday = datetime.now().weekday()
     return weekday < 5  # 0=周一, 4=周五

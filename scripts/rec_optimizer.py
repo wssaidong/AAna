@@ -370,8 +370,13 @@ def calc_sector_stats(records: List[FeedbackRecord]) -> Dict[str, SectorStats]:
         if not recs:
             continue
         wins = [r for r in recs if r.is_win]
-        # 连续亏损：统计连续_bad 标记
-        consecutive_bad = max((r.actual_change < 0 for r in recs), default=0)
+        # 连续亏损：统计连续_bad 标记（遍历计数连续亏损次数）
+        consecutive_bad = 0
+        for r in recs:
+            if r.actual_change < 0:
+                consecutive_bad += 1
+            else:
+                break
         sector_name = recs[0].sector_name if recs else sector
 
         stats[sector] = SectorStats(

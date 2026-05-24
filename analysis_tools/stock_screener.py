@@ -120,17 +120,22 @@ class StockScreener:
             return pd.DataFrame()
 
     def _is_banned_board(self, code: str) -> bool:
-        """检查是否属于不推荐的板块（科创板688/8开头、创业板300/301开头）"""
+        """检查是否属于不推荐的板块（科创板688/8开头、老三板8开头 - 过滤；创业板300/301开头 - 保留但风险提示）"""
         if not code:
             return False
         code_str = str(code)
-        # 科创板: 688开头 或 8开头（老代码）
+        # 科创板: 688开头 或 老三板: 8开头（过滤）
         if code_str.startswith('688') or code_str.startswith('8'):
             return True
-        # 创业板: 300开头 或 301开头
-        if code_str.startswith('300') or code_str.startswith('301'):
-            return True
+        # 创业板: 300开头 或 301开头（保留，不在此过滤）
         return False
+
+    def _is_gem_board(self, code: str) -> bool:
+        """检查是否属于创业板（300/301开头 - 保留但风险提示）"""
+        if not code:
+            return False
+        code_str = str(code)
+        return code_str.startswith('300') or code_str.startswith('301')
 
     def _apply_numeric_filter(self, df: pd.DataFrame, column: str,
                                min_val: float = None, max_val: float = None) -> pd.DataFrame:
@@ -162,12 +167,15 @@ class StockScreener:
             filtered = filtered[~filtered['代码'].apply(self._is_banned_board)]
             after_count = len(filtered)
             if before_count > after_count:
-                print(f"  排除科创板/创业板: {before_count - after_count} 只")
+                print(f"  排除科创板/老三板: {before_count - after_count} 只")
 
-        # PE筛选
+        # PE筛选（排除负PE）
+        pe_min = filters.get('pe_min')
+        if pe_min is None or pe_min < 0:
+            pe_min = 0.0001  # 排除负数和零PE
         filtered = self._apply_numeric_filter(
             filtered, '市盈率-动态',
-            min_val=filters.get('pe_min'),
+            min_val=pe_min,
             max_val=filters.get('pe_max')
         )
 
