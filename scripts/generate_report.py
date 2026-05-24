@@ -35,6 +35,8 @@ try:
         WEIGHT_TECH, WEIGHT_FUND, WEIGHT_MONEYFLOW,
     )
     from fund_screener import screen_funds, format_fund_report
+    from fund_tracker import get_tracker_report as get_fund_tracker_report
+    from fund_comparison import get_comparison_report as get_fund_comparison_report
     NEW_MODULES = True
 except ImportError as e:
     print(f"[AAna] 新模块加载失败: {e}，使用简化版")
@@ -903,6 +905,44 @@ def generate_report():
                     content += line + '\n'
         except Exception as e:
             content += f"*⚠️ 基金数据获取失败: {e}*\n\n"
+
+    # ── 基金持仓追踪 section ──────────────────────────────────────
+    if NEW_MODULES:
+        try:
+            sys.path.insert(0, str(Path(__file__).parent.parent / "data"))
+            from fund_tracker import get_tracker_report as get_fund_tracker_report
+            tracker_report = get_fund_tracker_report()
+            # 去掉 ## 标题（上方已有标题）
+            lines = tracker_report.split('\n')
+            skip = False
+            for line in lines:
+                if line.startswith('# '):
+                    skip = True
+                    continue
+                if skip and line == '':
+                    skip = False
+                if not skip:
+                    content += line + '\n'
+        except Exception as e:
+            content += f"*⚠️ 基金持仓读取失败: {e}*\n\n"
+
+    # ── 基金 vs 股票对比 section ─────────────────────────────────
+    if NEW_MODULES:
+        try:
+            from fund_comparison import get_comparison_report as get_fund_comparison_report
+            comp_report = get_fund_comparison_report()
+            lines = comp_report.split('\n')
+            skip = False
+            for line in lines:
+                if line.startswith('# '):
+                    skip = True
+                    continue
+                if skip and line == '':
+                    skip = False
+                if not skip:
+                    content += line + '\n'
+        except Exception as e:
+            content += f"*⚠️ 对比报告生成失败: {e}*\n\n"
 
     # ── 读取 paper_trading 持仓 ─────────────────────────────────
     paper_positions = []
