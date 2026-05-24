@@ -119,6 +119,7 @@ def check_alerts(qs: QuoteService, recs: list) -> list:
         ma20 = tech.get('ma20')
         ma5 = tech.get('ma5')
         ma10 = tech.get('ma10')
+        rsi = tech.get('rsi') or tech.get('rsi_14')
 
         # 获取K线用于BOLL计算
         klines = qs.kline(code, period='daily', count=30)
@@ -155,6 +156,12 @@ def check_alerts(qs: QuoteService, recs: list) -> list:
                 alert_types.append('🟢 突破BOLL下轨')
                 detail_parts.append(f"股价 {price} < BOLL下轨 {boll['boll_lower']}")
 
+        # 条件5: 趋势向下标注（RSI<30且price<ma20，不追下跌趋势中的超卖）
+        if rsi is not None and ma20 is not None and price is not None:
+            if rsi < 30 and price < ma20:
+                alert_types.append('⚠️ 趋势向下')
+                detail_parts.append(f"RSI={rsi:.1f}<30 且价格 {price} < MA20 {ma20:.2f}，下跌趋势不追超卖")
+
         if alert_types:
             alerts.append({
                 **rec,
@@ -164,6 +171,7 @@ def check_alerts(qs: QuoteService, recs: list) -> list:
                 'change_pct': change_pct,
                 'vol_ratio': vol_ratio,
                 'ma20': ma20,
+                'rsi': rsi,
                 'boll_upper': boll['boll_upper'] if boll else None,
                 'boll_lower': boll['boll_lower'] if boll else None,
             })

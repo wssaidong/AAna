@@ -45,7 +45,60 @@ def _read_csv(path):
         return list(csv.DictReader(f))
 
 
-FEEDBACK_FIELDS = ["date", "code", "name", "rec_date", "ret_1d", "ret_3d", "ret_5d", "ret_15d"]
+FEEDBACK_FIELDS = ["date", "code", "name", "rec_date", "trend", "ret_1d", "ret_3d", "ret_5d", "ret_15d"]
+
+
+def _detect_trend(klines):
+    """
+    从K线检测趋势状态：上升/震荡/下降
+    基于MA排列 + 价格位置 + 近期涨跌
+    """
+    if not klines or len(klines) < 20:
+        return "震荡"
+    try:
+        closes = []
+        for kl in klines:
+            c = _sf(kl.get("close"))
+            if c:
+                closes.append(c)
+        if len(closes) < 20:
+            return "震荡"
+        ma5 = sum(closes[-5:]) / 5
+        ma10 = sum(closes[-10:]) / 10
+        ma20 = sum(closes[-20:]) / 20
+        current = closes[-1]
+        recent_change = (closes[-1] - closes[-5]) / closes[-5] * 100 if closes[-5] > 0 else 0
+        if ma5 > ma10 > ma20 and current > ma5 and recent_change > 0:
+            return "上升"
+        elif ma5 < ma10 < ma20 and current < ma5 and recent_change < 0:
+            return "下降"
+        elif ma5 < ma10 < ma20:
+            return "下降"
+        elif ma5 > ma10 > ma20:
+            return "上升"
+        else:
+            return "震荡"
+    except Exception:
+        return "震荡"
+
+
+def _get_kline_for_trend(code: str, rec_date: str):
+    """获取推荐日附近的K线用于趋势检测"""
+    qs = QuoteService()
+    klines = qs.kline(code, period="daily", count=60, adjust="qfq")
+    if not klines:
+        return None
+    # 优先找推荐日附近的K线
+    target = rec_date[:10]
+    for kl in klines:
+        if kl.get("date", "")[:10] == target:
+            # 返回推荐日前后5天的K线
+            idx = klines.index(kl)
+            start = max(0, idx - 4)
+            end = min(len(klines), idx + 5)
+            return klines[start:end]
+    # 回退：返回最近60天
+    return klines[:30]
 
 def _write_csv(path, fields, rows, mode="w"):
     with open(path, mode, newline="", encoding="utf-8") as f:
@@ -176,11 +229,16 @@ def calculate_returns(rec_rows, trade_rows):
             # 尝试用推荐日附近的 K 线
             rec_close, rec_close_date = _get_kline_close(code, _date_offset(rec_date, 1))
 
+        # 检测趋势状态
+        trend_klines = _get_kline_for_trend(code, rec_date)
+        trend = _detect_trend(trend_klines) if trend_klines else "震荡"
+
         row_out = {
             "date": _today(),
             "code": code,
             "name": name,
             "rec_date": rec_date,
+            "trend": trend,
             "ret_1d": "",
             "ret_3d": "",
             "ret_5d": "",
@@ -266,7 +324,50 @@ def compute_stats(rows, top_n=20):
     return len(wins), total, round(winrate, 4), round(avg_win, 2), round(avg_loss, 2), profit_ratio
 
 
-def build_markdown_report(rec_rows, feedback_rows, stats):
+def compute_trend_stats(rows, top_n=20):
+    """
+    按趋势分类统计RSI超卖策略的胜率差异
+    区分：上升趋势中RSI超卖 vs 下降趋势中RSI超卖
+    返回趋势统计数据字典
+    """
+    valid = [r for r in rows if r.get("ret_1d") != ""]
+    valid = valid[-top_n:] if len(valid) > top_n else valid
+
+    if not valid:
+        return {}
+
+    # 按趋势分组
+    trend_groups = {"上升": [], "震荡": [], "下降": []}
+    for r in valid:
+        trend = r.get("trend", "震荡")
+        ret = _sf(r.get("ret_1d"))
+        if ret is not None and trend in trend_groups:
+            trend_groups[trend].append(ret)
+
+    trend_stats = {}
+    for trend, rets in trend_groups.items():
+        if not rets:
+            continue
+        wins = [r for r in rets if r > 0]
+        losses = [r for r in rets if r <= 0]
+        total = len(rets)
+        winrate = len(wins) / total if total > 0 else 0
+        avg_ret = sum(rets) / total if total > 0 else 0
+        avg_win = sum(wins) / len(wins) if wins else 0
+        avg_loss = sum(losses) / len(losses) if losses else 0
+        trend_stats[trend] = {
+            "count": total,
+            "wins": len(wins),
+            "losses": len(losses),
+            "winrate": round(winrate * 100, 1),
+            "avg_ret": round(avg_ret, 2),
+            "avg_win": round(avg_win, 2),
+            "avg_loss": round(avg_loss, 2),
+        }
+    return trend_stats
+
+
+def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
     """构建 Markdown 报告"""
     win_n, total, winrate, avg_win, avg_loss, profit_ratio = stats
 
@@ -288,6 +389,36 @@ def build_markdown_report(rec_rows, feedback_rows, stats):
         "",
     ]
 
+    # 趋势胜率统计（新增）
+    if trend_stats:
+        lines.extend([
+            "",
+            "## 📈 趋势胜率统计（RSI超卖视角）",
+            "",
+            f"| 趋势 | 样本 | 胜率 | 平均收益 | 上涨均幅 | 下跌均幅 |",
+            f"|:----:|:----:|:----:|:--------:|:--------:|:--------:|",
+        ])
+        emoji_map = {"上升": "📈", "震荡": "➡️", "下降": "📉"}
+        for trend in ["上升", "震荡", "下降"]:
+            if trend in trend_stats:
+                s = trend_stats[trend]
+                emoji = emoji_map.get(trend, "")
+                lines.append(
+                    f"| {emoji} {trend} | {s['count']} | {s['winrate']:.1f}% | {s['avg_ret']:+.2f}% | "
+                    f"{s['avg_win']:+.2f}% | {s['avg_loss']:+.2f}% |"
+                )
+        lines.append("")
+        # 添加趋势分析结论
+        if "上升" in trend_stats and "下降" in trend_stats:
+            up_wr = trend_stats["上升"]["winrate"]
+            down_wr = trend_stats["下降"]["winrate"]
+            if up_wr > down_wr:
+                lines.append(f"> 📊 **结论：** 上升趋势中RSI超卖策略胜率({up_wr:.1f}%)高于下降趋势({down_wr:.1f}%)，顺势策略更有效。")
+            elif down_wr > up_wr:
+                lines.append(f"> 📊 **结论：** 下降趋势中RSI超卖策略胜率({down_wr:.1f}%)高于上升趋势({up_wr:.1f}%)，或存在抄底机会但需谨慎。")
+            else:
+                lines.append("> 📊 **结论：** 不同趋势下RSI超卖策略胜率接近。")
+
     if winrate < WINRATE_THRESHOLD:
         lines.append("## ⚠️ 建议提高选股评分阈值")
         lines.append("")
@@ -297,8 +428,8 @@ def build_markdown_report(rec_rows, feedback_rows, stats):
         "",
         "## 📋 最新推荐详情",
         "",
-        "| 日期 | 代码 | 名称 | 推荐日 | 1日收益 | 3日收益 | 5日收益 | 15日收益 |",
-        "|------|------|------|--------|--------|--------|--------|--------|",
+        "| 日期 | 代码 | 名称 | 推荐日 | 趋势 | 1日收益 | 3日收益 | 5日收益 | 15日收益 |",
+        "|------|------|------|--------|------|--------|--------|--------|--------|",
     ])
 
     for r in feedback_rows[-20:]:
@@ -306,8 +437,10 @@ def build_markdown_report(rec_rows, feedback_rows, stats):
         ret_3d = f"{r['ret_3d']:+.2f}%" if r.get("ret_3d") != "" else "-"
         ret_5d = f"{r['ret_5d']:+.2f}%" if r.get("ret_5d") != "" else "-"
         ret_15d = f"{r['ret_15d']:+.2f}%" if r.get("ret_15d") != "" else "-"
+        trend_emoji = "📈" if r.get("trend") == "上升" else "📉" if r.get("trend") == "下降" else "➡️"
+        trend_str = r.get("trend", "震荡")
         lines.append(
-            f"| {r['date']} | {r['code']} | {r['name']} | {r['rec_date']} | {ret_1d} | {ret_3d} | {ret_5d} | {ret_15d} |"
+            f"| {r['date']} | {r['code']} | {r['name']} | {r['rec_date']} | {trend_emoji}{trend_str} | {ret_1d} | {ret_3d} | {ret_5d} | {ret_15d} |"
         )
 
     lines.extend([
@@ -350,8 +483,13 @@ def main():
     stats = compute_stats(feedback_rows, top_n=20)
     print(f"   统计样本: {stats[1]} 只, 胜率: {stats[2]*100:.1f}%, 盈亏比: {stats[5]}", file=sys.stderr)
 
+    # 5b. 趋势胜率统计
+    trend_stats = compute_trend_stats(feedback_rows, top_n=20)
+    if trend_stats:
+        print(f"   趋势分布: " + ", ".join(f"{k}({v['count']}只,{v['winrate']}%)" for k, v in trend_stats.items()), file=sys.stderr)
+
     # 6. 输出 Markdown 报告
-    report = build_markdown_report(rec_rows, feedback_rows, stats)
+    report = build_markdown_report(rec_rows, feedback_rows, stats, trend_stats)
     print(report)
 
 

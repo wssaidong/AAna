@@ -226,6 +226,23 @@ class StockScreener:
             if rsi_col:
                 filtered = self._apply_numeric_filter(filtered, rsi_col, min_val=filters['rsi_min'])
 
+        # 趋势过滤（排除下跌趋势：MA5<MA20 或近20日涨幅<-10%）
+        if filters.get('exclude_downtrend'):
+            before_count = len(filtered)
+            ma5_col = self._find_column(filtered, ['MA5', 'ma5'])
+            ma20_col = self._find_column(filtered, ['MA20', 'ma20'])
+            change20_col = self._find_column(filtered, ['20日涨跌幅', '近20日涨幅', '涨幅20日'])
+            # 过滤MA5<MA20
+            if ma5_col and ma20_col:
+                filtered = filtered[~(pd.to_numeric(filtered[ma5_col], errors='coerce') <
+                                     pd.to_numeric(filtered[ma20_col], errors='coerce'))]
+            # 过滤近20日涨幅<-10%
+            if change20_col:
+                filtered = filtered[~(pd.to_numeric(filtered[change20_col], errors='coerce') < -10)]
+            after_count = len(filtered)
+            if before_count > after_count:
+                print(f"  排除下跌趋势: {before_count - after_count} 只")
+
         # 总市值筛选（转换为亿）
         if '总市值' in filtered.columns:
             if filters.get('market_cap_min') is not None or filters.get('market_cap_max') is not None:
@@ -454,6 +471,8 @@ def main():
     parser.add_argument("--main-net-ratio-max", type=float, help="最大主力净流入占比 (%%)")
     parser.add_argument("--rsi-min", type=float, help="最小RSI")
     parser.add_argument("--rsi-max", type=float, help="最大RSI")
+    parser.add_argument("--exclude-downtrend", action="store_true",
+                       help="排除下跌趋势股票（MA5<MA20 或近20日涨幅<-10%）")
     parser.add_argument("--include-banned-board", action="store_true",
                        help="包含科创板/创业板（默认排除）")
     parser.add_argument("--weights", type=str, help="评分权重JSON字符串，格式: {\"pe\":15,\"pb\":10,...}")
@@ -466,7 +485,8 @@ def main():
         'debt_ratio_max', 'dividend_min', 'market_cap_min', 'market_cap_max',
         'volume_ratio_min', 'volume_ratio_max',
         'main_net_ratio_min', 'main_net_ratio_max',
-        'rsi_min', 'rsi_max'
+        'rsi_min', 'rsi_max',
+        'exclude_downtrend'
     ]
     filters = {
         k: getattr(args, k.replace('-', '_'))

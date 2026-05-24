@@ -441,10 +441,11 @@ def cleanup_old_reports(days=7):
         print(f"[AAna] 共清理 {removed} 个过期文件")
 
 
-def generate_report(stocks, index_data=None):
+def generate_report(stocks, index_data=None, sentiment_label='中性', position_ratio=0.5, market_status='待定', avg_change=0.0, hot_str='', hot_sects=None):
     """生成尾盘选股报告 v2.5"""
     today = get_today_str()
     now = datetime.now()
+    hot_sects = hot_sects or []
 
     report_dir = os.path.expanduser("~/code/AAna/reports")
     os.makedirs(report_dir, exist_ok=True)
@@ -620,7 +621,19 @@ def main():
     stocks = screen_afternoon_stocks()
     
     # 生成报告
-    filename, top_stocks = generate_report(stocks, index_data)
+    market_status = '待定'
+    avg_change = 0.0
+    hot_sects = []
+    hot_str = ''
+    filename, top_stocks = generate_report(
+        stocks, index_data,
+        sentiment_label=sentiment_label,
+        position_ratio=position_ratio,
+        market_status=market_status,
+        avg_change=avg_change,
+        hot_str=hot_str,
+        hot_sects=hot_sects
+    )
 
     # 持久化到 data/ 层
     if top_stocks:

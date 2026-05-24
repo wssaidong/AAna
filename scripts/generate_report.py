@@ -148,6 +148,59 @@ def get_close_list(kline):
     else:  # BaoStock list format
         return [float(d[4]) for d in kline]  # index 4 = close
 
+def detect_trend(kline):
+    """检测趋势状态：上升/震荡/下降
+    基于MA多头排列 + 价格位置 + 近期涨跌方向综合判断
+    """
+    if not kline or len(kline) < 20:
+        return "震荡", "neutral"
+    closes = get_close_list(kline)
+    if len(closes) < 20:
+        return "震荡", "neutral"
+    
+    ma5 = sum(closes[-5:]) / 5
+    ma10 = sum(closes[-10:]) / 10
+    ma20 = sum(closes[-20:]) / 20
+    current = closes[-1]
+    
+    # 计算近期涨跌
+    recent_change = (closes[-1] - closes[-5]) / closes[-5] * 100 if closes[-5] > 0 else 0
+    
+    # 上升趋势：MA多头且价格在均线上方
+    if ma5 > ma10 > ma20 and current > ma5 and recent_change > 0:
+        return "上升", "up"
+    # 下降趋势：MA空头且价格在均线下方
+    elif ma5 < ma10 < ma20 and current < ma5 and recent_change < 0:
+        return "下降", "down"
+    # 下降趋势：明显空头排列
+    elif ma5 < ma10 < ma20:
+        return "下降", "down"
+    # 上升趋势：明显多头排列
+    elif ma5 > ma10 > ma20:
+        return "上升", "up"
+    else:
+        return "震荡", "neutral"
+
+def is_ice_point(info, kline):
+    """判断是否是冰点日（跌停或接近跌停）"""
+    change_pct = info.get('change_pct', 0)
+    # 跌停（-9.5%以下算冰点）
+    if change_pct <= -9.5:
+        return True
+    # 大跌超过7%也视为冰点区域
+    if change_pct <= -7:
+        return True
+    return False
+
+def get_trend_emoji(trend):
+    """趋势状态对应的emoji"""
+    if trend == "上升":
+        return "📈"
+    elif trend == "下降":
+        return "📉"
+    else:
+        return "➡️"
+
 def check_均线多头(kline):
     """均线多头: MA5 > MA10 > MA20"""
     closes = get_close_list(kline)
@@ -559,6 +612,12 @@ def generate_report():
                 if check_MACD金叉(kline): signals.append('MACD金叉')
             info['signals'] = signals
 
+            # 趋势检测
+            trend, trend_key = detect_trend(kline)
+            info['trend'] = trend
+            info['trend_key'] = trend_key
+            info['is_ice_point'] = is_ice_point(info, kline)
+
             # 风控止损
             if NEW_MODULES:
                 sl = calc_stop_loss(info.get('price', 0))
@@ -676,42 +735,52 @@ def generate_report():
     content = header + "### \U0001f3c6 重点关注 Top 10\n\n"
     if NEW_MODULES:
         content += (
-            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 资金流 | 综合评分 | 信号 | 风险 | 软止损 |\n"
-            "|:----:|:----:|:----:|:----:|:------:|:------:|:------:|:--------:|:----:|:----:|:------:|\n"
+            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 资金流 | 综合评分 | 信号 | 风险 | 软止损 | 趋势 |\n"
+            "|:----:|:----:|:----:|:----:|:------:|:------:|:------:|:--------:|:----:|:----:|:------:|:----:|\n"
         )
         for i, stock in enumerate(all_stocks[:10], 1):
             signals = ''.join(stock.get('signals', []) or ['-'])
             mf_net = stock.get('money_flow_net', 0)
             mf_str = "{:+.0f}万".format(mf_net) if abs(mf_net) > 1 else "~"
+            ice_warning = " 🚨冰点" if stock.get('is_ice_point') else ""
+            trend_emoji = get_trend_emoji(stock.get('trend', '震荡'))
+            trend_str = stock.get('trend', '震荡')
             content += (
-                "| {} | {}{} | {} | {} | {} | {} | {} | **{}** | {} | {} | {} |\n".format(
+                "| {} | {}{}{} | {} | {} | {} | {} | {} | **{}** | {} | {} | {} | {} |\n".format(
                     i,
                     stock['emoji'],
                     stock['name'],
+                    ice_warning,
                     stock['code'],
                     format_price(stock['price']),
                     format_change(stock['change_pct']),
                     stock.get('tech_score', 0),
                     mf_str,
-                    stock['\u7efc\u5408\u8bc4\u5206'],
+                    stock['综合评分'],
                     signals,
-                    stock['\u98ce\u9669\u7b49\u7ea7'],
-                    stock.get('stop_soft', '-')
+                    stock['风险等级'],
+                    stock.get('stop_soft', '-'),
+                    trend_emoji + trend_str
                 )
             )
+
+    # 按板块展示（NEW_MODULES=False情况）
     else:
         content += (
-            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |\n"
-            "|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|:----:|:----:|\n"
+            "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 | 趋势 |\n"
+            "|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|:----:|:----:|:----:|\n"
         )
         for i, stock in enumerate(all_stocks[:10], 1):
             signals = ''.join(stock.get('signals', []) or ['-'])
+            trend_emoji = get_trend_emoji(stock.get('trend', '震荡'))
+            trend_str = stock.get('trend', '震荡')
+            ice_warning = " 🚨冰点" if stock.get('is_ice_point') else ""
             content += (
-                "| {} | {}{} | {} | {} | {} | {} | **{}** | {} | {} |\n".format(
-                    i, stock['emoji'], stock['name'], stock['code'],
+                "| {} | {}{}{} | {} | {} | {} | **{}** | {} | {} | {} |\n".format(
+                    i, stock['emoji'], stock['name'], ice_warning, stock['code'],
                     format_price(stock['price']), format_change(stock['change_pct']),
-                    stock.get('tech_score', 0), stock['\u7efc\u5408\u8bc4\u5206'],
-                    signals, stock['\u98ce\u9669\u7b49\u7ea7']
+                    stock.get('tech_score', 0), stock['综合评分'],
+                    signals, stock['风险等级'], trend_emoji + trend_str
                 )
             )
 
@@ -729,17 +798,22 @@ def generate_report():
         )
         for stock in cat['stocks']:
             reason = cat.get('logic', '-')
+            trend_emoji = get_trend_emoji(stock.get('trend', '震荡'))
+            trend_str = stock.get('trend', '震荡')
+            ice_warning = " 🚨冰点" if stock.get('is_ice_point') else ""
             content += (
-                "| {}{} | {} | {} | {} | {} | **{}** | {} | {} |\n".format(
+                "| {}{}{} | {} | {} | {} | {} | **{}** | {} | {} | {} |\n".format(
                     stock['emoji'],
                     stock['name'],
+                    ice_warning,
                     stock['code'],
                     format_price(stock['price']),
                     format_change(stock['change_pct']),
                     stock.get('tech_score', 0),
-                    stock['\u7efc\u5408\u8bc4\u5206'],
-                    stock['\u8bc4\u7ea7'],
-                    reason
+                    stock['综合评分'],
+                    stock['评级'],
+                    reason,
+                    trend_emoji + trend_str
                 )
             )
 
