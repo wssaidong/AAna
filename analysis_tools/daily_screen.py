@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 每日选股任务脚本
-沪深300 + 中证500，股价20-60元，输出短期和长期各5只
+沪深300 + 中证500，股价10-80元，输出短期和长期各5只
 """
 import sys
 import json
@@ -148,7 +148,7 @@ def screen():
     # 5. 股价过滤 20-60
     df['最新价'] = pd.to_numeric(df['最新价'], errors='coerce')
     df = df[(df['最新价'] >= 20) & (df['最新价'] <= 60)]
-    print(f"  股价20-60元过滤后: {len(df)} 只")
+    print(f"  股价10-80元过滤后: {len(df)} 只")
 
     if df.empty:
         print("没有符合条件股票")
@@ -180,7 +180,7 @@ def screen():
     result = {
         "screen_time": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         "scope": "沪深300 + 中证500",
-        "price_range": "20-60元",
+        "price_range": "10-80元",
         "short_term": format_results(short_term, '短期评分'),
         "long_term": format_results(long_term, '长期评分'),
         "total_scanned": len(all_codes),
@@ -200,7 +200,7 @@ def format_feishu_message(result):
     lines.append(f"📊 **每日选股报告**")
     lines.append(f"🕐 {result['screen_time']}")
     lines.append(f"📈 扫描范围：沪深300 + 中证500（共{result['total_scanned']}只）")
-    lines.append(f"💰 股价区间：20-60元（符合条件：{result['qualified_count']}只）")
+    lines.append(f"💰 股价区间：10-80元（符合条件：{result['qualified_count']}只）")
     lines.append("")
 
     lines.append("**🔥 短期推荐（动量+估值）**")
