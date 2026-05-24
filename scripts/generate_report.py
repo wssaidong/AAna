@@ -34,6 +34,7 @@ try:
         composite_score, RiskManager,
         WEIGHT_TECH, WEIGHT_FUND, WEIGHT_MONEYFLOW,
     )
+    from fund_screener import screen_funds, format_fund_report
     NEW_MODULES = True
 except ImportError as e:
     print(f"[AAna] 新模块加载失败: {e}，使用简化版")
@@ -64,6 +65,7 @@ def cleanup_old_reports(days=7):
     patterns = [
         f"{REPORT_DIR}/*-选股报告.md",
         f"{REPORT_DIR}/*尾盘选股.md",
+        f"{REPORT_DIR}/*基金*.md",
         f"{REPORT_DIR}/.snapshot_*.json",
         f"{REPORT_DIR}/盘中/*.log",
         f"{REPORT_DIR}/盘前/*.log",
@@ -875,8 +877,32 @@ def generate_report():
         "- 温和上涨0~5%：+10分\n"
         "- 涨停>9%：-15分（风险大）\n\n"
         "---\n\n"
-        "## 七、本周操作回顾\n\n"
+        "## 七、💰 基金推荐\n\n"
     ).format(WEIGHT_TECH if NEW_MODULES else 0.6, WEIGHT_FUND if NEW_MODULES else 0.4, WEIGHT_MONEYFLOW if NEW_MODULES else 0.0)
+
+    # ── 基金推荐 section ──────────────────────────────────────────
+    if NEW_MODULES:
+        content += (
+            "> 基于东方财富 API，数据每日更新非实时\n\n"
+            "**筛选条件：** 成立≥2年 · 规模≥5亿 · 近1年正收益\n\n"
+            "**评分公式：** 近3月×30% + 近1年×40% + YTD×30%\n\n"
+        )
+        try:
+            fund_results = screen_funds(top_n=3, max_pages=20)
+            fund_report = format_fund_report(fund_results)
+            # 去掉 Markdown 标题（已在上方有标题）
+            lines = fund_report.split('\n')
+            skip = False
+            for line in lines:
+                if line.startswith('# '):
+                    skip = True
+                    continue
+                if skip and line == '':
+                    skip = False
+                if not skip:
+                    content += line + '\n'
+        except Exception as e:
+            content += f"*⚠️ 基金数据获取失败: {e}*\n\n"
 
     # ── 读取 paper_trading 持仓 ─────────────────────────────────
     paper_positions = []
