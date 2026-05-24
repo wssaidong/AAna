@@ -119,7 +119,12 @@ class TuningConfig:
 def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
     """
     加载 rec_feedback.csv，转换为 FeedbackRecord 列表。
-    支持旧格式（recommendations.csv / tracking.csv）自动转换。
+    支持两种格式：
+    - v1（旧）: date,code,name,sector,sector_name,score,hold_days,actual_change,...
+    - v2（新）: date,code,name,rec_date,trend,ret_1d,ret_3d,ret_5d,ret_15d
+      （由 feedback_loop.py 生成，通过K线计算实际收益率）
+    v2 格式缺少 score/hold_days/actual_change，由 ret_1d 反推并估算其他字段。
+    如文件不存在则尝试从 recommendations.csv + tracking.csv 重建。
     """
     if csv_path is None:
         csv_path = FEEDBACK_CSV
@@ -136,30 +141,98 @@ def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
     records = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames or []
+        is_new_format = "ret_1d" in fieldnames and "actual_change" not in fieldnames
+
         for row in reader:
             try:
-                score = int(float(row.get("score", 0)))
-                hold_days = int(float(row.get("hold_days", 0)))
-                actual_change = float(row.get("actual_change", 0))
-                is_win = bool(row.get("is_win", str(actual_change > 0)).lower() == "true")
-                records.append(FeedbackRecord(
-                    date=row.get("date", ""),
-                    code=row.get("code", ""),
-                    name=row.get("name", ""),
-                    sector=row.get("sector", ""),
-                    sector_name=row.get("sector_name", ""),
-                    score=score,
-                    hold_days=hold_days,
-                    actual_change=actual_change,
-                    is_win=is_win,
-                    expected_high=float(row.get("expected_high", 0)),
-                    expected_low=float(row.get("expected_low", 0)),
-                    hit=row.get("hit", "") == "True",
-                    created_at=row.get("created_at", ""),
-                ))
+                if is_new_format:
+                    # v2 格式：通过 ret_1d 反推 actual_change/score/hold_days
+                    ret_1d_raw = row.get("ret_1d", "")
+                    actual_change = float(ret_1d_raw) if ret_1d_raw else 0.0
+                    score = _estimate_score_from_ret(actual_change)
+                    hold_days = 1  # v2 默认持有 1 天（T+1）
+
+                    # 尝试从 rec_date + recommendations.csv 获取 sector/name
+                    rec_date = row.get("rec_date", "")
+                    code = row.get("code", "")
+                    sector, sector_name = _lookup_sector(code, rec_date)
+
+                    records.append(FeedbackRecord(
+                        date=row.get("date", ""),
+                        code=code,
+                        name=row.get("name", ""),
+                        sector=sector,
+                        sector_name=sector_name,
+                        score=score,
+                        hold_days=hold_days,
+                        actual_change=actual_change,
+                        is_win=actual_change > 0,
+                        expected_high=0.0,
+                        expected_low=0.0,
+                        hit=actual_change > 0,
+                        created_at="",
+                    ))
+                else:
+                    # v1 格式（原有逻辑）
+                    score = int(float(row.get("score", 0)))
+                    hold_days = int(float(row.get("hold_days", 0)))
+                    actual_change = float(row.get("actual_change", 0))
+                    is_win = bool(row.get("is_win", str(actual_change > 0)).lower() == "true")
+                    records.append(FeedbackRecord(
+                        date=row.get("date", ""),
+                        code=row.get("code", ""),
+                        name=row.get("name", ""),
+                        sector=row.get("sector", ""),
+                        sector_name=row.get("sector_name", ""),
+                        score=score,
+                        hold_days=hold_days,
+                        actual_change=actual_change,
+                        is_win=is_win,
+                        expected_high=float(row.get("expected_high", 0)),
+                        expected_low=float(row.get("expected_low", 0)),
+                        hit=row.get("hit", "") == "True",
+                        created_at=row.get("created_at", ""),
+                    ))
             except (ValueError, KeyError) as e:
                 continue
     return records
+
+
+def _estimate_score_from_ret(actual_change: float) -> int:
+    """
+    根据实际收益率估算综合评分（用于 v2 格式无 score 字段的情况）。
+    规则：收益率越高评分越高，参考 _estimate_score 的逆逻辑。
+    """
+    score = 50
+    if actual_change >= 5:
+        score += 15
+    elif actual_change >= 3:
+        score += 10
+    elif actual_change >= 1:
+        score += 5
+    elif actual_change >= 0:
+        score += 0
+    else:
+        score -= 5
+        if actual_change <= -5:
+            score -= 5
+        elif actual_change <= -10:
+            score -= 10
+    return max(0, min(100, score))
+
+
+def _lookup_sector(code: str, rec_date: str) -> Tuple[str, str]:
+    """根据 code 和 rec_date 从 recommendations.csv 查找 sector/sector_name"""
+    rec_path = DATA_DIR / "recommendations.csv"
+    if not rec_path.exists():
+        return "", ""
+    with open(rec_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row.get("code") == code and row.get("date") == rec_date:
+                return row.get("sector", ""), row.get("sector_name", "")
+    return "", ""
 
 
 def _rebuild_from_existing() -> List[FeedbackRecord]:
