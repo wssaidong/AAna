@@ -1113,3 +1113,15 @@ if __name__ == "__main__":
         generate_report()
     if args.type in ('review', 'both'):
         generate_review_report()
+
+# === REC_OPTIMIZER_TUNING_START ===
+# 由 RecOptimizer 自动生成，勿手动修改
+REC_TUNING = {
+    "score_threshold": 60,
+    "hold_days": 5,
+    "weak_sectors": ['semi', 'energy', 'robot', 'ai_chip'],
+    "overall_win_rate": 11.8,
+    "total_records": 17,
+    "generated_at": "2026-05-24T11:51:29.721931",
+}
+# === REC_OPTIMIZER_TUNING_END ===

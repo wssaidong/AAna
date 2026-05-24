@@ -1,0 +1,83 @@
+{
+  "recommended_score_threshold": 60,
+  "recommended_hold_days": 5,
+  "weak_sectors": [
+    "semi",
+    "energy",
+    "robot",
+    "ai_chip"
+  ],
+  "total_records": 17,
+  "overall_win_rate": 11.76470588235294,
+  "_win_rate_threshold": 40.0,
+  "generated_at": "2026-05-24T11:51:29.721931",
+  "score_band_stats": {
+    "50-60": {
+      "band": "50-60",
+      "count": 3,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.29,
+      "avg_hold_days": 5.0
+    },
+    "60-70": {
+      "band": "60-70",
+      "count": 14,
+      "win_count": 2,
+      "win_rate": 14.285714285714285,
+      "avg_change": -0.7114285714285714,
+      "avg_hold_days": 5.0
+    }
+  },
+  "hold_days_stats": {
+    "5": {
+      "hold_days": 5,
+      "count": 17,
+      "win_count": 2,
+      "win_rate": 11.76470588235294,
+      "avg_change": -0.8135294117647058
+    }
+  },
+  "sector_stats": {
+    "semi": {
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "count": 3,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.8733333333333333
+    },
+    "robot": {
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "count": 5,
+      "win_count": 1,
+      "win_rate": 20.0,
+      "avg_change": -0.514
+    },
+    "energy": {
+      "sector": "energy",
+      "sector_name": "储能/绿电",
+      "count": 3,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.6
+    },
+    "ai_chip": {
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "count": 4,
+      "win_count": 1,
+      "win_rate": 25.0,
+      "avg_change": -0.48499999999999993
+    },
+    "ai_app": {
+      "sector": "ai_app",
+      "sector_name": "AI应用",
+      "count": 2,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.9500000000000001
+    }
+  }
+}
