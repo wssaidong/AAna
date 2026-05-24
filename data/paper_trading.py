@@ -140,7 +140,7 @@ def mark_to_market(date_str: str, quotes: dict) -> dict:
         for code, pos in d["positions"].items()
     )
     total_pnl = realized_pnl + unrealized_pnl
-    total_pnl_pct = total_pnl / d.get("init_cash", 100000) * 100
+    total_pnl_pct = (total_pnl / d["init_cash"] * 100) if d.get("init_cash") else 0.0
 
     prev_total = d["daily_snapshots"][-1]["total_value"] if d["daily_snapshots"] else d.get("init_cash", 100000)
     daily_pnl = total_value - prev_total
@@ -176,13 +176,13 @@ def auto_stop_loss(date_str: str, quotes: dict,
         pos = d["positions"][code]
         entry = pos["entry_price"]
         loss_pct = (price - entry) / entry
-        if loss_pct <= hard_pct:
-            trade = record_sell(code, price, date_str)
-            trade["stop_reason"] = f"硬止损{loss_pct*100:.1f}%"
-            triggered.append(trade)
-        elif loss_pct <= soft_pct:
+        if loss_pct <= soft_pct:
             trade = record_sell(code, price, date_str)
             trade["stop_reason"] = f"软止损{loss_pct*100:.1f}%"
+            triggered.append(trade)
+        elif loss_pct <= hard_pct:
+            trade = record_sell(code, price, date_str)
+            trade["stop_reason"] = f"硬止损{loss_pct*100:.1f}%"
             triggered.append(trade)
     return triggered
 
@@ -253,7 +253,7 @@ def sync_from_recommendations(date_str: str = None) -> dict:
     bought = []
     for rec in recs:
         code = rec.get("code", "").zfill(6)
-        if code in (d["positions"] for d in [_load()]):
+        if code in _load()["positions"]:
             continue  # 已有持仓
         price = float(rec.get("price") or 0)
         if price <= 0:

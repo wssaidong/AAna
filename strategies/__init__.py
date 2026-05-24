@@ -163,6 +163,8 @@ class ValueStrategy(BaseStrategy):
         price = tech.get('price')
 
         # ── 基本面评分 0-40 ──────────────────────────
+        from data.fundamentals import FundamentalService
+        fs = FundamentalService()
         if financials and all(k in financials for k in ('pe', 'pb', 'roe')):
             pe = financials.get('pe')
             pb = financials.get('pb')
@@ -190,7 +192,7 @@ class ValueStrategy(BaseStrategy):
         # ── 技术面评分 0-100 ──────────────────────────
         pe = (financials or {}).get('pe')
         pb = (financials or {}).get('pb')
-        pe_score = self._check_range(pe, 5, 60) * 40 if pe else 20  # 权重 40
+        pe_score = self._check_range(pe, 5, 60) * 40 if pe and pe > 0 else 20  # 权重 40
         pb_score = self._check_range(pb, 1, 10) * 30 if pb else 15  # 权重 30
         price_score = self._check_range(price, 5, 100) * 30 if price else 15
         tech_score = min(100, pe_score + pb_score + price_score)

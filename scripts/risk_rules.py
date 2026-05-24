@@ -289,7 +289,7 @@ class RiskManager:
             return False, "大盘冰点/极端，建议空仓", "空仓信号"
 
         if self.position_ratio == 0:
-            return False, f"情绪{sentiment_score}分，建议{get_position_ratio(self.sentiment_score)*100:.0f}仓", "降仓信号"
+            return False, f"情绪{self.sentiment_score}分，建议{get_position_ratio(self.sentiment_score)*100:.0f}仓", "降仓信号"
 
         price = info.get('price', 0)
         change_pct = info.get('change_pct', 0)

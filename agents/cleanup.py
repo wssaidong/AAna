@@ -110,6 +110,12 @@ def cleanup_reports():
         if dt < cutoff:
             # 删除整个日期目录
             import shutil
+        # 安全校验：确保路径在REPORTS_DIR内，防止路径穿越攻击
+            day_dir_abs = os.path.abspath(day_dir)
+            reports_dir_abs = os.path.abspath(REPORTS_DIR)
+            if not day_dir_abs.startswith(reports_dir_abs):
+                log.warning(f"路径穿越风险，跳过: {day_dir}")
+                continue
             shutil.rmtree(day_dir)
             removed.append(f"reports/{dirname}/")
             log.debug(f"已删除日期目录: {dirname}/")

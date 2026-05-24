@@ -8,7 +8,7 @@ import json
 import time
 from datetime import datetime
 
-sys.path.insert(0, '/Users/cai/.openclaw/workspace/.agents/skills/china-stock-analysis/scripts')
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../.openclaw/workspace/.agents/skills/china-stock-analysis/scripts'))
 
 try:
     import akshare as ak

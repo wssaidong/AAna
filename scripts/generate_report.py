@@ -110,7 +110,7 @@ def get_historical_kline(code, count=60):
             bs_code,
             "date,open,high,low,close,volume",
             start_date='2024-01-01',  # 提前获取足够历史数据
-            end_date='2026-04-20',
+            end_date=datetime.now().strftime('%Y-%m-%d'),
             frequency="d"
         )
         

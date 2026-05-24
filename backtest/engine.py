@@ -253,7 +253,7 @@ class ScoreSignalStrategy(Strategy):
         close = self.datas[0].close[0]
 
         # ── 止损 ──
-        if self.buy_price is not None:
+        if self.buy_price is not None and self.buy_price != 0:
             pnl_pct = (close - self.buy_price) / self.buy_price * 100
             if pnl_pct <= self.p.stop_loss_pct:
                 self.order = self.close()

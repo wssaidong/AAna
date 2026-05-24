@@ -160,7 +160,7 @@ class FundamentalService:
         if growth_data:
             rev_g = growth_data.get("revenue_growth")
             prof_g = growth_data.get("profit_growth")
-            best_growth = max(rev_g, prof_g) if (rev_g is not None and prof_g is not None) else (rev_g or prof_g)
+            best_growth = max(rev_g, prof_g) if (rev_g is not None and prof_g is not None) else (rev_g if rev_g is not None else prof_g)
         else:
             best_growth = None
 

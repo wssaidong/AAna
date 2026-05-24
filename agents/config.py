@@ -108,6 +108,9 @@ def get_time_str():
     return datetime.now().strftime("%H:%M:%S")
 
 def is_trading_day():
-    """简单判断是否是交易日（周一到周五）"""
+    """简单判断是否是交易日（周一到周五）
+    注意：此函数不校验节假日（如春节、国庆等），仅基于星期判断。
+    实际生产环境应调用 akshare 的 is_trading_day() 或接入交易日历API获取准确结果。
+    """
     weekday = datetime.now().weekday()
     return weekday < 5  # 0=周一, 4=周五

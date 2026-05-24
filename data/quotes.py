@@ -146,7 +146,7 @@ class QuoteService:
         prices = klines[-1]
         vol_list = [k['vol'] for k in klines]
 
-        ma = lambda n: sum(closes[-n:]) / n if len(closes) >= n else None
+        ma = lambda n: sum(closes[-n:]) / n if len(closes) >= n else (sum(closes) / len(closes) if closes else None)
 
         # RSI
         def calc_rsi(c, p=14):
@@ -240,7 +240,7 @@ class QuoteService:
                 low = _sf(parts[5])
                 vol = _sf(parts[8])
                 amount = _sf(parts[9])
-                change_pct = round((price - yc) / yc * 100, 2) if yc and price else 0
+                change_pct = round((price - yc) / yc * 100, 2) if yc and yc != 0 and price else 0
                 result[code] = {
                     'code': code, 'name': name,
                     'price': price, 'open': op, 'high': high, 'low': low,
@@ -286,7 +286,7 @@ class QuoteService:
 
     def _tencent_kline(self, code: str, period: str, count: int, adjust: str) -> List[Dict[str, Any]]:
         try:
-            mkt = 'sh' if code.startswith(('6', '9')) else 'sz'
+            mkt = 'sh' if code.startswith(('6', '9')) else ('bj' if code.startswith(('8', '4', '3')) else 'sz')
             url = TENCENT_KL
             params = {"param": f"{mkt}{code},day,,,{count},{adjust}"}
             r = _retry_req(url, params)

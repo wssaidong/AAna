@@ -167,7 +167,7 @@ class PortfolioTracker:
 
         # 累计总收益（含已实现）
         total_pnl = self.realized_pnl + sum(p.unrealized_pnl for p in self.positions.values())
-        total_pnl_pct = (total_pnl / self.initial_cash * 100) if self.initial_cash else 0.0
+        total_pnl_pct = (total_pnl / self.initial_cash * 100) if self.initial_cash and self.initial_cash != 0 else 0.0
 
         state = PortfolioState(
             date=date,
