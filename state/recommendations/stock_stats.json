@@ -20,6 +20,12 @@
           "change": -3.18,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-05-25",
+          "change": -0.31,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -43,6 +49,12 @@
           "date": "2026-05-21",
           "change": -1.45,
           "hit": false,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-05-25",
+          "change": -2.93,
+          "hit": true,
           "sector": "semi"
         }
       ],
@@ -68,6 +80,12 @@
           "change": -0.99,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-05-25",
+          "change": -1.51,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -92,6 +110,12 @@
           "change": 0.4,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-25",
+          "change": 0.19,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -114,6 +138,12 @@
         {
           "date": "2026-05-22",
           "change": -0.69,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-25",
+          "change": null,
           "hit": false,
           "sector": "robot"
         }
@@ -140,6 +170,12 @@
           "change": -1.48,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-25",
+          "change": 0.08,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -164,6 +200,12 @@
           "change": 0.0,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-25",
+          "change": null,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -186,6 +228,12 @@
         {
           "date": "2026-05-22",
           "change": -0.8,
+          "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-25",
+          "change": -0.73,
           "hit": true,
           "sector": "robot"
         }
@@ -212,6 +260,12 @@
           "change": -0.74,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-25",
+          "change": null,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -236,6 +290,12 @@
           "change": -0.04,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-25",
+          "change": -1.32,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -258,6 +318,12 @@
         {
           "date": "2026-05-22",
           "change": -1.02,
+          "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-05-25",
+          "change": 0.0,
           "hit": true,
           "sector": "energy"
         }
@@ -367,6 +433,11 @@
           "date": "2026-05-21",
           "avg_change": -1.8733333333333333,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-05-25",
+          "avg_change": -1.5833333333333333,
+          "hit_rate": 100.0
         }
       ]
     },
@@ -386,6 +457,11 @@
         {
           "date": "2026-05-22",
           "avg_change": -0.6,
+          "hit_rate": 100.0
+        },
+        {
+          "date": "2026-05-25",
+          "avg_change": -0.66,
           "hit_rate": 100.0
         }
       ]
@@ -407,6 +483,11 @@
           "date": "2026-05-22",
           "avg_change": -0.514,
           "hit_rate": 80.0
+        },
+        {
+          "date": "2026-05-25",
+          "avg_change": -0.15333333333333332,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -440,6 +521,7 @@
     "2026-05-19",
     "2026-05-20",
     "2026-05-21",
-    "2026-05-22"
+    "2026-05-22",
+    "2026-05-25"
   ]
 }
