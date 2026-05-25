@@ -3612,3 +3612,20 @@ logout success!
 [模拟交易] No module named 'data'
 [AAna] 复盘评分报告已生成: /Users/cai/code/AAna/reports/2026-05-23-复盘评分.md
 [AAna] 复盘报告已推送 GitHub
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-05-17-选股报告.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-05-25 动态选股报告...
+[AAna] 从新浪财经获取动态股票池...
+[Sina] Page 5 failed: Expecting value: line 1 column 1 (char 0)
+[AAna] 获取原始数据: 160 只
+[AAna] 筛选后: 0 只
+[AAna] 动态股票池: 0 只
+[AAna] 获取 0 只股票数据...
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 1253, in <module>
+    generate_report()
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 855, in generate_report
+    content += (
+IndexError: Replacement index 1 out of range for positional args tuple
