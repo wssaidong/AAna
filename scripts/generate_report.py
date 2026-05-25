@@ -846,8 +846,8 @@ def generate_report():
     if high_risk:
         content += "\n\u26a0\ufe0f **高风险警示（追高危险）**\n"
         for s in high_risk:
-            content += "- {}({}) 今日{:+.1f}%，追高风险大\n".format(
-                s['name'], s['code'], s['change_pct']
+            content += "- {name}({code}) 今日{change:+.1f}%，追高风险大\n".format(
+                name=s['name'], code=s['code'], change=s['change_pct']
             )
 
     # ========== 风险提示 ==========
@@ -865,7 +865,7 @@ def generate_report():
         "**止损原则：** {} 必须止损，不可恋战\n\n"
         "---\n\n"
         "## 六、评分系统说明（v2.5）\n\n"
-    ).format(stop_loss_rule)
+    ).format(stop_loss_rule, stop_loss_rule)
     content += (
         "| 维度 | 权重 | 评分要素 |\n"
         "|:----:|:----:|:--------|\n"
