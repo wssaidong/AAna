@@ -325,3 +325,8 @@
 [2026-05-25 21:35:05] 修正建议: 0 条
 [report] 已保存: /Users/cai/code/AAna/reports/2026-05-25/复盘/2026-05-25_2135_策略分析.md
 [git] 失败: Command '['git', 'push', 'origin', 'main']' returned non-zero exit status 128.
+[2026-05-25 21:40:05] 🌙 复盘子Agent 启动
+[2026-05-25 21:40:05] ==================================================
+[2026-05-25 21:40:05] 🛡️ 21:40 风险控制评估
+[report] 已保存: /Users/cai/code/AAna/reports/2026-05-25/复盘/2026-05-25_2140_风险评估.md
+[git] 失败: Command '['git', 'push', 'origin', 'main']' returned non-zero exit status 128.
