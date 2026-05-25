@@ -38,17 +38,19 @@ def filter_stocks(raw_stocks):
         price = float(s.get('trade', 0))
         change_pct = float(s.get('changepercent', 0))
         
-        # 排除新股、北交所、ST、科创板
+        # 排除新股、北交所、ST、科创板、创业板
         if code.startswith(('N', 'C', 'n', 'c', 'bj', '8', '9')):
             continue
         if name.startswith(('N', 'C', 'n', 'c', '*', 'S')):
             continue
         if code.startswith('688'):  # 科创板
             continue
-        # 价格/涨幅过滤
-        if price < 20 or price > 80:
+        if code.startswith(('300', '301')):  # 创业板
             continue
-        if change_pct < 0 or change_pct > 9.8:
+        # 价格/涨幅过滤（主板；涨幅>7%标注追高风险）
+        if price < 5 or price > 100:
+            continue
+        if change_pct < 0 or change_pct > 10.1:
             continue
         
         filtered.append({
