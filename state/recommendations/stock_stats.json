@@ -116,6 +116,12 @@
           "change": 0.19,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.0,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -176,6 +182,12 @@
           "change": 0.08,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.42,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -234,6 +246,12 @@
         {
           "date": "2026-05-25",
           "change": -0.73,
+          "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.7,
           "hit": true,
           "sector": "robot"
         }
@@ -296,6 +314,12 @@
           "change": -1.32,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.17,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -325,6 +349,12 @@
           "date": "2026-05-25",
           "change": 0.0,
           "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.94,
+          "hit": false,
           "sector": "energy"
         }
       ],
@@ -410,6 +440,48 @@
           "change": -0.53,
           "hit": true,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-05-26",
+          "change": 0.37,
+          "hit": true,
+          "sector": "ai_app"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "600570": {
+      "name": "恒生电子",
+      "records": [
+        {
+          "date": "2026-05-26",
+          "change": 0.58,
+          "hit": false,
+          "sector": "ai_app"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "600745": {
+      "name": "*ST闻泰",
+      "records": [
+        {
+          "date": "2026-05-26",
+          "change": -2.86,
+          "hit": true,
+          "sector": "robot"
+        }
+      ],
+      "consecutive_bad": 0
+    },
+    "600900": {
+      "name": "长江电力",
+      "records": [
+        {
+          "date": "2026-05-26",
+          "change": 0.04,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -463,6 +535,11 @@
           "date": "2026-05-25",
           "avg_change": -0.66,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-05-26",
+          "avg_change": 0.3833333333333333,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -488,6 +565,11 @@
           "date": "2026-05-25",
           "avg_change": -0.15333333333333332,
           "hit_rate": 66.66666666666666
+        },
+        {
+          "date": "2026-05-26",
+          "avg_change": -0.435,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -503,6 +585,11 @@
           "date": "2026-05-22",
           "avg_change": -0.9500000000000001,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-05-26",
+          "avg_change": 0.475,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -522,6 +609,7 @@
     "2026-05-20",
     "2026-05-21",
     "2026-05-22",
-    "2026-05-25"
+    "2026-05-25",
+    "2026-05-26"
   ]
 }
