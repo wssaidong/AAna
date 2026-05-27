@@ -199,9 +199,22 @@ def get_or_create_group(group_name):
     """
     获取或创建组合，返回 gid
     策略：
-    1. 尝试创建（如果已存在返回 -131 但无 gid）
-    2. 如果创建失败（-131），遍历 gid 范围找同名组合
+    1. 优先查 groups.json（同名已记录则直接返回 gid）
+    2. 尝试创建（如果已存在返回 -131 但无 gid）
+    3. 如果 -131，扫描全部 gid 范围找同名组合（updatetime 匹配）
+    4. 如果扫描也找不到，用 groups.json 里gid的最大值+10作为兜底
     """
+    # 1. 先查 groups.json 是否有这个组合的记录
+    groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
+    if os.path.exists(groups_file):
+        with open(groups_file) as f:
+            history = json.load(f)
+        if group_name in history and history[group_name].get('gid'):
+            gid = history[group_name]['gid']
+            print(f"[Eastmoney] 从 groups.json 找到 {group_name} → gid={gid}")
+            return gid
+
+    # 2. 尝试创建
     url_create = mkurl('ag', gn=group_name)
     result, sn = api_call(url_create)
     state = result.get('state')
@@ -213,49 +226,37 @@ def get_or_create_group(group_name):
     
     if state == -131:
         print(f"[Eastmoney] 组合 {group_name} 已存在，正在查找 gid...")
-        # 遍历 gid 范围，找属于这个用户且包含股票的组合
-        # 东方财富 gid 基本是递增的，从 136 开始往后找
-        # 先查 groups.json 是否有记录
-        groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
-        gid_map = {}
-        if os.path.exists(groups_file):
-            with open(groups_file) as f:
-                gid_map = {v['gid']: k for k, v in json.load(f).items() if v.get('gid')}
         
-        # 从 136 开始往后扫（今日组合gid=136）
-        for test_gid in range(136, 300):
-            if str(test_gid) in gid_map:
-                # groups.json 中有这个gid的记录
-                continue
+        # 3. 扫描全部 gid 范围（不跳过已记录gid，因为可能有同名但不同gid）
+        for test_gid in range(136, 400):
             url_check = mkurl('gstkinfos', g=test_gid)
             try:
                 r, _ = api_call(url_check)
                 if r.get('state') == 0 and r.get('data', {}).get('stkinfolist'):
-                    # 这是一个有效组合，但不知道名字
-                    # 尝试用它的 updatetime 推断
                     stocks = r['data']['stkinfolist']
                     updatetime = stocks[0].get('updatetime', 0)
-                    # updatetime 格式: 20260519084950 → date=20260519
                     updatetime_str = str(updatetime)
                     if len(updatetime_str) >= 8:
                         date_part = updatetime_str[:8]
                         if date_part == group_name:
-                            print(f"[Eastmoney] 找到 {group_name} 对应 gid={test_gid}")
+                            print(f"[Eastmoney] 扫描找到 {group_name} 对应 gid={test_gid}")
                             return test_gid
             except:
                 pass
         
-        # fallback: 如果扫不到，用 gid=136+1 作为新 gid（假设每天加1）
-        # 这个 heuristic 可能在某些情况下不准，但够用
-        print(f"[Eastmoney] 未找到 {group_name}，使用 fallback 策略")
-        # 取今天的 gid=136，明天应该用 gid=137
-        # 通过日期计算相对 gid
-        base_date = datetime(2026, 5, 19)
-        today = datetime.now()
-        offset = (today - base_date).days
-        inferred_gid = 136 + offset
-        print(f"[Eastmoney] 推断 gid={inferred_gid}（基于日期偏移 {offset} 天）")
-        return inferred_gid
+        # 4. 扫描也找不到，用 groups.json 历史最大值 + 步进作为兜底
+        if os.path.exists(groups_file):
+            with open(groups_file) as f:
+                history = json.load(f)
+            gids = [int(v['gid']) for v in history.values() if v.get('gid')]
+            if gids:
+                max_gid = max(gids)
+                inferred_gid = max_gid + 10
+                print(f"[Eastmoney] 扫描未找到，从历史 gid 最大值推断 gid={inferred_gid}")
+                return inferred_gid
+        
+        print(f"[Eastmoney] 未找到 {group_name}，也无法推断 gid")
+        return None
     
     print(f"[Eastmoney] 创建组合失败: state={state}")
     return None
