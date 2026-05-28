@@ -72,32 +72,44 @@ def save_cookie(data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def api_call(url):
-    """发送 API 请求，自动处理 st_sn 自增"""
-    cookie_str, cookie_data = load_cookie()
-    
-    # 当前 st_sn
-    current_sn = int(cookie_data.get('st_sn', 1))
-    
+def api_call(url, max_retries=2):
+    """发送 API 请求，st_sn 仅在成功时自增；连续失败时标记 cookie 失效"""
     headers = {
         'Referer': REFERER,
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/147.0.0.0 Safari/537.36',
         'Accept': '*/*',
     }
-    
-    resp = requests.get(url, headers=headers, cookies=dict(p.split('=', 1) for p in cookie_str.split('; ') if '=' in p), timeout=10)
-    
-    # 提取 st_sn（如果响应头或内容中有）
-    # 更新本地 st_sn
-    cookie_data['st_sn'] = current_sn + 1
-    save_cookie(cookie_data)
-    
-    text = resp.text
-    # 去掉 JSONP 包装
-    if '(' in text and ')' in text:
-        text = text[text.index('(')+1:text.rindex(')')]
-    
-    return json.loads(text), cookie_data['st_sn']
+
+    for attempt in range(max_retries + 1):
+        cookie_str, cookie_data = load_cookie()
+        current_sn = int(cookie_data.get('st_sn', 1))
+
+        cookies = dict(p.split('=', 1) for p in cookie_str.split('; ') if '=' in p)
+        resp = requests.get(url, headers=headers, cookies=cookies, timeout=10)
+        text = resp.text
+        if '(' in text and ')' in text:
+            text = text[text.index('(')+1:text.rindex(')')]
+
+        result = json.loads(text)
+        state = result.get('state')
+
+        # 只在成功时自增 st_sn 并保存
+        if state == 0:
+            cookie_data['st_sn'] = current_sn + 1
+            save_cookie(cookie_data)
+            return result, cookie_data['st_sn']
+
+        # -2 = CUToken为空/失效，强制退出不再重试
+        if state == -2:
+            print(f"[Eastmoney] Cookie 已失效 (state=-2)，请重新抓取 cookie")
+            raise PermissionError(f"东方财富 Cookie 失效 (CUToken为空)，请登录 quote.eastmoney.com/zixuan/ 重新抓取完整 cookie")
+
+        # 其他错误：最后一次尝试后退出
+        if attempt == max_retries:
+            print(f"[Eastmoney] API 请求失败: state={state} msg={result.get('message')}")
+            return result, current_sn
+
+    return result, current_sn
 
 
 def mkurl(endpoint, **params):

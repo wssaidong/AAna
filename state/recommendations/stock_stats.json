@@ -128,6 +128,12 @@
           "change": 0.0,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-05-28",
+          "change": 1.69,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -192,6 +198,12 @@
         {
           "date": "2026-05-26",
           "change": 0.42,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-28",
+          "change": 0.43,
           "hit": false,
           "sector": "robot"
         }
@@ -266,6 +278,12 @@
           "change": 0.02,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-05-28",
+          "change": -0.04,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -338,6 +356,12 @@
           "change": 0.57,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-05-28",
+          "change": 0.0,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -378,6 +402,12 @@
         {
           "date": "2026-05-27",
           "change": 0.21,
+          "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-05-28",
+          "change": 0.43,
           "hit": false,
           "sector": "energy"
         }
@@ -476,6 +506,12 @@
           "change": 0.25,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-05-28",
+          "change": 0.76,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -494,6 +530,12 @@
           "change": 0.74,
           "hit": false,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-05-28",
+          "change": -0.12,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -505,6 +547,12 @@
           "date": "2026-05-26",
           "change": -2.86,
           "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-05-28",
+          "change": -4.77,
+          "hit": false,
           "sector": "robot"
         }
       ],
@@ -522,6 +570,12 @@
         {
           "date": "2026-05-27",
           "change": 0.3,
+          "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-05-28",
+          "change": -0.04,
           "hit": false,
           "sector": "energy"
         }
@@ -599,6 +653,11 @@
           "date": "2026-05-27",
           "avg_change": 0.35999999999999993,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-05-28",
+          "avg_change": 0.13,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -629,6 +688,11 @@
           "date": "2026-05-26",
           "avg_change": -0.435,
           "hit_rate": 50.0
+        },
+        {
+          "date": "2026-05-28",
+          "avg_change": -0.6724999999999999,
+          "hit_rate": 25.0
         }
       ]
     },
@@ -653,6 +717,11 @@
         {
           "date": "2026-05-27",
           "avg_change": 0.74,
+          "hit_rate": 0.0
+        },
+        {
+          "date": "2026-05-28",
+          "avg_change": 0.32,
           "hit_rate": 0.0
         }
       ]
@@ -680,6 +749,7 @@
     "2026-05-22",
     "2026-05-25",
     "2026-05-26",
-    "2026-05-27"
+    "2026-05-27",
+    "2026-05-28"
   ]
 }
