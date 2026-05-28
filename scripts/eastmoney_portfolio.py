@@ -123,8 +123,9 @@ def create_group(name):
         return gid
     elif state == -131:
         print(f"[Eastmoney] 组合 {name} 已存在，跳过创建")
-        # 返回已存在的 gid
-        return result.get('data', {}).get('gid')
+        # 即使 -131，响应 data 里通常也有 gid
+        gid = result.get('data', {}).get('gid')
+        return gid if gid else None
     else:
         print(f"[Eastmoney] 创建组合失败: state={state} msg={result.get('message')}")
         return None
@@ -199,10 +200,9 @@ def get_or_create_group(group_name):
     """
     获取或创建组合，返回 gid
     策略：
-    1. 优先查 groups.json（同名已记录则直接返回 gid）
-    2. 尝试创建（如果已存在返回 -131 但无 gid）
-    3. 如果 -131，扫描全部 gid 范围找同名组合（updatetime 匹配）
-    4. 如果扫描也找不到，用 groups.json 里gid的最大值+10作为兜底
+    1. 用唯一名称创建（日期+时间戳后缀）确保每次都是新组合
+    2. 如果名称已存在（-131），从响应 data.gid 取（修复之前 gid 丢失问题）
+    3. 扫描 gid 范围找同名组合兜底
     """
     # 1. 先查 groups.json 是否有这个组合的记录
     groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
@@ -214,8 +214,10 @@ def get_or_create_group(group_name):
             print(f"[Eastmoney] 从 groups.json 找到 {group_name} → gid={gid}")
             return gid
 
-    # 2. 尝试创建
-    url_create = mkurl('ag', gn=group_name)
+    # 2. 尝试创建（用纯数字后缀，不用下划线——东方财富组合名不支持下划线）
+    suffix = int(datetime.now().timestamp()) % 100000  # 5位数字避免过长
+    unique_name = f"{group_name}{suffix}"
+    url_create = mkurl('ag', gn=unique_name)
     result, sn = api_call(url_create)
     state = result.get('state')
     
@@ -227,7 +229,13 @@ def get_or_create_group(group_name):
     if state == -131:
         print(f"[Eastmoney] 组合 {group_name} 已存在，正在查找 gid...")
         
-        # 3. 扫描全部 gid 范围（不跳过已记录gid，因为可能有同名但不同gid）
+        # 2a. 即使 -131，也尝试从响应中提取 gid（修复：之前漏掉了这个）
+        gid_from_response = result.get('data', {}).get('gid')
+        if gid_from_response:
+            print(f"[Eastmoney] 从 -131 响应中获取 gid={gid_from_response}")
+            return gid_from_response
+        
+        # 2b. 扫描全部 gid 范围找同名组合
         for test_gid in range(136, 400):
             url_check = mkurl('gstkinfos', g=test_gid)
             try:
@@ -244,7 +252,7 @@ def get_or_create_group(group_name):
             except:
                 pass
         
-        # 4. 扫描也找不到，用 groups.json 历史最大值 + 步进作为兜底
+        # 2c. 扫描也找不到，用 groups.json 历史最大值 + 步进作为兜底
         if os.path.exists(groups_file):
             with open(groups_file) as f:
                 history = json.load(f)
