@@ -1,0 +1,82 @@
+{
+  "timestamp": "2026-06-01T14:45:00.458038",
+  "data": {
+    "timestamp": "2026-06-01T14:45:00.457775",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 10.93,
+        "change": 0.28
+      },
+      {
+        "name": "深证成指",
+        "price": 15575.134,
+        "change": -0.17
+      },
+      {
+        "name": "创业板指",
+        "price": 4037.951,
+        "change": -0.48
+      },
+      {
+        "name": "科创50",
+        "price": 42.18,
+        "change": 2.03
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "半导体设备",
+        "avg_change": 0.9366666666666666,
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": 0.5,
+        "logic": "端侧AI+智能汽车"
+      },
+      {
+        "name": "储能/绿电",
+        "avg_change": 0.12333333333333334,
+        "logic": "碳中和+装机旺季"
+      },
+      {
+        "name": "AI算力/芯片",
+        "avg_change": -0.37749999999999995,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": -0.7075,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      }
+    ],
+    "strong_stocks": [
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "change": 2.43,
+        "rel_change": 2.015,
+        "price": 82.05,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      }
+    ],
+    "pullback_stocks": [
+      {
+        "name": "*ST闻泰",
+        "code": "600745",
+        "category": "人形机器人",
+        "change": -4.75,
+        "rel_change": -5.165,
+        "price": 20.67,
+        "stop_loss": "-5%",
+        "risk": "高",
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      }
+    ],
+    "trend": "➡️ 尾盘横盘整理"
+  }
+}
