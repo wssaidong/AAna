@@ -39,11 +39,9 @@ reports/*/main_agent.log
 reports/*/postmarket.log
 reports/*/premarket.log
 
-# Data (runtime — managed by data/ layer)
+# Data — commit CSV/JSON for persistence
 data/recommendations.csv
 data/tracking.csv
 data/summaries/
 data/tracking/
-data/recommendations.csv
-data/tracking.csv
 pycache
