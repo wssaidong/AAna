@@ -640,6 +640,15 @@ def generate_report():
             info['评级'] = 评级
             info['emoji'] = get_sector_emoji(info.get('name', ''))
 
+            # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
+            score_thresh = REC_TUNING.get('score_threshold', 50)
+            weak_sectors = REC_TUNING.get('weak_sectors', [])
+            sector = info.get('category', '') or info.get('sector', '')
+            if 综合评分 < score_thresh:
+                continue  # 评分低于阈值，跳过
+            if sector in weak_sectors:
+                continue  # 板块为弱势板块，跳过
+
             price = info.get('price', 0)
             if price <= 0:
                 continue
@@ -1254,14 +1263,15 @@ if __name__ == "__main__":
     if args.type in ('review', 'both'):
         generate_review_report()
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
-    "score_threshold": 60,
-    "hold_days": 5,
-    "weak_sectors": ['semi', 'energy', 'robot', 'ai_chip'],
-    "overall_win_rate": 11.8,
-    "total_records": 17,
-    "generated_at": "2026-05-24T11:51:29.721931",
+    "score_threshold": 50,
+    "hold_days": 1,
+    "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
+    "overall_win_rate": 21.9,
+    "total_records": 334,
+    "generated_at": "2026-06-03T16:24:00.777270",
 }
 # === REC_OPTIMIZER_TUNING_END ===

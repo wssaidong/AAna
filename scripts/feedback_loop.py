@@ -48,6 +48,13 @@ def _read_csv(path):
 FEEDBACK_FIELDS = ["date", "code", "name", "rec_date", "trend", "ret_1d", "ret_3d", "ret_5d", "ret_15d"]
 
 
+def _sf(val):
+    """安全转浮点数"""
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return None
+
 def _detect_trend(klines):
     """
     从K线检测趋势状态：上升/震荡/下降
@@ -68,14 +75,18 @@ def _detect_trend(klines):
         ma20 = sum(closes[-20:]) / 20
         current = closes[-1]
         recent_change = (closes[-1] - closes[-5]) / closes[-5] * 100 if closes[-5] > 0 else 0
+        # 严格上升：MA多头排列 + 价格在MA5之上 + 近期上涨
         if ma5 > ma10 > ma20 and current > ma5 and recent_change > 0:
             return "上升"
+        # 严格下降：MA空头排列 + 价格在MA5之下 + 近期下跌
         elif ma5 < ma10 < ma20 and current < ma5 and recent_change < 0:
             return "下降"
-        elif ma5 < ma10 < ma20:
-            return "下降"
+        # 弱上升：MA多头排列（价格或近期条件不满足）
         elif ma5 > ma10 > ma20:
             return "上升"
+        # 弱下降：MA空头排列
+        elif ma5 < ma10 < ma20:
+            return "下降"
         else:
             return "震荡"
     except Exception:
