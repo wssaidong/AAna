@@ -45,17 +45,6 @@ except ImportError as e:
 PROJECT_DIR = os.path.expanduser("~/code/AAna")
 REPORT_DIR = os.path.expanduser("~/code/AAna/reports")
 
-# === REC_OPTIMIZER_TUNING_START ===
-# 由 RecOptimizer 自动生成，勿手动修改
-REC_TUNING = {
-    "score_threshold": 50,
-    "hold_days": 1,
-    "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
-    "overall_win_rate": 21.9,
-    "total_records": 334,
-    "generated_at": "2026-06-03T20:00:14.927821",
-}
-# === REC_OPTIMIZER_TUNING_END ===
 
 def get_today_str():
     now = datetime.now()
@@ -1277,14 +1266,15 @@ if __name__ == "__main__":
 
 
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
     "score_threshold": 50,
     "hold_days": 1,
     "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
-    "overall_win_rate": 21.9,
-    "total_records": 334,
-    "generated_at": "2026-06-03T20:00:14.927821",
+    "overall_win_rate": 21.2,
+    "total_records": 354,
+    "generated_at": "2026-06-04T20:00:37.400971",
 }
 # === REC_OPTIMIZER_TUNING_END ===
