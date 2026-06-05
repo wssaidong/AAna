@@ -4957,3 +4957,21 @@ Traceback (most recent call last):
   File "/Users/cai/code/AAna/scripts/generate_report.py", line 644, in generate_report
     score_thresh = REC_TUNING.get('score_threshold', 50)
 NameError: name 'REC_TUNING' is not defined
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-05-28-选股报告.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-06-05 动态选股报告...
+[AAna] 从新浪财经获取动态股票池...
+[AAna] 获取原始数据: 200 只
+[AAna] 筛选后: 75 只
+[AAna] 动态股票池: 50 只
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 1263, in <module>
+    generate_report()
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 645, in generate_report
+    score_thresh = REC_TUNING.get('score_threshold', 50)
+NameError: name 'REC_TUNING' is not defined
