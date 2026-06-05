@@ -492,16 +492,38 @@ def get_sector_emoji(name):
 # ============================================
 # 报告生成
 # ============================================
+
+def main():
+    parser = argparse.ArgumentParser(description='AAna v2.5 每日选股报告')
+    parser.add_argument('--type', choices=['selection', 'review', 'both'], default='both',
+                        help='报告类型：选股报告(selection)、复盘报告(review)或两者(both)')
+    args = parser.parse_args()
+
+    git_pull()
+
+    if args.type in ('selection', 'both'):
+        generate_report()
+    if args.type in ('review', 'both'):
+        generate_review_report()
+
 def generate_report():
     today = get_today_str()
     filename = get_report_filename()
+
+    # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
+    REC_TUNING = {
+        "score_threshold": 50,
+        "hold_days": 1,
+        "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
+        "overall_win_rate": 21.2,
+        "total_records": 354,
+        "generated_at": "2026-06-04T20:00:37.400971",
+    }
 
     # 生成报告前清理过期文件（保留7天）
     cleanup_old_reports(days=7)
 
     print(f"[AAna v2.5] 生成 {today} 动态选股报告...")
-
-    # ── 1. 市场情绪 ──────────────────────────────────────────
     sentiment = {}
     if NEW_MODULES:
         sentiment = get_market_sentiment()
