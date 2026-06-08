@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "akshare>=1.14.0",
     "backtrader>=1.9.0",
+    "baostock>=0.8.9",
     "pandas>=2.0.0",
     "requests>=2.31.0",
 ]
