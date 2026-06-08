@@ -1,0 +1,136 @@
+{
+  "timestamp": "2026-06-08T14:45:00.338578",
+  "data": {
+    "timestamp": "2026-06-08T14:45:00.338222",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 10.98,
+        "change": 0.09
+      },
+      {
+        "name": "深证成指",
+        "price": 15314.7,
+        "change": 3.23
+      },
+      {
+        "name": "创业板指",
+        "price": 3957.935,
+        "change": 3.6
+      },
+      {
+        "name": "科创50",
+        "price": 39.06,
+        "change": 1.8
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "半导体设备",
+        "avg_change": 5.19,
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": 3.8775,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "AI算力/芯片",
+        "avg_change": 3.4850000000000003,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": 1.98,
+        "logic": "端侧AI+智能汽车"
+      },
+      {
+        "name": "储能/绿电",
+        "avg_change": 1.5133333333333334,
+        "logic": "碳中和+装机旺季"
+      }
+    ],
+    "strong_stocks": [
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "change": 6.67,
+        "rel_change": 4.49,
+        "price": 75.65,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "兆易创新",
+        "code": "603986",
+        "category": "AI算力/芯片",
+        "change": 5.83,
+        "rel_change": 3.65,
+        "price": 488.0,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "*ST闻泰",
+        "code": "600745",
+        "category": "人形机器人",
+        "change": 5.27,
+        "rel_change": 3.0899999999999994,
+        "price": 21.39,
+        "stop_loss": "-5%",
+        "risk": "高",
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "五洲新春",
+        "code": "603667",
+        "category": "人形机器人",
+        "change": 5.15,
+        "rel_change": 2.97,
+        "price": 74.34,
+        "stop_loss": "-5%",
+        "risk": "高",
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "change": 4.97,
+        "rel_change": 2.7899999999999996,
+        "price": 16.91,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "AI算力/芯片",
+        "change": 3.93,
+        "rel_change": 1.75,
+        "price": 75.14,
+        "stop_loss": "-8%",
+        "risk": "高",
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "半导体设备",
+        "change": 3.93,
+        "rel_change": 1.75,
+        "price": 75.14,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      }
+    ],
+    "pullback_stocks": [],
+    "trend": "📈 尾盘强势拉升"
+  }
+}
