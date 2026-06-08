@@ -534,15 +534,22 @@ def generate_report():
     sentiment_score = sentiment.get('score', 50)
     position_ratio = get_position_ratio(sentiment_score) if NEW_MODULES else 0.5
 
-    # ── 2. 增强选股源 ────────────────────────────────────────
+    # ── 2. 增强选股源（v2.6 修复：双池分离 normal + risk）────────
     if NEW_MODULES:
         dynamic_stocks = get_enhanced_stock_pool(
             include_zt=(sentiment_score > 40)
         )
+        risk_pool = []  # 涨停警示池（NEW_MODULES 分支不展开 risk）
     else:
-        from dynamic_stocks import get_dynamic_stock_pool
-        dynamic_stocks = get_dynamic_stock_pool()
-    print(f"[AAna] 动态股票池: {len(dynamic_stocks)} 只")
+        from dynamic_stocks import get_dynamic_stock_pool, get_stock_pool_split
+        try:
+            # 优先用双池接口：normal=推荐主池，risk=涨停警示池
+            dynamic_stocks, risk_pool = get_stock_pool_split()
+        except Exception as _e:
+            print(f"[AAna] 双池拆分失败，回退单池: {_e}")
+            dynamic_stocks = get_dynamic_stock_pool()
+            risk_pool = []
+    print(f"[AAna] 动态股票池: {len(dynamic_stocks)} 只 (涨停警示 {len(risk_pool)} 只)")
 
     # ── 3. 获取资金流向 ──────────────────────────────────────
     money_flows = {}
@@ -875,7 +882,14 @@ def generate_report():
         content += "今日无明显回调机会，关注明日开盘\n"
 
     high_risk = [s for s in all_stocks if s['change_pct'] > 7]
-    if high_risk:
+    # v2.6: 优先用上游传过来的 risk_pool（涨停警示池）
+    if risk_pool:
+        content += "\n\u26a0\ufe0f **高风险警示（追高危险，仅展示不推荐）**\n"
+        for s in risk_pool:
+            content += "- {name}({code}) 今日{change:+.1f}%，追高风险大\n".format(
+                name=s['name'], code=s['code'], change=s['change_pct']
+            )
+    elif high_risk:
         content += "\n\u26a0\ufe0f **高风险警示（追高危险）**\n"
         for s in high_risk:
             content += "- {name}({code}) 今日{change:+.1f}%，追高风险大\n".format(
