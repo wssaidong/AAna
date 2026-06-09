@@ -241,6 +241,59 @@ def summary() -> str:
 
 # ── 联动推荐复盘：自动建仓/清仓 ────────────────────────────────
 
+# ── v2.4 卖出策略集成（2026-06-09）───────────────────────────
+# 数据依据: 90 天回测 (1508 笔)
+#   S1 T+1 开盘即卖: 80.2% 胜率 / +1.17% 平均 / +1766% 累计 ⭐
+#   S5 跳空≥2% 跳过+剩余卖: 73.6% 胜率 / +0.38% 平均 / +424% 累计
+# 决策逻辑见 scripts/sell_strategy_v24.py
+
+def auto_sell_v24(date_str: str, quotes_ohlc: dict,
+                   cost_rate: float = 0.002) -> list:
+    """
+    v2.4 卖出策略（每个交易日下午 15:30 调用一次）
+    quotes_ohlc = {code: {'open','high','low','close','prev_close'}}
+                  注意：open 是当日开盘（不是 T+1），需传 T+N 日的 K 线
+
+    用法:
+        # 每日收盘后
+        quotes = fetch_ohlc_for_holdings(positions.keys())
+        triggered = paper_trading.auto_sell_v24(today, quotes)
+    """
+    from sell_strategy_v24 import make_sell_decision
+    d = _load()
+    triggered = []
+    for code in list(d["positions"].keys()):
+        pos = d["positions"][code]
+        ohlc = quotes_ohlc.get(code)
+        if not ohlc:
+            continue
+        try:
+            decision = make_sell_decision(
+                code=code, name=pos["name"],
+                entry_date=pos["entry_date"],
+                entry_price=pos["entry_price"],
+                shares=pos["shares"],
+                today=date_str,
+                open_price=ohlc.get("open", pos["entry_price"]),
+                high_price=ohlc.get("high", pos["entry_price"]),
+                low_price=ohlc.get("low", pos["entry_price"]),
+                close_price=ohlc.get("close", pos["entry_price"]),
+                cost_rate=cost_rate,
+            )
+            if decision.action == 'sell':
+                trade = record_sell(code, decision.price, date_str)
+                if trade:
+                    trade["stop_reason"] = decision.reason
+                    trade["sell_notes"] = decision.notes
+                    triggered.append(trade)
+                    print(f"[v2.4] {code} {pos['name']} T+{decision.days_held} "
+                          f"卖 @{decision.price:.2f} {decision.reason} "
+                          f"{decision.pnl_pct:+.2f}%")
+        except Exception as e:
+            print(f"[v2.4] {code} 决策失败: {e}")
+    return triggered
+
+
 def sync_from_recommendations(date_str: str = None) -> dict:
     """
     从 data/recommendations.csv 读取今日推荐，
