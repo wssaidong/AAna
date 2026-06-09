@@ -5248,3 +5248,14 @@ logout success!
 login success!
 logout success!
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-08-选股报告.md
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-06-01-尾盘选股.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-06-09 动态选股报告...
+[Sina] Page 4 failed: Expecting value: line 1 column 1 (char 0)
+[Source] sina OK (120 只, 8.4s)
+[AAna] 拆分: 推荐池 0 只 + 风险池 38 只 (source=sina)
+[AAna] 动态股票池: 0 只 (涨停警示 30 只)
+[AAna] 获取 0 只股票数据...
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-09-选股报告.md
