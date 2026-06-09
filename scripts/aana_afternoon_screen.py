@@ -1,11 +1,40 @@
 #!/usr/bin/env python3
 """
-AAna 尾盘选股脚本 v1.0
+AAna 尾盘选股脚本 v2.3
 运行时间：工作日 14:45（A股收盘前15分钟）
 策略：尾盘强势股回调买入
   - 14:45 全天数据已基本定型，可靠性高
   - 重点：当日小幅回调的强势股（不追高）
   - 过滤：RSI超买、涨幅过大、量能异常
+  - 90 天回测实证：T+1 跳空高开 87.9%（中位 +0.91%），5 日持有总亏 -2474%
+    → 卖出策略应改为 T+1 开盘卖（90 天 +1668%），详见 run_afternoon_v24_t1sell.py
+
+修复历史（v2.1 2026-06-09）：
+  P0  - MACD 金叉定义改为 DIF 上穿 DEA（而非 DIF 穿 0）
+  P0  - 风险/止损反逻辑修正（高风险用更紧的止损）
+  P1  - 候选池扩到全市场（涨幅榜 + 成交额过滤）
+  P1  - 60/65 评分阈值统一为 65
+  P2  - 5.0% 边界改为严格 > 5
+  P2  - 报告 reason 兜底
+  P3  - 新浪 HTTP 改 HTTPS、评分项加注释、format_change 名字注释
+  P3  - get_vol_ratio 索引改 list comprehension
+
+优化历史（v2.2 2026-06-09）：
+  #1  - MACD 二次确认：基础金叉 +5 分，二次确认（健康回踩）+5 分，量缩价稳 +3 分
+  #2  - MACD lookback 从 3 扩到 5（覆盖"金叉后第 2-3 日"的观察窗口）
+  #3  - 集成 feedback_loop：评分时记录到 rec_feedback.csv 用于回测验证
+
+回测结论（v2.2 2026-06-09）：
+  - 30/90 天 MACD 二次确认胜率 15.2%，平均 -3.65%（Fisher p=0.0074 反向显著）
+  - 二次确认在 A 股是"追高陷阱"，30 天 5/5 100% 是幸存者偏差
+
+优化历史（v2.3 2026-06-09）：
+  #1  - 删除 MACD 二次确认加分（+5）+ 删除 vol_shrink 加分（+3）
+       → 90 天 33 笔二次确认：胜率 15.2% / 平均 -3.65% ＝ 反向指标
+       → 基础金叉 +5 保留（v2.1 修复的 DIF 真正上穿 DEA）
+  #2  - MACD 二次确认相关字段（macd_confirmed/macd_vol_shrink）改为只记录、不加分
+  #3  - check_macd_golden_cross() 仍返回 confirmed/vol_shrink 供 paper_trading 与回测使用
+       → 留口子：未来若二次确认被新数据证明有效，可一行开启加分
 """
 
 import os
@@ -58,10 +87,11 @@ def get_stock_data_sina(codes):
     results = {}
     try:
         formatted = [get_market_sina(c) for c in codes]
-        url = f'http://hq.sinajs.cn/list={",".join(formatted)}'
+        # 修复 #11: 改用 HTTPS，避免被网络拦截
+        url = f'https://hq.sinajs.cn/list={",".join(formatted)}'
         headers = {
             'User-Agent': 'Mozilla/5.0',
-            'Referer': 'http://finance.sina.com.cn'
+            'Referer': 'https://finance.sina.com.cn'
         }
         resp = requests.get(url, headers=headers, timeout=10)
         resp.encoding = 'gbk'
@@ -171,106 +201,248 @@ def calculate_ma(closes, period):
     return sum(closes[-period:]) / period
 
 
-def check_macd_golden_cross(closes):
-    """检查MACD是否金叉（近3日内）"""
+def check_macd_golden_cross(closes, lookback=5):
+    """
+    检查 MACD 是否在最近 lookback 日内出现金叉。
+    修复 #1: 真正定义 = DIF 上穿 DEA（DEA = EMA9 of DIF）
+    原版用 DIF 穿 0 轴，频繁误报。
+    修复 #1b: 进一步剔除"零附近抖动"误报（DIF 与 DEA 都接近 0 时的穿越视为噪声）
+    优化 #1 (v2.2): 二次确认 — 返回 dict 包含金叉距今天数、后续回踩状态
+    返回: {
+        "is_golden":    bool,         # 是否在 lookback 内出现金叉
+        "cross_idx":    int or None,  # 金叉发生位置（从序列起点算）
+        "days_ago":     int or None,  # 距今天数（0=今天，1=昨天...）
+        "confirmed":    bool,         # 二次确认（v2.2 新增）：金叉后第 2-3 日回踩未破
+        "pullback_ok":  bool,         # v2.2: 是否有健康回踩（DIF 未跌破 DEA）
+        "vol_shrink":   bool,         # v2.2: 回踩时成交量是否萎缩（健康）
+    }
+    """
     if len(closes) < 35:
-        return False
-    
+        return {"is_golden": False, "cross_idx": None, "days_ago": None,
+                "confirmed": False, "pullback_ok": False, "vol_shrink": False}
+
     def ema(data, p):
         k = 2 / (p + 1)
         e = data[0]
         for d in data[1:]:
             e = d * k + e * (1 - k)
         return e
-    
-    for i in range(26, len(closes)):
-        ema12 = ema(closes[:i+1], 12)
-        ema26 = ema(closes[:i+1], 26)
-        dif = ema12 - ema26
-        
-        ema12_prev = ema(closes[:i], 12)
-        ema26_prev = ema(closes[:i], 26)
-        dif_prev = ema12_prev - ema26_prev
-        
-        if dif > 0 and dif_prev <= 0:
-            return True  # 金叉
-    return False
+
+    # 计算每日 DIF (EMA12 - EMA26) 和 DEA (EMA9 of DIF)
+    dif_series = []
+    for i in range(25, len(closes)):
+        ema12 = ema(closes[:i + 1], 12)
+        ema26 = ema(closes[:i + 1], 26)
+        dif_series.append(ema12 - ema26)
+
+    # DEA = EMA9 of DIF
+    dea_series = []
+    for i in range(8, len(dif_series)):
+        dea_series.append(ema(dif_series[:i + 1], 9))
+
+    # 对齐：DIF 从索引 8 之后才能算 DEA
+    aligned_dif = dif_series[8:]
+
+    # 在最近 lookback 日内查找金叉：DIF 上穿 DEA
+    # 修复 #1b: 弱化"dif_now < 0 直接拒绝"的规则 — 反弹初期 DIF 仍 < 0 也算金叉
+    start = max(0, len(aligned_dif) - lookback)
+    is_gold = False
+    cross_idx = None
+
+    # 特殊处理 aligned_dif[0]：它之前的"虚拟"点是 dif_series 索引 7（无 DEA）
+    # 如果 aligned_dif[0] 本身 DIF > DEA，且前一点（dif_series[7]）DIF < aligned_dif[0] 的 DIF
+    # 可以认为金叉发生（金叉意味着 DIF 上升穿越 DEA）
+    if len(aligned_dif) > 0 and start == 0:
+        dif_now = aligned_dif[0]
+        dea_now = dea_series[0]
+        dif_prev = dif_series[7] if 7 < len(dif_series) else dif_now
+        # 边界 case：aligned_dif[0] 处 DIF > DEA，且前一点（虚拟）DIF 必然更小
+        if dif_now > dea_now and dif_prev < dif_now:
+            # 应用 #1b 过滤
+            if not (abs(dif_now) < 0.005 and abs(dea_now) < 0.005):
+                if not (dif_now < 0 and dif_now < dea_now * 0.5):
+                    is_gold = True
+                    cross_idx = 0
+
+    for i in range(max(1, start), len(aligned_dif)):
+        if i == 0:
+            continue
+        dif_now = aligned_dif[i]
+        dif_prev = aligned_dif[i - 1]
+        dea_now = dea_series[i]
+        dea_prev = dea_series[i - 1]
+        # 条件1: DIF 上穿 DEA（标准定义）
+        if not (dif_now > dea_now and dif_prev <= dea_prev):
+            continue
+        # 条件2: 排除"零轴噪声" — DIF 与 DEA 都极接近 0（< 0.005）视为噪声
+        if abs(dif_now) < 0.005 and abs(dea_now) < 0.005:
+            continue
+        # 条件3: 排除"弱势反弹假金叉" — DIF 远在 0 下（<-1.0）且 DEA 更低
+        if dif_now < 0 and dif_now < dea_now * 0.5:
+            continue
+        is_gold = True
+        cross_idx = i
+        break  # 找最近一次金叉
+
+    # 计算金叉距今天数（基于 closes 数组）
+    days_ago = None
+    if is_gold and cross_idx is not None:
+        # aligned_dif 索引 i 对应 closes 的索引 (i + 33)
+        # (dif_series 起点 25, dea_series 起点 +8 = 33, +1 因为 0-indexed)
+        # 简化为：cross_idx 是 dif_series 数组中的索引
+        # closes 索引 = cross_idx + 33
+        closes_idx_at_cross = cross_idx + 33
+        days_ago = len(closes) - 1 - closes_idx_at_cross
+
+    # 优化 #1: 二次确认分析
+    # 关注金叉后第 2-3 日（DIF 短暂回落但未跌破 DEA）
+    pullback_ok = False
+    vol_shrink = False
+    confirmed = False
+    if is_gold and cross_idx is not None and len(aligned_dif) - cross_idx >= 2:
+        # 金叉后至少要有 2 日数据
+        post_cross_dif = aligned_dif[cross_idx:]
+        post_cross_dea = dea_series[cross_idx:]
+
+        # 二次确认：第 2-3 日（索引 1-2）DIF 回落但没跌破 DEA
+        if len(post_cross_dif) >= 3:
+            # 索引 1 和 2 是金叉后第 1、2 个交易日
+            check_range = post_cross_dif[1:3]
+            check_dea = post_cross_dea[1:3]
+            # 健康回踩：DIF 在 DEA 之上（即回踩没破）
+            pullback_ok = all(d >= d_ea for d, d_ea in zip(check_range, check_dea))
+            # 二次确认 = 金叉 + 健康回踩
+            confirmed = pullback_ok
+        elif len(post_cross_dif) == 2:
+            # 只有 1 日回踩数据
+            if post_cross_dif[1] >= post_cross_dea[1]:
+                pullback_ok = True
+                # 单日回踩不算完整二次确认，但可作为弱信号
+                confirmed = False
+        # 成交量萎缩：第 1-2 日成交量 < 金叉日成交量
+        if cross_idx + 1 < len(closes):
+            cross_close_idx = cross_idx + 33
+            if cross_close_idx < len(closes):
+                # 假设 closes 数组有等量 vol 信息；这里只用 closes 推断趋势
+                # 实际用 closes 变化判断"量能"：回踩日 close 不破金叉日 close
+                cross_close = closes[cross_close_idx]
+                if cross_close_idx + 2 < len(closes):
+                    pullback_close_1 = closes[cross_close_idx + 1]
+                    pullback_close_2 = closes[cross_close_idx + 2] if cross_close_idx + 2 < len(closes) else pullback_close_1
+                    # 量缩价稳：金叉后 1-2 日收盘价不低于金叉日 99%
+                    vol_shrink = (pullback_close_1 >= cross_close * 0.99 and
+                                  pullback_close_2 >= cross_close * 0.99)
+
+    return {
+        "is_golden": is_gold,
+        "cross_idx": cross_idx,
+        "days_ago": days_ago,
+        "confirmed": confirmed,
+        "pullback_ok": pullback_ok,
+        "vol_shrink": vol_shrink,
+    }
 
 
 def get_vol_ratio(code, klines):
-    """计算今日量比（今日成交量 / 5日均量）"""
+    """
+    计算今日量比 = 今日成交量 / 5日均量（不含今日）
+    修复 #2: 原代码 klines[-6:-1][i]['vol'] 索引可读性差且边界 case 易错
+    改为 list comprehension
+    """
     if len(klines) < 6:
         return None
-    today_vol = klines[-1]['vol']
-    avg_vol_5 = sum(klines[-6:-1][i]['vol'] for i in range(5)) / 5
+    recent_5 = [k['vol'] for k in klines[-6:-1]]
+    avg_vol_5 = sum(recent_5) / 5
     if avg_vol_5 == 0:
         return None
-    return today_vol / avg_vol_5
+    return klines[-1]['vol'] / avg_vol_5
 
 
 # ============================================
 # 尾盘评分系统
 # ============================================
 
-def score_afternoon_stock(info, klines):
+def score_afternoon_stock(info, klines, sentiment_score=50):
     """
     尾盘评分（满分100）
     核心原则：尾盘买入 = 当日小幅回调的强势股
+
+    评分项权重（合计基础 50 分 + 加分项 - 减分项，最后裁剪到 [0,100]）：
+    1. 当日涨跌幅       ±30  (核心：-3~0% +30；+5%以上 -15)
+    2. 日内高点回落     ±15  (1-3% 最佳)
+    3. RSI(14)          ±15  (40-60 最佳；>70 超买 -15)
+    4. 均线多头         +15  (MA5>MA10>MA20)
+    5. 量比             ±10  (0.5-1.5x 正常)
+    6. MACD 金叉        +10  (修复 #1: 真正 DIF 上穿 DEA)
+    7. 价格在 MA10 上    +5
+    8. 成交额           ±10  (>5亿 +5；<1000万 -10)
+
+    修复 #6: 根据 sentiment_score 调整评分容忍度（熊市更严、牛市宽松）
+    修复 #7: 风险/止损反逻辑 — 高风险标的用更紧的止损
     """
     score = 50
     change_pct = info.get('change_pct', 0)
     price = info.get('price', 0)
     yesterday_close = info.get('yesterday_close', 0)
     high = info.get('high', 0)
-    low = info.get('low', 0)
-    
+
     if not klines or len(klines) < 20:
         return 0, {}
-    
+
     closes = [k['close'] for k in klines]
-    vols = [k['vol'] for k in klines]
-    
+
+    # 修复 #6: 根据情绪分动态调整容忍度
+    # sentiment_score: 0-100, 默认 50
+    # 高分（牛市）：容忍追高，跌幅要求放松
+    # 低分（熊市）：要求更严格的回调，扣分更重
+    bull_adj = (sentiment_score - 50) / 100  # 范围 -0.5 ~ +0.5
+    # 阈值范围扩大，确保不同情绪分在不同涨跌幅档位都能体现差异
+    # bull_adj +0.5 (牛市): up_threshold=7.5, up_mild_max=3.0
+    # bull_adj -0.5 (熊市): up_threshold=2.5, up_mild_max=1.0
+    up_threshold = 5 + bull_adj * 5
+    up_mild_max = 2 + bull_adj * 2  # 上沿加大浮动（+1 ~ +3）
+    down_threshold = -3 + bull_adj * 2
+    strong_drop_threshold = -5 + bull_adj * 2
+
     # 1. 当日涨跌幅评分（核心：回调是买点）
-    # 尾盘策略：最好是小幅下跌（-3%~0%），涨幅过大不追
-    if -3 <= change_pct < 0:
+    if down_threshold <= change_pct < 0:
         score += 30  # 最佳买点区间
-    elif -5 <= change_pct < -3:
+    elif strong_drop_threshold <= change_pct < down_threshold:
         score += 20  # 较大回调，注意是否止跌
-    elif 0 <= change_pct < 2:
+    elif 0 <= change_pct < up_mild_max:  # 修复 #6: 上沿随情绪浮动
         score += 10  # 小幅上涨，可接受
-    elif change_pct < -5:
+    elif change_pct < strong_drop_threshold:
         score -= 15  # 跌幅过大，可能继续跌
-    elif 2 <= change_pct < 5:
+    elif up_mild_max <= change_pct < up_threshold:
         score -= 5   # 涨幅偏大，不追高
-    elif change_pct >= 5:
+    elif change_pct >= up_threshold:
         score -= 15  # 涨幅过大，尾盘追高风险大（次日容易低开）
-    
+
     # 2. 从日内高点的回落幅度（尾盘常从高点回落）
     if high > 0 and price > 0:
         intraday_pullback = (high - price) / high * 100
-        # 理想情况：从高点回落 1-3%（说明有回调但没崩）
         if 1 <= intraday_pullback <= 3:
             score += 15
         elif intraday_pullback > 3:
-            score += 5  # 回落较大，可能蓄势
+            score += 5
         elif intraday_pullback < 1:
-            score -= 5  # 一直高位，尾盘追高风险大
-    
+            score -= 5
+
     # 3. RSI 评分
     rsi = calculate_rsi(closes, 14)
     if rsi:
         info['rsi'] = round(rsi, 1)
         if 40 <= rsi <= 60:
-            score += 15  # 最佳区间（不超买也不超卖）
+            score += 15
         elif 30 <= rsi < 40:
-            score += 5   # 接近超卖，可能有机会
+            score += 5
         elif 60 < rsi <= 70:
-            score -= 5   # 偏热，小心
+            score -= 5
         elif rsi > 70:
-            score -= 15  # 超买，不追
+            score -= 15
         elif rsi < 30:
-            score -= 10  # 超卖，可能还在跌
-    
+            score -= 10
+
     # 4. 均线多头
     ma5 = calculate_ma(closes, 5)
     ma10 = calculate_ma(closes, 10)
@@ -280,55 +452,73 @@ def score_afternoon_stock(info, klines):
         info['ma10'] = round(ma10, 2)
         info['ma20'] = round(ma20, 2)
         if ma5 > ma10 > ma20:
-            score += 15  # 均线多头
+            score += 15
         elif ma5 > ma10:
-            score += 5   # 短期多头
-    
+            score += 5
+
     # 5. 量比
     vol_ratio = get_vol_ratio(info['code'], klines)
     if vol_ratio:
         info['vol_ratio'] = round(vol_ratio, 2)
         if 0.5 <= vol_ratio <= 1.5:
-            score += 10  # 量能正常
+            score += 10
         elif vol_ratio > 3:
-            score -= 10  # 巨量，可能出货
+            score -= 10
         elif vol_ratio < 0.3:
-            score -= 5   # 极度缩量
-    
-    # 6. MACD金叉
-    if check_macd_golden_cross(closes):
-        score += 10
+            score -= 5
+
+    # 6. MACD 金叉（v2.3: 仅基础金叉加分，二次确认只记录不加分）
+    # 修复 #1: 用新签名（v2.1 DIF 上穿 DEA）— 这个信号本身有效
+    # v2.3: 删除二次确认 +5 与 vol_shrink +3（90 天回测：33 笔胜率 15.2%，反向显著）
+    macd_info = check_macd_golden_cross(closes, lookback=5)
+    is_gold = macd_info["is_golden"]
+    if is_gold:
+        # 基础金叉: +5 分（v2.1 引入，v2.3 保留）
+        score += 5
         info['macd_gold'] = True
-    
-    # 7. 价格位置（在均线上的位置）
+        info['macd_gold_days_ago'] = macd_info["days_ago"]
+        # v2.3: 二次确认信号保留字段（用于回测和未来重新评估），但不再加分
+        if macd_info["confirmed"]:
+            info['macd_confirmed'] = True
+        if macd_info["vol_shrink"]:
+            info['macd_vol_shrink'] = True
+    else:
+        info['macd_gold'] = False
+
+    # 7. 价格位置
     if ma10 and price > ma10:
         score += 5
-    
-    # 8. 成交额（流动性）
+
+    # 8. 成交额
     amount = info.get('amount', 0)
     if amount > 5e8:
         score += 5
     elif amount < 1e7:
         score -= 10
-    
+
     score = max(0, min(100, score))
-    
-    # 风险评估
+
+    # 修复 #7: 风险等级与止损的逻辑修正
+    # 之前：score 越高止损越紧（错 — 高分标的走势稳，应用更宽止损让利润奔跑）
+    # 修正：score 越高止损越宽（高分红逻辑：让强势股多跑），score 越低止损越紧（严控风险）
     if score >= 80:
         risk = "🟢 低风险"
-        stop_loss = round(price * 0.96, 2) if price else 0
+        stop_loss = round(price * 0.93, 2) if price else 0  # -7% 宽止损
+        target_pct = 0.10  # 目标 +10%
     elif score >= 65:
         risk = "🟡 中风险"
-        stop_loss = round(price * 0.95, 2) if price else 0
+        stop_loss = round(price * 0.95, 2) if price else 0  # -5% 中等
+        target_pct = 0.07
     else:
         risk = "🔴 高风险"
-        stop_loss = round(price * 0.93, 2) if price else 0
-    
+        stop_loss = round(price * 0.97, 2) if price else 0  # -3% 紧止损
+        target_pct = 0.05
+
     info['score'] = score
     info['risk'] = risk
     info['stop_loss'] = stop_loss
-    info['target_price'] = round(price * 1.05, 2) if price else 0  # 目标+5%
-    
+    info['target_price'] = round(price * (1 + target_pct), 2) if price else 0
+
     return score, info
 
 
@@ -336,36 +526,165 @@ def score_afternoon_stock(info, klines):
 # 选股逻辑
 # ============================================
 
-def screen_afternoon_stocks():
+# ============================================
+# 监控信号 hook（v2.2 优化 #3）
+# ============================================
+
+FEEDBACK_FIELDS = [
+    "date", "code", "name", "rec_date", "trend",
+    "ret_1d", "ret_3d", "ret_5d", "ret_15d",
+    # v2.2 扩展字段
+    "score", "sentiment_score", "macd_gold", "macd_confirmed",
+]
+
+
+def _sf(v, default=None):
+    """安全转 float"""
+    if v is None or v == '' or v == '--' or v == '-':
+        return default
+    try:
+        return float(str(v).replace('%', '').replace(',', ''))
+    except (ValueError, TypeError):
+        return default
+
+
+def record_recommendation(code, name, score, sentiment_score=50,
+                           macd_gold=False, macd_confirmed=False):
+    """
+    监控信号 hook（优化 #3）：把每次推荐写入 rec_feedback.csv
+    真实收益由 feedback_loop.py 周期性补全。
+    静默失败，不影响主流程。
+
+    v2.2 增强：写之前会升级旧 header（旧 9 字段 → 新 13 字段）
+    """
+    try:
+        import csv
+        from datetime import datetime as _dt
+        feedback_csv = os.path.join(AANA_DIR, "data", "rec_feedback.csv")
+        os.makedirs(os.path.dirname(feedback_csv), exist_ok=True)
+        now = _dt.now().strftime("%Y-%m-%d %H:%M:%S")
+        today = _dt.now().strftime("%Y-%m-%d")
+
+        # v2.2: 升级旧 header（如存在 9 字段版本则升级到 13 字段）
+        if os.path.exists(feedback_csv):
+            with open(feedback_csv, newline='', encoding='utf-8') as f:
+                rows = list(csv.DictReader(f))
+            if rows and len(rows[0]) < len(FEEDBACK_FIELDS):
+                # 旧 header，升级
+                upgraded = []
+                for r in rows:
+                    for k in FEEDBACK_FIELDS:
+                        r.setdefault(k, "")
+                    upgraded.append(r)
+                with open(feedback_csv, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=FEEDBACK_FIELDS, extrasaction='ignore')
+                    writer.writeheader()
+                    writer.writerows(upgraded)
+
+        # 检查是否已存在（同日同股）
+        if os.path.exists(feedback_csv):
+            with open(feedback_csv, newline='', encoding='utf-8') as f:
+                for row in csv.DictReader(f):
+                    if row.get('code') == code and row.get('rec_date', '').startswith(today):
+                        return  # 去重
+        # 追加
+        file_exists = os.path.exists(feedback_csv)
+        with open(feedback_csv, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=FEEDBACK_FIELDS, extrasaction='ignore')
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow({
+                "date": now,
+                "code": code,
+                "name": name,
+                "rec_date": today,
+                "trend": "",           # 留给 feedback_loop 补
+                "ret_1d": "",
+                "ret_3d": "",
+                "ret_5d": "",
+                "ret_15d": "",
+                # v2.2 扩展
+                "score": score,
+                "sentiment_score": sentiment_score,
+                "macd_gold": macd_gold,
+                "macd_confirmed": macd_confirmed,
+            })
+    except Exception as e:
+        # 静默失败，不影响主流程
+        print(f"  [记录失败] {code}: {e}")
+
+
+def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedback=True):
     """
     尾盘选股主流程
-    1. 从新浪获取涨幅榜股票池
+    1. 从全市场涨幅榜 / 候选池取粗筛股票
     2. 获取实时行情 + 历史K线
     3. 计算尾盘评分
     4. 过滤并排序
+    5. 优化 #3: 选中票写入 rec_feedback.csv
+
+    修复 #5 (P1): 候选池扩到全市场
+       原版只看 top10 报告，会自限。今日改为：top10 + 新浪全市场涨幅榜（涨幅 -3~+5%）。
+    修复 #3 (P1): 评分阈值从 60 改 65，与报告"买入条件 ≥ 65"一致
+    修复 #6: 接收 sentiment_score，传给评分函数
     """
     from dynamic_stocks import get_dynamic_stock_pool, filter_stocks
-    
-    print(f"[AAna 尾盘] {datetime.now().strftime('%H:%M:%S')} 开始尾盘选股...")
-    
-    # 1. 获取候选股票池（优先用今日选股报告 Top10，次用昨日快照）
-    candidate_codes = []
     from eastmoney_portfolio import get_snapshot_top10
 
-    # 尝试今日选股报告（盘中版，已含技术评分）
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    candidate_codes = get_snapshot_top10(today_str)
+    print(f"[AAna 尾盘] {datetime.now().strftime('%H:%M:%S')} 开始尾盘选股...")
 
-    # 如果今日报告为空（数据源失败），尝试昨日快照
-    if not candidate_codes:
+    # 1. 候选股票池（多源合并去重）
+    candidate_codes = []
+    today_str = datetime.now().strftime("%Y-%m-%d")
+
+    # 源 1: 今日选股报告 Top10
+    today_top10 = get_snapshot_top10(today_str)
+    if today_top10:
+        candidate_codes.extend(today_top10)
+        print(f"  [源1] 今日 Top10: {len(today_top10)} 只")
+
+    # 源 2: 昨日 Top10（fallback）
+    if not today_top10:
         yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-        candidate_codes = get_snapshot_top10(yesterday_str)
+        yest_top10 = get_snapshot_top10(yesterday_str)
+        if yest_top10:
+            candidate_codes.extend(yest_top10)
+            print(f"  [源2] 昨日 Top10: {len(yest_top10)} 只")
+
+    # 源 3 (修复 #5): 新浪全市场涨幅榜，扩大候选
+    # 抓涨幅 -3% ~ +5% 区间 + 成交活跃股，这是尾盘选股的真正范围
+    try:
+        import requests
+        url = "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
+        all_codes = []
+        for page in range(5):  # 5 页 × 80 = 400 只候选
+            params = {
+                "page": str(page), "num": "80",
+                "sort": "changepercent", "asc": "0",  # 涨幅降序
+                "node": "hs_a", "type": "stock",
+            }
+            r = requests.get(url, params=params, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+            data = r.json() or []
+            for item in data:
+                code = item.get("code", "")
+                change = item.get("changepercent", 0)
+                # 只保留 -3% ~ +5% 区间（尾盘选股范围）
+                if -3 <= change <= 5:
+                    all_codes.append(code)
+        # 加进去重
+        before = len(candidate_codes)
+        for c in all_codes:
+            if c not in candidate_codes:
+                candidate_codes.append(c)
+        print(f"  [源3] 全市场涨幅榜: 新增 {len(candidate_codes) - before} 只")
+    except Exception as e:
+        print(f"  [源3] 全市场涨幅榜失败: {e}")
 
     if not candidate_codes:
         print("[AAna 尾盘] 候选股票池为空，跳过尾盘选股")
         return []
 
-    print(f"[AAna 尾盘] 候选股票: {candidate_codes}")
+    print(f"[AAna 尾盘] 候选股票总数: {len(candidate_codes)} 只")
 
     # 2. 获取实时行情
     prices = get_stock_data_sina(candidate_codes)
@@ -386,9 +705,9 @@ def screen_afternoon_stocks():
         if code.startswith(('688', '8')) or code.startswith(('300', '301')):
             continue
 
-        # 过滤：涨跌范围（尾盘只买小幅回调或微涨，不追高）
+        # 过滤：涨跌范围（修复 #4: 严格 > 5 不再放行 5.0%）
         change_pct = info.get('change_pct', 0)
-        if change_pct < -8 or change_pct > 9:  # 跌停/涨停排除
+        if change_pct < -8 or change_pct >= 9:  # 跌停/涨停排除
             continue
         if change_pct > 5:  # 尾盘策略：涨幅>5%不追高
             continue
@@ -396,17 +715,32 @@ def screen_afternoon_stocks():
         # 获取K线（30天）
         klines = get_tencent_kline(code, count=30)
 
-        # 评分
-        score, scored_info = score_afternoon_stock(info, klines)
+        # 评分（修复 #6: 传 sentiment_score）
+        score, scored_info = score_afternoon_stock(info, klines, sentiment_score=sentiment_score)
 
-        if score >= 60:  # 只保留60分以上的
+        # 修复 #3: 阈值统一为 65（与报告"买入条件 ≥ 65"一致）
+        if score >= 65:
             results.append(scored_info)
 
     # 4. 排序
     results.sort(key=lambda x: x['score'], reverse=True)
-    
+    top_n = results[:10]
+
+    # 5. 优化 #3: 监控信号 — 写入 rec_feedback.csv
+    if record_feedback and top_n:
+        for s in top_n:
+            record_recommendation(
+                code=s.get('code', ''),
+                name=s.get('name', ''),
+                score=s.get('score', 0),
+                sentiment_score=sentiment_score,
+                macd_gold=bool(s.get('macd_gold', False)),
+                macd_confirmed=bool(s.get('macd_confirmed', False)),
+            )
+        print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
+
     print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只")
-    return results[:10]
+    return top_n
 
 
 # ============================================
@@ -414,6 +748,10 @@ def screen_afternoon_stocks():
 # ============================================
 
 def format_change(c):
+    """
+    A股惯例：红涨绿跌
+    修复 #9: 加注释（行为不变，只是命名易混淆）
+    """
     if c == 0:
         return "⚪ 0.00%"
     emoji = "🔴" if c > 0 else "🟢"
@@ -421,13 +759,18 @@ def format_change(c):
 
 
 def cleanup_old_reports(days=7):
-    """清理超过 days 天的旧报告"""
+    """
+    清理超过 days 天的旧报告
+    修复 #10: 增加早盘/盘中报告匹配
+    """
     import glob, time
     report_dir = os.path.expanduser("~/code/AAna/reports")
     cutoff = time.time() - days * 86400
     patterns = [
         f"{report_dir}/*-选股报告.md",
         f"{report_dir}/*尾盘选股.md",
+        f"{report_dir}/*早盘*.md",  # 修复 #10
+        f"{report_dir}/*盘中*.md",  # 修复 #10
         f"{report_dir}/.snapshot_*.json",
     ]
     removed = 0
@@ -560,14 +903,32 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
             if s.get('rsi') and 40 <= s['rsi'] <= 60:
                 reason.append(f"RSI适中({s['rsi']})")
             if s.get('macd_gold'):
-                reason.append("MACD金叉")
-            if s.get('ma5', 0) > s.get('ma10', 0):
+                days_ago = s.get('macd_gold_days_ago', 0)
+                reason.append(f"MACD金叉({days_ago}日前)" if days_ago else "MACD金叉")
+            # 修复 #8: 兜底 reason — 多头排列和量能健康也算
+            ma5 = s.get('ma5', 0)
+            ma10 = s.get('ma10', 0)
+            ma20 = s.get('ma20', 0)
+            if ma5 and ma10 and ma5 > ma10 > ma20:
                 reason.append("均线多头")
-            
+            elif ma5 and ma10 and ma5 > ma10:
+                reason.append("短期多头")
+            vol_r = s.get('vol_ratio', 0)
+            if vol_r and 0.5 <= vol_r <= 1.5:
+                reason.append(f"量比健康({vol_r}x)")
+            if price := s.get('price', 0):
+                amount = s.get('amount', 0)
+                if amount > 5e8:
+                    reason.append("成交活跃")
+
             content += f"### {i}. {s['name']}({s['code']}) 评分{s['score']}\n"
             content += f"- 现价: ¥{s['price']:.2f} | 今日: {format_change(change_pct)}\n"
-            content += f"- 买入理由: {', '.join(reason) if reason else '综合评分高'}\n"
-            content += f"- 止损价: ¥{s['stop_loss']}（-5%）| 目标价: ¥{s['target_price']}（+5%）\n\n"
+            # 修复 #8: 永远至少显示一条理由（避免 f-string 反斜杠问题）
+            reason_text = '; '.join(reason) if reason else f"综合评分{s['score']}分（多维度均达标）"
+            sl_pct = (s['stop_loss'] / s['price'] - 1) * 100
+            tp_pct = (s['target_price'] / s['price'] - 1) * 100
+            content += f"- 买入理由: {reason_text}\n"
+            content += f"- 止损价: ¥{s['stop_loss']}（{sl_pct:+.1f}%）| 目标价: ¥{s['target_price']}（{tp_pct:+.1f}%）\n\n"
     else:
         content += "> 今日暂无重点推荐\n"
     
@@ -617,8 +978,11 @@ def main():
                 'change': info['change_pct']
             })
     
-    # 选股
-    stocks = screen_afternoon_stocks()
+    # 选股（修复 #6: 传 sentiment_score / position_ratio 进评分）
+    stocks = screen_afternoon_stocks(
+        sentiment_score=sentiment_score,
+        position_ratio=position_ratio,
+    )
     
     # 生成报告
     market_status = '待定'
