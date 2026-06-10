@@ -260,7 +260,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
 
     md += f"\n📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/max(len(hit_rows),1)*100:.1f}%\n"
     md += f"- 整体均值：{avg:+.2f}% | 正：{avg_pos:+.2f}% | 负：{avg_neg:+.2f}%\n"
-    md += f"- vs 上证 +{sh_pct:.2f}% 超额：**{avg - sh_pct:+.2f}%**\n"
+    md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}%**\n"
 
     md += "\n━━━ **新晋异动 Top5** ━━━\n\n"
     for i, (theme, h) in enumerate(selected, 1):

@@ -1,0 +1,198 @@
+{
+  "init_cash": 100000.0,
+  "trades": [
+    {
+      "date": "2026-06-10",
+      "code": "603618",
+      "name": "杭电股份",
+      "action": "buy",
+      "price": 39.97,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "002842",
+      "name": "翔鹭钨业",
+      "action": "buy",
+      "price": 35.62,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "002645",
+      "name": "华宏科技",
+      "action": "buy",
+      "price": 31.45,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "603713",
+      "name": "密尔克卫",
+      "action": "buy",
+      "price": 55.51,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "603867",
+      "name": "新化股份",
+      "action": "buy",
+      "price": 39.27,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "605566",
+      "name": "福莱蒽特",
+      "action": "buy",
+      "price": 44.3,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 90",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "605020",
+      "name": "永和股份",
+      "action": "buy",
+      "price": 32.81,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 90",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "603311",
+      "name": "金海高科",
+      "action": "buy",
+      "price": 38.58,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 85",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "600895",
+      "name": "张江高科",
+      "action": "buy",
+      "price": 31.43,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 80",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-10",
+      "code": "605488",
+      "name": "福莱新材",
+      "action": "buy",
+      "price": 35.65,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 80",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    }
+  ],
+  "positions": {
+    "603618": {
+      "date": "2026-06-10",
+      "name": "杭电股份",
+      "shares": 100,
+      "entry_price": 39.97,
+      "highest_price": 39.97,
+      "entry_date": "2026-06-10"
+    },
+    "002842": {
+      "date": "2026-06-10",
+      "name": "翔鹭钨业",
+      "shares": 100,
+      "entry_price": 35.62,
+      "highest_price": 35.62,
+      "entry_date": "2026-06-10"
+    },
+    "002645": {
+      "date": "2026-06-10",
+      "name": "华宏科技",
+      "shares": 100,
+      "entry_price": 31.45,
+      "highest_price": 31.45,
+      "entry_date": "2026-06-10"
+    },
+    "603713": {
+      "date": "2026-06-10",
+      "name": "密尔克卫",
+      "shares": 100,
+      "entry_price": 55.51,
+      "highest_price": 55.51,
+      "entry_date": "2026-06-10"
+    },
+    "603867": {
+      "date": "2026-06-10",
+      "name": "新化股份",
+      "shares": 100,
+      "entry_price": 39.27,
+      "highest_price": 39.27,
+      "entry_date": "2026-06-10"
+    },
+    "605566": {
+      "date": "2026-06-10",
+      "name": "福莱蒽特",
+      "shares": 100,
+      "entry_price": 44.3,
+      "highest_price": 44.3,
+      "entry_date": "2026-06-10"
+    },
+    "605020": {
+      "date": "2026-06-10",
+      "name": "永和股份",
+      "shares": 100,
+      "entry_price": 32.81,
+      "highest_price": 32.81,
+      "entry_date": "2026-06-10"
+    },
+    "603311": {
+      "date": "2026-06-10",
+      "name": "金海高科",
+      "shares": 100,
+      "entry_price": 38.58,
+      "highest_price": 38.58,
+      "entry_date": "2026-06-10"
+    },
+    "600895": {
+      "date": "2026-06-10",
+      "name": "张江高科",
+      "shares": 100,
+      "entry_price": 31.43,
+      "highest_price": 31.43,
+      "entry_date": "2026-06-10"
+    },
+    "605488": {
+      "date": "2026-06-10",
+      "name": "福莱新材",
+      "shares": 100,
+      "entry_price": 35.65,
+      "highest_price": 35.65,
+      "entry_date": "2026-06-10"
+    }
+  },
+  "daily_snapshots": []
+}
