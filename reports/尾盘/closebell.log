@@ -31,3 +31,6 @@
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+[2026-06-10 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-10 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-10 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
