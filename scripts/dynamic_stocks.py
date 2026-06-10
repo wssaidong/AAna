@@ -17,13 +17,17 @@ RISK_CHANGE = 9.5                        # >= 9.5% 视为涨停，标记风险�
 SUPPORT_SOURCES = ('sina', 'tencent', 'eastmoney')  # fallback 链
 
 
-def get_sina_top_gainers(num=200):
-    """从新浪财经获取A股涨幅榜（按涨幅降序）"""
+def get_sina_top_gainers(num=800):
+    """从新浪财经获取A股涨幅榜（按涨幅降序）
+    2026-06-10 修复: Sina 涨幅榜前 200 只全 >9.5% (实际是 "涨幅榜" 排序，最小涨幅 9.97%),
+    导致 filter_stocks 区间 (-3% ~ +7%) 0 通过。默认拉 20 页 (800 只) 覆盖到温和上涨区。
+    """
     url = "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
     headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'http://finance.sina.com.cn'}
 
     all_stocks = []
-    for page in range(1, 6):  # 5 pages * 40 = 200
+    pages = max(1, (num + 39) // 40)
+    for page in range(1, pages + 1):
         params = {
             'page': page, 'num': 40, 'sort': 'changepercent', 'asc': 0,
             'node': 'hs_a', 'symbol': '', '_s_r_a': 'page'
@@ -290,7 +294,7 @@ def get_dynamic_stock_pool():
     """
     print("[AAna] 获取动态股票池（多源 fallback）...")
 
-    raw_stocks, source = get_top_gainers_with_fallback(200)
+    raw_stocks, source = get_top_gainers_with_fallback(800)
     if not raw_stocks:
         print("[AAna] 所有数据源失败，返回空池")
         return []
@@ -308,7 +312,7 @@ def get_stock_pool_split():
     - normal_pool: 推荐主池（涨幅 -3% ~ 7%，按综合评分排）
     - risk_pool: 涨停警示池（涨幅 >= 9.5%）
     """
-    raw_stocks, source = get_top_gainers_with_fallback(300)
+    raw_stocks, source = get_top_gainers_with_fallback(800)
     if not raw_stocks:
         return [], []
     normal, risk = filter_stocks_with_risk_pool(raw_stocks)
