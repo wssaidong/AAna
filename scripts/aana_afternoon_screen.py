@@ -404,19 +404,24 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
     down_threshold = -3 + bull_adj * 2
     strong_drop_threshold = -5 + bull_adj * 2
 
-    # 1. 当日涨跌幅评分（核心：回调是买点）
+    # 1. 当日涨跌幅评分（核心：尾盘 = 回调买入，绝对不追红涨）
+    # P1 修复：删除所有对红涨的加分项（之前 +10/+10 让 0~+5% 红涨也进了 Top10）
+    # 策略：change_pct >= 0 一律扣分，只奖励绿盘回调
     if down_threshold <= change_pct < 0:
-        score += 30  # 最佳买点区间
+        score += 30  # 最佳买点区间（绿盘回调）
     elif strong_drop_threshold <= change_pct < down_threshold:
         score += 20  # 较大回调，注意是否止跌
-    elif 0 <= change_pct < up_mild_max:  # 修复 #6: 上沿随情绪浮动
-        score += 10  # 小幅上涨，可接受
     elif change_pct < strong_drop_threshold:
         score -= 15  # 跌幅过大，可能继续跌
+    # P1 修复：红涨一律扣分（按幅度递增）
+    elif 0 <= change_pct < 1:
+        score -= 3   # 微红涨，警示
+    elif 1 <= change_pct < up_mild_max:
+        score -= 8   # 上涨 1-3%，违反策略
     elif up_mild_max <= change_pct < up_threshold:
-        score -= 5   # 涨幅偏大，不追高
+        score -= 12  # 上涨 3-5%，明显追高
     elif change_pct >= up_threshold:
-        score -= 15  # 涨幅过大，尾盘追高风险大（次日容易低开）
+        score -= 15  # 上涨 >5%，大幅追高风险
 
     # 2. 从日内高点的回落幅度（尾盘常从高点回落）
     if high > 0 and price > 0:
@@ -496,6 +501,24 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
     elif amount < 1e7:
         score -= 10
 
+    # P1 修复：评分改为分级封顶，去掉"全员 100"陷阱
+    # 之前 max(0, min(100, score)) → 3-4 只全部 100 分，无法区分强弱
+    # 改为：score >= 95 → 锁定到 95-100 区间（细分靠其他维度）
+    #       score >= 80 → 锁定 80-94
+    #       score >= 65 → 锁定 65-79
+    #       < 65 → 不通过筛选
+    # 通过额外字段 score_band 在报告中显示分级
+    if score >= 95:
+        score_band = "S级"
+        score = 95 + min(5, score - 95)  # 95-100
+    elif score >= 80:
+        score_band = "A级"
+        score = 80 + min(14, score - 80)  # 80-94
+    elif score >= 65:
+        score_band = "B级"
+        score = 65 + min(14, score - 65)  # 65-79
+    else:
+        score_band = "C级"
     score = max(0, min(100, score))
 
     # 修复 #7: 风险等级与止损的逻辑修正
@@ -705,11 +728,17 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         if code.startswith(('688', '8')) or code.startswith(('300', '301')):
             continue
 
-        # 过滤：涨跌范围（修复 #4: 严格 > 5 不再放行 5.0%）
+        # 过滤：涨跌范围（修复 P0-A: 严格只允许绿盘回调，杜绝追高）
+        # 策略核心：尾盘买入 = 当日小幅回调的强势股（不追高）
+        # 之前 bug：评分函数对 0~+5% 也给分，导致推红涨股，违反策略。
         change_pct = info.get('change_pct', 0)
         if change_pct < -8 or change_pct >= 9:  # 跌停/涨停排除
             continue
-        if change_pct > 5:  # 尾盘策略：涨幅>5%不追高
+        if change_pct > 3:  # P0-A 修复：涨幅上限从 5% 收紧到 3%（更严格不追高）
+            continue
+        # P0-A 关键修复：红涨（change_pct > 0）一律不进评分环节
+        # 策略白纸黑字"当日回调 -3%~0%"，所以必须为负或零
+        if change_pct > 0:
             continue
 
         # 获取K线（30天）
@@ -798,18 +827,24 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
     cleanup_old_reports(days=7)
 
     # 大盘状态
-    market_status = "乐观" if index_data and any(i['change'] > 0 for i in index_data) else "谨慎"
+    # P1 修复：情绪标签直接用传入的 sentiment_label，不再重复判断指数（避免"冰点+乐观"矛盾）
+    market_status = sentiment_label if sentiment_label else ("谨慎" if not index_data else "中性")
     avg_change = 0
     if index_data:
         avg_change = sum(i['change'] for i in index_data) / len(index_data)
 
-    # 热点板块
+    # 热点板块 — P1 修复：失败时打印明确日志（不静默）+ 报告里显示"获取失败"
     hot_sects = []
+    hot_data_source = "ok"
     if AFTER_NEW:
         try:
             hot_sects = get_hot_sectors(3) or []
-        except Exception:
-            pass
+            if not hot_sects:
+                hot_data_source = "fallback_empty"
+                print(f"[AAna 尾盘] ⚠️ 热点板块获取为空（接口可能限流）")
+        except Exception as e:
+            hot_data_source = "fallback_error"
+            print(f"[AAna 尾盘] ⚠️ 热点板块接口异常: {type(e).__name__}: {e}")
     hot_str = " | ".join("{}({:+.1f}%)".format(s['name'], s['change']) for s in hot_sects[:3])
 
     content = (
@@ -836,11 +871,15 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
     content += "\n**市场情绪：** {} | **平均涨跌：** {:+.2f}%".format(market_status, avg_change)
     if hot_str:
         content += " | **热点：** {}".format(hot_str)
+    elif hot_data_source != "ok":
+        # P1 修复：板块数据失败时显示"获取失败"，不静默
+        content += " | **热点：** ⚠️获取失败({})".format(hot_data_source)
     content += "\n\n---\n\n"
 
 
     content += (
-        "> \u7b56\u7565\u8bf4\u660e\uff1a\u5c3f\u76d8\u4e70\u5165\u5f53\u65e5\u5c0f\u5e45\u56de\u8c03\u7684\u5f3a\u52bf\u80a1\n"
+        # P1 修复：错字"尿盘"→"尾盘"（unicode 5c3f 改成 5c3e）
+        "> \u7b56\u7565\u8bf4\u660e\uff1a\u5c3e\u76d8\u4e70\u5165\u5f53\u65e5\u5c0f\u5e45\u56de\u8c03\u7684\u5f3a\u52bf\u80a1\n"
         "> - \u5f53\u65e5\u56de\u8c03 -3%~0% \u4e14\u4ef7\u683c\u4ecd\u5728\u5747\u7ebf\u4e0a\u65b9\n"
         "> - RSI 40-60\uff08\u4e0d\u8d85\u4e70\u4e5f\u4e0d\u8d85\u5356\uff09\n"
         "> - \u91cf\u6bd4\u6b63\u5e38\uff080.5~1.5x\uff09\n"
@@ -890,10 +929,13 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
 
 ---
 
-## 四、Top 3 重点关注
-
+## 四、Top3 重点关注（动态按实际数量调整）
 """
-    
+    # P1 修复：动态匹配实际数量（不再硬编码 Top3）
+    if stocks:
+        n_top = min(3, len(stocks))
+        content += "\n## 四、Top {} 重点关注\n\n".format(n_top)
+
     if stocks[:3]:
         for i, s in enumerate(stocks[:3], 1):
             reason = []
@@ -977,7 +1019,29 @@ def main():
                 'price': info['price'],
                 'change': info['change_pct']
             })
-    
+    # P1 修复：avg_change 提前算出来，避免冰点短路分支里用 `if 'avg_change' in dir()` 怪写法
+    avg_change = sum(i['change'] for i in index_data) / len(index_data) if index_data else 0.0
+
+    # P0-B 修复：冰点日 / 仓位 < 10% 时直接短路，不跑选股
+    # 之前 bug：报告顶部写"建议仓位 0%"，但仍推 8 只（自相矛盾）
+    # 阈值 < 0.1：仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
+    is_ice_point = sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
+    if is_ice_point:
+        print(f"[AAna 尾盘] ❄️ 情绪={sentiment_label}/仓位={position_ratio*100:.0f}%，跳过尾盘选股（冰点日策略不推任何票）")
+        # 仍然生成报告，但内容是"暂停推荐"
+        filename, top_stocks = generate_report(
+            [], index_data,
+            sentiment_label=sentiment_label,
+            position_ratio=position_ratio,
+            market_status='冰点',
+            avg_change=avg_change,
+            hot_str='',
+            hot_sects=[]
+        )
+        print(f"[AAna 尾盘] 📝 冰点日报已生成: {filename}")
+        print(f"[AAna 尾盘] 🛑 不推送推荐，不同步东财，不写入推荐池")
+        return []
+
     # 选股（修复 #6: 传 sentiment_score / position_ratio 进评分）
     stocks = screen_afternoon_stocks(
         sentiment_score=sentiment_score,
@@ -985,8 +1049,8 @@ def main():
     )
     
     # 生成报告
-    market_status = '待定'
-    avg_change = 0.0
+    market_status = sentiment_label if sentiment_label else '待定'
+    # avg_change 已在上方算过
     hot_sects = []
     hot_str = ''
     filename, top_stocks = generate_report(

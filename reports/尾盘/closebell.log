@@ -78,3 +78,44 @@
 [2026-06-11 14:45:00] [daily_v24_recommend] ============================================================
 [2026-06-11 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-06-11 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603103', '601009', '000859', '000001', '601318', '601872', '600641', '600887', '600535', '603213']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 82 只
+[AAna 尾盘] 候选股票总数: 92 只
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 13 只
+[2026-06-11 14:45:05] [daily_v24_recommend]   找到 10 只推荐
+[2026-06-11 14:45:05] [daily_v24_recommend]     601318 中国平安 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     001203 大中矿业 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     603226 菲林格尔 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     600176 中国巨石 score=95
+[2026-06-11 14:45:05] [daily_v24_recommend]     600887 伊利股份 score=90
+[2026-06-11 14:45:05] [daily_v24_recommend]     600641 先导基电 score=75
+[2026-06-11 14:45:05] [daily_v24_recommend]     603139 康惠股份 score=75
+[2026-06-11 14:45:05] [daily_v24_recommend]     603203 快克智能 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend]     601698 中国卫通 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend]     601133 柏诚股份 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 601318 中国平安 @52.6 100股
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 001203 大中矿业 @41.18 100股
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 603226 菲林格尔 @54.8 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600176 中国巨石 @40.97 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600887 伊利股份 @25.59 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600641 先导基电 @28.77 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 603139 康惠股份 @39.33 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 603203 快克智能 @58.0 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 601698 中国卫通 @31.95 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 601133 柏诚股份 @30.42 100股
+[2026-06-11 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-11 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-11-v24-尾盘推荐.md
+[2026-06-11 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-11 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-11 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-06-11 14:45:06] [daily_v24_recommend] ============================================================

@@ -43,8 +43,8 @@ def get_market_sentiment() -> dict:
     falling = sum(1 for i in indices if i['change'] < 0)
 
     # ── 涨跌停数量 ──
-    zt_count, dt_count = get_limit_counts()
-    print(f"[情绪] 涨停:{zt_count} 跌停:{dt_count} 上证:{avg_change:+.2f}%")
+    zt_count, dt_count, limit_data_source = get_limit_counts()
+    print(f"[情绪] 涨停:{zt_count} 跌停:{dt_count} 上证:{avg_change:+.2f}% [数据源:{limit_data_source}]")
 
     # ── 情绪分计算 ──
     score = 50  # 基础分
@@ -67,8 +67,11 @@ def get_market_sentiment() -> dict:
     else:
         score -= 35
 
-    # 涨跌停比（衡量市场活跃度）
-    if zt_count >= 80:
+    # 涨跌停比（衡量市场活跃度）— P1 修复：数据缺失 (-1) 时跳过该项评分
+    if zt_count < 0:
+        # 数据缺失，不基于涨跌停调整情绪分
+        pass
+    elif zt_count >= 80:
         score += 15  # 极度亢奋
     elif zt_count >= 50:
         score += 10
@@ -197,30 +200,38 @@ def get_index_data() -> list:
 # ── 3. 涨跌停数量 ────────────────────────────────────────────────
 
 def get_limit_counts() -> tuple:
-    """返回 (涨停数, 跌停数)"""
-    try:
-        # 东方财富涨停统计
-        url = "https://push2.eastmoney.com/api/qt/clist/get"
-        params = {
-            "pn": 1, "pz": 1, "po": 1, "np": 1,
-            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-            "fltt": 2, "invt": 2, "fid": "f3",
-            "fs": "m:0+t:6+f:!+,+m:0+t:13+f:!+,+m:0+t:80+f:!+,+m:1+t:2+f:!+,+m:1+t:23+f:!+,+m:1+t:A+f:!+",
-            "fields": "f1",
-            "_": int(datetime.now().timestamp() * 1000),
-        }
-        resp = requests.get(url, params=params, headers=HEADERS, timeout=8)
-        zt = resp.json().get('data', {}).get('total', 0)
+    """返回 (涨停数, 跌停数) — P1 修复：加 retry + 标记数据源"""
+    # 数据源标记（供 main() 判断是否降级使用）
+    data_source = "eastmoney"
+    for attempt in range(3):  # 最多重试 3 次
+        try:
+            # 东方财富涨停统计
+            url = "https://push2.eastmoney.com/api/qt/clist/get"
+            params = {
+                "pn": 1, "pz": 1, "po": 1, "np": 1,
+                "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+                "fltt": 2, "invt": 2, "fid": "f3",
+                "fs": "m:0+t:6+f:!+,+m:0+t:13+f:!+,+m:0+t:80+f:!+,+m:1+t:2+f:!+,+m:1+t:23+f:!+,+m:1+t:A+f:!+",
+                "fields": "f1",
+                "_": int(datetime.now().timestamp() * 1000),
+            }
+            resp = requests.get(url, params=params, headers=HEADERS, timeout=8)
+            zt = resp.json().get('data', {}).get('total', 0)
 
-        # 跌停（简化：直接用涨幅<-9.8的筛选）
-        params2 = dict(params)
-        params2["fs"] = "m:0+t:6+f:!-,+m:0+t:13+f:!-,+m:0+t:80+f:!-,+m:1+t:2+f:!-,+m:1+t:23+f:!-,+m:1+t:A+f:!-"
-        resp2 = requests.get(url, params=params2, headers=HEADERS, timeout=8)
-        dt = resp2.json().get('data', {}).get('total', 0)
-        return zt, dt
-    except Exception as e:
-        print(f"[情绪] 涨跌停统计失败: {e}")
-        return 10, 3  # 返回安全默认值（不极端）
+            # 跌停
+            params2 = dict(params)
+            params2["fs"] = "m:0+t:6+f:!-,+m:0+t:13+f:!-,+m:0+t:80+f:!-,+m:1+t:2+f:!-,+m:1+t:23+f:!-,+m:1+t:A+f:!-"
+            resp2 = requests.get(url, params=params2, headers=HEADERS, timeout=8)
+            dt = resp2.json().get('data', {}).get('total', 0)
+            return zt, dt, data_source
+        except Exception as e:
+            if attempt < 2:
+                import time as _t
+                _t.sleep(1.0 * (attempt + 1))  # 退避 1s/2s
+                continue
+            print(f"[情绪] 涨跌停统计失败(已重试3次): {e}")
+            # P1 修复：失败时返回 -1 标记"未知"，而不是写死 10/3 让情绪误判
+            return -1, -1, "fallback"
 
 
 # ── 4. 热点板块 ──────────────────────────────────────────────────

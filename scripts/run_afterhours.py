@@ -205,10 +205,15 @@ def generate_full_report(date_str):
         if len(selected) >= 5:
             break
 
+    # 14:45 vs 15:00 时点差警示（v1.3 必跑）
+    tail_path = f"{REPORT_DIR}/{date_str}-尾盘选股.md"
+    gap_md, has_gap = realtime_gap_alert(indices, tail_path)
+
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                               positives, negatives, avg, avg_pos, avg_neg,
-                              sh_pct, cyb_pct, kc50_pct, selected, len(hot))
+                              sh_pct, cyb_pct, kc50_pct, selected, len(hot),
+                              gap_md)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
@@ -217,9 +222,54 @@ def generate_full_report(date_str):
     return feishu_md, full_md
 
 
+def realtime_gap_alert(indices, tail_path, threshold_pct=2.0):
+    """对比 14:45 尾盘报告 vs 15:00 收盘数据。
+    Returns (md, has_alert) — 差距 >= 2pp 时返回警示md。
+    2026-06-11 实测科创50 14:45 +9.71% → 15:00 +0.62% 差 -9.09pp（巨幅反转！必须警示）。
+    """
+    import os as _os
+    if not tail_path or not _os.path.exists(tail_path):
+        return "", False
+    try:
+        with open(tail_path) as f:
+            tail_content = f.read()
+    except Exception:
+        return "", False
+    name_map = {"sh000001": "上证指数", "sz399001": "深证成指",
+                "sz399006": "创业板指", "sz399005": "中小100",
+                "sz399300": "沪深300", "sh000688": "科创50"}
+    rows, has_alert = [], False
+    for k, name in name_map.items():
+        m = re.search(rf"\|\s*{name}\s*\|[^|]*?([+-]?\d+\.\d+)\s*%", tail_content)
+        if not m:
+            continue
+        v1445 = float(m.group(1))
+        v1500 = indices.get(k, {}).get("change_pct", 0)
+        delta = v1500 - v1445
+        if abs(delta) >= threshold_pct:
+            has_alert = True
+        rows.append((name, v1445, v1500, delta))
+    if not has_alert or not rows:
+        return "", False
+    md = "\n⚠️ **数据口径警示**（14:45 尾盘 vs 15:00 收盘 时点差）\n\n"
+    md += "| 指数 | 14:45 尾盘 | 15:00 收盘 | 时点差 | 方向 |\n"
+    md += "|:----:|:---------:|:---------:|:------:|:----:|\n"
+    for name, v1445, v1500, delta in rows:
+        if (v1445 > 0) != (v1500 > 0) and abs(delta) >= 2:
+            arrow = "🔄 反转"
+        elif delta > 0:
+            arrow = "📈 修正"
+        else:
+            arrow = "📉 修正"
+        md += f"| {name} | {v1445:+.2f}% | {v1500:+.2f}% | {delta:+.2f} pp | {arrow} |\n"
+    md += f"\n> 14:45 盘中建议与收盘差异 > {threshold_pct}pp，请以本盘后战报为准。\n"
+    return md, True
+
+
 def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    positives, negatives, avg, avg_pos, avg_neg,
-                   sh_pct, cyb_pct, kc50_pct, selected, hot_count):
+                   sh_pct, cyb_pct, kc50_pct, selected, hot_count,
+                   gap_md=""):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     md = f"📊 **盘后战报 {date_str} {now[11:]}**\n\n"
 
@@ -233,7 +283,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"{i}️⃣ {theme} — {cnt}次（较昨日 {arrow}{abs(diff)}）\n"
 
     md += f"\n⚠️ **市场特征：**（根据 {hot_count} 只强势股判断）\n"
-    md += f"- 上证 +{sh_pct:.2f}% / 创业板 +{cyb_pct:.2f}% / 科创50 +{kc50_pct:.2f}%\n\n"
+    md += f"- 上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
 
     md += "📈 **大盘收盘表现：**\n"
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指", "sz399006": "创业板指",
@@ -268,9 +318,11 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"{i}️⃣ {h['code']} {h['name']} — {theme} **{pct:+.2f}%**\n"
 
     md += "\n━━━ **明日观察要点** ━━━\n"
-    md += f"1️⃣ **大盘：** 上证 +{sh_pct:.2f}%，{'强势' if sh_pct > 1.5 else '震荡'}；关注明日开盘30分钟量能\n"
+    md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else '震荡'}；关注明日开盘30分钟量能\n"
     md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
     md += f"3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
+    if gap_md:
+        md += gap_md
     md += "\n⚠️ **仅供参考，不构成投资建议**\n"
     return md
 
