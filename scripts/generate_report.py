@@ -503,6 +503,14 @@ def main():
 
     if args.type in ('selection', 'both'):
         generate_report()
+        # 选股报告生成后，自动同步 Top10 到东方财富组合
+        try:
+            subprocess.run(
+                [sys.executable, os.path.join(os.path.dirname(__file__), 'sync_top10_v5.py')],
+                check=False, capture_output=True, text=True, timeout=60
+            )
+        except Exception as _se:
+            print(f"[AAna] 同步 Top10 到东方财富失败（非致命）: {_se}")
     if args.type in ('review', 'both'):
         generate_review_report()
 
@@ -1297,6 +1305,14 @@ if __name__ == "__main__":
 
     if args.type in ('selection', 'both'):
         generate_report()
+        # 选股报告生成后，自动同步 Top10 到东方财富组合
+        try:
+            subprocess.run(
+                [sys.executable, os.path.join(os.path.dirname(__file__), 'sync_top10_v5.py')],
+                check=False, capture_output=True, text=True, timeout=60
+            )
+        except Exception as _se:
+            print(f"[AAna] 同步 Top10 到东方财富失败（非致命）: {_se}")
     if args.type in ('review', 'both'):
         generate_review_report()
 

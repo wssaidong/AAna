@@ -1023,9 +1023,11 @@ def main():
                 today_date = datetime.now().strftime("%Y-%m-%d")
                 codes = get_snapshot_top10(today_date)
                 if codes:
-                    success = sync_portfolio_to_eastmoney(codes, group_name=today_str)
+                    # 尾盘组合命名规则：YYYYMMDDPP（区别于早盘的纯日期）
+                    afternoon_group = f"{today_str}PP"
+                    success = sync_portfolio_to_eastmoney(codes, group_name=afternoon_group)
                     if success:
-                        print(f"\n✅ 已同步 Top10 精选到东方财富组合")
+                        print(f"\n✅ 已同步 Top10 精选到东方财富组合 {afternoon_group}")
                 else:
                     print(f"\n⚠️ 快照无数据，跳过东方财富同步")
             except Exception as e:
