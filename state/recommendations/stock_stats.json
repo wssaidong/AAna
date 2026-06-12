@@ -74,6 +74,12 @@
           "change": 3.66,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-06-12",
+          "change": 5.39,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -164,6 +170,12 @@
           "change": 1.28,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -2.48,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -242,6 +254,12 @@
           "change": 2.0,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -4.07,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -306,6 +324,12 @@
         {
           "date": "2026-06-10",
           "change": 1.9,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -1.68,
           "hit": false,
           "sector": "robot"
         }
@@ -403,6 +427,12 @@
           "date": "2026-06-10",
           "change": -0.19,
           "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -1.33,
+          "hit": true,
           "sector": "robot"
         }
       ],
@@ -530,6 +560,12 @@
           "change": 0.93,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -1.0,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -866,6 +902,12 @@
           "change": 0.6,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -0.89,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -932,6 +974,12 @@
           "change": 0.88,
           "hit": false,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-06-12",
+          "change": -1.55,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -973,6 +1021,12 @@
           "date": "2026-06-10",
           "change": 0.35,
           "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-06-12",
+          "change": 0.06,
+          "hit": false,
           "sector": "robot"
         }
       ],
@@ -1144,6 +1198,11 @@
           "date": "2026-06-11",
           "avg_change": 2.3133333333333335,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-06-12",
+          "avg_change": -0.3866666666666669,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -1259,6 +1318,11 @@
           "date": "2026-06-10",
           "avg_change": 0.6325,
           "hit_rate": 50.0
+        },
+        {
+          "date": "2026-06-12",
+          "avg_change": -0.9874999999999999,
+          "hit_rate": 25.0
         }
       ]
     },
@@ -1323,6 +1387,11 @@
         {
           "date": "2026-06-11",
           "avg_change": 0.88,
+          "hit_rate": 0.0
+        },
+        {
+          "date": "2026-06-12",
+          "avg_change": -1.22,
           "hit_rate": 0.0
         }
       ]
@@ -1396,6 +1465,7 @@
     "2026-06-08",
     "2026-06-09",
     "2026-06-10",
-    "2026-06-11"
+    "2026-06-11",
+    "2026-06-12"
   ]
 }

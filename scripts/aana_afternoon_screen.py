@@ -135,24 +135,58 @@ def get_stock_data_sina(codes):
 
 
 def get_tencent_kline(code, count=30):
-    """获取腾讯历史K线（前复权）"""
+    """
+    获取历史K线（前复权）
+    v2.5.1 修复（2026-06-12）：原 web.ifzq.gtimg.cn 返回 501（接口废弃），
+    改用东财 push2his K线（已知稳定，30 根 < 100ms）。
+    """
     import requests
     try:
-        mkt = 'sh' if code.startswith(('6', '9')) else 'sz'
-        url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param={mkt}{code},day,,,{count},qfq"
-        resp = requests.get(url, timeout=10)
-        text = resp.text.strip()
-        # 格式: var kline_dayhfq={...}
+        # 1) 首选：东财 push2his K线（沪深都稳定）
+        mkt = 1 if code.startswith(('6', '9')) else 0
+        url = f"https://push2his.eastmoney.com/api/qt/stock/kline/get"
+        params = {
+            "secid": f"{mkt}.{code}",
+            "fields1": "f1,f2,f3,f4,f5,f6",
+            "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+            "klt": "101", "fqt": "1",
+            "end": "20500101", "lmt": str(count),
+        }
+        resp = requests.get(url, params=params,
+                            headers={"User-Agent": "Mozilla/5.0",
+                                     "Referer": "https://quote.eastmoney.com/"},
+                            timeout=8)
+        klines = resp.json().get('data', {}).get('klines', [])
+        if klines:
+            result = []
+            for line in klines:
+                parts = line.split(",")
+                if len(parts) >= 6:
+                    try:
+                        result.append({
+                            'date': parts[0],
+                            'open': float(parts[1]),
+                            'high': float(parts[3]),
+                            'low': float(parts[4]),
+                            'close': float(parts[2]),
+                            'vol': float(parts[5]),
+                        })
+                    except (ValueError, IndexError):
+                        continue
+            if result:
+                return result
+
+        # 2) 备用：原腾讯 K线（web.ifzq.gtimg.cn，已知 501 不可用，但留口子）
+        mkt_str = 'sh' if code.startswith(('6', '9')) else 'sz'
+        url2 = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param={mkt_str}{code},day,,,{count},qfq"
+        resp2 = requests.get(url2, timeout=8)
+        text = resp2.text.strip()
         if '=' in text:
             text = text.split('=', 1)[1]
         data = json.loads(text)
-        
-        # 取日K数据
-        day_data = data.get('data', {}).get(f'{mkt}{code}', {}).get('qfqday', [])
+        day_data = data.get('data', {}).get(f'{mkt_str}{code}', {}).get('qfqday', [])
         if not day_data:
-            day_data = data.get('data', {}).get(f'{mkt}{code}', {}).get('day', [])
-        
-        # 转换为 [{date, open, high, low, close, vol}, ...]
+            day_data = data.get('data', {}).get(f'{mkt_str}{code}', {}).get('day', [])
         result = []
         for item in day_data:
             if len(item) >= 6:
@@ -166,7 +200,7 @@ def get_tencent_kline(code, count=30):
                 })
         return result
     except Exception as e:
-        print(f"[Tencent K线] {code}: {e}")
+        print(f"[K线] {code}: {e}")
         return []
 
 
@@ -995,6 +1029,7 @@ def main():
     sentiment_label = '乐观'
     sentiment_score = 50
     position_ratio = 0.5
+    sent = None
     if AFTER_NEW:
         sent = get_market_sentiment()
         sentiment_label = sent.get('label', '乐观')
@@ -1005,6 +1040,18 @@ def main():
             sent.get('zt_count', 0), sent.get('dt_count', 0),
             position_ratio * 100
         ))
+
+    # v2.5.1 修复（2026-06-12）：冰点短路必须配合"数据源=fallback"判断
+    # 原因：6/12 实战发现东财涨跌停接口 fallback 时返回 (-1,-1)，
+    # 冰点短路单独看 label='冰点' 会误判 → 强制空仓
+    # 修复：data_source=fallback 时把 position_ratio 抬高到 0.3（轻仓），
+    #        label='冰点' 仍短路（避免硬逆势），但不会因为单点数据脏就全空仓。
+    data_source_fallback = (sent is not None) and (
+        sent.get('zt_count', 0) == -1 or sent.get('dt_count', 0) == -1
+    )
+    if data_source_fallback and position_ratio < 0.3:
+        print(f"[情绪] ⚠️ 涨跌停数据 fallback，仓位从 {position_ratio*100:.0f}% 提升到 30%（避免单点脏数据误判冰点）")
+        position_ratio = 0.3
 
     # 获取大盘指数
     index_codes = ['000001', '399001', '399006', '000688']
@@ -1025,7 +1072,13 @@ def main():
     # P0-B 修复：冰点日 / 仓位 < 10% 时直接短路，不跑选股
     # 之前 bug：报告顶部写"建议仓位 0%"，但仍推 8 只（自相矛盾）
     # 阈值 < 0.1：仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
-    is_ice_point = sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
+    #
+    # v2.5.1 修复（2026-06-12）：is_ice_point 增加"数据源正常"前提——
+    # 冰点短路必须**在情绪数据有效**的前提下触发。如果数据全 fallback，
+    # 不要直接冰点短路（position_ratio 已经被 P0 修复抬到 0.3）。
+    is_ice_point = (
+        sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
+    ) and not data_source_fallback
     if is_ice_point:
         print(f"[AAna 尾盘] ❄️ 情绪={sentiment_label}/仓位={position_ratio*100:.0f}%，跳过尾盘选股（冰点日策略不推任何票）")
         # 仍然生成报告，但内容是"暂停推荐"
@@ -1104,4 +1157,18 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # v2.5.1 修复（2026-06-12）：根据 main() 返回值 + 数据源状态决定 exit code
+    # 0=正常有推荐  1=有输出但无推荐  2=数据脏/上游 fallback（触发 alert）
+    import sys as _sys
+    try:
+        result = main()
+    except SystemExit as e:
+        raise
+    except Exception as e:
+        print(f"[AAna 尾盘] ❌ 未捕获异常: {e}")
+        import traceback; traceback.print_exc()
+        _sys.exit(2)
+    # 简单判定：main() 返回 [] 表示 0 推荐
+    if not result:
+        _sys.exit(1)
+    _sys.exit(0)

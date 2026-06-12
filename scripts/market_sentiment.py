@@ -164,37 +164,78 @@ def _default_sentiment() -> dict:
 # ── 2. 主要指数行情 ──────────────────────────────────────────────
 
 def get_index_data() -> list:
-    """获取主要指数实时数据"""
+    """
+    获取主要指数实时数据。
+    v2.5.1 修复（2026-06-12）：弃用 sina hq 接口（字段错位 bug 算出 -98% 误判冰点），
+    改用腾讯 qt.gtimg.cn（字段稳定，change_pct 索引=32 已知正确）。
+    同时加 sanity check：单指数涨跌 > 10% 视为数据脏，跳过。
+    """
+    indices = []
+
+    # 源 1: 腾讯 qt.gtimg.cn（首选，字段稳定）
     try:
-        url = "http://hq.sinajs.cn/list=s_sh000001,s_sz399001,s_sz399006,s_sh000300"
-        resp = requests.get(url, headers={
-            'User-Agent': 'Mozilla/5.0',
-            'Referer': 'http://finance.sina.com.cn'
-        }, timeout=8)
+        url = "https://qt.gtimg.cn/q=sh000001,sz399001,sz399006,sh000300"
+        resp = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=8)
         resp.encoding = 'gbk'
-        lines = resp.text.strip().split('\n')
-        indices = []
-        for line in lines:
-            if '=' not in line:
+        for line in resp.text.strip().split(';'):
+            if '=' not in line or '"' not in line:
                 continue
-            name = line.split('=')[0].split('_')[-1]
-            parts = line.split('=')[1].strip('";\n ').split(',')
-            if len(parts) < 4:
+            vals = line.split('"')[1].split('~')
+            if len(vals) < 50:
                 continue
-            yesterday_close = float(parts[2])
-            price = float(parts[3])
-            change = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
-            vol_ratio = 1.0  # 简化
+            try:
+                name = vals[1]
+                price = float(vals[3])
+                change = float(vals[32])  # 涨跌幅%
+            except (ValueError, IndexError):
+                continue
+            # sanity check: 指数单日波动不可能 > 10%
+            if abs(change) > 10:
+                print(f"[情绪] ⚠️ 指数 {name} 涨跌 {change:+.2f}% 超出合理范围，丢弃")
+                continue
             indices.append({
-                "name": {"s_sh000001": "上证指数", "s_sz399001": "深证成指",
-                         "s_sz399006": "创业板", "s_sh000300": "沪深300"}.get(name, name),
-                "change": round(change, 2), "price": price,
-                "volume_ratio": vol_ratio,
+                "name": name, "change": round(change, 2),
+                "price": price, "volume_ratio": 1.0,
             })
-        return indices
+        if indices:
+            return indices
     except Exception as e:
-        print(f"[情绪] 指数数据失败: {e}")
-        return []
+        print(f"[情绪] 腾讯指数源失败: {e}")
+
+    # 源 2: 东财 push2（备用，解析 f3=涨跌幅）
+    try:
+        url = "https://push2.eastmoney.com/api/qt/clist/get"
+        params = {
+            "pn": "1", "pz": "10", "po": "1", "np": "1",
+            "fltt": "2", "invt": "2", "fid": "f3",
+            "fs": "m:1+t:2,m:0+t:2",  # 沪深主要指数
+            "fields": "f12,f14,f2,f3",
+        }
+        resp = requests.get(url, params=params, headers=HEADERS, timeout=8)
+        items = resp.json().get('data', {}).get('diff', [])
+        for item in items:
+            try:
+                change = float(item.get('f3', 0))
+                price = float(item.get('f2', 0))
+            except (ValueError, TypeError):
+                continue
+            if abs(change) > 10:
+                continue
+            indices.append({
+                "name": item.get('f14', ''),
+                "change": round(change, 2),
+                "price": price,
+                "volume_ratio": 1.0,
+            })
+        if indices:
+            return indices
+    except Exception as e:
+        print(f"[情绪] 东财指数源失败: {e}")
+
+    # 双源都失败
+    if not indices:
+        print("[情绪] ❌ 指数数据双源 fallback")
+    return indices
 
 
 # ── 3. 涨跌停数量 ────────────────────────────────────────────────

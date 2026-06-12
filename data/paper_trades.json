@@ -440,8 +440,47 @@
       "reason": "止损/止盈/到期",
       "pnl": 119.0,
       "pnl_pct": 3.91
+    },
+    {
+      "date": "2026-06-12",
+      "code": "600714",
+      "name": "金瑞矿业",
+      "action": "buy",
+      "price": 27.85,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-12",
+      "code": "000021",
+      "name": "深科技",
+      "action": "buy",
+      "price": 37.0,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 75",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600714": {
+      "date": "2026-06-12",
+      "name": "金瑞矿业",
+      "shares": 100,
+      "entry_price": 27.85,
+      "highest_price": 27.85,
+      "entry_date": "2026-06-12"
+    },
+    "000021": {
+      "date": "2026-06-12",
+      "name": "深科技",
+      "shares": 100,
+      "entry_price": 37.0,
+      "highest_price": 37.0,
+      "entry_date": "2026-06-12"
+    }
+  },
   "daily_snapshots": []
 }
