@@ -330,89 +330,118 @@
       "reason": "AAna v2.4 尾盘评分 70",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-12",
+      "code": "601318",
+      "name": "中国平安",
+      "action": "sell",
+      "price": 52.46,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -14.0,
+      "pnl_pct": -0.27
+    },
+    {
+      "date": "2026-06-12",
+      "code": "001203",
+      "name": "大中矿业",
+      "action": "sell",
+      "price": 41.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -18.0,
+      "pnl_pct": -0.44
+    },
+    {
+      "date": "2026-06-12",
+      "code": "603226",
+      "name": "菲林格尔",
+      "action": "sell",
+      "price": 55.64,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 84.0,
+      "pnl_pct": 1.53
+    },
+    {
+      "date": "2026-06-12",
+      "code": "600176",
+      "name": "中国巨石",
+      "action": "sell",
+      "price": 42.5,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 153.0,
+      "pnl_pct": 3.73
+    },
+    {
+      "date": "2026-06-12",
+      "code": "600887",
+      "name": "伊利股份",
+      "action": "sell",
+      "price": 25.64,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 5.0,
+      "pnl_pct": 0.2
+    },
+    {
+      "date": "2026-06-12",
+      "code": "600641",
+      "name": "先导基电",
+      "action": "sell",
+      "price": 29.41,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 64.0,
+      "pnl_pct": 2.22
+    },
+    {
+      "date": "2026-06-12",
+      "code": "603139",
+      "name": "康惠股份",
+      "action": "sell",
+      "price": 39.73,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 40.0,
+      "pnl_pct": 1.02
+    },
+    {
+      "date": "2026-06-12",
+      "code": "603203",
+      "name": "快克智能",
+      "action": "sell",
+      "price": 58.51,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 51.0,
+      "pnl_pct": 0.88
+    },
+    {
+      "date": "2026-06-12",
+      "code": "601698",
+      "name": "中国卫通",
+      "action": "sell",
+      "price": 32.6,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 65.0,
+      "pnl_pct": 2.03
+    },
+    {
+      "date": "2026-06-12",
+      "code": "601133",
+      "name": "柏诚股份",
+      "action": "sell",
+      "price": 31.61,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 119.0,
+      "pnl_pct": 3.91
     }
   ],
-  "positions": {
-    "601318": {
-      "date": "2026-06-11",
-      "name": "中国平安",
-      "shares": 100,
-      "entry_price": 52.6,
-      "highest_price": 52.6,
-      "entry_date": "2026-06-11"
-    },
-    "001203": {
-      "date": "2026-06-11",
-      "name": "大中矿业",
-      "shares": 100,
-      "entry_price": 41.18,
-      "highest_price": 41.18,
-      "entry_date": "2026-06-11"
-    },
-    "603226": {
-      "date": "2026-06-11",
-      "name": "菲林格尔",
-      "shares": 100,
-      "entry_price": 54.8,
-      "highest_price": 54.8,
-      "entry_date": "2026-06-11"
-    },
-    "600176": {
-      "date": "2026-06-11",
-      "name": "中国巨石",
-      "shares": 100,
-      "entry_price": 40.97,
-      "highest_price": 40.97,
-      "entry_date": "2026-06-11"
-    },
-    "600887": {
-      "date": "2026-06-11",
-      "name": "伊利股份",
-      "shares": 100,
-      "entry_price": 25.59,
-      "highest_price": 25.59,
-      "entry_date": "2026-06-11"
-    },
-    "600641": {
-      "date": "2026-06-11",
-      "name": "先导基电",
-      "shares": 100,
-      "entry_price": 28.77,
-      "highest_price": 28.77,
-      "entry_date": "2026-06-11"
-    },
-    "603139": {
-      "date": "2026-06-11",
-      "name": "康惠股份",
-      "shares": 100,
-      "entry_price": 39.33,
-      "highest_price": 39.33,
-      "entry_date": "2026-06-11"
-    },
-    "603203": {
-      "date": "2026-06-11",
-      "name": "快克智能",
-      "shares": 100,
-      "entry_price": 58.0,
-      "highest_price": 58.0,
-      "entry_date": "2026-06-11"
-    },
-    "601698": {
-      "date": "2026-06-11",
-      "name": "中国卫通",
-      "shares": 100,
-      "entry_price": 31.95,
-      "highest_price": 31.95,
-      "entry_date": "2026-06-11"
-    },
-    "601133": {
-      "date": "2026-06-11",
-      "name": "柏诚股份",
-      "shares": 100,
-      "entry_price": 30.42,
-      "highest_price": 30.42,
-      "entry_date": "2026-06-11"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
