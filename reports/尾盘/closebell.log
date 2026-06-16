@@ -201,3 +201,32 @@
 [2026-06-16 14:45:00] [daily_v24_recommend] ============================================================
 [2026-06-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-06-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601137', '603225', '603527', '605006', '600522', '002125', '002203', '601168', '601021', '603031']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 4 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 4 只
+[2026-06-16 14:45:05] [daily_v24_recommend]   找到 4 只推荐
+[2026-06-16 14:45:05] [daily_v24_recommend]     002203 海亮股份 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     601021 春秋航空 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     603031 安孚科技 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     601168 西部矿业 score=80
+[2026-06-16 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 002203 海亮股份 @24.41 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 601021 春秋航空 @46.88 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 603031 安孚科技 @53.2 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 601168 西部矿业 @30.84 100股
+[2026-06-16 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-16 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-16-v24-尾盘推荐.md
+[2026-06-16 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-16 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-16 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-06-16 14:45:05] [daily_v24_recommend] ============================================================

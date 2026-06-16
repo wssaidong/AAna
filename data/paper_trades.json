@@ -484,8 +484,85 @@
       "reason": "止损/止盈/到期",
       "pnl": 342.0,
       "pnl_pct": 9.24
+    },
+    {
+      "date": "2026-06-16",
+      "code": "002203",
+      "name": "海亮股份",
+      "action": "buy",
+      "price": 24.41,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-16",
+      "code": "601021",
+      "name": "春秋航空",
+      "action": "buy",
+      "price": 46.88,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-16",
+      "code": "603031",
+      "name": "安孚科技",
+      "action": "buy",
+      "price": 53.2,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-16",
+      "code": "601168",
+      "name": "西部矿业",
+      "action": "buy",
+      "price": 30.84,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 80",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "002203": {
+      "date": "2026-06-16",
+      "name": "海亮股份",
+      "shares": 100,
+      "entry_price": 24.41,
+      "highest_price": 24.41,
+      "entry_date": "2026-06-16"
+    },
+    "601021": {
+      "date": "2026-06-16",
+      "name": "春秋航空",
+      "shares": 100,
+      "entry_price": 46.88,
+      "highest_price": 46.88,
+      "entry_date": "2026-06-16"
+    },
+    "603031": {
+      "date": "2026-06-16",
+      "name": "安孚科技",
+      "shares": 100,
+      "entry_price": 53.2,
+      "highest_price": 53.2,
+      "entry_date": "2026-06-16"
+    },
+    "601168": {
+      "date": "2026-06-16",
+      "name": "西部矿业",
+      "shares": 100,
+      "entry_price": 30.84,
+      "highest_price": 30.84,
+      "entry_date": "2026-06-16"
+    }
+  },
   "daily_snapshots": []
 }
