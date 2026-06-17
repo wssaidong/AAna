@@ -200,6 +200,12 @@
           "change": -0.16,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 0.0,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -638,6 +644,12 @@
           "change": 0.07,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 0.02,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -752,6 +764,12 @@
           "change": 0.52,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 0.72,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -834,6 +852,12 @@
         {
           "date": "2026-06-16",
           "change": 0.93,
+          "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 0.0,
           "hit": false,
           "sector": "energy"
         }
@@ -1004,6 +1028,12 @@
           "change": -0.89,
           "hit": false,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 1.1,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -1074,6 +1104,12 @@
         {
           "date": "2026-06-12",
           "change": -1.55,
+          "hit": false,
+          "sector": "ai_app"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 0.04,
           "hit": false,
           "sector": "ai_app"
         }
@@ -1196,6 +1232,12 @@
           "change": 0.58,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-06-17",
+          "change": -0.11,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1248,6 +1290,12 @@
         {
           "date": "2026-06-11",
           "change": 0.07,
+          "hit": false,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-06-17",
+          "change": 2.26,
           "hit": false,
           "sector": "ai_chip"
         }
@@ -1403,6 +1451,11 @@
           "date": "2026-06-16",
           "avg_change": 0.6766666666666667,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-06-17",
+          "avg_change": 0.20333333333333334,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -1543,6 +1596,11 @@
           "date": "2026-06-12",
           "avg_change": -1.22,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-06-17",
+          "avg_change": 0.5700000000000001,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -1593,6 +1651,11 @@
           "date": "2026-06-11",
           "avg_change": 0.5333333333333333,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-06-17",
+          "avg_change": 0.7599999999999999,
+          "hit_rate": 33.33333333333333
         }
       ]
     }
@@ -1618,6 +1681,7 @@
     "2026-06-11",
     "2026-06-12",
     "2026-06-15",
-    "2026-06-16"
+    "2026-06-16",
+    "2026-06-17"
   ]
 }

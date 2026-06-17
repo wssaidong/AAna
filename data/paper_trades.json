@@ -572,8 +572,28 @@
       "reason": "止损/止盈/到期",
       "pnl": 42.0,
       "pnl_pct": 1.36
+    },
+    {
+      "date": "2026-06-17",
+      "code": "600869",
+      "name": "远东股份",
+      "action": "buy",
+      "price": 33.35,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600869": {
+      "date": "2026-06-17",
+      "name": "远东股份",
+      "shares": 100,
+      "entry_price": 33.35,
+      "highest_price": 33.35,
+      "entry_date": "2026-06-17"
+    }
+  },
   "daily_snapshots": []
 }
