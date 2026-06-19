@@ -58,6 +58,55 @@ def get_yesterday_str():
     from datetime import timedelta
     return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
+
+# ============================================
+# 交易日判断 (2026-06-19 P0 修复)
+# 解决端午/中秋/国庆等法定节假日 cron 仍触发生成空报告的问题
+# ============================================
+# 2026 年中国法定休市日 (周末 + 调休 + 法定节假日)
+# 来源: 国务院办公厅每年发布的节假日安排通知
+_HOLIDAY_2026 = {
+    # 元旦: 1/1-3
+    '2026-01-01', '2026-01-02', '2026-01-03',
+    # 春节: 2/17-23 (除夕到初六), 调休 2/14(六)上班、2/28(日)上班
+    '2026-02-17', '2026-02-18', '2026-02-19', '2026-02-20',
+    '2026-02-21', '2026-02-22', '2026-02-23',
+    # 清明: 4/4-6
+    '2026-04-04', '2026-04-05', '2026-04-06',
+    # 劳动节: 5/1-5
+    '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05',
+    # 端午: 6/19-21 (周五-周日), 调休 6/22(周一)休
+    '2026-06-19', '2026-06-20', '2026-06-21', '2026-06-22',
+    # 中秋+国庆: 10/1-7
+    '2026-10-01', '2026-10-02', '2026-10-03',
+    '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07',
+}
+
+
+def is_trading_day(date_str=None):
+    """判断是否为 A 股交易日（周末 + 法定节假日都算非交易日）
+    
+    Args:
+        date_str: 'YYYY-MM-DD' 格式日期, 默认今天
+    
+    Returns:
+        (is_trading: bool, reason: str) — reason 仅在非交易日时填
+    """
+    if date_str is None:
+        date_str = get_today_str()
+    try:
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+    except ValueError:
+        return True, ''  # 解析失败按交易日处理 (fail-open)
+    # 周末
+    if dt.weekday() >= 5:  # 5=周六, 6=周日
+        return False, f'周末 ({["周一","周二","周三","周四","周五","周六","周日"][dt.weekday()]})'
+    # 2026 法定节假日 (其他年份未维护 — fail-open 避免误杀)
+    year = dt.strftime('%Y')
+    if year == '2026' and date_str in _HOLIDAY_2026:
+        return False, '法定节假日'
+    return True, ''
+
 def get_report_filename(report_type='选股报告'):
     return f"{REPORT_DIR}/{get_today_str()}-{report_type}.md"
 
@@ -499,16 +548,32 @@ def main():
                         help='报告类型：选股报告(selection)、复盘报告(review)或两者(both)')
     args = parser.parse_args()
 
+    # ── 非交易日快速跳过 (2026-06-19 P0 修复) ──────────────────
+    # 避免周末/节假日 cron 触发生成无意义的空报告
+    # 注意: 仍走 git_pull() 保持代码最新, 但 report/sync/eastmoney 全跳过
+    is_trade, non_trade_reason = is_trading_day()
+    if not is_trade:
+        today_str = get_today_str()
+        print(f"[AAna] {today_str} 非交易日 ({non_trade_reason})，跳过报告生成")
+        # 仍跑 git_pull — 让节假日期间代码也保持最新
+        git_pull()
+        return 0
+
     git_pull()
 
     if args.type in ('selection', 'both'):
         generate_report()
         # 选股报告生成后，自动同步 Top10 到东方财富组合
         try:
-            subprocess.run(
-                [sys.executable, os.path.join(os.path.dirname(__file__), 'sync_top10_v5.py')],
-                check=False, capture_output=True, text=True, timeout=60
-            )
+            # 2026-06-19 修复: sync_top10_v5.py 不存在, 改用 sync_top10_v9.py
+            sync_script = os.path.join(os.path.dirname(__file__), 'sync_top10_v9.py')
+            if os.path.exists(sync_script):
+                subprocess.run(
+                    [sys.executable, sync_script],
+                    check=False, capture_output=True, text=True, timeout=60
+                )
+            else:
+                print(f"[AAna] 同步脚本不存在: {sync_script} (跳过)")
         except Exception as _se:
             print(f"[AAna] 同步 Top10 到东方财富失败（非致命）: {_se}")
     if args.type in ('review', 'both'):
