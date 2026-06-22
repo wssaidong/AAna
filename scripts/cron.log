@@ -6312,3 +6312,363 @@ logout success!
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-19-选股报告.md
 [AAna v2.5] 生成 2026-06-19 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-06-19_09_00.json，跳过复盘报告
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna v2.5] 生成 2026-06-20 动态选股报告...
+[Source] sina OK (800 只, 11.6s)
+[AAna] 拆分: 推荐池 196 只 + 风险池 64 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-20-选股报告.md
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-06-13-选股报告.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-06-20 动态选股报告...
+[Source] sina OK (800 只, 12.7s)
+[AAna] 拆分: 推荐池 196 只 + 风险池 64 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-20-选股报告.md
+[AAna v2.5] 生成 2026-06-20 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-06-20_09_00.json，跳过复盘报告
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna v2.5] 生成 2026-06-21 动态选股报告...
+[Source] sina OK (800 只, 21.6s)
+[AAna] 拆分: 推荐池 196 只 + 风险池 64 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-21-选股报告.md
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-06-14-选股报告.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-06-21 动态选股报告...
+[Source] sina OK (800 只, 23.4s)
+[AAna] 拆分: 推荐池 196 只 + 风险池 64 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-21-选股报告.md
+[AAna v2.5] 生成 2026-06-21 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-06-21_09_00.json，跳过复盘报告
