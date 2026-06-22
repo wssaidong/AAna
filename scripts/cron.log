@@ -6672,3 +6672,212 @@ logout success!
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-21-选股报告.md
 [AAna v2.5] 生成 2026-06-21 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-06-21_09_00.json，跳过复盘报告
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna v2.5] 生成 2026-06-22 动态选股报告...
+[Source] sina OK (800 只, 14.8s)
+[AAna] 拆分: 推荐池 224 只 + 风险池 108 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[Errno 54] Connection reset by peer
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+服务器连接失败，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[Errno 32] Broken pipe
+接收数据异常，请稍后再试。
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-06-22-选股报告.md
+[AAna v2.5] 生成 2026-06-22 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-06-22_09_00.json，跳过复盘报告
