@@ -1359,27 +1359,10 @@ def generate_review_report():
     return filename
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='AAna 报告生成器')
-    parser.add_argument('--type', '-t', default='selection',
-                        choices=['selection', 'review', 'both'],
-                        help='selection=选股报告, review=复盘评分, both=两者都生成')
-    args = parser.parse_args()
-
-    # 每次运行前拉取最新代码
-    git_pull()
-
-    if args.type in ('selection', 'both'):
-        generate_report()
-        # 选股报告生成后，自动同步 Top10 到东方财富组合
-        try:
-            subprocess.run(
-                [sys.executable, os.path.join(os.path.dirname(__file__), 'sync_top10_v5.py')],
-                check=False, capture_output=True, text=True, timeout=60
-            )
-        except Exception as _se:
-            print(f"[AAna] 同步 Top10 到东方财富失败（非致命）: {_se}")
-    if args.type in ('review', 'both'):
-        generate_review_report()
+    # 2026-06-22 P0 修复: CLI 入口直接调 main(), 让 is_trading_day() 短路生效
+    # 之前此处独立写了一份 CLI 入口, 绕过了 main() 第 554 行的非交易日判断,
+    # 导致 6/22 端午调休日 cron 仍然完整跑选股报告 (拉数据 + 拉 K 线 + 创建东财组合)
+    sys.exit(main())
 
 
 
