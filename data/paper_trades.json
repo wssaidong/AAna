@@ -616,25 +616,30 @@
       "reason": "AAna v2.4 尾盘评分 95",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-23",
+      "code": "603269",
+      "name": "海鸥股份",
+      "action": "sell",
+      "price": 24.15,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 68.0,
+      "pnl_pct": 2.9
+    },
+    {
+      "date": "2026-06-23",
+      "code": "603859",
+      "name": "能科科技",
+      "action": "sell",
+      "price": 52.18,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -4.0,
+      "pnl_pct": -0.08
     }
   ],
-  "positions": {
-    "603269": {
-      "date": "2026-06-22",
-      "name": "海鸥股份",
-      "shares": 100,
-      "entry_price": 23.47,
-      "highest_price": 23.47,
-      "entry_date": "2026-06-22"
-    },
-    "603859": {
-      "date": "2026-06-22",
-      "name": "能科科技",
-      "shares": 100,
-      "entry_price": 52.22,
-      "highest_price": 52.22,
-      "entry_date": "2026-06-22"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
