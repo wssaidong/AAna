@@ -290,9 +290,13 @@ def calculate_returns(rec_rows, trade_rows):
 
 
 def append_feedback(rows):
-    """追加写入 feedback CSV"""
+    """追加写入 feedback CSV（按 code+rec_date 去重，避免重跑累积冗余行）"""
     existing = _read_csv(FEEDBACK_CSV)
-    _write_csv(FEEDBACK_CSV, FEEDBACK_FIELDS, existing + rows, mode="w")
+    seen = {(r.get("code", ""), r.get("rec_date", "")) for r in existing}
+    deduped_new = [r for r in rows if (r.get("code", ""), r.get("rec_date", "")) not in seen]
+    if len(deduped_new) < len(rows):
+        print(f"   去重跳过 {len(rows) - len(deduped_new)} 条已存在记录", file=sys.stderr)
+    _write_csv(FEEDBACK_CSV, FEEDBACK_FIELDS, existing + deduped_new, mode="w")
 
 
 def compute_stats(rows, top_n=20):
@@ -444,14 +448,18 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
     ])
 
     for r in feedback_rows[-20:]:
-        ret_1d = f"{r['ret_1d']:+.2f}%" if r.get("ret_1d") != "" else "-"
-        ret_3d = f"{r['ret_3d']:+.2f}%" if r.get("ret_3d") != "" else "-"
-        ret_5d = f"{r['ret_5d']:+.2f}%" if r.get("ret_5d") != "" else "-"
-        ret_15d = f"{r['ret_15d']:+.2f}%" if r.get("ret_15d") != "" else "-"
+        ret_1d = _sf(r.get("ret_1d"))
+        ret_3d = _sf(r.get("ret_3d"))
+        ret_5d = _sf(r.get("ret_5d"))
+        ret_15d = _sf(r.get("ret_15d"))
+        ret_1d_str = f"{ret_1d:+.2f}%" if ret_1d is not None else "-"
+        ret_3d_str = f"{ret_3d:+.2f}%" if ret_3d is not None else "-"
+        ret_5d_str = f"{ret_5d:+.2f}%" if ret_5d is not None else "-"
+        ret_15d_str = f"{ret_15d:+.2f}%" if ret_15d is not None else "-"
         trend_emoji = "📈" if r.get("trend") == "上升" else "📉" if r.get("trend") == "下降" else "➡️"
         trend_str = r.get("trend", "震荡")
         lines.append(
-            f"| {r['date']} | {r['code']} | {r['name']} | {r['rec_date']} | {trend_emoji}{trend_str} | {ret_1d} | {ret_3d} | {ret_5d} | {ret_15d} |"
+            f"| {r['date']} | {r['code']} | {r['name']} | {r['rec_date']} | {trend_emoji}{trend_str} | {ret_1d_str} | {ret_3d_str} | {ret_5d_str} | {ret_15d_str} |"
         )
 
     lines.extend([
@@ -490,17 +498,19 @@ def main():
     append_feedback(feedback_rows)
     print(f"   已追加写入: {FEEDBACK_CSV}", file=sys.stderr)
 
-    # 5. 统计
-    stats = compute_stats(feedback_rows, top_n=20)
+    # 5. 统计 — 读 CSV 全表末尾 20 条（而不是只统计当天新增的 feedback_rows，
+    #    否则样本被压到当天 rec 条数，分母严重偏小 → 胜率误导）
+    all_feedback = _read_csv(FEEDBACK_CSV)
+    stats = compute_stats(all_feedback, top_n=20)
     print(f"   统计样本: {stats[1]} 只, 胜率: {stats[2]*100:.1f}%, 盈亏比: {stats[5]}", file=sys.stderr)
 
     # 5b. 趋势胜率统计
-    trend_stats = compute_trend_stats(feedback_rows, top_n=20)
+    trend_stats = compute_trend_stats(all_feedback, top_n=20)
     if trend_stats:
         print(f"   趋势分布: " + ", ".join(f"{k}({v['count']}只,{v['winrate']}%)" for k, v in trend_stats.items()), file=sys.stderr)
 
-    # 6. 输出 Markdown 报告
-    report = build_markdown_report(rec_rows, feedback_rows, stats, trend_stats)
+    # 6. 输出 Markdown 报告（详情表用 CSV 全表末尾 20 条，与统计分母对齐）
+    report = build_markdown_report(rec_rows, all_feedback, stats, trend_stats)
     print(report)
 
 
