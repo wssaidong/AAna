@@ -649,17 +649,19 @@
       "reason": "AAna v2.4 尾盘评分 70",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-24",
+      "code": "002213",
+      "name": "大为股份",
+      "action": "sell",
+      "price": 38.31,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -143.0,
+      "pnl_pct": -3.6
     }
   ],
-  "positions": {
-    "002213": {
-      "date": "2026-06-23",
-      "name": "大为股份",
-      "shares": 100,
-      "entry_price": 39.74,
-      "highest_price": 39.74,
-      "entry_date": "2026-06-23"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
