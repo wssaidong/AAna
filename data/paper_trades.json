@@ -660,8 +660,47 @@
       "reason": "止损/止盈/到期",
       "pnl": -143.0,
       "pnl_pct": -3.6
+    },
+    {
+      "date": "2026-06-25",
+      "code": "600641",
+      "name": "先导基电",
+      "action": "buy",
+      "price": 37.2,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-25",
+      "code": "002709",
+      "name": "天赐材料",
+      "action": "buy",
+      "price": 55.23,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600641": {
+      "date": "2026-06-25",
+      "name": "先导基电",
+      "shares": 100,
+      "entry_price": 37.2,
+      "highest_price": 37.2,
+      "entry_date": "2026-06-25"
+    },
+    "002709": {
+      "date": "2026-06-25",
+      "name": "天赐材料",
+      "shares": 100,
+      "entry_price": 55.23,
+      "highest_price": 55.23,
+      "entry_date": "2026-06-25"
+    }
+  },
   "daily_snapshots": []
 }
