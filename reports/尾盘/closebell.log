@@ -436,3 +436,21 @@
 [2026-06-26 14:45:00] [daily_v24_recommend] ============================================================
 [2026-06-26 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-06-26 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603225', '600392', '600497', '603068', '600958', '002549', '000623', '000686', '601136', '603995']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 75 只
+[AAna 尾盘] 候选股票总数: 85 只
+[K线] 603225: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600392: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603068: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603995: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-26 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-26 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
