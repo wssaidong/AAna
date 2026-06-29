@@ -704,8 +704,47 @@
       "reason": "止损/止盈/到期",
       "pnl": -2.0,
       "pnl_pct": -0.04
+    },
+    {
+      "date": "2026-06-29",
+      "code": "603341",
+      "name": "龙旗科技",
+      "action": "buy",
+      "price": 41.29,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-06-29",
+      "code": "002842",
+      "name": "翔鹭钨业",
+      "action": "buy",
+      "price": 48.79,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 70",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "603341": {
+      "date": "2026-06-29",
+      "name": "龙旗科技",
+      "shares": 100,
+      "entry_price": 41.29,
+      "highest_price": 41.29,
+      "entry_date": "2026-06-29"
+    },
+    "002842": {
+      "date": "2026-06-29",
+      "name": "翔鹭钨业",
+      "shares": 100,
+      "entry_price": 48.79,
+      "highest_price": 48.79,
+      "entry_date": "2026-06-29"
+    }
+  },
   "daily_snapshots": []
 }
