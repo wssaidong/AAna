@@ -1,0 +1,93 @@
+{
+  "date": "2026-06-29",
+  "market_prediction": "📈 偏暖 谨慎乐观，控制仓位",
+  "sentiment": "📈 偏暖",
+  "focus_sectors": [
+    "AI算力/芯片",
+    "人形机器人",
+    "AI应用"
+  ],
+  "recommended_stocks": [
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002230",
+      "name": "科大讯飞",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002049",
+      "name": "紫光国微",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "603667",
+      "name": "五洲新春",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002836",
+      "name": "新宏泽",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "-3~+1%",
+      "expected_high": 1.0,
+      "expected_low": -3.0
+    },
+    {
+      "code": "600745",
+      "name": "*ST闻泰",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600570",
+      "name": "恒生电子",
+      "sector": "ai_app",
+      "sector_name": "AI应用",
+      "reason": "端侧AI+智能汽车",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    }
+  ],
+  "created_at": "2026-06-29T08:30:00.768394"
+}
