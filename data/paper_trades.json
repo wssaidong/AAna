@@ -748,8 +748,47 @@
       "reason": "止损/止盈/到期",
       "pnl": -29.0,
       "pnl_pct": -0.59
+    },
+    {
+      "date": "2026-07-01",
+      "code": "603726",
+      "name": "朗迪集团",
+      "action": "buy",
+      "price": 33.73,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-01",
+      "code": "002158",
+      "name": "汉钟精机",
+      "action": "buy",
+      "price": 36.25,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "603726": {
+      "date": "2026-07-01",
+      "name": "朗迪集团",
+      "shares": 100,
+      "entry_price": 33.73,
+      "highest_price": 33.73,
+      "entry_date": "2026-07-01"
+    },
+    "002158": {
+      "date": "2026-07-01",
+      "name": "汉钟精机",
+      "shares": 100,
+      "entry_price": 36.25,
+      "highest_price": 36.25,
+      "entry_date": "2026-07-01"
+    }
+  },
   "daily_snapshots": []
 }
