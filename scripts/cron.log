@@ -8008,3 +8008,95 @@ logout success!
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-07-01-选股报告.md
 [AAna v2.5] 生成 2026-07-01 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-07-01_09_00.json，跳过复盘报告
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-06-25-尾盘选股.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-07-02 动态选股报告...
+[Source] sina OK (800 只, 12.9s)
+[AAna] 拆分: 推荐池 290 只 + 风险池 73 只 (source=sina)
+[AAna] 动态股票池: 50 只 (涨停警示 30 只)
+[AAna] 获取 40 只股票数据...
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+login success!
+logout success!
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-07-02-选股报告.md
+[AAna v2.5] 生成 2026-07-02 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-07-02_09_00.json，跳过复盘报告

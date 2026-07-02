@@ -792,8 +792,28 @@
       "reason": "止损/止盈/到期",
       "pnl": -125.0,
       "pnl_pct": -3.45
+    },
+    {
+      "date": "2026-07-02",
+      "code": "600160",
+      "name": "巨化股份",
+      "action": "buy",
+      "price": 54.64,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600160": {
+      "date": "2026-07-02",
+      "name": "巨化股份",
+      "shares": 100,
+      "entry_price": 54.64,
+      "highest_price": 54.64,
+      "entry_date": "2026-07-02"
+    }
+  },
   "daily_snapshots": []
 }

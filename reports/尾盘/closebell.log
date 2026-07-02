@@ -567,3 +567,29 @@
 [2026-07-02 14:45:00] [daily_v24_recommend] ============================================================
 [2026-07-02 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-07-02 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603067', '601233', '600531', '603906', '603978', '600160', '601211', '000776', '002549', '000623']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 50 只
+[AAna 尾盘] 候选股票总数: 60 只
+[K线] 601233: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000776: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002549: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只
+[2026-07-02 14:45:05] [daily_v24_recommend]   找到 1 只推荐
+[2026-07-02 14:45:05] [daily_v24_recommend]     600160 巨化股份 score=100
+[2026-07-02 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-02 14:45:05] [daily_v24_recommend]     建仓 600160 巨化股份 @54.64 100股
+[2026-07-02 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-02 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-02-v24-尾盘推荐.md
+[2026-07-02 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-02 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-02 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-07-02 14:45:05] [daily_v24_recommend] ============================================================

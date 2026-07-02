@@ -188,26 +188,48 @@ def generate_full_report(date_str):
 
     print(f"      选新晋异动 Top5…")
     top10_set = set(top10_codes)
-    outside = [h for h in hot if h["code"] not in top10_set]
+    # ⚠️ v1.5/v1.12 pitfall: 过滤 *ST/ST 投机标的
+    outside = [h for h in hot
+               if h["code"] not in top10_set
+               and "*ST" not in h.get("name", "")
+               and "ST" not in h.get("name", "")
+               and h.get("change_pct", 0) >= 9.5]  # 至少涨停
+    # ⚠️ v1.5 pitfall: priority 拓宽至 20 项 + 动态按当日热度调整
     priority = ["AI智算", "算力", "半导体设备", "固态电池", "稀土永磁", "低空经济",
                 "液冷服务器", "PCB概念", "先进封装", "MLCC", "存储芯片", "机器人",
-                "商业航天", "数字科技", "央企"]
+                "商业航天", "数字科技", "央企", "一季报增长", "创新药", "可控核聚变",
+                "分红", "黄金"]
+    # 用 themes[:5] (当日热度前5) 替换硬编码前5个,实现动态 priority
+    dynamic_top = themes[:5] if themes else []
+    final_priority = list(dict.fromkeys(dynamic_top + priority))  # 去重保序
     selected = []
     seen = set()
-    for theme in priority:
+    for theme in final_priority:
+        if len(selected) >= 5:
+            break
         for h in outside:
             if h["code"] in seen:
                 continue
             if theme in h.get("reason", ""):
+                # ⚠️ v1.9 pitfall: 优先选 20cm 涨停 (创业板/科创板 33/48)
+                market = h.get("market")
+                h["_is_20cm"] = market in (33, 48)
                 selected.append((theme, h))
                 seen.add(h["code"])
                 break
-        if len(selected) >= 5:
-            break
+    # ⚠️ v1.9 pitfall: 排序 — 20cm 涨停优先,其次按涨幅降序
+    selected.sort(key=lambda x: (x[1].get("_is_20cm", False), x[1].get("change_pct", 0)), reverse=True)
+    selected = selected[:5]
 
-    # 14:45 vs 15:00 时点差警示（v1.3 必跑）
-    tail_path = f"{REPORT_DIR}/{date_str}-尾盘选股.md"
-    gap_md, has_gap = realtime_gap_alert(indices, tail_path)
+    # 14:45 vs 15:00 时点差警示（v1.3 必跑 + v1.6/v1.13 路径修复）
+    # 候选路径顺序（v1.6 + v1.13 持续生效）:
+    #   1. /Users/cai/code/AAna/reports/{date}/盘中/{date}_1445_尾盘分析.md  ← 首选
+    #   2. /Users/cai/code/AAna/reports/{date}-尾盘选股.md                ← 已确认失真
+    candidate_paths = [
+        f"{REPORT_DIR}/{date_str}/盘中/{date_str}_1445_尾盘分析.md",
+        f"{REPORT_DIR}/{date_str}-尾盘选股.md",
+    ]
+    gap_md, has_gap = realtime_gap_alert(indices, candidate_paths)
 
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
@@ -222,26 +244,41 @@ def generate_full_report(date_str):
     return feishu_md, full_md
 
 
-def realtime_gap_alert(indices, tail_path, threshold_pct=2.0):
+def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
     """对比 14:45 尾盘报告 vs 15:00 收盘数据。
     Returns (md, has_alert) — 差距 >= 2pp 时返回警示md。
     2026-06-11 实测科创50 14:45 +9.71% → 15:00 +0.62% 差 -9.09pp（巨幅反转！必须警示）。
+
+    ⚠️ v1.13 关键修复:
+    - tail_paths 改为路径列表（盘中优先 + 尾盘选股 fallback）
+    - 只列已抓取到的指数（盘中报告指数列不固定）
+    - regex 必须跨管道 .*?（v1.5 修复）
     """
     import os as _os
-    if not tail_path or not _os.path.exists(tail_path):
-        return "", False
-    try:
-        with open(tail_path) as f:
-            tail_content = f.read()
-    except Exception:
+    if isinstance(tail_paths, str):
+        tail_paths = [tail_paths]
+    tail_content = None
+    used_path = None
+    for p in tail_paths:
+        if p and _os.path.exists(p):
+            try:
+                with open(p) as f:
+                    tail_content = f.read()
+                used_path = p
+                break
+            except Exception:
+                continue
+    if not tail_content:
         return "", False
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指",
                 "sz399006": "创业板指", "sz399005": "中小100",
                 "sz399300": "沪深300", "sh000688": "科创50"}
     rows, has_alert = [], False
     for k, name in name_map.items():
-        m = re.search(rf"\|\s*{name}\s*\|[^|]*?([+-]?\d+\.\d+)\s*%", tail_content)
+        # ⚠️ v1.5 修复: regex 必须跨管道 .*?（不是 [^|]*?）
+        m = re.search(rf"\|\s*{name}\s*\|.*?([+-]?\d+\.\d+)\s*%", tail_content)
         if not m:
+            # ⚠️ v1.13 修复: 跳过缺失指数（如盘中报告无沪深300/中小100）
             continue
         v1445 = float(m.group(1))
         v1500 = indices.get(k, {}).get("change_pct", 0)
@@ -263,6 +300,7 @@ def realtime_gap_alert(indices, tail_path, threshold_pct=2.0):
             arrow = "📉 修正"
         md += f"| {name} | {v1445:+.2f}% | {v1500:+.2f}% | {delta:+.2f} pp | {arrow} |\n"
     md += f"\n> 14:45 盘中建议与收盘差异 > {threshold_pct}pp，请以本盘后战报为准。\n"
+    md += f"> 数据源：{used_path}（共 {len(rows)}/6 指数）\n"
     return md, True
 
 
@@ -318,9 +356,21 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"{i}️⃣ {h['code']} {h['name']} — {theme} **{pct:+.2f}%**\n"
 
     md += "\n━━━ **明日观察要点** ━━━\n"
-    md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else '震荡'}；关注明日开盘30分钟量能\n"
-    md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
-    md += f"3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
+    # ⚠️ v1.11/v1.13 模式检测: 候选池失败模式 + 大盘性质
+    if avg < -3.0:
+        # v1.11 第五种模式: 系统性崩盘 (10%命中+负Alpha)
+        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日！上证 {sh_pct:+.2f}%，深证 {indices.get('sz399001',{}).get('change_pct',0):+.2f}%，**关注明日反弹**（普跌次日反弹概率高）\n"
+        md += f"2️⃣ **回避：** 昨日涨幅+4%以上的追高标的（今日集体杀跌主力）\n"
+        md += f"3️⃣ **防御：** 高股息/黄金/稀土等防御板块作为底仓\n"
+    elif sh_pct < -1.5 and kc50_pct < -5:
+        # 平稳转急跌型 (类似 2026-06-26)
+        md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！盘中{sh_pct:+.2f}%以内震荡 → 尾盘1小时集体跳水（创业板/科创50 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%）\n"
+        md += f"2️⃣ **回避：** 追高强势股（今日全市场普跌）+ 题材投机（小盘股流动性风险）\n"
+        md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])} 龙头股是否扛住杀跌（扛住=主线成立）\n"
+    else:
+        md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
+        md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
+        md += f"3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
     if gap_md:
         md += gap_md
     md += "\n⚠️ **仅供参考，不构成投资建议**\n"
@@ -435,7 +485,7 @@ def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
 
 ## 六、明日观察要点
 
-1. **大盘性质：** 上证 +{sh_pct:.2f}%，{'强势行情' if sh_pct > 1.5 else ('震荡偏强' if sh_pct > 0 else '震荡偏弱')}；关注明日开盘30分钟量能
+1. **大盘性质：** 上证 {sh_pct:+.2f}%，{'强势行情' if sh_pct > 1.5 else ('震荡偏强' if sh_pct > 0 else '震荡偏弱')}；关注明日开盘30分钟量能
 2. **主线持续性：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交额不萎缩50%
 3. **防御方向：** 央企/红利股作为底仓对冲
 
