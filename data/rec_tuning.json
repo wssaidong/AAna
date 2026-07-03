@@ -9,10 +9,10 @@
     "elec",
     "robot"
   ],
-  "total_records": 821,
-  "overall_win_rate": 31.5468940316687,
+  "total_records": 824,
+  "overall_win_rate": 31.43203883495146,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-07-02T20:00:18.926321",
+  "generated_at": "2026-07-03T20:00:40.346183",
   "score_band_stats": {
     "40-50": {
       "band": "40-50",
@@ -24,10 +24,10 @@
     },
     "50-60": {
       "band": "50-60",
-      "count": 152,
+      "count": 155,
       "win_count": 111,
-      "win_rate": 73.02631578947368,
-      "avg_change": 1.1211842105263157,
+      "win_rate": 71.61290322580646,
+      "avg_change": 1.099483870967742,
       "avg_hold_days": 1.0
     },
     "60-70": {
@@ -42,10 +42,10 @@
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 821,
+      "count": 824,
       "win_count": 259,
-      "win_rate": 31.5468940316687,
-      "avg_change": -9.91239951278931
+      "win_rate": 31.43203883495146,
+      "avg_change": -9.876310679611679
     }
   },
   "sector_stats": {
