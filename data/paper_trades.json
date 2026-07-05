@@ -847,33 +847,41 @@
       "reason": "AAna v2.4 尾盘评分 95",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-04",
+      "code": "603068",
+      "name": "博通集成",
+      "action": "sell",
+      "price": 40.02,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 70.0,
+      "pnl_pct": 1.78
+    },
+    {
+      "date": "2026-07-04",
+      "code": "600316",
+      "name": "洪都航空",
+      "action": "sell",
+      "price": 29.13,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -4.0,
+      "pnl_pct": -0.14
+    },
+    {
+      "date": "2026-07-04",
+      "code": "605168",
+      "name": "三人行",
+      "action": "sell",
+      "price": 51.51,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 29.0,
+      "pnl_pct": 0.57
     }
   ],
-  "positions": {
-    "603068": {
-      "date": "2026-07-03",
-      "name": "博通集成",
-      "shares": 100,
-      "entry_price": 39.32,
-      "highest_price": 39.32,
-      "entry_date": "2026-07-03"
-    },
-    "600316": {
-      "date": "2026-07-03",
-      "name": "洪都航空",
-      "shares": 100,
-      "entry_price": 29.17,
-      "highest_price": 29.17,
-      "entry_date": "2026-07-03"
-    },
-    "605168": {
-      "date": "2026-07-03",
-      "name": "三人行",
-      "shares": 100,
-      "entry_price": 51.22,
-      "highest_price": 51.22,
-      "entry_date": "2026-07-03"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }

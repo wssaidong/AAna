@@ -333,3 +333,28 @@
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
 [2026-07-03 09:32:05] [daily_v24_sell] ✅ 完成
 [2026-07-03 09:32:05] [daily_v24_sell] ============================================================
+[2026-07-04 09:32:00] [daily_v24_sell] ============================================================
+[2026-07-04 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
+[2026-07-04 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
+[2026-07-04 09:32:00] [daily_v24_sell]   持仓 3 只: 603068, 600316, 605168
+[2026-07-04 09:32:00] [daily_v24_sell] [2/4] 取 T+1 行情 + 调用 auto_sell_v24()...
+[2026-07-04 09:32:00] [daily_v24_sell]   603068 T+1: O=40.02 H=38.95 L=40.49 C=38.58
+[2026-07-04 09:32:01] [daily_v24_sell]   600316 T+1: O=29.13 H=29.24 L=29.75 C=28.68
+[2026-07-04 09:32:01] [daily_v24_sell]   605168 T+1: O=51.51 H=51.19 L=53.13 C=48.88
+[2026-07-04 09:32:02] [daily_v24_sell]   调用 paper_trading.auto_sell_v24()...
+[v2.4] 603068 博通集成 T+1 卖 @40.02 T1_open_sell +1.58%
+[v2.4] 600316 洪都航空 T+1 卖 @29.13 T1_open_sell -0.34%
+[v2.4] 605168 三人行 T+1 卖 @51.51 T1_open_sell +0.37%
+[2026-07-04 09:32:02] [daily_v24_sell]   触发卖出 3 笔
+[2026-07-04 09:32:02] [daily_v24_sell] [3/4] 生成 Markdown 报告...
+[2026-07-04 09:32:02] [daily_v24_sell]   报告已存: /Users/cai/code/AAna/reports/2026-07-04-v24-T1卖出.md
+[2026-07-04 09:32:02] [daily_v24_sell] [4/4] 推送飞书...
+[2026-07-04 09:32:02] [daily_v24_sell] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-04 09:32:02] [daily_v24_sell] ✅ 完成
+[2026-07-04 09:32:02] [daily_v24_sell] ============================================================
