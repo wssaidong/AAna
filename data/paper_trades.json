@@ -880,8 +880,66 @@
       "reason": "止损/止盈/到期",
       "pnl": 29.0,
       "pnl_pct": 0.57
+    },
+    {
+      "date": "2026-07-06",
+      "code": "002202",
+      "name": "金风科技",
+      "action": "buy",
+      "price": 23.92,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-06",
+      "code": "002921",
+      "name": "联诚精密",
+      "action": "buy",
+      "price": 28.06,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 70",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-06",
+      "code": "603683",
+      "name": "晶华新材",
+      "action": "buy",
+      "price": 28.51,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 70",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "002202": {
+      "date": "2026-07-06",
+      "name": "金风科技",
+      "shares": 100,
+      "entry_price": 23.92,
+      "highest_price": 23.92,
+      "entry_date": "2026-07-06"
+    },
+    "002921": {
+      "date": "2026-07-06",
+      "name": "联诚精密",
+      "shares": 100,
+      "entry_price": 28.06,
+      "highest_price": 28.06,
+      "entry_date": "2026-07-06"
+    },
+    "603683": {
+      "date": "2026-07-06",
+      "name": "晶华新材",
+      "shares": 100,
+      "entry_price": 28.51,
+      "highest_price": 28.51,
+      "entry_date": "2026-07-06"
+    }
+  },
   "daily_snapshots": []
 }

@@ -660,3 +660,31 @@
 [2026-07-06 14:45:00] [daily_v24_recommend] ============================================================
 [2026-07-06 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-07-06 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600379', '002600', '002202', '000938', '002921', '600885', '603298', '603683', '603319', '603960']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 58 只
+[AAna 尾盘] 候选股票总数: 68 只
+[K线] 603319: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 3 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 3 只
+[2026-07-06 14:45:06] [daily_v24_recommend]   找到 3 只推荐
+[2026-07-06 14:45:06] [daily_v24_recommend]     002202 金风科技 score=100
+[2026-07-06 14:45:06] [daily_v24_recommend]     002921 联诚精密 score=70
+[2026-07-06 14:45:06] [daily_v24_recommend]     603683 晶华新材 score=70
+[2026-07-06 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 002202 金风科技 @23.92 100股
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 002921 联诚精密 @28.06 100股
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 603683 晶华新材 @28.51 100股
+[2026-07-06 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-06 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-06-v24-尾盘推荐.md
+[2026-07-06 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-06 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-06 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-06 14:45:06] [daily_v24_recommend] ============================================================

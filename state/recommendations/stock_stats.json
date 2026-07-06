@@ -110,6 +110,12 @@
           "change": -0.05,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -1.41,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -266,6 +272,12 @@
           "change": 0.0,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -1.49,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -379,6 +391,12 @@
           "date": "2026-07-03",
           "change": 2.76,
           "hit": true,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -4.19,
+          "hit": false,
           "sector": "semi"
         }
       ],
@@ -724,12 +742,6 @@
       "name": "科大讯飞",
       "records": [
         {
-          "date": "2026-05-19",
-          "change": 0.0,
-          "hit": false,
-          "sector": "robot"
-        },
-        {
           "date": "2026-05-21",
           "change": -0.52,
           "hit": false,
@@ -902,6 +914,12 @@
           "change": 1.36,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-06",
+          "change": 0.29,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -1070,6 +1088,12 @@
           "change": -1.51,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -0.06,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1206,6 +1230,12 @@
         {
           "date": "2026-07-02",
           "change": 0.35,
+          "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -1.43,
           "hit": false,
           "sector": "energy"
         }
@@ -1453,6 +1483,12 @@
           "date": "2026-07-03",
           "change": -0.56,
           "hit": false,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -0.41,
+          "hit": true,
           "sector": "ai_chip"
         }
       ],
@@ -1820,6 +1856,12 @@
           "change": -0.56,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-06",
+          "change": 0.52,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1915,6 +1957,12 @@
           "date": "2026-07-03",
           "change": 3.31,
           "hit": true,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-06",
+          "change": -1.77,
+          "hit": false,
           "sector": "ai_chip"
         }
       ],
@@ -2014,6 +2062,11 @@
           "date": "2026-07-03",
           "avg_change": 0.9033333333333333,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-06",
+          "avg_change": -2.8000000000000003,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -2129,6 +2182,11 @@
           "date": "2026-07-02",
           "avg_change": -0.5733333333333334,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-06",
+          "avg_change": -0.3233333333333333,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -2454,14 +2512,16 @@
           "date": "2026-07-03",
           "avg_change": 1.3699999999999999,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-06",
+          "avg_change": -0.845,
+          "hit_rate": 25.0
         }
       ]
     }
   },
   "updated": [
-    "2026-06-03",
-    "2026-06-04",
-    "2026-06-05",
     "2026-06-08",
     "2026-06-09",
     "2026-06-10",
@@ -2481,6 +2541,7 @@
     "2026-06-30",
     "2026-07-01",
     "2026-07-02",
-    "2026-07-03"
+    "2026-07-03",
+    "2026-07-06"
   ]
 }
