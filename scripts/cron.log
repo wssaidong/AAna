@@ -8399,3 +8399,6 @@ logout success!
 [AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
 [AAna] 2026-07-05 非交易日 (周末 (周日))，跳过报告生成
 [AAna] Git pull: Already up to date.
+[AAna] 新模块加载失败: No module named 'fund_tracker'，使用简化版
+[AAna] 2026-07-05 非交易日 (周末 (周日))，跳过报告生成
+[AAna] Git pull: Already up to date.
