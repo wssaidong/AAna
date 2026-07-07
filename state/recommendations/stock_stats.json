@@ -536,6 +536,12 @@
           "change": 0.0,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 2.25,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -704,6 +710,12 @@
           "change": 0.21,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.0,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -741,12 +753,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-05-21",
-          "change": -0.52,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-22",
           "change": -0.8,
@@ -920,6 +926,12 @@
           "change": 0.29,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.99,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -1094,6 +1106,12 @@
           "change": -0.06,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-07",
+          "change": -0.14,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1238,6 +1256,12 @@
           "change": -1.43,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.37,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1311,12 +1335,6 @@
     "002415": {
       "name": "海康威视",
       "records": [
-        {
-          "date": "2026-05-20",
-          "change": 0.09,
-          "hit": false,
-          "sector": "ai_app"
-        },
         {
           "date": "2026-05-22",
           "change": -0.53,
@@ -1490,6 +1508,12 @@
           "change": -0.41,
           "hit": true,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.83,
+          "hit": true,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -1628,6 +1652,12 @@
           "change": 0.0,
           "hit": true,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.43,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -1740,6 +1770,12 @@
         {
           "date": "2026-07-02",
           "change": 0.12,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.0,
           "hit": false,
           "sector": "robot"
         }
@@ -1861,6 +1897,12 @@
           "date": "2026-07-06",
           "change": 0.52,
           "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-07",
+          "change": 0.0,
+          "hit": false,
           "sector": "energy"
         }
       ],
@@ -2187,6 +2229,11 @@
           "date": "2026-07-06",
           "avg_change": -0.3233333333333333,
           "hit_rate": 66.66666666666666
+        },
+        {
+          "date": "2026-07-07",
+          "avg_change": 0.07666666666666666,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -2302,6 +2349,11 @@
           "date": "2026-07-02",
           "avg_change": -0.135,
           "hit_rate": 25.0
+        },
+        {
+          "date": "2026-07-07",
+          "avg_change": 0.81,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -2427,6 +2479,11 @@
           "date": "2026-07-03",
           "avg_change": 0.0,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-07-07",
+          "avg_change": 0.63,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -2542,6 +2599,7 @@
     "2026-07-01",
     "2026-07-02",
     "2026-07-03",
-    "2026-07-06"
+    "2026-07-06",
+    "2026-07-07"
   ]
 }
