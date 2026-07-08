@@ -946,8 +946,47 @@
       "reason": "止损/止盈/到期",
       "pnl": 49.0,
       "pnl_pct": 1.72
+    },
+    {
+      "date": "2026-07-08",
+      "code": "600895",
+      "name": "张江高科",
+      "action": "buy",
+      "price": 33.81,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-08",
+      "code": "603722",
+      "name": "阿科力",
+      "action": "buy",
+      "price": 41.39,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 80",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600895": {
+      "date": "2026-07-08",
+      "name": "张江高科",
+      "shares": 100,
+      "entry_price": 33.81,
+      "highest_price": 33.81,
+      "entry_date": "2026-07-08"
+    },
+    "603722": {
+      "date": "2026-07-08",
+      "name": "阿科力",
+      "shares": 100,
+      "entry_price": 41.39,
+      "highest_price": 41.39,
+      "entry_date": "2026-07-08"
+    }
+  },
   "daily_snapshots": []
 }

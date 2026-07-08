@@ -21,7 +21,12 @@ from datetime import datetime
 import requests
 
 # ── 新模块引入 ──────────────────────────────────────────────
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+DATA_DIR = PROJECT_ROOT / "data"
+for _p in (str(SCRIPT_DIR), str(DATA_DIR), str(PROJECT_ROOT)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 try:
     from market_sentiment import (
         get_market_sentiment, get_hot_sectors,
@@ -40,6 +45,9 @@ try:
     NEW_MODULES = True
 except ImportError as e:
     print(f"[AAna] 新模块加载失败: {e}，使用简化版")
+    WEIGHT_TECH = 0.60
+    WEIGHT_FUND = 0.40
+    WEIGHT_MONEYFLOW = 0.00
     NEW_MODULES = False
 
 PROJECT_DIR = os.path.expanduser("~/code/AAna")
@@ -525,6 +533,78 @@ def format_change(change_pct):
     emoji = "🔴" if change_pct > 0 else "🟢"
     return f"{emoji} {change_pct:+.2f}%"
 
+
+# generate_report.py 的股票池 all_codes 只包含个股，不包含指数代码。
+# 过去直接 prices.get('000001') 会永远取空，导致报告渲染“上证指数：数据待获取 +0.00%”。
+# 指数源统一复用 market_sentiment.get_index_data()：腾讯 qt.gtimg.cn 首选 + 东财备用 + sanity check。
+INDEX_DISPLAY_ORDER = [
+    ("000001", "上证指数"),
+    ("399001", "深证成指"),
+    ("399006", "创业板指"),
+    ("000300", "沪深300"),
+]
+INDEX_NAME_TO_CODE = {
+    "上证指数": "000001",
+    "深证成指": "399001",
+    "创业板指": "399006",
+    "创业板": "399006",
+    "沪深300": "000300",
+    # 兼容旧报告模板；market_sentiment 当前默认不返回科创50，但如果后续返回也能入 prices。
+    "科创50": "000688",
+}
+
+
+def refresh_index_prices_from_market_sentiment(prices, get_index_data_fn=None):
+    """用 market_sentiment.get_index_data() 补齐报告渲染所需指数价格。
+
+    Args:
+        prices: generate_report 内部价格字典，会原地写入指数项。
+        get_index_data_fn: 测试注入用；默认导入 market_sentiment.get_index_data。
+
+    Returns:
+        int: 成功写入/更新的指数数量。
+    """
+    if get_index_data_fn is None:
+        from market_sentiment import get_index_data as get_index_data_fn
+
+    updated = 0
+    for idx in get_index_data_fn() or []:
+        name = str(idx.get('name', '')).strip()
+        code = INDEX_NAME_TO_CODE.get(name)
+        if not code:
+            continue
+        try:
+            price = float(idx.get('price', 0) or 0)
+            change_pct = float(idx.get('change', idx.get('change_pct', 0)) or 0)
+        except (TypeError, ValueError):
+            continue
+        if price <= 0:
+            continue
+        prices[code] = {
+            'code': code,
+            'name': name,
+            'price': price,
+            'change_pct': change_pct,
+            'amount': idx.get('amount', 0),
+        }
+        updated += 1
+    return updated
+
+
+def format_market_overview_rows(prices):
+    """渲染大盘概览表格行，避免深证/创业板/沪深300硬编码为 '-'。"""
+    rows = []
+    for code, name in INDEX_DISPLAY_ORDER:
+        info = prices.get(code, {}) or {}
+        price = info.get('price') or 0
+        change_pct = info.get('change_pct', 0)
+        if price > 0:
+            status = '🔴 上涨' if change_pct > 0 else ('🟢 下跌' if change_pct < 0 else '⚪ 持平')
+            rows.append("| {} | {:.2f} | {} |".format(name, price, status))
+        else:
+            rows.append("| {} | 数据待获取 | - |".format(name))
+    return "\n".join(rows) + "\n\n"
+
 def get_sector_emoji(name):
     """根据股票名称返回板块emoji"""
     if any(k in name for k in ['寒武纪', '海光', '中际', '新易盛', '光模块']):
@@ -668,6 +748,12 @@ def generate_report():
     print(f"[AAna] 获取 {len(all_codes)} 只股票数据...")
     prices = get_stock_data_sina(all_codes)
 
+    try:
+        idx_count = refresh_index_prices_from_market_sentiment(prices)
+        print(f"  [指数] 已补拉 {idx_count}/{len(INDEX_DISPLAY_ORDER)} 个指数")
+    except Exception as e:
+        print(f"  [指数] market_sentiment.get_index_data() 失败: {e}（不影响报告生成）")
+
     # 合并板块信息
     for cat_id, cat in stock_pool.items():
         cat['stocks'] = []
@@ -800,8 +886,17 @@ def generate_report():
     # ── 关键价位：上证指数当前价格/涨跌幅 ───────────────────
     sh_price = prices.get('000001', {}).get('price') or 0
     sh_change = prices.get('000001', {}).get('change_pct', 0)
+    # 2026-07-03 修复（4 天 P2）：报告涨跌幅=昨收涨跌幅 → 标题加副标题
+    # 8:00-9:30 早盘 cron 跑时市场未开盘，报告"涨跌幅"实际是昨收涨跌幅。
+    # 开盘后用户看会发现与盘中价不符 → 副标题明示
+    from datetime import time as _dt_time
+    is_premarket = datetime.now().time() < _dt_time(9, 30)
+    subtitle = ""
+    if is_premarket:
+        subtitle = "> ⚠️ **早盘副标题（8:00-9:30 报告专用）**：本报告\"涨跌幅\"=**昨收涨跌幅**（市场未开盘，无今日实时数据）。开盘后请以券商 App 实时行情为准。\n\n"
     header = (
         "# A股选股报告 — {} v2.5\n\n".format(today) +
+        subtitle +
         "> AAna 智能选股系统 v2.5 | 仅供参考，不构成投资建议\n"
         "> **生成时间：** {}\n".format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +
         "> **情绪评分：** {}（{}）| **上证指数：** {} {:+.2f}% | **建议仓位：** {}\n\n".format(
@@ -819,14 +914,8 @@ def generate_report():
         "---\n\n" +
         sentiment_section +
         "| 指标 | 数值 | 状态 |\n"
-        "|:----:|:----:|:----:|\n"
-        "| 上证指数 | {} | {} |\n".format(
-            prices.get('000001', {}).get('price') or '数据待获取',
-            '\U0001f534 上涨' if prices.get('000001', {}).get('change_pct', 0) > 0 else '\U0001f7e2 下跌'
-        ) +
-        "| 深证成指 | - | - |\n"
-        "| 创业板 | - | - |\n"
-        "| 科创50 | - | - |\n\n"
+        "|:----:|:----:|:----:|\n" +
+        format_market_overview_rows(prices) +
         "**市场情绪：** {} | **建议仓位：** {}\n\n".format(
             sentiment.get('label', '乐观') if NEW_MODULES else '乐观',
             pos_ratio_str
@@ -1390,14 +1479,15 @@ if __name__ == "__main__":
 
 
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
     "score_threshold": 60,
     "hold_days": 1,
     "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
-    "overall_win_rate": 31.2,
-    "total_records": 830,
-    "generated_at": "2026-07-07T20:00:37.058136",
+    "overall_win_rate": 31.1,
+    "total_records": 832,
+    "generated_at": "2026-07-08T20:00:56.035066",
 }
 # === REC_OPTIMIZER_TUNING_END ===

@@ -8584,3 +8584,9 @@ logout success!
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-07-07-选股报告.md
 [AAna v2.5] 生成 2026-07-07 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-07-07_09_00.json，跳过复盘报告
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 43, in <module>
+    from fund_tracker import get_tracker_report as get_fund_tracker_report
+  File "/Users/cai/code/AAna/data/fund_tracker.py", line 46, in <module>
+    def get_nav(code: str) -> dict | None:
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
