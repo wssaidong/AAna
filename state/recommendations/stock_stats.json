@@ -122,6 +122,12 @@
           "change": -0.11,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-09",
+          "change": -1.48,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -290,6 +296,12 @@
           "change": -0.93,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-09",
+          "change": -0.58,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -414,6 +426,12 @@
         {
           "date": "2026-07-08",
           "change": 0.09,
+          "hit": false,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-07-09",
+          "change": -3.67,
           "hit": false,
           "sector": "semi"
         }
@@ -563,6 +581,12 @@
         },
         {
           "date": "2026-07-08",
+          "change": 0.0,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-07-09",
           "change": 0.0,
           "hit": false,
           "sector": "robot"
@@ -746,6 +770,12 @@
           "change": 0.54,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-09",
+          "change": -0.87,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -783,12 +813,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-05-25",
-          "change": -0.73,
-          "hit": true,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-26",
           "change": 0.7,
@@ -962,6 +986,12 @@
           "change": -0.84,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-09",
+          "change": 0.42,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -1142,6 +1172,12 @@
           "change": -0.14,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-09",
+          "change": 1.5,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1291,6 +1327,12 @@
           "date": "2026-07-07",
           "change": 0.37,
           "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-09",
+          "change": 0.27,
+          "hit": false,
           "sector": "energy"
         }
       ],
@@ -1814,6 +1856,12 @@
           "change": 2.52,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-09",
+          "change": 3.4,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -1938,6 +1986,12 @@
         {
           "date": "2026-07-07",
           "change": 0.0,
+          "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-09",
+          "change": 0.47,
           "hit": false,
           "sector": "energy"
         }
@@ -2156,6 +2210,11 @@
           "date": "2026-07-08",
           "avg_change": -0.010000000000000002,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-07-09",
+          "avg_change": -1.9100000000000001,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -2281,6 +2340,11 @@
           "date": "2026-07-07",
           "avg_change": 0.07666666666666666,
           "hit_rate": 66.66666666666666
+        },
+        {
+          "date": "2026-07-09",
+          "avg_change": 0.7466666666666667,
+          "hit_rate": 33.33333333333333
         }
       ]
     },
@@ -2406,6 +2470,11 @@
           "date": "2026-07-08",
           "avg_change": 1.02,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-09",
+          "avg_change": 0.7374999999999999,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -2636,7 +2705,6 @@
     }
   },
   "updated": [
-    "2026-06-08",
     "2026-06-09",
     "2026-06-10",
     "2026-06-11",
@@ -2658,6 +2726,7 @@
     "2026-07-03",
     "2026-07-06",
     "2026-07-07",
-    "2026-07-08"
+    "2026-07-08",
+    "2026-07-09"
   ]
 }
