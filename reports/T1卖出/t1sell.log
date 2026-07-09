@@ -395,3 +395,26 @@
 [2026-07-08 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
 [2026-07-08 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
 [2026-07-08 09:32:00] [daily_v24_sell]   ⚠️ 无持仓，跳过
+[2026-07-09 09:32:00] [daily_v24_sell] ============================================================
+[2026-07-09 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
+[2026-07-09 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
+[2026-07-09 09:32:00] [daily_v24_sell]   持仓 2 只: 600895, 603722
+[2026-07-09 09:32:00] [daily_v24_sell] [2/4] 取 T+1 行情 + 调用 auto_sell_v24()...
+[2026-07-09 09:32:00] [daily_v24_sell]   600895 T+1: O=33.92 H=33.96 L=34.09 C=33.77
+[2026-07-09 09:32:00] [daily_v24_sell]   603722 T+1: O=39.95 H=40.73 L=41.86 C=39.95
+[2026-07-09 09:32:01] [daily_v24_sell]   调用 paper_trading.auto_sell_v24()...
+[v2.4] 600895 张江高科 T+1 卖 @33.92 T1_open_sell +0.13%
+[v2.4] 603722 阿科力 T+1 卖 @39.95 T1_open_sell -3.68%
+[2026-07-09 09:32:01] [daily_v24_sell]   触发卖出 2 笔
+[2026-07-09 09:32:01] [daily_v24_sell] [3/4] 生成 Markdown 报告...
+[2026-07-09 09:32:01] [daily_v24_sell]   报告已存: /Users/cai/code/AAna/reports/2026-07-09-v24-T1卖出.md
+[2026-07-09 09:32:01] [daily_v24_sell] [4/4] 推送飞书...
+[2026-07-09 09:32:01] [daily_v24_sell] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-09 09:32:01] [daily_v24_sell] ✅ 完成
+[2026-07-09 09:32:01] [daily_v24_sell] ============================================================
