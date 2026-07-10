@@ -162,31 +162,76 @@ def save_morning_snapshot(prices):
 # Git pull: 每次运行前拉取最新代码
 # ============================================
 def get_historical_kline(code, count=60):
-    """获取历史 K 线 - 使用 BaoStock"""
+    """获取历史 K 线
+
+    v2.5.1 修复（2026-07-08）：弃用 baostock（50 只股票 50 次 login/logout 慢路径 5+ 分钟）。
+    改用东财 push2his.eastmoney.com（重试 3 次）+ 新浪 K 线（fallback）。
+    返回数据格式保持 baostock 兼容：list of [date,open,high,low,close,volume]
+    """
+    import requests, time
+
+    # ─── 源 1: 东财 push2his（首选，重试 3 次）───
     try:
-        import baostock as bs
-        bs.login()
-        
-        # BaoStock format
-        bs_code = f"sh.{code}" if code.startswith("6") else f"sz.{code}"
-        rs = bs.query_history_k_data_plus(
-            bs_code,
-            "date,open,high,low,close,volume",
-            start_date='2024-01-01',  # 提前获取足够历史数据
-            end_date=datetime.now().strftime('%Y-%m-%d'),
-            frequency="d"
+        secid = f"1.{code}" if code.startswith(("5", "6", "9")) else f"0.{code}"
+        url = (
+            f"https://push2his.eastmoney.com/api/qt/stock/kline/get"
+            f"?secid={secid}&fields1=f1,f2&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&end=20500101"
         )
-        
-        data = []
-        while rs.next():
-            data.append(rs.get_row_data())
-        bs.logout()
-        
-        if data:
-            return data[-count:]  # 返回最近 count 条
-        return None
+        for attempt in range(3):
+            try:
+                if attempt > 0:
+                    time.sleep(0.5 * attempt)  # 退避 0.5s / 1.0s
+                resp = requests.get(url, headers={
+                    'User-Agent': 'Mozilla/5.0',
+                    'Referer': 'https://quote.eastmoney.com/'
+                }, timeout=8)
+                data = resp.json().get("data", {})
+                klines = data.get("klines", [])
+                if klines:
+                    # 东财 "2026-07-08,open,close,high,low,volume" → baostock 兼容格式
+                    result = []
+                    for line in klines[:count]:
+                        parts = line.split(",")
+                        if len(parts) < 6: continue
+                        # date,open,high,low,close,volume
+                        result.append([parts[0], parts[1], parts[3], parts[4], parts[2], parts[5]])
+                    if result:
+                        return result
+            except Exception as _e:
+                if attempt == 2:  # 最后一次仍失败，让外层 except 接管
+                    raise
     except Exception as e:
-        print(f"[BaoStock] Error for {code}: {e}")
+        # 东财彻底失败（瞬时风控/网络），fallback 到新浪
+        pass
+
+    # ─── 源 2: 新浪 K 线（已知可用，fallback）───
+    try:
+        sina_code = f"sh{code}" if code.startswith(("5", "6", "9")) else f"sz{code}"
+        url = "http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData"
+        resp = requests.get(url, params={
+            'symbol': sina_code, 'scale': 240, 'ma': 5, 'datalen': count,
+        }, headers={
+            'Referer': 'http://finance.sina.com.cn',
+            'User-Agent': 'Mozilla/5.0',
+        }, timeout=8)
+        rows = resp.json()
+        if not rows:
+            return None
+        # 新浪返回: [{day, open, high, low, close, volume}, ...]
+        # 转 baostock 兼容: [date, open, high, low, close, volume]
+        result = []
+        for r in rows[:count]:
+            result.append([
+                r.get('day', ''),
+                r.get('open', ''),
+                r.get('high', ''),
+                r.get('low', ''),
+                r.get('close', ''),
+                r.get('volume', ''),
+            ])
+        return result if result else None
+    except Exception as e:
+        print(f"[K线] 新浪 fallback 也失败 {code}: {e}")
         return None
 
 def calculate_ema(data, period):
