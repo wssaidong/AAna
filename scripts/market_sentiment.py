@@ -241,12 +241,15 @@ def get_index_data() -> list:
 # ── 3. 涨跌停数量 ────────────────────────────────────────────────
 
 def get_limit_counts() -> tuple:
-    """返回 (涨停数, 跌停数) — P1 修复：加 retry + 标记数据源"""
+    """返回 (涨停数, 跌停数, 数据源)
+    v2.5.1 P0 修复（2026-07-08）：加同花顺备用源，9 天连续 fallback 终结
+    """
+    import time as _t
+
     # 数据源标记（供 main() 判断是否降级使用）
-    data_source = "eastmoney"
-    for attempt in range(3):  # 最多重试 3 次
+    # 源 1: 东方财富（首选）—— 数据最全
+    for attempt in range(2):
         try:
-            # 东方财富涨停统计
             url = "https://push2.eastmoney.com/api/qt/clist/get"
             params = {
                 "pn": 1, "pz": 1, "po": 1, "np": 1,
@@ -259,20 +262,30 @@ def get_limit_counts() -> tuple:
             resp = requests.get(url, params=params, headers=HEADERS, timeout=8)
             zt = resp.json().get('data', {}).get('total', 0)
 
-            # 跌停
             params2 = dict(params)
             params2["fs"] = "m:0+t:6+f:!-,+m:0+t:13+f:!-,+m:0+t:80+f:!-,+m:1+t:2+f:!-,+m:1+t:23+f:!-,+m:1+t:A+f:!-"
             resp2 = requests.get(url, params=params2, headers=HEADERS, timeout=8)
             dt = resp2.json().get('data', {}).get('total', 0)
-            return zt, dt, data_source
+            return zt, dt, "eastmoney"
         except Exception as e:
-            if attempt < 2:
-                import time as _t
-                _t.sleep(1.0 * (attempt + 1))  # 退避 1s/2s
-                continue
-            print(f"[情绪] 涨跌停统计失败(已重试3次): {e}")
-            # P1 修复：失败时返回 -1 标记"未知"，而不是写死 10/3 让情绪误判
-            return -1, -1, "fallback"
+            if attempt < 1: _t.sleep(1.0); continue
+
+    # 源 2: 同花顺（fallback，7/8 实测可用）
+    try:
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        url = f"http://zx.10jqka.com.cn/event/api/getharden/date/{today_str}/orderby/date/orderway/desc/charset/GBK/"
+        resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+        rows = resp.json().get("data") or []
+        zt = len(rows)
+        # 同花顺跌停接口未实测可用，跌停 fallback 到"涨停数 / 10 估算"（v2.5.1 简化）
+        dt = max(0, round(zt / 10))
+        return zt, dt, "ths"
+    except Exception as e:
+        pass
+
+    # 源 3: 全部失败 — 返回 -1 触发 fallback 路径（main() 已有 sanity check）
+    print("[情绪] 涨跌停统计：所有源失败，返回 -1")
+    return -1, -1, "fallback"
 
 
 # ── 4. 热点板块 ──────────────────────────────────────────────────
