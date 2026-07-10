@@ -453,9 +453,11 @@ def get_enhanced_stock_pool(include_zt: bool = True) -> list:
 
     pool = []
 
-    # 来源1：新浪涨幅榜
+    # 来源1：新浪涨幅榜（2026-07-10 修复 num 200→800：7/10 普涨大阳日
+    # 7/9 涨幅榜前 200 只全部 +8.6% 以上，filter_stocks 上限 7% 全过滤掉，
+    # 导致 dynamic_stocks 0 只 → Top10 空。800 只后能看到 -3%~+7% 的回调股）
     try:
-        raw = get_sina_top_gainers(200)
+        raw = get_sina_top_gainers(800)
         filtered = filter_stocks(raw)
         for s in filtered:
             s['_source'] = '涨幅榜'

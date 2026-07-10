@@ -8602,3 +8602,9 @@ Traceback (most recent call last):
   File "/Users/cai/code/AAna/data/fund_tracker.py", line 46, in <module>
     def get_nav(code: str) -> dict | None:
 TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/scripts/generate_report.py", line 43, in <module>
+    from fund_tracker import get_tracker_report as get_fund_tracker_report
+  File "/Users/cai/code/AAna/data/fund_tracker.py", line 46, in <module>
+    def get_nav(code: str) -> dict | None:
+TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
