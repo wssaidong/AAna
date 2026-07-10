@@ -164,7 +164,7 @@ def generate_full_report(date_str):
     hot_yest = ths_hot(_yesterday(date_str))
     ct = theme_counter(hot)
     cy = theme_counter(hot_yest)
-    themes = [t for t, _ in ct.most_common(10)]
+    themes = [t for t, _ in ct.most_common() if t != "ST板块"][:10]
 
     print(f"[5/5] 计算候选池命中率…")
     top10_codes = [c for c, _, _ in top10]
@@ -194,6 +194,9 @@ def generate_full_report(date_str):
                and "*ST" not in h.get("name", "")
                and "ST" not in h.get("name", "")
                and h.get("change_pct", 0) >= 9.5]  # 至少涨停
+    # ⚠️ v1.17 pitfall: 必须先按 20cm 优先 + 涨幅降序预排序，再按题材去重；
+    # 否则 priority 先命中主板 10cm 会挤掉创业板/科创板 20cm 涨停。
+    outside.sort(key=lambda h: (-(1 if h.get("market") in (33, 48) else 0), -h.get("change_pct", 0)))
     # ⚠️ v1.5 pitfall: priority 拓宽至 20 项 + 动态按当日热度调整
     priority = ["AI智算", "算力", "半导体设备", "固态电池", "稀土永磁", "低空经济",
                 "液冷服务器", "PCB概念", "先进封装", "MLCC", "存储芯片", "机器人",
@@ -203,22 +206,21 @@ def generate_full_report(date_str):
     dynamic_top = themes[:5] if themes else []
     final_priority = list(dict.fromkeys(dynamic_top + priority))  # 去重保序
     selected = []
-    seen = set()
-    for theme in final_priority:
+    used_theme = set()
+    for h in outside:
         if len(selected) >= 5:
             break
-        for h in outside:
-            if h["code"] in seen:
-                continue
-            if theme in h.get("reason", ""):
-                # ⚠️ v1.9 pitfall: 优先选 20cm 涨停 (创业板/科创板 33/48)
-                market = h.get("market")
-                h["_is_20cm"] = market in (33, 48)
-                selected.append((theme, h))
-                seen.add(h["code"])
-                break
-    # ⚠️ v1.9 pitfall: 排序 — 20cm 涨停优先,其次按涨幅降序
-    selected.sort(key=lambda x: (x[1].get("_is_20cm", False), x[1].get("change_pct", 0)), reverse=True)
+        reason = h.get("reason", "")
+        matched = next((theme for theme in final_priority if theme in reason), None)
+        if not matched:
+            continue
+        # 先按 20cm 优先排序后的股票流逐个选；同一题材只取一只，保证题材多样性。
+        if matched in used_theme:
+            continue
+        market = h.get("market")
+        h["_is_20cm"] = market in (33, 48)
+        selected.append((matched, h))
+        used_theme.add(matched)
     selected = selected[:5]
 
     # 14:45 vs 15:00 时点差警示（v1.3 必跑 + v1.6/v1.13 路径修复）
@@ -335,6 +337,8 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
     md += "> 注：报告 08:03 生成，'baseline' 实为昨日(昨-1)收盘涨跌幅\n\n"
     md += "| 代码 | 名称 | baseline | 今日实际 | Δ | 评估 |\n"
     md += "|:----:|:----:|:------:|:------:|:----:|:----:|\n"
+    if not hit_rows:
+        md += "| ⚠️ | 上游报告缺失 | N/A | N/A | N/A | 无候选池评估 |\n"
     for code, name, baseline, actual, delta in hit_rows:
         if delta >= 3:
             ev = "✅ 强势延续"
@@ -346,9 +350,13 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
             ev = "❌ 高位回吐"
         md += f"| {code} | {name} | {baseline:+.2f}% | {actual:+.2f}% | {delta:+.2f}% | {ev} |\n"
 
-    md += f"\n📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/max(len(hit_rows),1)*100:.1f}%\n"
-    md += f"- 整体均值：{avg:+.2f}% | 正：{avg_pos:+.2f}% | 负：{avg_neg:+.2f}%\n"
-    md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}%**\n"
+    if hit_rows:
+        md += f"\n📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/len(hit_rows)*100:.1f}%\n"
+        md += f"- 整体均值：{avg:+.2f}% | 正：{avg_pos:+.2f}% | 负：{avg_neg:+.2f}%\n"
+        md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}%**\n"
+    else:
+        md += "\n⚠️ **候选池评估：** 上游选股报告 Top10 为空，本次无候选池命中率评估\n"
+        md += f"- 大盘参考：上证 {sh_pct:+.2f}%；候选池超额：**N/A**\n"
 
     md += "\n━━━ **新晋异动 Top5** ━━━\n\n"
     for i, (theme, h) in enumerate(selected, 1):
@@ -430,6 +438,8 @@ def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
 | 排名 | 代码 | 名称 | baseline (昨收) | 今日实际 | Δ | 评估 |
 |:----:|:----:|:----:|:------:|:------:|:----:|:----:|
 """
+    if not hit_rows:
+        md += "| ⚠️ | N/A | 上游报告缺失 | N/A | N/A | N/A | 无候选池评估 |\n"
     for i, (code, name, baseline, actual, delta) in enumerate(hit_rows, 1):
         if delta >= 3:
             ev = "✅ 强势延续"
@@ -441,15 +451,25 @@ def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
             ev = "❌ 高位回吐"
         md += f"| {i} | {code} | {name} | {baseline:+.2f}% | {actual:+.2f}% | {delta:+.2f}% | {ev} |\n"
 
-    md += f"""
+    if hit_rows:
+        md += f"""
 **统计：**
-- 命中率：{len(positives)}/{len(hit_rows)} = {len(positives)/max(len(hit_rows),1)*100:.1f}%
+- 命中率：{len(positives)}/{len(hit_rows)} = {len(positives)/len(hit_rows)*100:.1f}%
 - 整体均值：{avg:+.2f}%
 - 正收益均值：{avg_pos:+.2f}%（{len(positives)} 只）
 - 负收益均值：{avg_neg:+.2f}%（{len(negatives)} 只）
-- **vs 上证 +{sh_pct:.2f}% 超额：{avg - sh_pct:+.2f}%**
-- vs 创业板 +{cyb_pct:.2f}% 超额：{avg - cyb_pct:+.2f}%
+- **vs 上证 {sh_pct:+.2f}% 超额：{avg - sh_pct:+.2f}%**
+- vs 创业板 {cyb_pct:+.2f}% 超额：{avg - cyb_pct:+.2f}%
+"""
+    else:
+        md += f"""
+**统计：**
+- ⚠️ 上游选股报告 Top10 为空，本次无候选池命中率评估
+- 大盘参考：上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}%
+- 候选池超额：**N/A**
+"""
 
+    md += f"""
 ---
 
 ## 四、归因分析
