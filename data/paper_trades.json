@@ -1034,41 +1034,162 @@
       "reason": "AAna v2.4 尾盘评分 95",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600171",
+      "name": "上海贝岭",
+      "action": "sell",
+      "price": 29.38,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 88.0,
+      "pnl_pct": 3.09
+    },
+    {
+      "date": "2026-07-11",
+      "code": "603690",
+      "name": "至纯科技",
+      "action": "sell",
+      "price": 34.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 41.0,
+      "pnl_pct": 1.22
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600641",
+      "name": "先导基电",
+      "action": "sell",
+      "price": 41.56,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -145.0,
+      "pnl_pct": -3.37
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600961",
+      "name": "株冶集团",
+      "action": "sell",
+      "price": 27.58,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 128.0,
+      "pnl_pct": 4.87
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600845",
+      "name": "宝信软件",
+      "action": "buy",
+      "price": 20.0,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600171",
+      "name": "上海贝岭",
+      "action": "buy",
+      "price": 28.28,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "code": "603690",
+      "name": "至纯科技",
+      "action": "buy",
+      "price": 33.32,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600641",
+      "name": "先导基电",
+      "action": "buy",
+      "price": 42.7,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-11",
+      "code": "600961",
+      "name": "株冶集团",
+      "action": "buy",
+      "price": 26.52,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 95",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-12",
+      "code": "600845",
+      "name": "宝信软件",
+      "action": "sell",
+      "price": 19.82,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -18.0,
+      "pnl_pct": -0.9
+    },
+    {
+      "date": "2026-07-12",
+      "code": "600171",
+      "name": "上海贝岭",
+      "action": "sell",
+      "price": 29.38,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 110.0,
+      "pnl_pct": 3.89
+    },
+    {
+      "date": "2026-07-12",
+      "code": "603690",
+      "name": "至纯科技",
+      "action": "sell",
+      "price": 34.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 68.0,
+      "pnl_pct": 2.04
+    },
+    {
+      "date": "2026-07-12",
+      "code": "600641",
+      "name": "先导基电",
+      "action": "sell",
+      "price": 41.56,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -114.0,
+      "pnl_pct": -2.67
+    },
+    {
+      "date": "2026-07-12",
+      "code": "600961",
+      "name": "株冶集团",
+      "action": "sell",
+      "price": 27.58,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 106.0,
+      "pnl_pct": 4.0
     }
   ],
-  "positions": {
-    "600171": {
-      "date": "2026-07-10",
-      "name": "上海贝岭",
-      "shares": 100,
-      "entry_price": 28.5,
-      "highest_price": 28.5,
-      "entry_date": "2026-07-10"
-    },
-    "603690": {
-      "date": "2026-07-10",
-      "name": "至纯科技",
-      "shares": 100,
-      "entry_price": 33.59,
-      "highest_price": 33.59,
-      "entry_date": "2026-07-10"
-    },
-    "600641": {
-      "date": "2026-07-10",
-      "name": "先导基电",
-      "shares": 100,
-      "entry_price": 43.01,
-      "highest_price": 43.01,
-      "entry_date": "2026-07-10"
-    },
-    "600961": {
-      "date": "2026-07-10",
-      "name": "株冶集团",
-      "shares": 100,
-      "entry_price": 26.3,
-      "highest_price": 26.3,
-      "entry_date": "2026-07-10"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }

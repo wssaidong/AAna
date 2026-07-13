@@ -4,6 +4,8 @@ AAna 基金持仓追踪模块
 数据来源: fundgz.1234567.com.cn (天天基金实时估值)
 支持: 定投记录、每日净值更新、收益计算、持仓报告
 """
+from __future__ import annotations
+
 import sys
 import json
 import os
