@@ -478,3 +478,7 @@
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
 [2026-07-12 09:32:03] [daily_v24_sell] ✅ 完成
 [2026-07-12 09:32:03] [daily_v24_sell] ============================================================
+[2026-07-13 09:32:00] [daily_v24_sell] ============================================================
+[2026-07-13 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
+[2026-07-13 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
+[2026-07-13 09:32:00] [daily_v24_sell]   ⚠️ 无持仓，跳过
