@@ -1188,8 +1188,47 @@
       "reason": "止损/止盈/到期",
       "pnl": 106.0,
       "pnl_pct": 4.0
+    },
+    {
+      "date": "2026-07-13",
+      "code": "001229",
+      "name": "魅视科技",
+      "action": "buy",
+      "price": 46.51,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-13",
+      "code": "002558",
+      "name": "巨人网络",
+      "action": "buy",
+      "price": 28.28,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "001229": {
+      "date": "2026-07-13",
+      "name": "魅视科技",
+      "shares": 100,
+      "entry_price": 46.51,
+      "highest_price": 46.51,
+      "entry_date": "2026-07-13"
+    },
+    "002558": {
+      "date": "2026-07-13",
+      "name": "巨人网络",
+      "shares": 100,
+      "entry_price": 28.28,
+      "highest_price": 28.28,
+      "entry_date": "2026-07-13"
+    }
+  },
   "daily_snapshots": []
 }
