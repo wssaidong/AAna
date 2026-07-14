@@ -870,3 +870,6 @@
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
 [2026-07-13 14:45:06] [daily_v24_recommend] ✅ 完成
 [2026-07-13 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-14 14:45:01] [daily_v24_recommend] ============================================================
+[2026-07-14 14:45:01] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-14 14:45:01] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...

@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-07-14T14:45:02.080364",
+  "data": {
+    "timestamp": "2026-07-14T14:45:02.080010",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 10.54,
+        "change": 0.09
+      },
+      {
+        "name": "深证成指",
+        "price": 14522.854,
+        "change": -0.07
+      },
+      {
+        "name": "创业板指",
+        "price": 3723.517,
+        "change": -0.16
+      },
+      {
+        "name": "科创50",
+        "price": 29.65,
+        "change": -1.3
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "半导体设备",
+        "avg_change": 2.64,
+        "logic": "AI芯片国产替代+政策驱动"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": 0.32499999999999996,
+        "logic": "端侧AI+智能汽车"
+      },
+      {
+        "name": "AI算力/芯片",
+        "avg_change": 0.245,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": 0.15250000000000002,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "储能/绿电",
+        "avg_change": 0.10333333333333335,
+        "logic": "碳中和+装机旺季"
+      }
+    ],
+    "strong_stocks": [
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "change": 6.07,
+        "rel_change": 6.430000000000001,
+        "price": 15.73,
+        "stop_loss": "-10%",
+        "risk": "中",
+        "logic": "AI芯片国产替代+政策驱动"
+      }
+    ],
+    "pullback_stocks": [],
+    "trend": "➡️ 尾盘横盘整理"
+  }
+}
