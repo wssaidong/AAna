@@ -482,3 +482,26 @@
 [2026-07-13 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
 [2026-07-13 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
 [2026-07-13 09:32:00] [daily_v24_sell]   ⚠️ 无持仓，跳过
+[2026-07-14 09:32:00] [daily_v24_sell] ============================================================
+[2026-07-14 09:32:00] [daily_v24_sell] AAna v2.4 T+1 开盘卖出启动 (dry_run=False)
+[2026-07-14 09:32:00] [daily_v24_sell] [1/4] 读 paper_trades.json 持仓...
+[2026-07-14 09:32:00] [daily_v24_sell]   持仓 2 只: 001229, 002558
+[2026-07-14 09:32:00] [daily_v24_sell] [2/4] 取 T+1 行情 + 调用 auto_sell_v24()...
+[2026-07-14 09:32:00] [daily_v24_sell]   001229 T+1: O=45.89 H=43.87 L=46.98 C=43.24
+[2026-07-14 09:32:00] [daily_v24_sell]   002558 T+1: O=28.05 H=28.04 L=28.26 C=27.73
+[2026-07-14 09:32:01] [daily_v24_sell]   调用 paper_trading.auto_sell_v24()...
+[v2.4] 001229 魅视科技 T+1 卖 @45.89 T1_open_sell -1.53%
+[v2.4] 002558 巨人网络 T+1 卖 @28.05 T1_open_sell -1.01%
+[2026-07-14 09:32:01] [daily_v24_sell]   触发卖出 2 笔
+[2026-07-14 09:32:01] [daily_v24_sell] [3/4] 生成 Markdown 报告...
+[2026-07-14 09:32:01] [daily_v24_sell]   报告已存: /Users/cai/code/AAna/reports/2026-07-14-v24-T1卖出.md
+[2026-07-14 09:32:01] [daily_v24_sell] [4/4] 推送飞书...
+[2026-07-14 09:32:01] [daily_v24_sell] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-14 09:32:01] [daily_v24_sell] ✅ 完成
+[2026-07-14 09:32:01] [daily_v24_sell] ============================================================
