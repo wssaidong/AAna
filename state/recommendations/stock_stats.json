@@ -134,6 +134,12 @@
           "change": 6.07,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-15",
+          "change": -0.2,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -314,6 +320,12 @@
           "change": 0.78,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-15",
+          "change": -0.17,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -451,6 +463,12 @@
           "date": "2026-07-14",
           "change": 1.07,
           "hit": true,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-07-15",
+          "change": -2.19,
+          "hit": false,
           "sector": "semi"
         }
       ],
@@ -856,12 +874,6 @@
       "name": "科大讯飞",
       "records": [
         {
-          "date": "2026-05-29",
-          "change": -1.07,
-          "hit": true,
-          "sector": "ai_chip"
-        },
-        {
           "date": "2026-06-03",
           "change": 0.92,
           "hit": true,
@@ -1032,6 +1044,12 @@
         {
           "date": "2026-07-14",
           "change": -0.12,
+          "hit": true,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-15",
+          "change": 0.32,
           "hit": true,
           "sector": "ai_chip"
         }
@@ -1486,12 +1504,6 @@
       "name": "海康威视",
       "records": [
         {
-          "date": "2026-05-29",
-          "change": -0.77,
-          "hit": false,
-          "sector": "ai_chip"
-        },
-        {
           "date": "2026-06-01",
           "change": 0.0,
           "hit": true,
@@ -1664,6 +1676,12 @@
           "change": 0.36,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-15",
+          "change": 0.69,
+          "hit": false,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -1819,6 +1837,12 @@
           "date": "2026-07-13",
           "change": 0.57,
           "hit": false,
+          "sector": "ai_app"
+        },
+        {
+          "date": "2026-07-15",
+          "change": 1.53,
+          "hit": true,
           "sector": "ai_app"
         }
       ],
@@ -2228,9 +2252,15 @@
           "change": -0.04,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-15",
+          "change": -2.67,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
-      "consecutive_bad": 3
+      "consecutive_bad": 0
     }
   },
   "sectors": {
@@ -2346,6 +2376,11 @@
           "date": "2026-07-14",
           "avg_change": 2.64,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-15",
+          "avg_change": -0.8533333333333334,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -2771,6 +2806,11 @@
           "date": "2026-07-13",
           "avg_change": 0.6499999999999999,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-07-15",
+          "avg_change": 1.1099999999999999,
+          "hit_rate": 50.0
         }
       ]
     },
@@ -2871,6 +2911,11 @@
           "date": "2026-07-14",
           "avg_change": 0.06666666666666667,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-15",
+          "avg_change": -1.175,
+          "hit_rate": 100.0
         }
       ]
     }
@@ -2897,6 +2942,7 @@
     "2026-07-09",
     "2026-07-10",
     "2026-07-13",
-    "2026-07-14"
+    "2026-07-14",
+    "2026-07-15"
   ]
 }
