@@ -1243,17 +1243,19 @@
       "reason": "AAna v2.4 尾盘评分 100",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-15",
+      "code": "002714",
+      "name": "牧原股份",
+      "action": "sell",
+      "price": 37.71,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -25.0,
+      "pnl_pct": -0.66
     }
   ],
-  "positions": {
-    "002714": {
-      "date": "2026-07-14",
-      "name": "牧原股份",
-      "shares": 100,
-      "entry_price": 37.96,
-      "highest_price": 37.96,
-      "entry_date": "2026-07-14"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }

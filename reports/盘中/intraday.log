@@ -2593,3 +2593,21 @@
 [2026-07-14 14:45:01] 📊 14:45 尾盘推荐
 [report] 已保存: /Users/cai/code/AAna/reports/2026-07-14/盘中/2026-07-14_1445_尾盘分析.md
 [git] 已推送: feat: add 2026-07-14 afternoon analysis (auto)
+[2026-07-15 10:00:04] 👁️ 盘中子Agent 启动
+[2026-07-15 10:00:04] ==================================================
+[2026-07-15 10:00:04] 👁️ 盘中实时监控
+[2026-07-15 10:00:05] 大盘状态: ➡️ 震荡整理 (平均 -0.39%)
+[2026-07-15 10:00:05] 异动股票: 0 只
+[2026-07-15 10:30:00] 👁️ 盘中子Agent 启动
+[2026-07-15 10:30:00] ==================================================
+[2026-07-15 10:30:00] 👁️ 盘中实时监控
+[2026-07-15 10:30:00] 大盘状态: ➡️ 震荡整理 (平均 -0.39%)
+[2026-07-15 10:30:00] 异动股票: 0 只
+[2026-07-15 11:00:00] 👁️ 盘中子Agent 启动
+[2026-07-15 11:00:00] ==================================================
+[2026-07-15 11:00:00] 👁️ 盘中实时监控
+[data_sources] 腾讯API失败: HTTPSConnectionPool(host='qt.gtimg.cn', port=443): Read timed out. (read timeout=10)
+[data_sources] 新浪API失败: HTTPConnectionPool(host='hq.sinajs.cn', port=80): Read timed out. (read timeout=10)
+[data_utils] 新浪API失败: HTTPConnectionPool(host='hq.sinajs.cn', port=80): Max retries exceeded with url: /list=sz000001,sz399001,sz399006,sz000688,sh603986,sz002230,sz002049,sz002415,sh603667,sz002836,sh600745,sh600703,sh600584,sz002594,sz002459,sh600900,sh600570 (Caused by ConnectTimeoutError(<HTTPConnection(host='hq.sinajs.cn', port=80) at 0x10e07d280>, 'Connection to hq.sinajs.cn timed out. (connect timeout=10)'))
+[2026-07-15 11:00:54] 大盘状态: ⚠️ 数据异常 (平均 +0.00%)
+[2026-07-15 11:00:54] 异动股票: 0 只
