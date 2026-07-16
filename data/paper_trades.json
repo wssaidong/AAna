@@ -1254,8 +1254,123 @@
       "reason": "止损/止盈/到期",
       "pnl": -25.0,
       "pnl_pct": -0.66
+    },
+    {
+      "date": "2026-07-16",
+      "code": "601628",
+      "name": "中国人寿",
+      "action": "buy",
+      "price": 38.92,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "code": "603882",
+      "name": "金域医学",
+      "action": "buy",
+      "price": 27.81,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "code": "600196",
+      "name": "复星医药",
+      "action": "buy",
+      "price": 24.7,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "code": "002536",
+      "name": "飞龙股份",
+      "action": "buy",
+      "price": 54.57,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "code": "600690",
+      "name": "海尔智家",
+      "action": "buy",
+      "price": 21.02,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 82",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-07-16",
+      "code": "002768",
+      "name": "国恩股份",
+      "action": "buy",
+      "price": 55.13,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 70",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "601628": {
+      "date": "2026-07-16",
+      "name": "中国人寿",
+      "shares": 100,
+      "entry_price": 38.92,
+      "highest_price": 38.92,
+      "entry_date": "2026-07-16"
+    },
+    "603882": {
+      "date": "2026-07-16",
+      "name": "金域医学",
+      "shares": 100,
+      "entry_price": 27.81,
+      "highest_price": 27.81,
+      "entry_date": "2026-07-16"
+    },
+    "600196": {
+      "date": "2026-07-16",
+      "name": "复星医药",
+      "shares": 100,
+      "entry_price": 24.7,
+      "highest_price": 24.7,
+      "entry_date": "2026-07-16"
+    },
+    "002536": {
+      "date": "2026-07-16",
+      "name": "飞龙股份",
+      "shares": 100,
+      "entry_price": 54.57,
+      "highest_price": 54.57,
+      "entry_date": "2026-07-16"
+    },
+    "600690": {
+      "date": "2026-07-16",
+      "name": "海尔智家",
+      "shares": 100,
+      "entry_price": 21.02,
+      "highest_price": 21.02,
+      "entry_date": "2026-07-16"
+    },
+    "002768": {
+      "date": "2026-07-16",
+      "name": "国恩股份",
+      "shares": 100,
+      "entry_price": 55.13,
+      "highest_price": 55.13,
+      "entry_date": "2026-07-16"
+    }
+  },
   "daily_snapshots": []
 }
