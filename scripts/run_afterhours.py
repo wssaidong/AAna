@@ -194,9 +194,14 @@ def generate_full_report(date_str):
                and "*ST" not in h.get("name", "")
                and "ST" not in h.get("name", "")
                and h.get("change_pct", 0) >= 9.5]  # 至少涨停
-    # ⚠️ v1.17 pitfall: 必须先按 20cm 优先 + 涨幅降序预排序，再按题材去重；
-    # 否则 priority 先命中主板 10cm 会挤掉创业板/科创板 20cm 涨停。
-    outside.sort(key=lambda h: (-(1 if h.get("market") in (33, 48) else 0), -h.get("change_pct", 0)))
+    # 20cm 识别必须看代码段/实际涨幅，不能用同花顺 market 字段：
+    # 实测 market=33 同时覆盖深市主板与创业板，按 market 会把所有深市 10cm 误判为 20cm。
+    def _is_20cm_stock(h):
+        code = str(h.get("code", ""))
+        return code.startswith(("300", "301", "688", "689")) or h.get("change_pct", 0) >= 19.5
+
+    # 先按 20cm 优先 + 涨幅降序预排序，再按题材去重。
+    outside.sort(key=lambda h: (-int(_is_20cm_stock(h)), -h.get("change_pct", 0)))
     # ⚠️ v1.5 pitfall: priority 拓宽至 20 项 + 动态按当日热度调整
     priority = ["AI智算", "算力", "半导体设备", "固态电池", "稀土永磁", "低空经济",
                 "液冷服务器", "PCB概念", "先进封装", "MLCC", "存储芯片", "机器人",
@@ -213,12 +218,16 @@ def generate_full_report(date_str):
         reason = h.get("reason", "")
         matched = next((theme for theme in final_priority if theme in reason), None)
         if not matched:
+            # 20cm/涨停股即使题材不在既有 priority，也应使用 reason 首标签入榜，
+            # 避免 AI智能体、DeepSeek 等新题材被硬编码列表漏掉。
+            matched = next((tag.strip() for tag in reason.split("+")
+                            if tag.strip() and tag.strip() != "ST板块"), None)
+        if not matched:
             continue
         # 先按 20cm 优先排序后的股票流逐个选；同一题材只取一只，保证题材多样性。
         if matched in used_theme:
             continue
-        market = h.get("market")
-        h["_is_20cm"] = market in (33, 48)
+        h["_is_20cm"] = _is_20cm_stock(h)
         selected.append((matched, h))
         used_theme.add(matched)
     selected = selected[:5]
@@ -364,21 +373,35 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"{i}️⃣ {h['code']} {h['name']} — {theme} **{pct:+.2f}%**\n"
 
     md += "\n━━━ **明日观察要点** ━━━\n"
-    # ⚠️ v1.11/v1.13 模式检测: 候选池失败模式 + 大盘性质
-    if avg < -3.0:
-        # v1.11 第五种模式: 系统性崩盘 (10%命中+负Alpha)
-        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日！上证 {sh_pct:+.2f}%，深证 {indices.get('sz399001',{}).get('change_pct',0):+.2f}%，**关注明日反弹**（普跌次日反弹概率高）\n"
-        md += f"2️⃣ **回避：** 昨日涨幅+4%以上的追高标的（今日集体杀跌主力）\n"
-        md += f"3️⃣ **防御：** 高股息/黄金/稀土等防御板块作为底仓\n"
+    # 大盘性质必须用指数均值，不可误用候选池 avg；叠加时点差识别 v1.21 假突破盲区。
+    core_pcts = [indices.get(k, {}).get("change_pct", 0)
+                 for k in ("sh000001", "sz399001", "sz399006", "sh000688")]
+    market_avg = sum(core_pcts) / len(core_pcts)
+    gap_deltas = [abs(float(x)) for x in re.findall(
+        r"\|\s*([+-]?\d+\.\d+)\s*pp\s*\|", gap_md or "")]
+    max_gap = max(gap_deltas, default=0.0)
+    large_gap = max_gap >= 3.5
+
+    if market_avg < -3.0 and large_gap:
+        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日（模式⑤）+ 假突破后尾盘急跌（模式⑦）；四大指数平均 {market_avg:+.2f}%，最大时点差 {max_gap:.2f}pp，先观察止跌而非抢反弹\n"
+        md += "2️⃣ **回避：** 昨日涨幅3%-5%的追高标的；医药/消费/黄金等所谓防御股也须等待量价企稳\n"
+        md += f"3️⃣ **主线：** 观察{', '.join(themes[:4])}龙头次日溢价；无溢价则维持低仓位\n"
+    elif market_avg < -3.0:
+        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日！四大指数平均 {market_avg:+.2f}%，关注明日缩量止跌信号\n"
+        md += "2️⃣ **回避：** 昨日涨幅3%-5%的追高标的（系统性杀跌时回吐最明显）\n"
+        md += "3️⃣ **防御：** 保持低仓位，等指数与主线龙头同步企稳后再加仓\n"
+    elif large_gap:
+        md += f"1️⃣ **大盘性质：** ⚠️ 假突破后尾盘急跌型！最大时点差 {max_gap:.2f}pp，盘中建议已被收盘推翻\n"
+        md += "2️⃣ **回避：** 追高强势股与高Beta小盘股，先看次日开盘量能\n"
+        md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头能否扛住杀跌\n"
     elif sh_pct < -1.5 and kc50_pct < -5:
-        # 平稳转急跌型 (类似 2026-06-26)
-        md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！盘中{sh_pct:+.2f}%以内震荡 → 尾盘1小时集体跳水（创业板/科创50 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%）\n"
-        md += f"2️⃣ **回避：** 追高强势股（今日全市场普跌）+ 题材投机（小盘股流动性风险）\n"
-        md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])} 龙头股是否扛住杀跌（扛住=主线成立）\n"
+        md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！创业板/科创50收盘 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%\n"
+        md += "2️⃣ **回避：** 追高强势股 + 小盘题材投机\n"
+        md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头股是否扛住杀跌\n"
     else:
         md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
-        md += f"3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
+        md += "3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
     if gap_md:
         md += gap_md
     md += "\n⚠️ **仅供参考，不构成投资建议**\n"

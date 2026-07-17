@@ -140,6 +140,12 @@
           "change": -0.2,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 1.27,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -147,12 +153,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-05-19",
-          "change": 1.01,
-          "hit": true,
-          "sector": "semi"
-        },
         {
           "date": "2026-05-20",
           "change": 1.28,
@@ -326,6 +326,12 @@
           "change": -0.17,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 0.14,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -469,6 +475,12 @@
           "date": "2026-07-15",
           "change": -2.19,
           "hit": false,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 1.48,
+          "hit": true,
           "sector": "semi"
         }
       ],
@@ -642,6 +654,12 @@
         {
           "date": "2026-07-16",
           "change": 2.19,
+          "hit": false,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 0.19,
           "hit": false,
           "sector": "robot"
         }
@@ -848,6 +866,12 @@
           "change": 1.41,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 0.11,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -885,12 +909,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-06-04",
-          "change": 1.17,
-          "hit": true,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-06-05",
           "change": 0.02,
@@ -1064,6 +1082,12 @@
           "change": 0.63,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 0.86,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -1528,12 +1552,6 @@
       "name": "海康威视",
       "records": [
         {
-          "date": "2026-06-02",
-          "change": -0.17,
-          "hit": false,
-          "sector": "ai_app"
-        },
-        {
           "date": "2026-06-03",
           "change": 0.65,
           "hit": true,
@@ -1706,6 +1724,12 @@
           "change": 0.98,
           "hit": false,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-07-17",
+          "change": -0.03,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2024,6 +2048,12 @@
           "change": 1.9,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-17",
+          "change": -3.93,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -2300,6 +2330,12 @@
           "change": -2.67,
           "hit": true,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-17",
+          "change": 2.92,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2423,6 +2459,11 @@
           "date": "2026-07-15",
           "avg_change": -0.8533333333333334,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-07-17",
+          "avg_change": 0.9633333333333334,
+          "hit_rate": 66.66666666666666
         }
       ]
     },
@@ -2718,6 +2759,11 @@
           "date": "2026-07-16",
           "avg_change": 1.5324999999999998,
           "hit_rate": 25.0
+        },
+        {
+          "date": "2026-07-17",
+          "avg_change": -1.2100000000000002,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -2973,12 +3019,16 @@
           "date": "2026-07-15",
           "avg_change": -1.175,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-07-17",
+          "avg_change": 1.25,
+          "hit_rate": 33.33333333333333
         }
       ]
     }
   },
   "updated": [
-    "2026-06-16",
     "2026-06-17",
     "2026-06-18",
     "2026-06-19",
@@ -3000,6 +3050,7 @@
     "2026-07-13",
     "2026-07-14",
     "2026-07-15",
-    "2026-07-16"
+    "2026-07-16",
+    "2026-07-17"
   ]
 }
