@@ -1037,3 +1037,25 @@
 [2026-07-21 14:45:00] [daily_v24_recommend] ============================================================
 [2026-07-21 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-07-21 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601088', '600276', '603369', '601628', '600900', '600887', '000963', '003010', '601318', '601899']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 601088: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601628: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000963: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003010: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601318: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-21 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-21 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif

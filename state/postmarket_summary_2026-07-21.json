@@ -1,0 +1,373 @@
+{
+  "timestamp": "2026-07-21T21:30:00.456528",
+  "data": {
+    "timestamp": "2026-07-21T21:30:00.455973",
+    "index_summary": [
+      {
+        "name": "上证指数",
+        "close": 10.98,
+        "change": -0.09
+      },
+      {
+        "name": "深证成指",
+        "close": 13610.231,
+        "change": -0.34
+      },
+      {
+        "name": "创业板指",
+        "close": 3443.102,
+        "change": -0.75
+      },
+      {
+        "name": "科创50",
+        "close": 25.83,
+        "change": 0.04
+      }
+    ],
+    "sector_summary": [
+      {
+        "name": "人形机器人",
+        "logic": "特斯拉Optimus Q1发布+政策扶持",
+        "avg_change": 0.4075,
+        "max_change": 0.91,
+        "min_change": -0.12,
+        "stocks": [
+          {
+            "code": "603667",
+            "name": "五洲新春",
+            "close": 53.52,
+            "change": 0.0
+          },
+          {
+            "code": "002836",
+            "name": "新宏泽",
+            "close": 8.44,
+            "change": 0.84
+          },
+          {
+            "code": "002230",
+            "name": "科大讯飞",
+            "close": 40.97,
+            "change": 0.91
+          },
+          {
+            "code": "600745",
+            "name": "*ST闻泰",
+            "close": 17.19,
+            "change": -0.12
+          }
+        ],
+        "count": 4
+      },
+      {
+        "name": "储能/绿电",
+        "logic": "碳中和+装机旺季",
+        "avg_change": 0.06666666666666667,
+        "max_change": 0.28,
+        "min_change": -0.07,
+        "stocks": [
+          {
+            "code": "002594",
+            "name": "比亚迪",
+            "close": 93.92,
+            "change": -0.01
+          },
+          {
+            "code": "002459",
+            "name": "晶澳科技",
+            "close": 7.06,
+            "change": 0.28
+          },
+          {
+            "code": "600900",
+            "name": "长江电力",
+            "close": 28.98,
+            "change": -0.07
+          }
+        ],
+        "count": 3
+      },
+      {
+        "name": "半导体设备",
+        "logic": "AI芯片国产替代+政策驱动",
+        "avg_change": -0.5133333333333333,
+        "max_change": 0.38,
+        "min_change": -1.53,
+        "stocks": [
+          {
+            "code": "600703",
+            "name": "三安光电",
+            "close": 11.6,
+            "change": -1.53
+          },
+          {
+            "code": "002049",
+            "name": "紫光国微",
+            "close": 61.77,
+            "change": -0.39
+          },
+          {
+            "code": "600584",
+            "name": "长电科技",
+            "close": 76.99,
+            "change": 0.38
+          }
+        ],
+        "count": 3
+      },
+      {
+        "name": "AI应用",
+        "logic": "端侧AI+智能汽车",
+        "avg_change": -0.595,
+        "max_change": -0.29,
+        "min_change": -0.9,
+        "stocks": [
+          {
+            "code": "002415",
+            "name": "海康威视",
+            "close": 34.28,
+            "change": -0.9
+          },
+          {
+            "code": "600570",
+            "name": "恒生电子",
+            "close": 20.64,
+            "change": -0.29
+          }
+        ],
+        "count": 2
+      },
+      {
+        "name": "AI算力/芯片",
+        "logic": "DeepSeek带动算力需求爆发",
+        "avg_change": -0.8624999999999999,
+        "max_change": 0.91,
+        "min_change": -3.07,
+        "stocks": [
+          {
+            "code": "603986",
+            "name": "兆易创新",
+            "close": 432.3,
+            "change": -3.07
+          },
+          {
+            "code": "002230",
+            "name": "科大讯飞",
+            "close": 40.97,
+            "change": 0.91
+          },
+          {
+            "code": "002049",
+            "name": "紫光国微",
+            "close": 61.77,
+            "change": -0.39
+          },
+          {
+            "code": "002415",
+            "name": "海康威视",
+            "close": 34.28,
+            "change": -0.9
+          }
+        ],
+        "count": 4
+      }
+    ],
+    "top_stocks": [
+      {
+        "name": "科大讯飞",
+        "code": "002230",
+        "category": "AI算力/芯片",
+        "close": 40.97,
+        "change": 0.91
+      },
+      {
+        "name": "科大讯飞",
+        "code": "002230",
+        "category": "人形机器人",
+        "close": 40.97,
+        "change": 0.91
+      },
+      {
+        "name": "新宏泽",
+        "code": "002836",
+        "category": "人形机器人",
+        "close": 8.44,
+        "change": 0.84
+      },
+      {
+        "name": "长电科技",
+        "code": "600584",
+        "category": "半导体设备",
+        "close": 76.99,
+        "change": 0.38
+      },
+      {
+        "name": "晶澳科技",
+        "code": "002459",
+        "category": "储能/绿电",
+        "close": 7.06,
+        "change": 0.28
+      },
+      {
+        "name": "五洲新春",
+        "code": "603667",
+        "category": "人形机器人",
+        "close": 53.52,
+        "change": 0.0
+      },
+      {
+        "name": "比亚迪",
+        "code": "002594",
+        "category": "储能/绿电",
+        "close": 93.92,
+        "change": -0.01
+      },
+      {
+        "name": "长江电力",
+        "code": "600900",
+        "category": "储能/绿电",
+        "close": 28.98,
+        "change": -0.07
+      },
+      {
+        "name": "*ST闻泰",
+        "code": "600745",
+        "category": "人形机器人",
+        "close": 17.19,
+        "change": -0.12
+      },
+      {
+        "name": "恒生电子",
+        "code": "600570",
+        "category": "AI应用",
+        "close": 20.64,
+        "change": -0.29
+      }
+    ],
+    "bottom_stocks": [
+      {
+        "name": "紫光国微",
+        "code": "002049",
+        "category": "半导体设备",
+        "close": 61.77,
+        "change": -0.39
+      },
+      {
+        "name": "海康威视",
+        "code": "002415",
+        "category": "AI算力/芯片",
+        "close": 34.28,
+        "change": -0.9
+      },
+      {
+        "name": "海康威视",
+        "code": "002415",
+        "category": "AI应用",
+        "close": 34.28,
+        "change": -0.9
+      },
+      {
+        "name": "三安光电",
+        "code": "600703",
+        "category": "半导体设备",
+        "close": 11.6,
+        "change": -1.53
+      },
+      {
+        "name": "兆易创新",
+        "code": "603986",
+        "category": "AI算力/芯片",
+        "close": 432.3,
+        "change": -3.07
+      }
+    ],
+    "total_count": 16,
+    "actual_prices": {
+      "000001": {
+        "close": 10.98,
+        "change_pct": -0.09,
+        "name": "平安银行"
+      },
+      "399001": {
+        "close": 13610.231,
+        "change_pct": -0.34,
+        "name": "深证成指"
+      },
+      "399006": {
+        "close": 3443.102,
+        "change_pct": -0.75,
+        "name": "创业板指"
+      },
+      "000688": {
+        "close": 25.83,
+        "change_pct": 0.04,
+        "name": "国城矿业"
+      },
+      "603986": {
+        "close": 432.3,
+        "change_pct": -3.07,
+        "name": "兆易创新"
+      },
+      "002230": {
+        "close": 40.97,
+        "change_pct": 0.91,
+        "name": "科大讯飞"
+      },
+      "002049": {
+        "close": 61.77,
+        "change_pct": -0.39,
+        "name": "紫光国微"
+      },
+      "002415": {
+        "close": 34.28,
+        "change_pct": -0.9,
+        "name": "海康威视"
+      },
+      "603667": {
+        "close": 53.52,
+        "change_pct": 0.0,
+        "name": "五洲新春"
+      },
+      "002836": {
+        "close": 8.44,
+        "change_pct": 0.84,
+        "name": "新宏泽"
+      },
+      "600745": {
+        "close": 17.19,
+        "change_pct": -0.12,
+        "name": "*ST闻泰"
+      },
+      "600703": {
+        "close": 11.6,
+        "change_pct": -1.53,
+        "name": "三安光电"
+      },
+      "600584": {
+        "close": 76.99,
+        "change_pct": 0.38,
+        "name": "长电科技"
+      },
+      "002594": {
+        "close": 93.92,
+        "change_pct": -0.01,
+        "name": "比亚迪"
+      },
+      "002459": {
+        "close": 7.06,
+        "change_pct": 0.28,
+        "name": "晶澳科技"
+      },
+      "600900": {
+        "close": 28.98,
+        "change_pct": -0.07,
+        "name": "长江电力"
+      },
+      "600570": {
+        "close": 20.64,
+        "change_pct": -0.29,
+        "name": "恒生电子"
+      }
+    }
+  }
+}
