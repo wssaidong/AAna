@@ -226,9 +226,21 @@ def get_or_create_group(group_name):
             print(f"[Eastmoney] 从 groups.json 找到 {group_name} → gid={gid}")
             return gid
 
-    # 2. 尝试创建（用纯数字后缀，不用下划线——东方财富组合名不支持下划线）
-    suffix = int(datetime.now().timestamp()) % 100000  # 5位数字避免过长
-    unique_name = f"{group_name}{suffix}"
+    # 2. 尝试创建
+    # 幂等修复（2026-07-22）：两种标准命名走幂等路径
+    #   - YYYYMMDD（如 20260722）→ 8 位纯数字
+    #   - YYYYMMDDPP（如 20260722PP）→ 8 位数字 + 2 位 PP 后缀
+    #   - YYYYMMDDZZ（如 20260722ZZ）→ 深度分析 8 位数字 + 2 位 ZZ 后缀
+    # 命中条件：前 8 位是纯数字 且（长度==8 或 长度==10 且后 2 位是 PP/ZZ）
+    # 其他名字（手动命名 / 任何含特殊字符的）→ 仍自动加 5 位后缀防冲突
+    # 原因：原逻辑每次都加后缀导致同一天创建多个 unique_name → 东财 App 端
+    # 显示 N 个看起来"今天"的孤儿组合（7/22 实测 gid=1041 + 1051 同内容双胞胎）
+    if (len(group_name) == 8 and group_name.isdigit()) or \
+       (len(group_name) == 10 and group_name[:8].isdigit() and group_name[8:] in ('PP', 'ZZ')):
+        unique_name = group_name  # 标准命名：幂等（API -131 时 reuse 已存在的同名组合）
+    else:
+        suffix = int(datetime.now().timestamp()) % 100000  # 5位数字避免过长
+        unique_name = f"{group_name}{suffix}"  # 其他名：加后缀防冲突
     url_create = mkurl('ag', gn=unique_name)
     result, sn = api_call(url_create)
     state = result.get('state')
