@@ -158,6 +158,12 @@
           "change": 2.38,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-23",
+          "change": -0.08,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -165,12 +171,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-05-25",
-          "change": -2.93,
-          "hit": true,
-          "sector": "semi"
-        },
         {
           "date": "2026-05-27",
           "change": -0.66,
@@ -344,6 +344,12 @@
           "change": 2.0,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.9,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -506,6 +512,12 @@
           "change": 0.82,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.0,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -513,12 +525,6 @@
     "603667": {
       "name": "五洲新春",
       "records": [
-        {
-          "date": "2026-05-21",
-          "change": -0.12,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-22",
           "change": 0.4,
@@ -692,6 +698,12 @@
           "change": 1.58,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 3.14,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -729,12 +741,6 @@
     "002836": {
       "name": "新宏泽",
       "records": [
-        {
-          "date": "2026-05-21",
-          "change": -0.16,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-22",
           "change": -1.48,
@@ -908,6 +914,12 @@
           "change": 0.85,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.12,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -945,12 +957,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-06-10",
-          "change": 0.47,
-          "hit": true,
-          "sector": "robot"
-        },
         {
           "date": "2026-06-11",
           "change": 0.93,
@@ -1124,6 +1130,12 @@
           "change": 0.82,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.39,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -1161,12 +1173,6 @@
     "002594": {
       "name": "比亚迪",
       "records": [
-        {
-          "date": "2026-05-21",
-          "change": -0.05,
-          "hit": false,
-          "sector": "energy"
-        },
         {
           "date": "2026-05-22",
           "change": -0.04,
@@ -1340,6 +1346,12 @@
           "change": 1.8,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.88,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1347,12 +1359,6 @@
     "002459": {
       "name": "晶澳科技",
       "records": [
-        {
-          "date": "2026-05-21",
-          "change": -0.3,
-          "hit": false,
-          "sector": "energy"
-        },
         {
           "date": "2026-05-22",
           "change": -1.02,
@@ -1525,6 +1531,12 @@
           "date": "2026-07-22",
           "change": 0.71,
           "hit": false,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 1.11,
+          "hit": true,
           "sector": "energy"
         }
       ],
@@ -2126,6 +2138,12 @@
           "change": 1.84,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.18,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -2293,6 +2311,12 @@
           "date": "2026-07-22",
           "change": 0.7,
           "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-07-23",
+          "change": 0.0,
+          "hit": false,
           "sector": "energy"
         }
       ],
@@ -2564,17 +2588,17 @@
           "date": "2026-07-22",
           "avg_change": 1.7333333333333334,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-07-23",
+          "avg_change": 0.2733333333333334,
+          "hit_rate": 0.0
         }
       ]
     },
     "energy": {
       "name": "储能/绿电",
       "records": [
-        {
-          "date": "2026-05-21",
-          "avg_change": -0.5233333333333333,
-          "hit_rate": 0.0
-        },
         {
           "date": "2026-05-22",
           "avg_change": -0.6,
@@ -2719,17 +2743,17 @@
           "date": "2026-07-22",
           "avg_change": 1.07,
           "hit_rate": 33.33333333333333
+        },
+        {
+          "date": "2026-07-23",
+          "avg_change": 0.6633333333333334,
+          "hit_rate": 33.33333333333333
         }
       ]
     },
     "robot": {
       "name": "人形机器人",
       "records": [
-        {
-          "date": "2026-05-21",
-          "avg_change": -0.552,
-          "hit_rate": 0.0
-        },
         {
           "date": "2026-05-22",
           "avg_change": -0.514,
@@ -2873,6 +2897,11 @@
         {
           "date": "2026-07-22",
           "avg_change": 1.2725,
+          "hit_rate": 25.0
+        },
+        {
+          "date": "2026-07-23",
+          "avg_change": 0.9575000000000001,
           "hit_rate": 25.0
         }
       ]
@@ -3149,7 +3178,6 @@
     }
   },
   "updated": [
-    "2026-06-22",
     "2026-06-23",
     "2026-06-24",
     "2026-06-25",
@@ -3171,6 +3199,7 @@
     "2026-07-17",
     "2026-07-20",
     "2026-07-21",
-    "2026-07-22"
+    "2026-07-22",
+    "2026-07-23"
   ]
 }
