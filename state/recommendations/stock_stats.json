@@ -170,6 +170,12 @@
           "change": 2.02,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.43,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -177,12 +183,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-05-29",
-          "change": -0.1,
-          "hit": false,
-          "sector": "semi"
-        },
         {
           "date": "2026-06-01",
           "change": 0.38,
@@ -355,6 +355,12 @@
           "date": "2026-07-24",
           "change": 1.62,
           "hit": true,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.75,
+          "hit": false,
           "sector": "semi"
         }
       ],
@@ -530,6 +536,12 @@
           "change": 3.58,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 1.39,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -537,12 +549,6 @@
     "603667": {
       "name": "五洲新春",
       "records": [
-        {
-          "date": "2026-05-25",
-          "change": 0.19,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-26",
           "change": 0.0,
@@ -716,6 +722,12 @@
           "change": 3.84,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.06,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -753,12 +765,6 @@
     "002836": {
       "name": "新宏泽",
       "records": [
-        {
-          "date": "2026-05-25",
-          "change": 0.08,
-          "hit": true,
-          "sector": "robot"
-        },
         {
           "date": "2026-05-26",
           "change": 0.42,
@@ -932,6 +938,12 @@
           "change": 0.0,
           "hit": false,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.0,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -969,12 +981,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-06-12",
-          "change": -1.0,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-06-15",
           "change": -1.51,
@@ -1147,6 +1153,12 @@
           "date": "2026-07-24",
           "change": 1.23,
           "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.0,
+          "hit": false,
           "sector": "robot"
         }
       ],
@@ -1624,12 +1636,6 @@
       "name": "海康威视",
       "records": [
         {
-          "date": "2026-06-05",
-          "change": -0.45,
-          "hit": false,
-          "sector": "ai_chip"
-        },
-        {
           "date": "2026-06-08",
           "change": 1.89,
           "hit": false,
@@ -1802,6 +1808,12 @@
           "change": -0.9,
           "hit": true,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-07-27",
+          "change": -3.9,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2162,6 +2174,12 @@
           "change": 1.76,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 0.12,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -2474,6 +2492,12 @@
           "change": -3.31,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-27",
+          "change": 2.47,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2622,6 +2646,11 @@
           "date": "2026-07-24",
           "avg_change": 2.4066666666666667,
           "hit_rate": 66.66666666666666
+        },
+        {
+          "date": "2026-07-27",
+          "avg_change": 0.8566666666666666,
+          "hit_rate": 33.33333333333333
         }
       ]
     },
@@ -2784,11 +2813,6 @@
       "name": "人形机器人",
       "records": [
         {
-          "date": "2026-05-25",
-          "avg_change": -0.15333333333333332,
-          "hit_rate": 66.66666666666666
-        },
-        {
           "date": "2026-05-26",
           "avg_change": -0.435,
           "hit_rate": 50.0
@@ -2932,6 +2956,11 @@
           "date": "2026-07-24",
           "avg_change": 1.7075,
           "hit_rate": 75.0
+        },
+        {
+          "date": "2026-07-27",
+          "avg_change": 0.045,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -3202,14 +3231,16 @@
           "date": "2026-07-20",
           "avg_change": -1.2425000000000002,
           "hit_rate": 50.0
+        },
+        {
+          "date": "2026-07-27",
+          "avg_change": -0.7149999999999999,
+          "hit_rate": 50.0
         }
       ]
     }
   },
   "updated": [
-    "2026-06-24",
-    "2026-06-25",
-    "2026-06-26",
     "2026-06-29",
     "2026-06-30",
     "2026-07-01",
@@ -3229,6 +3260,7 @@
     "2026-07-21",
     "2026-07-22",
     "2026-07-23",
-    "2026-07-24"
+    "2026-07-24",
+    "2026-07-27"
   ]
 }
