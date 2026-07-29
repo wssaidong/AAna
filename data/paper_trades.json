@@ -1386,8 +1386,28 @@
       "reason": "止损/止盈/到期",
       "pnl": -44.0,
       "pnl_pct": -0.8
+    },
+    {
+      "date": "2026-07-29",
+      "code": "002895",
+      "name": "川恒股份",
+      "action": "buy",
+      "price": 35.12,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "002895": {
+      "date": "2026-07-29",
+      "name": "川恒股份",
+      "shares": 100,
+      "entry_price": 35.12,
+      "highest_price": 35.12,
+      "entry_date": "2026-07-29"
+    }
+  },
   "daily_snapshots": []
 }

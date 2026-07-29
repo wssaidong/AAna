@@ -4,12 +4,6 @@
       "name": "三安光电",
       "records": [
         {
-          "date": "2026-05-20",
-          "change": 1.51,
-          "hit": true,
-          "sector": "semi"
-        },
-        {
           "date": "2026-05-21",
           "change": -3.18,
           "hit": false,
@@ -182,6 +176,12 @@
           "change": 2.07,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-29",
+          "change": 0.92,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -189,12 +189,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-06-03",
-          "change": -0.04,
-          "hit": true,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-06-04",
           "change": 1.89,
@@ -368,6 +362,12 @@
           "change": 2.33,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-29",
+          "change": 0.31,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -375,12 +375,6 @@
     "600584": {
       "name": "长电科技",
       "records": [
-        {
-          "date": "2026-05-20",
-          "change": 1.72,
-          "hit": true,
-          "sector": "semi"
-        },
         {
           "date": "2026-05-21",
           "change": -0.99,
@@ -554,6 +548,12 @@
           "change": 3.85,
           "hit": true,
           "sector": "semi"
+        },
+        {
+          "date": "2026-07-29",
+          "change": 0.17,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -561,12 +561,6 @@
     "603667": {
       "name": "五洲新春",
       "records": [
-        {
-          "date": "2026-06-05",
-          "change": 0.9,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-06-08",
           "change": 5.15,
@@ -740,6 +734,12 @@
           "change": 1.51,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-29",
+          "change": -0.1,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -777,12 +777,6 @@
     "002836": {
       "name": "新宏泽",
       "records": [
-        {
-          "date": "2026-06-05",
-          "change": 0.09,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-06-08",
           "change": 2.8,
@@ -956,6 +950,12 @@
           "change": 1.06,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-29",
+          "change": -0.81,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -993,12 +993,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-06-17",
-          "change": 0.02,
-          "hit": false,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-06-18",
           "change": 0.63,
@@ -1172,6 +1166,12 @@
           "change": 1.33,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-07-29",
+          "change": 0.23,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -1648,12 +1648,6 @@
       "name": "海康威视",
       "records": [
         {
-          "date": "2026-06-10",
-          "change": 0.96,
-          "hit": true,
-          "sector": "ai_app"
-        },
-        {
           "date": "2026-06-11",
           "change": 0.6,
           "hit": false,
@@ -1824,6 +1818,12 @@
         {
           "date": "2026-07-28",
           "change": 1.18,
+          "hit": false,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-07-29",
+          "change": -0.88,
           "hit": false,
           "sector": "ai_chip"
         }
@@ -2014,12 +2014,6 @@
       "name": "*ST闻泰",
       "records": [
         {
-          "date": "2026-06-05",
-          "change": 5.27,
-          "hit": false,
-          "sector": "robot"
-        },
-        {
           "date": "2026-06-08",
           "change": 5.27,
           "hit": false,
@@ -2191,6 +2185,12 @@
           "date": "2026-07-28",
           "change": 2.09,
           "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-07-29",
+          "change": 0.54,
+          "hit": false,
           "sector": "robot"
         }
       ],
@@ -2532,11 +2532,6 @@
       "name": "半导体设备",
       "records": [
         {
-          "date": "2026-05-20",
-          "avg_change": 1.5033333333333332,
-          "hit_rate": 100.0
-        },
-        {
           "date": "2026-05-21",
           "avg_change": -1.8733333333333333,
           "hit_rate": 0.0
@@ -2680,6 +2675,11 @@
           "date": "2026-07-28",
           "avg_change": 2.75,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-07-29",
+          "avg_change": 0.545,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -2842,11 +2842,6 @@
       "name": "人形机器人",
       "records": [
         {
-          "date": "2026-06-05",
-          "avg_change": 1.5699999999999998,
-          "hit_rate": 0.0
-        },
-        {
           "date": "2026-06-08",
           "avg_change": 3.8775,
           "hit_rate": 50.0
@@ -2990,6 +2985,11 @@
           "date": "2026-07-28",
           "avg_change": 1.4975,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-07-29",
+          "avg_change": -0.12333333333333334,
+          "hit_rate": 0.0
         }
       ]
     },
@@ -3275,6 +3275,11 @@
           "date": "2026-07-28",
           "avg_change": 4.8149999999999995,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-07-29",
+          "avg_change": -0.11333333333333333,
+          "hit_rate": 0.0
         }
       ]
     }
@@ -3301,6 +3306,7 @@
     "2026-07-23",
     "2026-07-24",
     "2026-07-27",
-    "2026-07-28"
+    "2026-07-28",
+    "2026-07-29"
   ]
 }
