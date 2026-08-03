@@ -1312,3 +1312,36 @@
 [2026-08-03 14:45:00] [daily_v24_recommend] ============================================================
 [2026-08-03 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-08-03 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600988', '002415', '000603', '600536', '603306', '002841', '002396', '002558', '002261', '002158']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 6 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 6 只
+[2026-08-03 14:45:05] [daily_v24_recommend]   找到 6 只推荐
+[2026-08-03 14:45:05] [daily_v24_recommend]     600988 赤峰黄金 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     600536 中国软件 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002396 星网锐捷 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002558 巨人网络 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002158 汉钟精机 score=90
+[2026-08-03 14:45:05] [daily_v24_recommend]     603306 华懋科技 score=80
+[2026-08-03 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 600988 赤峰黄金 @38.86 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 600536 中国软件 @32.85 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002396 星网锐捷 @24.83 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002558 巨人网络 @29.22 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002158 汉钟精机 @24.83 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 603306 华懋科技 @56.07 100股
+[2026-08-03 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-03 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-03-v24-尾盘推荐.md
+[2026-08-03 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-03 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-03 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-08-03 14:45:06] [daily_v24_recommend] ============================================================

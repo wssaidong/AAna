@@ -1408,8 +1408,123 @@
       "reason": "止损/止盈/到期",
       "pnl": 2.0,
       "pnl_pct": 0.06
+    },
+    {
+      "date": "2026-08-03",
+      "code": "600988",
+      "name": "赤峰黄金",
+      "action": "buy",
+      "price": 38.86,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-03",
+      "code": "600536",
+      "name": "中国软件",
+      "action": "buy",
+      "price": 32.85,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-03",
+      "code": "002396",
+      "name": "星网锐捷",
+      "action": "buy",
+      "price": 24.83,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-03",
+      "code": "002558",
+      "name": "巨人网络",
+      "action": "buy",
+      "price": 29.22,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-03",
+      "code": "002158",
+      "name": "汉钟精机",
+      "action": "buy",
+      "price": 24.83,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 90",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-03",
+      "code": "603306",
+      "name": "华懋科技",
+      "action": "buy",
+      "price": 56.07,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 80",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600988": {
+      "date": "2026-08-03",
+      "name": "赤峰黄金",
+      "shares": 100,
+      "entry_price": 38.86,
+      "highest_price": 38.86,
+      "entry_date": "2026-08-03"
+    },
+    "600536": {
+      "date": "2026-08-03",
+      "name": "中国软件",
+      "shares": 100,
+      "entry_price": 32.85,
+      "highest_price": 32.85,
+      "entry_date": "2026-08-03"
+    },
+    "002396": {
+      "date": "2026-08-03",
+      "name": "星网锐捷",
+      "shares": 100,
+      "entry_price": 24.83,
+      "highest_price": 24.83,
+      "entry_date": "2026-08-03"
+    },
+    "002558": {
+      "date": "2026-08-03",
+      "name": "巨人网络",
+      "shares": 100,
+      "entry_price": 29.22,
+      "highest_price": 29.22,
+      "entry_date": "2026-08-03"
+    },
+    "002158": {
+      "date": "2026-08-03",
+      "name": "汉钟精机",
+      "shares": 100,
+      "entry_price": 24.83,
+      "highest_price": 24.83,
+      "entry_date": "2026-08-03"
+    },
+    "603306": {
+      "date": "2026-08-03",
+      "name": "华懋科技",
+      "shares": 100,
+      "entry_price": 56.07,
+      "highest_price": 56.07,
+      "entry_date": "2026-08-03"
+    }
+  },
   "daily_snapshots": []
 }
