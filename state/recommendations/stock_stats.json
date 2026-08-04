@@ -4,12 +4,6 @@
       "name": "三安光电",
       "records": [
         {
-          "date": "2026-05-29",
-          "change": -0.88,
-          "hit": false,
-          "sector": "semi"
-        },
-        {
           "date": "2026-06-01",
           "change": 0.0,
           "hit": true,
@@ -182,6 +176,12 @@
           "change": -4.14,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -1.05,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -189,12 +189,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-06-08",
-          "change": 3.93,
-          "hit": true,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-06-09",
           "change": -2.44,
@@ -368,6 +362,12 @@
           "change": -3.72,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -0.39,
+          "hit": false,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -375,12 +375,6 @@
     "600584": {
       "name": "长电科技",
       "records": [
-        {
-          "date": "2026-05-29",
-          "change": -1.47,
-          "hit": false,
-          "sector": "semi"
-        },
         {
           "date": "2026-06-01",
           "change": 2.43,
@@ -552,6 +546,12 @@
         {
           "date": "2026-07-31",
           "change": -8.2,
+          "hit": false,
+          "sector": "semi"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -1.6,
           "hit": false,
           "sector": "semi"
         }
@@ -994,12 +994,6 @@
       "name": "科大讯飞",
       "records": [
         {
-          "date": "2026-06-23",
-          "change": 0.97,
-          "hit": false,
-          "sector": "robot"
-        },
-        {
           "date": "2026-06-24",
           "change": 0.0,
           "hit": false,
@@ -1172,6 +1166,12 @@
           "change": -0.19,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-08-04",
+          "change": 0.0,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -1209,12 +1209,6 @@
     "002594": {
       "name": "比亚迪",
       "records": [
-        {
-          "date": "2026-05-26",
-          "change": 0.17,
-          "hit": true,
-          "sector": "energy"
-        },
         {
           "date": "2026-05-27",
           "change": 0.57,
@@ -1388,6 +1382,12 @@
           "change": -0.27,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-08-04",
+          "change": 0.0,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1395,12 +1395,6 @@
     "002459": {
       "name": "晶澳科技",
       "records": [
-        {
-          "date": "2026-05-26",
-          "change": 0.94,
-          "hit": false,
-          "sector": "energy"
-        },
         {
           "date": "2026-05-27",
           "change": 0.21,
@@ -1574,6 +1568,12 @@
           "change": 0.13,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -0.38,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1647,12 +1647,6 @@
     "002415": {
       "name": "海康威视",
       "records": [
-        {
-          "date": "2026-06-18",
-          "change": 0.9,
-          "hit": false,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-06-19",
           "change": 0.9,
@@ -1826,6 +1820,12 @@
           "change": -0.13,
           "hit": true,
           "sector": "ai_app"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -0.73,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2206,12 +2206,6 @@
       "name": "长江电力",
       "records": [
         {
-          "date": "2026-05-26",
-          "change": 0.04,
-          "hit": true,
-          "sector": "energy"
-        },
-        {
           "date": "2026-05-27",
           "change": 0.3,
           "hit": false,
@@ -2384,6 +2378,12 @@
           "change": 0.34,
           "hit": false,
           "sector": "energy"
+        },
+        {
+          "date": "2026-08-04",
+          "change": 0.55,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -2546,6 +2546,12 @@
           "change": -9.09,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-08-04",
+          "change": -0.37,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2555,11 +2561,6 @@
     "semi": {
       "name": "半导体设备",
       "records": [
-        {
-          "date": "2026-05-29",
-          "avg_change": -0.8166666666666668,
-          "hit_rate": 0.0
-        },
         {
           "date": "2026-06-01",
           "avg_change": 0.9366666666666666,
@@ -2704,17 +2705,17 @@
           "date": "2026-07-31",
           "avg_change": -5.353333333333333,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-08-04",
+          "avg_change": -1.0133333333333334,
+          "hit_rate": 0.0
         }
       ]
     },
     "energy": {
       "name": "储能/绿电",
       "records": [
-        {
-          "date": "2026-05-26",
-          "avg_change": 0.3833333333333333,
-          "hit_rate": 66.66666666666666
-        },
         {
           "date": "2026-05-27",
           "avg_change": 0.35999999999999993,
@@ -2859,6 +2860,11 @@
           "date": "2026-08-03",
           "avg_change": 0.06666666666666667,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-08-04",
+          "avg_change": 0.05666666666666668,
+          "hit_rate": 33.33333333333333
         }
       ]
     },
@@ -3314,6 +3320,11 @@
           "date": "2026-07-31",
           "avg_change": -4.013333333333334,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-08-04",
+          "avg_change": -0.3666666666666667,
+          "hit_rate": 66.66666666666666
         }
       ]
     }
@@ -3339,6 +3350,7 @@
     "2026-07-29",
     "2026-07-30",
     "2026-07-31",
-    "2026-08-03"
+    "2026-08-03",
+    "2026-08-04"
   ]
 }

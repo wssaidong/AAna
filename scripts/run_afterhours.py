@@ -11,7 +11,7 @@ import argparse
 import re
 import sys
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 
@@ -96,9 +96,90 @@ def theme_counter(hot_list):
     return c
 
 
+def get_industry_ranking(top_n=10):
+    """东财行业板块涨跌；主域断连时使用官方 delay 域。"""
+    params = {
+        "pn": "1", "pz": "100", "po": "1", "np": "1",
+        "fltt": "2", "invt": "2", "fid": "f3", "fs": "m:90+t:2",
+        "fields": "f12,f14,f2,f3,f4,f8,f20",
+    }
+    errors = []
+    for url in (
+        "https://push2.eastmoney.com/api/qt/clist/get",
+        "https://push2delay.eastmoney.com/api/qt/clist/get",
+    ):
+        try:
+            r = requests.get(
+                url, params=params,
+                headers={"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"},
+                timeout=15,
+            )
+            r.raise_for_status()
+            first_page = r.json().get("data") or {}
+            items = list(first_page.get("diff") or [])
+            total = int(first_page.get("total") or len(items))
+            # 东财每页最多100条；分页拉全，才能给出真实 Bottom 榜。
+            pages = (total + 99) // 100
+            for page in range(2, pages + 1):
+                page_params = dict(params)
+                page_params["pn"] = str(page)
+                pr = requests.get(
+                    url, params=page_params,
+                    headers={"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"},
+                    timeout=15,
+                )
+                pr.raise_for_status()
+                items.extend((pr.json().get("data") or {}).get("diff") or [])
+            if not items:
+                continue
+            rows = [{"code": x.get("f12", ""), "name": x.get("f14", ""),
+                     "change_pct": float(x.get("f3") or 0)} for x in items]
+            rows.sort(key=lambda x: x["change_pct"], reverse=True)
+            return {"top": rows[:top_n], "bottom": rows[-top_n:],
+                    "total": total, "returned": len(rows), "source": url}
+        except Exception as exc:
+            errors.append(f"{url.split('/')[2]}: {type(exc).__name__}")
+    return {"top": [], "bottom": [], "total": 0, "error": "; ".join(errors)}
+
+
+def get_daily_dragon_tiger(date_str):
+    """东财龙虎榜；盘后未更新/报表为空时返回可审计的降级状态。"""
+    url = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+    params = {
+        "reportName": "RPT_DAILYBILLBOARD_DETAILSNEW", "columns": "ALL",
+        "filter": f"(TRADE_DATE>='{date_str}')",
+        "pageNumber": "1", "pageSize": "100",
+        "sortColumns": "BILLBOARD_NET_AMT", "sortTypes": "-1",
+        "source": "WEB", "client": "WEB",
+    }
+    try:
+        r = requests.get(
+            url, params=params,
+            headers={"User-Agent": UA, "Referer": "https://data.eastmoney.com/"},
+            timeout=15,
+        )
+        d = r.json()
+        rows = ((d.get("result") or {}).get("data") or [])
+        if rows:
+            return {"rows": rows, "source": url}
+        return {"rows": [], "note": f"龙虎榜盘后暂不可用（东财 code={d.get('code')} {d.get('message', '')}），新晋异动改用同花顺强势股"}
+    except Exception as exc:
+        return {"rows": [], "note": f"东财龙虎榜请求失败（{type(exc).__name__}），新晋异动改用同花顺强势股"}
+
+
 def _yesterday(date_str):
-    from datetime import timedelta
     return (datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+
+
+def previous_nonempty_hot_day(date_str, max_lookback=10):
+    """回溯最近一个同花顺有数据的日期，避免空自然日环比被放大。"""
+    cursor = datetime.strptime(date_str, "%Y-%m-%d")
+    for offset in range(1, max_lookback + 1):
+        day = (cursor - timedelta(days=offset)).strftime("%Y-%m-%d")
+        rows = ths_hot(day)
+        if rows:
+            return day, rows
+    return None, []
 
 
 def parse_top10_with_baseline(date_str):
@@ -111,10 +192,14 @@ def parse_top10_with_baseline(date_str):
         return []
     rows = []
     in_section = False
+    seen = set()
     for line in content.split("\n"):
         if "重点关注 Top 10" in line or "🏆 重点关注" in line:
             in_section = True
             continue
+        # Top10 是 ### 小节；遇到下一个同级/更高级标题必须立即停止。
+        if in_section and re.match(r"^#{1,3}\s+", line):
+            break
         if in_section and line.startswith("|"):
             if "排名" in line or "代码" in line:
                 continue
@@ -130,11 +215,37 @@ def parse_top10_with_baseline(date_str):
                     if m:
                         pct = float(m.group(1))
                         break
-            if code and pct is not None:
+            if code and pct is not None and code not in seen:
                 rows.append((code, name or code, pct))
-        elif in_section and line.startswith("## "):
-            break
-    return rows[:10]
+                seen.add(code)
+            if len(rows) >= 10:
+                break
+    return rows
+
+
+def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
+                            other_5_avg=None):
+    """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。"""
+    deltas = [row[3] for row in gap_rows]
+    max_delta = max(deltas, default=0.0)
+    min_delta = min(deltas, default=0.0)
+    if market_avg < -3.0 and min_delta <= -3.5:
+        return "💥 极端情绪日（模式⑤）+ 假突破后尾盘跳水（v1.22第四层）"
+    if market_avg < -3.0:
+        return "💥 极端情绪日（模式⑤）"
+    if max_delta >= 3.5:
+        return "📈 假平稳真急涨型（v1.22第五层）"
+    if min_delta <= -3.5:
+        return "📉 假突破后尾盘跳水型（v1.22第四层）"
+    if sh_pct < -1.5 and kc50_pct < -5:
+        return "📉 平稳转急跌型（模式⑦）"
+    if other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
+        return "📊 主板稳态 + 科创50单点跳水型"
+    if sh_pct > 1.5:
+        return "📈 强势行情"
+    if sh_pct < -1.0:
+        return "📉 震荡偏弱"
+    return "➡️ 震荡"
 
 
 def eval_index(pct):
@@ -161,10 +272,29 @@ def generate_full_report(date_str):
     print(f"      Top10 {len(top10)} 只")
 
     print(f"[4/5] 计算题材热度对比…")
-    hot_yest = ths_hot(_yesterday(date_str))
+    comparison_date, hot_yest = previous_nonempty_hot_day(date_str)
+    if comparison_date:
+        print(f"      环比基准: {comparison_date}（最近非空日期；不宣称交易日）")
+    else:
+        print("      ⚠️ 最近10日无非空题材数据，环比按0处理")
     ct = theme_counter(hot)
     cy = theme_counter(hot_yest)
     themes = [t for t, _ in ct.most_common() if t != "ST板块"][:10]
+
+    print("      拉东财行业板块涨跌…")
+    industry = get_industry_ranking(10)
+    if industry.get("total"):
+        source_label = "push2delay fallback" if "push2delay" in industry.get("source", "") else "push2"
+        print(f"      东财行业 {industry.get('returned', 0)}/{industry['total']} 个（{source_label}）")
+    else:
+        print(f"      ⚠️ 东财行业降级失败: {industry.get('error', '无数据')}")
+
+    print("      拉今日龙虎榜…")
+    dragon = get_daily_dragon_tiger(date_str)
+    if dragon.get("rows"):
+        print(f"      龙虎榜 {len(dragon['rows'])} 条")
+    else:
+        print(f"      ⚠️ 龙虎榜降级: {dragon.get('note', '无数据')}")
 
     print(f"[5/5] 计算候选池命中率…")
     top10_codes = [c for c, _, _ in top10]
@@ -240,18 +370,19 @@ def generate_full_report(date_str):
         f"{REPORT_DIR}/{date_str}/盘中/{date_str}_1445_尾盘分析.md",
         f"{REPORT_DIR}/{date_str}-尾盘选股.md",
     ]
-    gap_md, has_gap = realtime_gap_alert(indices, candidate_paths)
+    gap_md, has_gap, gap_rows, gap_source = realtime_gap_alert(indices, candidate_paths)
 
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                               positives, negatives, avg, avg_pos, avg_neg,
                               sh_pct, cyb_pct, kc50_pct, selected, len(hot),
-                              gap_md)
+                              gap_md, gap_rows, comparison_date, industry, dragon)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
                                  positives, negatives, avg, avg_pos, avg_neg,
-                                 sh_pct, cyb_pct, kc50_pct, selected, len(hot))
+                                 sh_pct, cyb_pct, kc50_pct, selected, len(hot),
+                                 feishu_md=feishu_md)
     return feishu_md, full_md
 
 
@@ -280,7 +411,7 @@ def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
             except Exception:
                 continue
     if not tail_content:
-        return "", False
+        return "", False, [], None
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指",
                 "sz399006": "创业板指", "sz399005": "中小100",
                 "sz399300": "沪深300", "sh000688": "科创50"}
@@ -297,8 +428,10 @@ def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
         if abs(delta) >= threshold_pct:
             has_alert = True
         rows.append((name, v1445, v1500, delta))
-    if not has_alert or not rows:
-        return "", False
+    if not rows:
+        return "", False, [], used_path
+    if not has_alert:
+        return "", False, rows, used_path
     md = "\n⚠️ **数据口径警示**（14:45 尾盘 vs 15:00 收盘 时点差）\n\n"
     md += "| 指数 | 14:45 尾盘 | 15:00 收盘 | 时点差 | 方向 |\n"
     md += "|:----:|:---------:|:---------:|:------:|:----:|\n"
@@ -312,27 +445,54 @@ def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
         md += f"| {name} | {v1445:+.2f}% | {v1500:+.2f}% | {delta:+.2f} pp | {arrow} |\n"
     md += f"\n> 14:45 盘中建议与收盘差异 > {threshold_pct}pp，请以本盘后战报为准。\n"
     md += f"> 数据源：{used_path}（共 {len(rows)}/6 指数）\n"
-    return md, True
+    return md, True, rows, used_path
 
 
 def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    positives, negatives, avg, avg_pos, avg_neg,
                    sh_pct, cyb_pct, kc50_pct, selected, hot_count,
-                   gap_md=""):
+                   gap_md="", gap_rows=None, comparison_date=None,
+                   industry=None, dragon=None):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    md = f"📊 **盘后战报 {date_str} {now[11:]}**\n\n"
+    md = (f"📊 **盘后战报｜生成时间 {now} CST｜"
+          f"目标交易日 {date_str} 15:00 收盘**\n\n")
 
     md += "━━━ **行业今日全貌** ━━━\n\n"
+    industry = industry or {}
+    if industry.get("top"):
+        top_text = " / ".join(
+            f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["top"][:5]
+        )
+        bottom_text = " / ".join(
+            f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["bottom"][-5:]
+        )
+        md += f"📈 **东财行业涨幅 Top5：** {top_text}\n"
+        md += f"📉 **东财行业跌幅 Bottom5：** {bottom_text}\n"
+        md += f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('total', 0)} 个行业板块。\n"
+        if "push2delay" in industry.get("source", ""):
+            md += "> 数据源降级：东财 push2 主域断连，已切换官方 push2delay 域。\n\n"
+    else:
+        md += f"> ⚠️ 东财行业板块不可用：{industry.get('error', '无数据')}；以下用同花顺强势股题材聚合作为 fallback。\n\n"
     md += "🔥 **今日最强题材（热度排行 Top10）：**\n"
+    comparison_label = comparison_date or "最近非空日"
     for i, theme in enumerate(themes, 1):
         cnt = ct.get(theme, 0)
         yest = cy.get(theme, 0)
         diff = cnt - yest
         arrow = "↑" if diff > 0 else ("↓" if diff < 0 else "→")
-        md += f"{i}️⃣ {theme} — {cnt}次（较昨日 {arrow}{abs(diff)}）\n"
+        md += f"{i}️⃣ {theme} — {cnt}次（较{comparison_label} {arrow}{abs(diff)}）\n"
 
-    md += f"\n⚠️ **市场特征：**（根据 {hot_count} 只强势股判断）\n"
-    md += f"- 上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
+    core_pcts = [indices.get(k, {}).get("change_pct", 0)
+                 for k in ("sh000001", "sz399001", "sz399006", "sh000688")]
+    market_avg = sum(core_pcts) / len(core_pcts)
+    other_5 = [indices.get(k, {}).get("change_pct", 0)
+               for k in ("sh000001", "sz399001", "sz399006", "sz399005", "sz399300")]
+    other_5_avg = sum(other_5) / len(other_5)
+    market_feature = classify_market_feature(
+        market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows or [], other_5_avg
+    )
+    md += f"\n⚠️ **市场特征：** {market_feature}（根据 {hot_count} 只强势股判断）\n"
+    md += f"- 四大核心指数平均 {market_avg:+.2f}%｜上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
 
     md += "📈 **大盘收盘表现：**\n"
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指", "sz399006": "创业板指",
@@ -359,39 +519,53 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
             ev = "❌ 高位回吐"
         md += f"| {code} | {name} | {baseline:+.2f}% | {actual:+.2f}% | {delta:+.2f}% | {ev} |\n"
 
+    if 0 < len(hit_rows) < 7:
+        md += f"\n⚠️ **上游 Top10 严重不完整：仅 {len(hit_rows)}/10（完整度 {len(hit_rows)*10}%），样本量不足。**\n"
+    elif 7 <= len(hit_rows) < 10:
+        md += f"\n⚠️ **上游 Top10 不完整：仅 {len(hit_rows)}/10（完整度 {len(hit_rows)*10}%），统计置信度打折。**\n"
     if hit_rows:
+        baseline_avg = sum(r[2] for r in hit_rows) / len(hit_rows)
+        continuation_negative = sum(1 for r in hit_rows if r[4] < 0)
         md += f"\n📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/len(hit_rows)*100:.1f}%\n"
         md += f"- 整体均值：{avg:+.2f}% | 正：{avg_pos:+.2f}% | 负：{avg_neg:+.2f}%\n"
-        md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}%**\n"
+        md += f"- baseline均值：{baseline_avg:+.2f}% | {continuation_negative}/{len(hit_rows)} 负延续 | Δ均值：{avg - baseline_avg:+.2f}pp\n"
+        md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}pp**\n"
+        md += f"- vs 四大核心指数均值 {market_avg:+.2f}% 超额：**{avg - market_avg:+.2f}pp**\n"
     else:
         md += "\n⚠️ **候选池评估：** 上游选股报告 Top10 为空，本次无候选池命中率评估\n"
         md += f"- 大盘参考：上证 {sh_pct:+.2f}%；候选池超额：**N/A**\n"
 
     md += "\n━━━ **新晋异动 Top5** ━━━\n\n"
+    dragon = dragon or {}
+    if not dragon.get("rows"):
+        md += f"> ⚠️ {dragon.get('note', '龙虎榜无数据')}。以下为候选池外涨停异动代表（20cm优先、题材去重）。\n\n"
     for i, (theme, h) in enumerate(selected, 1):
         pct = h.get("change_pct", 0)
         md += f"{i}️⃣ {h['code']} {h['name']} — {theme} **{pct:+.2f}%**\n"
 
     md += "\n━━━ **明日观察要点** ━━━\n"
-    # 大盘性质必须用指数均值，不可误用候选池 avg；叠加时点差识别 v1.21 假突破盲区。
-    core_pcts = [indices.get(k, {}).get("change_pct", 0)
-                 for k in ("sh000001", "sz399001", "sz399006", "sh000688")]
-    market_avg = sum(core_pcts) / len(core_pcts)
-    gap_deltas = [abs(float(x)) for x in re.findall(
-        r"\|\s*([+-]?\d+\.\d+)\s*pp\s*\|", gap_md or "")]
-    max_gap = max(gap_deltas, default=0.0)
-    large_gap = max_gap >= 3.5
+    deltas = [row[3] for row in (gap_rows or [])]
+    max_delta = max(deltas, default=0.0)
+    min_delta = min(deltas, default=0.0)
 
-    if market_avg < -3.0 and large_gap:
-        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日（模式⑤）+ 假突破后尾盘急跌（模式⑦）；四大指数平均 {market_avg:+.2f}%，最大时点差 {max_gap:.2f}pp，先观察止跌而非抢反弹\n"
-        md += "2️⃣ **回避：** 昨日涨幅3%-5%的追高标的；医药/消费/黄金等所谓防御股也须等待量价企稳\n"
+    if market_avg < -3.0 and min_delta <= -3.5:
+        md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日（模式⑤）+ 假突破后尾盘跳水；四大指数平均 {market_avg:+.2f}%，最深时点差 {min_delta:+.2f}pp，先观察止跌而非抢反弹\n"
+        md += "2️⃣ **回避：** 昨日涨幅3%-5%的追高标的；所谓防御股也须等待量价企稳\n"
         md += f"3️⃣ **主线：** 观察{', '.join(themes[:4])}龙头次日溢价；无溢价则维持低仓位\n"
     elif market_avg < -3.0:
         md += f"1️⃣ **大盘性质：** ⚠️ 极端情绪日！四大指数平均 {market_avg:+.2f}%，关注明日缩量止跌信号\n"
         md += "2️⃣ **回避：** 昨日涨幅3%-5%的追高标的（系统性杀跌时回吐最明显）\n"
         md += "3️⃣ **防御：** 保持低仓位，等指数与主线龙头同步企稳后再加仓\n"
-    elif large_gap:
-        md += f"1️⃣ **大盘性质：** ⚠️ 假突破后尾盘急跌型！最大时点差 {max_gap:.2f}pp，盘中建议已被收盘推翻\n"
+    elif max_delta >= 3.5:
+        md += f"1️⃣ **大盘性质：** 📈 假平稳真急涨型！最大正时点差 {max_delta:+.2f}pp，14:45 谨慎判断被收盘强势推翻；明日先验量能，避免高潮追涨\n"
+        md += f"2️⃣ **主线持续性：** {', '.join(themes[:3])}龙头若高开不回落且成交不萎缩50%，反弹结构延续；集体低开则防一日游\n"
+        continuation = (f"{sum(1 for r in hit_rows if r[4] < 0)}/{len(hit_rows)}延续性转弱"
+                        if hit_rows else "候选池缺失")
+        md += (f"3️⃣ **候选池修正：** {len(positives)}/{len(hit_rows)}命中但"
+               f"仅较上证 {avg - sh_pct:+.2f}pp、较四大核心指数 {avg - market_avg:+.2f}pp；"
+               f"{continuation}，不追昨日+4%强势股，优先今日新主线回踩确认标的\n")
+    elif min_delta <= -3.5:
+        md += f"1️⃣ **大盘性质：** ⚠️ 假突破后尾盘跳水型！最深时点差 {min_delta:+.2f}pp，盘中建议已被收盘推翻\n"
         md += "2️⃣ **回避：** 追高强势股与高Beta小盘股，先看次日开盘量能\n"
         md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头能否扛住杀跌\n"
     elif sh_pct < -1.5 and kc50_pct < -5:
@@ -403,6 +577,8 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
         md += "3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
     if gap_md:
+        # 外发正文只保留数据源文件名，不泄露本机绝对路径。
+        gap_md = re.sub(r"(?<=数据源：)(?:/[^\s（]+/)+", "", gap_md)
         md += gap_md
     md += "\n⚠️ **仅供参考，不构成投资建议**\n"
     return md
@@ -410,7 +586,16 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
 
 def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
                        positives, negatives, avg, avg_pos, avg_neg,
-                       sh_pct, cyb_pct, kc50_pct, selected, hot_count):
+                       sh_pct, cyb_pct, kc50_pct, selected, hot_count,
+                       feishu_md=None):
+    """完整落盘报告；复用已验证的飞书正文，避免两套市场定性漂移。"""
+    if feishu_md is not None:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return (f"# AAna 盘后战报 — {date_str}\n\n"
+                f"> **生成时间：** {now}\n"
+                f"> **目标交易日：** {date_str} 15:00 收盘\n"
+                f"> **数据源：** 腾讯收盘行情 + 东财行业板块 + 同花顺强势股；龙虎榜不可用时明确降级\n\n"
+                f"{feishu_md}\n")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指", "sz399006": "创业板指",
                 "sz399005": "中小100", "sz399300": "沪深300", "sh000688": "科创50"}
@@ -576,15 +761,17 @@ def main():
     print(f"=== A股盘后战报 {args.date} ===")
     feishu_md, full_md = generate_full_report(args.date)
 
+    if args.dry:
+        print("\n=== 飞书 Markdown (DRY) ===")
+        print(feishu_md)
+        return
+
     report_path = f"{REPORT_DIR}/{args.date}-盘后战报.md"
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(full_md)
     print(f"✅ 报告已保存: {report_path}")
 
-    if args.dry:
-        print("\n=== 飞书 Markdown (DRY) ===")
-        print(feishu_md)
-    elif not args.no_feishu:
+    if not args.no_feishu:
         send_feishu(feishu_md, dry=False)
 
 
