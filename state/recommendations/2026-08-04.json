@@ -1,0 +1,103 @@
+{
+  "date": "2026-08-04",
+  "market_prediction": "📈 偏暖 谨慎乐观，控制仓位",
+  "sentiment": "📈 偏暖",
+  "focus_sectors": [
+    "半导体设备",
+    "AI算力/芯片",
+    "储能/绿电"
+  ],
+  "recommended_stocks": [
+    {
+      "code": "600703",
+      "name": "三安光电",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002049",
+      "name": "紫光国微",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600584",
+      "name": "长电科技",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002230",
+      "name": "科大讯飞",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "-3~+1%",
+      "expected_high": 1.0,
+      "expected_low": -3.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "-3~+1%",
+      "expected_high": 1.0,
+      "expected_low": -3.0
+    },
+    {
+      "code": "002594",
+      "name": "比亚迪",
+      "sector": "energy",
+      "sector_name": "储能/绿电",
+      "reason": "碳中和+装机旺季",
+      "expected_change": "-3~+1%",
+      "expected_high": 1.0,
+      "expected_low": -3.0
+    },
+    {
+      "code": "002459",
+      "name": "晶澳科技",
+      "sector": "energy",
+      "sector_name": "储能/绿电",
+      "reason": "碳中和+装机旺季",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "sector": "energy",
+      "sector_name": "储能/绿电",
+      "reason": "碳中和+装机旺季",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    }
+  ],
+  "created_at": "2026-08-04T08:30:00.836918"
+}
