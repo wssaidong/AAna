@@ -1,0 +1,2 @@
+[console_scripts]
+aana = agents.main_agent:main

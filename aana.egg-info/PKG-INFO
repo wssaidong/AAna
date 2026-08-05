@@ -1,0 +1,311 @@
+Metadata-Version: 2.4
+Name: aana
+Version: 0.1.0
+Summary: AAna — A股智能投研助手，覆盖盘前→盘中→盘后→周末全链路
+Author-email: AAna Contributors <wssaidong@users.noreply.github.com>
+License: MIT
+Keywords: stock,a股,量化,投研,finance
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Office/Business :: Financial :: Investment
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: akshare>=1.14.0
+Requires-Dist: backtrader>=1.9.0
+Requires-Dist: baostock>=0.8.9
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=24.0.0; extra == "dev"
+Requires-Dist: ruff>=0.4.0; extra == "dev"
+Dynamic: license-file
+
+# AAna — A股智能投研助手
+
+AAna 是一个围绕 A股交易周期设计的自动化智能投研系统，覆盖**盘前 → 盘中 → 盘后 → 周末**全链路。
+
+---
+
+## 系统架构
+
+```
+agents/
+├── main_agent.py          # 总调度，任务分发与状态管理
+├── premarket_agent.py     # 盘前子Agent（07:00–09:28）
+├── intraday_agent.py      # 盘中子Agent（09:30–14:57）
+├── postmarket_agent.py    # 复盘子Agent（21:30–21:45）
+└── cleanup.py             # 状态清理
+
+scripts/
+├── aana_afternoon_screen.py    # 尾盘选股脚本
+├── eastmoney_portfolio.py      # 东方财富自选股组合同步
+├── eastmoney_scraper.py        # 东方财富数据抓取
+├── dynamic_stocks.py           # 动态股票池管理
+└── technical_filter.py         # 技术面过滤
+
+analysis_tools/
+├── data_fetcher.py            # 多源数据获取（新浪/腾讯/东财/同花顺）
+├── stock_screener.py          # 选股筛选器
+├── financial_analyzer.py       # 财务分析
+├── valuation_calculator.py     # 估值计算
+├── recommendation_tracker.py   # 推荐追踪
+└── daily_screen.py             # 每日筛选
+
+docs/
+├── stock.md                    # 股票知识库
+├── stock-indicators-classification.md  # 技术指标分类
+├── 选股模板.md                 # 选股报告模板
+└── 复盘模板.md                 # 复盘报告模板
+```
+
+---
+
+## 核心功能
+
+### 盘前（07:00–09:28）
+- **健康检测**：系统自检、数据源连通性
+- **盘前简报**：隔夜外盘回顾、宏观要闻、大盘情绪预判
+- **竞价推送**：集合竞价异动个股
+
+### 盘中（09:30–14:57）
+- **持仓异动监控**：涨跌幅突破、量比异动、均线突破/跌破、MACD金叉/死叉
+- **动态持仓调整**：根据实时信号调整关注池
+- **尾盘选股**：14:30 启动综合打分，输出 Top5 明日候选
+
+### 盘后（15:30 / 21:30–21:45）
+- **盘后战报**（15:30）：行业全貌、候选池命中率分析、新晋异动 Top5
+- **复盘评分**（21:30）：当日策略有效性、风险控制评估
+- **明日策略**（21:45）：基于当日复盘输出下一交易日操作计划
+
+### 周末备战（周日 20:00）
+- **5因子打分模型**：估值、动量、资金面、技术面、基本面
+- **下周重点观察池**：5–10 只候选股
+- **仓位节奏建议**：根据大盘环境给出仓位配置建议
+
+---
+
+## 数据源
+
+| 数据类型 | 主数据源 | 备用数据源 |
+|---|---|---|
+| 实时行情 | 新浪财经 | 腾讯K线 |
+| K线数据 | 腾讯财经 | 新浪财经 |
+| 行业板块 | 东方财富 | 同花顺 |
+| 强势股 | 同花顺 | 东财热点 |
+| 财务数据 | AKShare | 东方财富 |
+| 自选股组合 | 东方财富组合API | — |
+
+---
+
+## 东方财富组合同步
+
+尾盘选股结果自动同步至东方财富自选股组合，命名规则：**日期+PP**（如 `20260522PP`）。
+
+手动同步命令：
+```bash
+cd ~/code/AAna/scripts
+python3 eastmoney_portfolio.py
+```
+
+---
+
+## 定时任务（Cron）
+
+| 任务 | Cron | Skill |
+|---|---|---|
+| 盘中异动监控 | `0 9,10,11,13,14,15 * * 1-5` | a-stock-monitor |
+| 尾盘选股同步 | `45 14 * * 1-5` | — |
+| 盘后战报 | `30 15 * * 1-5` | a-stock-afterhours |
+| 周末备战 | `0 20 * * 0` | a-stock-weekend |
+
+---
+
+## 目录结构
+
+```
+AAna/
+├── agents/            # Agent 核心逻辑
+├── analysis_tools/    # 数据分析与工具
+├── scripts/           # 可执行脚本
+├── docs/             # 知识库与模板
+├── reports/          # 每日报告输出（自动生成）
+│   └── YYYY-MM-DD/
+│       ├── 选股报告.md
+│       ├── 复盘评分.md
+│       └── 明日策略.md
+├── state/            # 状态与推荐追踪
+└── prompts/          # Agent 提示词模板
+```
+
+---
+
+## 快速开始
+
+```bash
+# 安装依赖
+pip install akshare pandas requests
+
+# 运行盘前
+python agents/premarket_agent.py
+
+# 运行尾盘选股
+python scripts/aana_afternoon_screen.py
+
+# 运行复盘
+python agents/postmarket_agent.py
+```
+
+---
+
+## v2.6 新功能
+
+### 1) stock_screener 新参数用法
+
+v2.6 新增 **量比筛选**、**主力净流入占比筛选**、**RSI极端值过滤**、**自定义评分权重** 等参数：
+
+```bash
+# 量比筛选：找出量比 > 2 的异动股
+python -m analysis_tools.stock_screener \
+  --scope hs300 \
+  --volume-ratio-min 2 \
+  --top 20
+
+# 主力净流入占比 + RSI 过滤
+python -m analysis_tools.stock_screener \
+  --scope all \
+  --main-net-ratio-min 5 \
+  --rsi-max 70 \
+  --top 30
+
+# 自定义评分权重（PE权重降低，量比/资金流权重提高）
+python -m analysis_tools.stock_screener \
+  --scope zz500 \
+  --weights '{"pe":10,"pb":5,"roe":10,"change":5,"volume_ratio":10,"main_net_ratio":10,"rsi":10}' \
+  --top 20
+```
+
+**支持参数：**
+
+| 参数 | 说明 | 示例 |
+|:----:|:----:|:-----|
+| `--volume-ratio-min/max` | 量比筛选 | `--volume-ratio-min 1.5` |
+| `--main-net-ratio-min/max` | 主力净流入占比(%) | `--main-net-ratio-min 5` |
+| `--rsi-min/max` | RSI极端值过滤 | `--rsi-max 70` |
+| `--include-banned-board` | 包含科创/创业板（默认排除） | `--include-banned-board` |
+| `--weights` | JSON评分权重 | `--weights '{"pe":15}'` |
+
+---
+
+### 2) generate_report 新增「本周操作回顾」
+
+generate_report 在选股报告末尾自动生成 **本周操作回顾**（Section 七），读取 `data/paper_trading.json` 中的模拟持仓数据，展示：
+
+- 当前持仓：股票名称、代码、持仓天数、成本价、现价、浮盈/浮盈%
+- 汇总：初始资金、累计收益（含收益率）、持仓只数
+
+```
+| 股票 | 代码 | 持仓天数 | 成本价 | 现价 | 浮盈 | 浮盈% |
+|:----:|:----:|:------:|:------:|:----:|:----:|:----:|
+| 🧠科大讯飞 | 002230 | 3天 | ¥45.20 | ¥47.50 | +230 | +1.02% |
+
+> **模拟仓汇总：** 初始资金 100,000 | 累计收益 +230.00（+0.23%）| 持仓 1 只
+```
+
+> 注意：`data/paper_trading.json` 由 `data/paper_trading.py` 模拟交易模块管理，需先运行过模拟下单才会显示持仓。
+
+---
+
+### 3) HoldDaysScanner 用法示例
+
+最优持有天数扫描器，对同一批股票遍历 `hold_days ∈ {5, 10, 15, 20, 30}`，输出各天数的总收益率、交易次数、胜率、最大回撤对比表：
+
+```python
+from backtest.optimizer import HoldDaysScanner
+
+# 扫描最优持有天数
+scanner = HoldDaysScanner(
+    codes=["603906", "605566", "000001"],
+    start="20250101",
+    end="20250601"
+)
+result = scanner.scan()       # 执行扫描
+scanner.print_summary()       # 打印 Markdown 对比表
+
+# 获取最优持有天数
+best = scanner.best_hold_days()
+print(f"最优持有天数: {best} 天")
+```
+
+**输出示例：**
+
+```
+### 📊 最优持有天数扫描结果（代码: ['603906', ...]，区间: 20250101~20250601）
+
+| hold_days | 总收益率(%) | 交易次数 | 胜率(%) | 平均持仓天 | 最大回撤(%) |
+|------------|------------|----------|---------|------------|------------|
+|          5 |      12.34 |       20 |    65.0 |       5.0  |      -3.21  |
+|         10 |      18.76 |       15 |    70.2 |      10.0  |      -4.15  |
+|         15 |      22.11 |       12 |    72.5 |      15.0  |      -5.02  |
+|         20 |      19.33 |       10 |    68.0 |      20.0  |      -6.10  |
+|         30 |      15.82 |        8 |    65.0 |      30.0  |      -7.50  |
+
+✅ 最优持有天数：**15 天**（总收益率 22.11%）
+```
+
+---
+
+### 4) StopLossComparator 用法示例
+
+止损条件回测对比器，同一参数下对比「带止损（-5%）」vs「不带止损（stop_loss_pct=0）」两种策略表现：
+
+```python
+from backtest.optimizer import StopLossComparator
+
+# 止损条件回测对比
+comparator = StopLossComparator(
+    codes=["603906", "605566"],
+    start="20250101",
+    end="20250601",
+    hold_days=5
+)
+result = comparator.compare()       # 执行两组回测
+comparator.print_summary()          # 打印对比表
+
+# 查看结果
+print(f"带止损总收益率: {result['with_stop_loss']['total_return_pct']}%")
+print(f"不带止损总收益率: {result['without_stop_loss']['total_return_pct']}%")
+```
+
+**输出示例：**
+
+```
+### 🔍 止损条件回测对比（代码: ['603906', ...]，持仓: 5天，区间: 20250101~20250601）
+
+| 指标         | 带止损(-5%)  | 不带止损     |
+|--------------|-------------|-------------|
+| 总收益率(%)  |       18.76 |       15.32  |
+| 交易次数     |           15 |           12  |
+| 胜率(%)      |        70.2 |        68.0  |
+| 平均持仓天   |        10.1 |        10.0  |
+| 最大回撤(%)  |        -4.15|        -6.10  |
+
+✅ 带止损总收益率更高，领先 3.44 个百分点
+```
+
+---
+
+## 技术栈
+
+- **语言**：Python 3.9+
+- **数据获取**：AKShare、requests、pandas
+- **定时任务**：cron + Hermes Agent
+- **报告输出**：Markdown
+- **版本管理**：Git + GitHub
