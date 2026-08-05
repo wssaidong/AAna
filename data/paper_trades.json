@@ -1595,49 +1595,63 @@
       "reason": "AAna v2.4 尾盘评分 100",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-05",
+      "code": "603816",
+      "name": "顾家家居",
+      "action": "sell",
+      "price": 25.13,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -4.0,
+      "pnl_pct": -0.16
+    },
+    {
+      "date": "2026-08-05",
+      "code": "603260",
+      "name": "合盛硅业",
+      "action": "sell",
+      "price": 34.89,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -23.0,
+      "pnl_pct": -0.65
+    },
+    {
+      "date": "2026-08-05",
+      "code": "605088",
+      "name": "冠盛股份",
+      "action": "sell",
+      "price": 21.48,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 44.0,
+      "pnl_pct": 2.09
+    },
+    {
+      "date": "2026-08-05",
+      "code": "603197",
+      "name": "保隆科技",
+      "action": "sell",
+      "price": 30.55,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 56.0,
+      "pnl_pct": 1.87
+    },
+    {
+      "date": "2026-08-05",
+      "code": "603092",
+      "name": "德力佳",
+      "action": "sell",
+      "price": 50.8,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -10.0,
+      "pnl_pct": -0.2
     }
   ],
-  "positions": {
-    "603816": {
-      "date": "2026-08-04",
-      "name": "顾家家居",
-      "shares": 100,
-      "entry_price": 25.17,
-      "highest_price": 25.17,
-      "entry_date": "2026-08-04"
-    },
-    "603260": {
-      "date": "2026-08-04",
-      "name": "合盛硅业",
-      "shares": 100,
-      "entry_price": 35.12,
-      "highest_price": 35.12,
-      "entry_date": "2026-08-04"
-    },
-    "605088": {
-      "date": "2026-08-04",
-      "name": "冠盛股份",
-      "shares": 100,
-      "entry_price": 21.04,
-      "highest_price": 21.04,
-      "entry_date": "2026-08-04"
-    },
-    "603197": {
-      "date": "2026-08-04",
-      "name": "保隆科技",
-      "shares": 100,
-      "entry_price": 29.99,
-      "highest_price": 29.99,
-      "entry_date": "2026-08-04"
-    },
-    "603092": {
-      "date": "2026-08-04",
-      "name": "德力佳",
-      "shares": 100,
-      "entry_price": 50.9,
-      "highest_price": 50.9,
-      "entry_date": "2026-08-04"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
