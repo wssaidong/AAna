@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 AAna × 东方财富自选股组合管理
-支持：创建组合、添加股票、删除组合（自动滚动保留7天）
+支持：创建组合、添加股票、删除组合（自动滚动保留最近3个交易日）
 """
 import os
 import json
@@ -17,7 +17,7 @@ COOKIE_FILE_ALT = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfol
 BASE_URL = "https://myfavor.eastmoney.com/v4/webouter"
 APPKEY = "e9166c7e9cdfad3aa3fd7d93b757e9b1"
 REFERER = "https://quote.eastmoney.com/zixuan/"
-KEEP_DAYS = 7  # 滚动保留天数
+KEEP_DAYS = 3  # 滚动保留最近 N 个交易日：cutoff=今天-N，保留 date >= cutoff 的组合（含今天）
 
 
 # ============================================
@@ -378,7 +378,7 @@ def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
     主函数：将推荐股票同步到东方财富组合
     1. 创建/找到今日组合（名称=group_name 或 yyyyMMdd）
     2. 添加新推荐股票
-    3. 删除7天前的旧组合
+    3. 滚动删除早于今天 N 天的旧组合（保留最近 N 个交易日，含今天）
     """
     today_str = datetime.now().strftime("%Y%m%d")
     if group_name is None:
@@ -396,7 +396,9 @@ def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
     added = add_stocks(gid, stock_codes)
     print(f"[Eastmoney] 添加完成: {added}/{len(stock_codes)} 只成功")
 
-    # 3. 清理7天前的旧组合
+    # 3. 滚动删除：保留最近 KEEP_DAYS 个交易日（含今天）
+    #    cutoff = today - KEEP_DAYS; 删 date < cutoff 的组合
+    #    KEEP_DAYS=3 → 保留 today/today-1/today-2/today-3 = 4 个交易日窗口
     groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
     groups_history = {}
     if os.path.exists(groups_file):
