@@ -710,13 +710,15 @@ def generate_report():
     filename = get_report_filename()
 
     # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
+    # 2026-08-07 调整：hold_days 1→14 (2 周持仓 / 中线策略)
+    # 配套：score_threshold 50→55 (略提高门槛，过滤短线追板噪声)
     REC_TUNING = {
-        "score_threshold": 50,
-        "hold_days": 1,
+        "score_threshold": 55,
+        "hold_days": 14,
         "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
         "overall_win_rate": 21.2,
         "total_records": 354,
-        "generated_at": "2026-06-04T20:00:37.400971",
+        "generated_at": "2026-08-07T10:30:00.000000",
     }
 
     # 生成报告前清理过期文件（保留7天）
@@ -980,10 +982,19 @@ def generate_report():
     all_stocks = []
     for cat in stock_pool.values():
         all_stocks.extend(cat['stocks'])
-    all_stocks.sort(key=lambda x: x['\u7efc\u5408\u8bc4\u5206'], reverse=True)
+    all_stocks.sort(key=lambda x: x['综合评分'], reverse=True)
 
     # Top 10（含资金流数据）
-    content = header + "### \U0001f3c6 重点关注 Top 10\n\n"
+    content = header + "### ⏱ 持仓策略\n\n"
+    content += (
+        "**持仓周期：14 个交易日（中线 2 周）** · 当前选股已剔除纯短线追板信号，"
+        "强化中期趋势 + 周线动能 + 资金持续性。\n\n"
+        "**配套止损原则：** 跌破建议止损位即出，不死扛；"
+        "若 5 日内方向反向 + 跌破 MA20，先减半仓观察，不机械等待 14 天。\n\n"
+        "**调仓节奏：** 每 5 日复盘持仓趋势，若强势板块轮动加速则同步止盈部分仓位。\n\n"
+        "---\n\n"
+        "### 🏆 重点关注 Top 10\n\n"
+    )
     if NEW_MODULES:
         content += (
             "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 资金流 | 综合评分 | 信号 | 风险 | 软止损 | 趋势 |\n"
@@ -1549,11 +1560,11 @@ if __name__ == "__main__":
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
-    "score_threshold": 60,
-    "hold_days": 1,
+    "score_threshold": 65,
+    "hold_days": 14,
     "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
     "overall_win_rate": 29.6,
     "total_records": 875,
-    "generated_at": "2026-08-06T20:00:10.470661",
+    "generated_at": "2026-08-07T10:30:00.000000",
 }
 # === REC_OPTIMIZER_TUNING_END ===

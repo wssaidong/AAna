@@ -1672,25 +1672,30 @@
       "reason": "AAna v2.4 尾盘评分 100",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-07",
+      "code": "603993",
+      "name": "洛阳钼业",
+      "action": "sell",
+      "price": 20.55,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 21.0,
+      "pnl_pct": 1.03
+    },
+    {
+      "date": "2026-08-07",
+      "code": "600895",
+      "name": "张江高科",
+      "action": "sell",
+      "price": 32.54,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -11.0,
+      "pnl_pct": -0.34
     }
   ],
-  "positions": {
-    "603993": {
-      "date": "2026-08-06",
-      "name": "洛阳钼业",
-      "shares": 100,
-      "entry_price": 20.34,
-      "highest_price": 20.34,
-      "entry_date": "2026-08-06"
-    },
-    "600895": {
-      "date": "2026-08-06",
-      "name": "张江高科",
-      "shares": 100,
-      "entry_price": 32.65,
-      "highest_price": 32.65,
-      "entry_date": "2026-08-06"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
