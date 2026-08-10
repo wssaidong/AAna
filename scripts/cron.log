@@ -9172,3 +9172,11 @@ TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-08-07-选股报告.md
 [AAna v2.5] 生成 2026-08-07 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-08-07_09_00.json，跳过复盘报告
+[AAna] 2026-08-08 非交易日 (周末 (周六))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-08 非交易日 (周末 (周六))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-09 非交易日 (周末 (周日))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-09 非交易日 (周末 (周日))，跳过报告生成
+[AAna] Git pull: Already up to date.
