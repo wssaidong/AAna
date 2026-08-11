@@ -1559,14 +1559,15 @@ if __name__ == "__main__":
 
 
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
     "score_threshold": 60,
     "hold_days": 1,
     "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
-    "overall_win_rate": 29.6,
-    "total_records": 875,
-    "generated_at": "2026-08-10T20:00:16.257181",
+    "overall_win_rate": 29.4,
+    "total_records": 881,
+    "generated_at": "2026-08-11T20:00:44.622231",
 }
 # === REC_OPTIMIZER_TUNING_END ===
