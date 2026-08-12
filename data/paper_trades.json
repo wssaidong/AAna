@@ -1760,57 +1760,74 @@
       "reason": "AAna v2.4 尾盘评分 70",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-12",
+      "code": "603988",
+      "name": "中电电机",
+      "action": "sell",
+      "price": 23.3,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -20.0,
+      "pnl_pct": -0.85
+    },
+    {
+      "date": "2026-08-12",
+      "code": "601225",
+      "name": "陕西煤业",
+      "action": "sell",
+      "price": 25.77,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -17.0,
+      "pnl_pct": -0.66
+    },
+    {
+      "date": "2026-08-12",
+      "code": "600685",
+      "name": "中船防务",
+      "action": "sell",
+      "price": 26.57,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.23
+    },
+    {
+      "date": "2026-08-12",
+      "code": "601233",
+      "name": "桐昆股份",
+      "action": "sell",
+      "price": 23.86,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -7.0,
+      "pnl_pct": -0.29
+    },
+    {
+      "date": "2026-08-12",
+      "code": "001358",
+      "name": "兴欣新材",
+      "action": "sell",
+      "price": 25.92,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -16.0,
+      "pnl_pct": -0.61
+    },
+    {
+      "date": "2026-08-12",
+      "code": "002674",
+      "name": "兴业科技",
+      "action": "sell",
+      "price": 27.82,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -19.0,
+      "pnl_pct": -0.68
     }
   ],
-  "positions": {
-    "603988": {
-      "date": "2026-08-11",
-      "name": "中电电机",
-      "shares": 100,
-      "entry_price": 23.5,
-      "highest_price": 23.5,
-      "entry_date": "2026-08-11"
-    },
-    "601225": {
-      "date": "2026-08-11",
-      "name": "陕西煤业",
-      "shares": 100,
-      "entry_price": 25.94,
-      "highest_price": 25.94,
-      "entry_date": "2026-08-11"
-    },
-    "600685": {
-      "date": "2026-08-11",
-      "name": "中船防务",
-      "shares": 100,
-      "entry_price": 26.63,
-      "highest_price": 26.63,
-      "entry_date": "2026-08-11"
-    },
-    "601233": {
-      "date": "2026-08-11",
-      "name": "桐昆股份",
-      "shares": 100,
-      "entry_price": 23.93,
-      "highest_price": 23.93,
-      "entry_date": "2026-08-11"
-    },
-    "001358": {
-      "date": "2026-08-11",
-      "name": "兴欣新材",
-      "shares": 100,
-      "entry_price": 26.08,
-      "highest_price": 26.08,
-      "entry_date": "2026-08-11"
-    },
-    "002674": {
-      "date": "2026-08-11",
-      "name": "兴业科技",
-      "shares": 100,
-      "entry_price": 28.01,
-      "highest_price": 28.01,
-      "entry_date": "2026-08-11"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
