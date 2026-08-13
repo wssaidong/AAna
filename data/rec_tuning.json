@@ -3,49 +3,49 @@
   "recommended_hold_days": 1,
   "weak_sectors": [
     "ai_app",
-    "semi",
     "chem",
     "mach",
     "elec",
+    "semi",
     "robot"
   ],
-  "total_records": 881,
-  "overall_win_rate": 29.398410896708288,
+  "total_records": 886,
+  "overall_win_rate": 29.006772009029348,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-08-12T20:00:19.325016",
+  "generated_at": "2026-08-13T15:16:20.255564",
   "score_band_stats": {
     "40-50": {
       "band": "40-50",
-      "count": 521,
+      "count": 398,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -19.071247600767766,
+      "avg_change": -5.131356783919608,
       "avg_hold_days": 1.0
     },
     "50-60": {
       "band": "50-60",
-      "count": 212,
-      "win_count": 111,
-      "win_rate": 52.358490566037744,
-      "avg_change": 0.8038679245283018,
+      "count": 352,
+      "win_count": 121,
+      "win_rate": 34.375,
+      "avg_change": 0.5048579545454545,
       "avg_hold_days": 1.0
     },
     "60-70": {
       "band": "60-70",
-      "count": 148,
-      "win_count": 148,
+      "count": 136,
+      "win_count": 136,
       "win_rate": 100.0,
-      "avg_change": 10.997432432432442,
+      "avg_change": 8.11411764705883,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 881,
-      "win_count": 259,
-      "win_rate": 29.398410896708288,
-      "avg_change": -9.23732122587971
+      "count": 886,
+      "win_count": 257,
+      "win_rate": 29.006772009029348,
+      "avg_change": -0.8589729119638785
     }
   },
   "sector_stats": {
@@ -61,9 +61,9 @@
       "sector": "robot",
       "sector_name": "人形机器人",
       "count": 33,
-      "win_count": 22,
-      "win_rate": 66.66666666666666,
-      "avg_change": -1.8424242424242419
+      "win_count": 12,
+      "win_rate": 36.36363636363637,
+      "avg_change": 1.4590909090909092
     },
     "ai_app": {
       "sector": "ai_app",
@@ -77,9 +77,9 @@
       "sector": "semi",
       "sector_name": "半导体设备",
       "count": 33,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -20.81939393939394
+      "win_count": 1,
+      "win_rate": 3.0303030303030303,
+      "avg_change": -5.9442424242424226
     },
     "chem": {
       "sector": "chem",
@@ -87,7 +87,7 @@
       "count": 22,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -25.08090909090909
+      "avg_change": -9.358181818181817
     },
     "mach": {
       "sector": "mach",
@@ -95,7 +95,7 @@
       "count": 22,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -42.46909090909091
+      "avg_change": -2.1568181818181817
     },
     "elec": {
       "sector": "elec",

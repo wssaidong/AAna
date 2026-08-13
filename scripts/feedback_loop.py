@@ -12,6 +12,7 @@ import csv
 import json
 import sys
 import os
+import shutil
 import warnings
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -93,23 +94,55 @@ def _detect_trend(klines):
         return "震荡"
 
 
+_KLINE_CACHE = {}
+
+
+def _kline_cached(code: str, count: int = 260):
+    """按 code 缓存日线，避免同一只股票被反复拉取（原版每只股票要拉 5+ 次）。"""
+    if code in _KLINE_CACHE:
+        return _KLINE_CACHE[code]
+    try:
+        qs = QuoteService()
+        kl = qs.kline(code, period="daily", count=count, adjust="qfq") or []
+    except Exception:
+        kl = []
+    # 统一按日期升序（旧 → 新）；QuoteService 已是升序，这里做一次防御性排序
+    kl = sorted([k for k in kl if k.get("date")], key=lambda k: k.get("date", "")[:10])
+    _KLINE_CACHE[code] = kl
+    return kl
+
+
+def _find_bar_index(klines, target_date):
+    """
+    返回 target_date 在 klines 中的下标。
+    精确命中优先；否则取 <= target_date 的最后一根（推荐日停牌/非交易日的情况）。
+    找不到返回 None —— 绝不回退到「最老的一根」。
+    """
+    if not klines or not target_date:
+        return None
+    t = target_date[:10]
+    idx = None
+    for i, kl in enumerate(klines):
+        d = kl.get("date", "")[:10]
+        if d == t:
+            return i
+        if d <= t:
+            idx = i
+        else:
+            break
+    return idx
+
+
 def _get_kline_for_trend(code: str, rec_date: str):
-    """获取推荐日附近的K线用于趋势检测"""
-    qs = QuoteService()
-    klines = qs.kline(code, period="daily", count=60, adjust="qfq")
+    """获取推荐日附近的K线用于趋势检测（需要 >=20 根做均线，取推荐日前 20 根）"""
+    klines = _kline_cached(code)
     if not klines:
         return None
-    # 优先找推荐日附近的K线
-    target = rec_date[:10]
-    for kl in klines:
-        if kl.get("date", "")[:10] == target:
-            # 返回推荐日前后5天的K线
-            idx = klines.index(kl)
-            start = max(0, idx - 4)
-            end = min(len(klines), idx + 5)
-            return klines[start:end]
-    # 回退：返回最近60天
-    return klines[:30]
+    idx = _find_bar_index(klines, rec_date)
+    if idx is None:
+        return klines[-30:]
+    start = max(0, idx - 29)
+    return klines[start:idx + 1]
 
 def _write_csv(path, fields, rows, mode="w"):
     with open(path, mode, newline="", encoding="utf-8") as f:
@@ -147,26 +180,45 @@ def _date_offset(date_str, offset):
 
 def _get_kline_close(code: str, target_date: str) -> tuple:
     """
-    获取最近 close 价格，支持指定日期或最近交易日。
-    返回 (price, date_str)，找不到返回 (None, None)
+    获取 target_date 当日（或之前最近一个交易日）的收盘价。
+    返回 (price, date_str)，找不到返回 (None, None)。
+
+    ⚠️ 2026-08-13 修复：原实现在找不到 target_date 时回退到 klines[0]
+    （升序数据里 = 最老的一根，可能是 3~5 个月前的价格）→ 静默算出完全错误的收益率。
+    现在找不到就返回 (None, None)，宁可留空也不产生脏数据。
     """
-    qs = QuoteService()
-    # 腾讯 K 线最多返回 500 条，够用
-    klines = qs.kline(code, period="daily", count=100, adjust="qfq")
+    klines = _kline_cached(code)
     if not klines:
         return None, None
-
-    # 尝试精确匹配 target_date
-    for kl in klines:
-        if kl.get("date", "")[:10] == target_date[:10]:
-            p = _sf(kl.get("close"))
-            if p:
-                return p, kl.get("date", "")[:10]
-
-    # 回退：找最近一条
-    kl = klines[0]
+    idx = _find_bar_index(klines, target_date)
+    if idx is None:
+        return None, None
+    kl = klines[idx]
     p = _sf(kl.get("close"))
-    return p, kl.get("date", "")[:10] if p else (None, None)
+    if p is None:
+        return None, None
+    return p, kl.get("date", "")[:10]
+
+
+def _future_close(code: str, base_date: str, n_bars: int) -> tuple:
+    """
+    取 base_date 之后第 n_bars 个【交易日】的收盘价（按 K 线行数走，不是日历日）。
+    未来还没走完 n_bars 根 → 返回 (None, None)，该周期留空。
+    """
+    klines = _kline_cached(code)
+    if not klines:
+        return None, None
+    idx = _find_bar_index(klines, base_date)
+    if idx is None:
+        return None, None
+    tgt = idx + n_bars
+    if tgt >= len(klines):
+        return None, None
+    kl = klines[tgt]
+    p = _sf(kl.get("close"))
+    if p is None:
+        return None, None
+    return p, kl.get("date", "")[:10]
 
 
 def _sf(v, default=None):
@@ -189,10 +241,37 @@ def _calc_ret(entry_price, exit_price):
 # ── 核心逻辑 ────────────────────────────────────────────────────────────────
 
 def load_recent_recommendations(days=7):
-    """加载最近 N 日的推荐"""
+    """
+    加载最近 N 日的推荐。
+
+    ⚠️ 2026-08-13 修复（写入/读取源分裂）：
+    尾盘主链路 daily_v24_recommend.py → aana_afternoon_screen.screen_afternoon_stocks()
+    只写 rec_feedback.csv（record_recommendation），**不写** recommendations.csv
+    （append_recommendations_batch 只在 aana_afternoon_screen.main() 里调，cron 走的是
+    screen_afternoon_stocks() 函数入口，绕过了 main）。
+    结果：recommendations.csv 自 2026-07-29 起再无新增 → 本脚本连续多日「0 条推荐」空跑。
+
+    修复：两个源都读并按 (code, date) 合并去重。
+    """
     cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
-    rows = _read_csv(REC_CSV)
-    return [r for r in rows if r.get("date", "") >= cutoff]
+
+    merged = {}
+
+    # 源 1：recommendations.csv（早期 / main() 入口写入）
+    for r in _read_csv(REC_CSV):
+        d = (r.get("date") or "")[:10]
+        code = r.get("code", "")
+        if d and code and d >= cutoff:
+            merged[(code, d)] = {"code": code, "name": r.get("name", ""), "date": d}
+
+    # 源 2：rec_feedback.csv 的 rec_date（尾盘 v2.4 主链路实际写入点）
+    for r in _read_csv(FEEDBACK_CSV):
+        d = (r.get("rec_date") or "")[:10]
+        code = r.get("code", "")
+        if d and code and d >= cutoff:
+            merged.setdefault((code, d), {"code": code, "name": r.get("name", ""), "date": d})
+
+    return sorted(merged.values(), key=lambda x: (x["date"], x["code"]))
 
 
 def load_positions():
@@ -262,26 +341,27 @@ def calculate_returns(rec_rows, trade_rows):
 
         # 尝试从持仓记录获取实际持仓信息
         pos = position_map.get(code)
+        base_date = rec_close_date or rec_date
+        base_price = rec_close
+
+        # ⚠️ 2026-08-13 修复（复权基准混用）：
+        # paper_trades.json 里的 entry_price 是**未复权**成交价（如 603269 = 23.47），
+        # 而 K 线走的是 qfq **前复权**序列（同日 close = 15.847）。
+        # 两者直接相除会算出 -34.61% 这种假暴跌（该笔实际是 +2.9%）。
+        # 因此：持仓记录只用来对齐【建仓日期】，价格一律取同一条 qfq 序列，保证基准一致。
+        if pos and pos.get("entry_date"):
+            entry_close, entry_date = _get_kline_close(code, pos["entry_date"][:10])
+            if entry_close is not None:
+                base_price = entry_close
+                base_date = entry_date
 
         for nd in N_DAYS:
-            if pos:
-                # 有实际持仓：用实际持仓价格
-                hold_exit_date = _date_offset(pos["entry_date"], nd)
-                if hold_exit_date:
-                    exit_price, _ = _get_kline_close(code, hold_exit_date)
-                    if exit_price is None:
-                        exit_price, _ = _get_kline_close(code, _date_offset(pos["entry_date"], nd + 1))
-                else:
-                    exit_price = None
-            else:
-                # 无实际持仓：用推荐日后 N 日的 K 线
-                target = _date_offset(rec_date, nd)
-                exit_price, _ = _get_kline_close(code, target)
-                if exit_price is None:
-                    # 尝试往后找一天
-                    exit_price, _ = _get_kline_close(code, _date_offset(rec_date, nd + 1))
-
-            ret = _calc_ret(rec_close, exit_price)
+            # ⚠️ 2026-08-13 修复：原实现用 _date_offset() 加【日历日】，
+            # 周末/节假日直接落在非交易日上 → _get_kline_close 找不到 → 旧代码回退到
+            # klines[0]（最老的一根）→ 算出天文数字般错误的收益率。
+            # 现在按【交易日行数】前进，未来 bar 不够就留空。
+            exit_price, _ = _future_close(code, base_date, nd)
+            ret = _calc_ret(base_price, exit_price)
             row_out[f"ret_{nd}d"] = ret if ret is not None else ""
 
         results.append(row_out)
@@ -290,13 +370,102 @@ def calculate_returns(rec_rows, trade_rows):
 
 
 def append_feedback(rows):
-    """追加写入 feedback CSV（按 code+rec_date 去重，避免重跑累积冗余行）"""
+    """
+    合并写入 feedback CSV。
+
+    ⚠️ 2026-08-13 修复两个严重缺陷：
+    1) 列丢失：原实现用固定 FEEDBACK_FIELDS + extrasaction="ignore" 全量重写，
+       会把实际文件里的 score / sentiment_score / macd_gold / macd_confirmed
+       四列**整表抹掉**（这四列由 aana_afternoon_screen.record_recommendation 写入，
+       且 rec_optimizer.py 依赖）。现在按「已有表头 ∪ 标准字段」写回。
+    2) 永不回填：原实现按 (code, rec_date) 去重后直接丢弃新算的行，导致
+       已存在但 ret_* 为空的记录**永远补不上收益率**（实测 106 行自 6/10 起一直空）。
+       现在改为：已存在 → 用新算出的非空值补全空字段；不存在 → 追加。
+    """
     existing = _read_csv(FEEDBACK_CSV)
-    seen = {(r.get("code", ""), r.get("rec_date", "")) for r in existing}
-    deduped_new = [r for r in rows if (r.get("code", ""), r.get("rec_date", "")) not in seen]
-    if len(deduped_new) < len(rows):
-        print(f"   去重跳过 {len(rows) - len(deduped_new)} 条已存在记录", file=sys.stderr)
-    _write_csv(FEEDBACK_CSV, FEEDBACK_FIELDS, existing + deduped_new, mode="w")
+
+    # 保留文件里已有的所有列（防止把 score 等列写没了）
+    fields = list(FEEDBACK_FIELDS)
+    if FEEDBACK_CSV.exists():
+        with open(FEEDBACK_CSV, newline="", encoding="utf-8") as f:
+            hdr = csv.DictReader(f).fieldnames or []
+        for c in hdr:
+            if c not in fields:
+                fields.append(c)
+
+    index = {(r.get("code", ""), r.get("rec_date", "")): r for r in existing}
+
+    added = 0
+    backfilled = 0
+    for new in rows:
+        key = (new.get("code", ""), new.get("rec_date", ""))
+        old = index.get(key)
+        if old is None:
+            existing.append(new)
+            index[key] = new
+            added += 1
+            continue
+        # 已存在：只补空字段，不覆盖已有值
+        touched = False
+        for col in ("trend", "ret_1d", "ret_3d", "ret_5d", "ret_15d"):
+            nv = str(new.get(col, "") or "").strip()
+            ov = str(old.get(col, "") or "").strip()
+            if nv and not ov:
+                old[col] = new[col]
+                touched = True
+        if touched:
+            backfilled += 1
+
+    print(f"   新增 {added} 条 / 回填 {backfilled} 条历史空记录", file=sys.stderr)
+
+    # 写前备份 + 写后校验（沿用 SKILL.md「缓存是真理之源」预防 SOP）
+    if FEEDBACK_CSV.exists():
+        shutil.copy2(FEEDBACK_CSV, str(FEEDBACK_CSV) + ".bak")
+    _write_csv(FEEDBACK_CSV, fields, existing, mode="w")
+    check = _read_csv(FEEDBACK_CSV)
+    if len(check) != len(existing):
+        # 写坏了就还原，绝不让一次失败的写抹掉历史
+        if os.path.exists(str(FEEDBACK_CSV) + ".bak"):
+            shutil.copy2(str(FEEDBACK_CSV) + ".bak", FEEDBACK_CSV)
+        raise RuntimeError(f"rec_feedback.csv 写后校验失败（{len(check)} != {len(existing)}），已从 .bak 还原")
+
+    return added, backfilled
+
+
+MAX_ABS_RET = 22.0  # A股单日涨跌上限（创业板/科创板 ±20%）→ 超过即为脏数据
+
+
+def _valid_rows(rows, top_n=20):
+    """
+    取用于统计的有效行。
+
+    ⚠️ 2026-08-13 新增两道防线（对齐 SKILL.md「sanity check 阈值表」个股日涨跌 ±22%）：
+    1) 剔除 |ret_1d| > 22% 的物理不可能值 —— 这些是历史 _get_kline_close() 回退到
+       「最老一根K线」产生的脏数据（实测 278 行，最极端 -58%）。
+    2) 按 (code, rec_date) 去重，保留字段最全的一行 —— 历史文件里同一条推荐被
+       record_recommendation 多次追加，会让「最近20只」被少数几只重复票占满。
+    """
+    dedup = {}
+    for r in rows:
+        ret = _sf(r.get("ret_1d"))
+        if ret is None:
+            continue
+        if abs(ret) > MAX_ABS_RET:
+            continue  # 脏数据，跳过
+        key = (r.get("code", ""), r.get("rec_date", ""))
+        prev = dedup.get(key)
+        if prev is None:
+            dedup[key] = r
+        else:
+            # 保留 ret_* 填得更全的那行
+            score_new = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                            if str(r.get(c, "") or "").strip())
+            score_old = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                            if str(prev.get(c, "") or "").strip())
+            if score_new >= score_old:
+                dedup[key] = r
+    valid = sorted(dedup.values(), key=lambda r: (r.get("rec_date", ""), r.get("code", "")))
+    return valid[-top_n:] if len(valid) > top_n else valid
 
 
 def compute_stats(rows, top_n=20):
@@ -304,9 +473,7 @@ def compute_stats(rows, top_n=20):
     计算最近 N 条推荐的统计数据。
     返回 (win_count, total, winrate, avg_win, avg_loss, profit_ratio)
     """
-    # 过滤掉没有收益率的记录，取最近 top_n 条
-    valid = [r for r in rows if r.get("ret_1d") != ""]
-    valid = valid[-top_n:] if len(valid) > top_n else valid
+    valid = _valid_rows(rows, top_n)
 
     if not valid:
         return 0, 0, 0.0, 0.0, 0.0, None
@@ -345,8 +512,7 @@ def compute_trend_stats(rows, top_n=20):
     区分：上升趋势中RSI超卖 vs 下降趋势中RSI超卖
     返回趋势统计数据字典
     """
-    valid = [r for r in rows if r.get("ret_1d") != ""]
-    valid = valid[-top_n:] if len(valid) > top_n else valid
+    valid = _valid_rows(rows, top_n)
 
     if not valid:
         return {}
@@ -447,7 +613,7 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
         "|------|------|------|--------|------|--------|--------|--------|--------|",
     ])
 
-    for r in feedback_rows[-20:]:
+    for r in _valid_rows(feedback_rows, 20):
         ret_1d = _sf(r.get("ret_1d"))
         ret_3d = _sf(r.get("ret_3d"))
         ret_5d = _sf(r.get("ret_5d"))
@@ -474,11 +640,32 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
 # ── 主入口 ────────────────────────────────────────────────────────────────────
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--days", type=int, default=7,
+                    help="回看天数（默认 7）")
+    ap.add_argument("--backfill", action="store_true",
+                    help="回填模式：扫描 rec_feedback.csv 中所有 ret_* 为空的历史记录并补算")
+    args = ap.parse_args()
+
     print("🔄 加载数据...", file=sys.stderr)
 
-    # 1. 读取最近7日推荐
-    rec_rows = load_recent_recommendations(days=7)
-    print(f"   最近7日推荐: {len(rec_rows)} 条", file=sys.stderr)
+    # 1. 读取推荐（合并 recommendations.csv + rec_feedback.csv 两个源）
+    if args.backfill:
+        # 回填模式：把所有 ret_* 有缺失的历史记录拉出来重算
+        pend = {}
+        for r in _read_csv(FEEDBACK_CSV):
+            if all(str(r.get(c, "") or "").strip() for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")):
+                continue
+            d = (r.get("rec_date") or "")[:10]
+            code = r.get("code", "")
+            if d and code:
+                pend[(code, d)] = {"code": code, "name": r.get("name", ""), "date": d}
+        rec_rows = sorted(pend.values(), key=lambda x: (x["date"], x["code"]))
+        print(f"   回填模式: {len(rec_rows)} 条待补记录", file=sys.stderr)
+    else:
+        rec_rows = load_recent_recommendations(days=args.days)
+        print(f"   最近{args.days}日推荐: {len(rec_rows)} 条", file=sys.stderr)
 
     # 2. 读取持仓记录
     trade_data = load_paper_trades()
@@ -494,9 +681,9 @@ def main():
     feedback_rows = calculate_returns(rec_rows, trade_data)
     print(f"   计算完成: {len(feedback_rows)} 条", file=sys.stderr)
 
-    # 4. 追加写入 CSV
+    # 4. 合并写入 CSV（新增 + 回填空字段）
     append_feedback(feedback_rows)
-    print(f"   已追加写入: {FEEDBACK_CSV}", file=sys.stderr)
+    print(f"   已写入: {FEEDBACK_CSV}", file=sys.stderr)
 
     # 5. 统计 — 读 CSV 全表末尾 20 条（而不是只统计当天新增的 feedback_rows，
     #    否则样本被压到当天 rec 条数，分母严重偏小 → 胜率误导）
