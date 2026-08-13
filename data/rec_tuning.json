@@ -12,14 +12,14 @@
   "total_records": 886,
   "overall_win_rate": 29.006772009029348,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-08-13T15:16:20.255564",
+  "generated_at": "2026-08-13T20:00:47.074527",
   "score_band_stats": {
     "40-50": {
       "band": "40-50",
       "count": 398,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -5.131356783919608,
+      "avg_change": -5.052336683417096,
       "avg_hold_days": 1.0
     },
     "50-60": {
@@ -45,7 +45,7 @@
       "count": 886,
       "win_count": 257,
       "win_rate": 29.006772009029348,
-      "avg_change": -0.8589729119638785
+      "avg_change": -0.8234762979683934
     }
   },
   "sector_stats": {

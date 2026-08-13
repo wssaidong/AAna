@@ -1561,3 +1561,36 @@
 [2026-08-13 14:45:00] [daily_v24_recommend] ============================================================
 [2026-08-13 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
 [2026-08-13 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600673', '600547', '600895', '002842', '000426', '002674', '600459', '600330', '603011', '603920']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 152 只
+[AAna 尾盘] 候选股票总数: 162 只
+[K线] 600547: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002842: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 5 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 5 只
+[2026-08-13 14:45:08] [daily_v24_recommend]   找到 5 只推荐
+[2026-08-13 14:45:08] [daily_v24_recommend]     600895 张江高科 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     002674 兴业科技 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     600459 贵研铂业 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     603011 合锻智能 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     000426 兴业银锡 score=70
+[2026-08-13 14:45:08] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 600895 张江高科 @32.78 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 002674 兴业科技 @28.76 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 600459 贵研铂业 @20.79 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 603011 合锻智能 @24.73 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 000426 兴业银锡 @37.98 100股
+[2026-08-13 14:45:08] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-13 14:45:08] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-13-v24-尾盘推荐.md
+[2026-08-13 14:45:08] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-13 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-13 14:45:08] [daily_v24_recommend] ✅ 完成
+[2026-08-13 14:45:08] [daily_v24_recommend] ============================================================
