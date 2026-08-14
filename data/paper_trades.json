@@ -1881,49 +1881,63 @@
       "reason": "AAna v2.4 尾盘评分 70",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-14",
+      "code": "600895",
+      "name": "张江高科",
+      "action": "sell",
+      "price": 32.66,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -12.0,
+      "pnl_pct": -0.37
+    },
+    {
+      "date": "2026-08-14",
+      "code": "002674",
+      "name": "兴业科技",
+      "action": "sell",
+      "price": 28.64,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -12.0,
+      "pnl_pct": -0.42
+    },
+    {
+      "date": "2026-08-14",
+      "code": "600459",
+      "name": "贵研铂业",
+      "action": "sell",
+      "price": 20.46,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -33.0,
+      "pnl_pct": -1.59
+    },
+    {
+      "date": "2026-08-14",
+      "code": "603011",
+      "name": "合锻智能",
+      "action": "sell",
+      "price": 24.23,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -50.0,
+      "pnl_pct": -2.02
+    },
+    {
+      "date": "2026-08-14",
+      "code": "000426",
+      "name": "兴业银锡",
+      "action": "sell",
+      "price": 36.82,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -116.0,
+      "pnl_pct": -3.05
     }
   ],
-  "positions": {
-    "600895": {
-      "date": "2026-08-13",
-      "name": "张江高科",
-      "shares": 100,
-      "entry_price": 32.78,
-      "highest_price": 32.78,
-      "entry_date": "2026-08-13"
-    },
-    "002674": {
-      "date": "2026-08-13",
-      "name": "兴业科技",
-      "shares": 100,
-      "entry_price": 28.76,
-      "highest_price": 28.76,
-      "entry_date": "2026-08-13"
-    },
-    "600459": {
-      "date": "2026-08-13",
-      "name": "贵研铂业",
-      "shares": 100,
-      "entry_price": 20.79,
-      "highest_price": 20.79,
-      "entry_date": "2026-08-13"
-    },
-    "603011": {
-      "date": "2026-08-13",
-      "name": "合锻智能",
-      "shares": 100,
-      "entry_price": 24.73,
-      "highest_price": 24.73,
-      "entry_date": "2026-08-13"
-    },
-    "000426": {
-      "date": "2026-08-13",
-      "name": "兴业银锡",
-      "shares": 100,
-      "entry_price": 37.98,
-      "highest_price": 37.98,
-      "entry_date": "2026-08-13"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
