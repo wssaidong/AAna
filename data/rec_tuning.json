@@ -10,24 +10,24 @@
     "robot"
   ],
   "total_records": 886,
-  "overall_win_rate": 29.006772009029348,
+  "overall_win_rate": 29.232505643340858,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-08-13T20:00:47.074527",
+  "generated_at": "2026-08-14T20:00:22.373273",
   "score_band_stats": {
     "40-50": {
       "band": "40-50",
-      "count": 398,
+      "count": 402,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -5.052336683417096,
+      "avg_change": -5.022960199004984,
       "avg_hold_days": 1.0
     },
     "50-60": {
       "band": "50-60",
-      "count": 352,
-      "win_count": 121,
-      "win_rate": 34.375,
-      "avg_change": 0.5048579545454545,
+      "count": 348,
+      "win_count": 123,
+      "win_rate": 35.3448275862069,
+      "avg_change": 0.5150862068965517,
       "avg_hold_days": 1.0
     },
     "60-70": {
@@ -43,9 +43,9 @@
     "1": {
       "hold_days": 1,
       "count": 886,
-      "win_count": 257,
-      "win_rate": 29.006772009029348,
-      "avg_change": -0.8234762979683934
+      "win_count": 259,
+      "win_rate": 29.232505643340858,
+      "avg_change": -0.8312189616252782
     }
   },
   "sector_stats": {
