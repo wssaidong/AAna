@@ -1564,6 +1564,7 @@ if __name__ == "__main__":
 
 
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
@@ -1572,6 +1573,6 @@ REC_TUNING = {
     "weak_sectors": ['ai_app', 'chem', 'mach', 'elec', 'semi', 'robot'],
     "overall_win_rate": 29.2,
     "total_records": 886,
-    "generated_at": "2026-08-14T20:00:22.373273",
+    "generated_at": "2026-08-17T20:00:11.664526",
 }
 # === REC_OPTIMIZER_TUNING_END ===
