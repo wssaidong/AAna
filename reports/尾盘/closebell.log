@@ -1618,3 +1618,38 @@
     "type": "config",
     "message": "not configured",
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-15 14:45:03] [daily_v24_recommend] ============================================================
+[2026-08-15 14:45:03] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-15 14:45:03] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-15-选股报告.md
+[Eastmoney] 报告 Top10: ['603156', '600301', '600188', '600330', '603358', '600988', '002364', '002674', '002827', '600498']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 70 只
+[AAna 尾盘] 候选股票总数: 80 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-15 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-15 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-16 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-16-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-15-选股报告.md
+  [源3] 全市场涨幅榜: 新增 72 只
+[AAna 尾盘] 候选股票总数: 72 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-16 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-16 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif

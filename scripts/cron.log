@@ -9312,3 +9312,40 @@ TypeError: unsupported operand type(s) for |: 'type' and 'NoneType'
 [AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-08-14-选股报告.md
 [AAna v2.5] 生成 2026-08-14 复盘评分报告...
 [AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-08-14_09_00.json，跳过复盘报告
+[AAna] 2026-08-15 非交易日 (周末 (周六))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-15 非交易日 (周末 (周六))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-16 非交易日 (周末 (周日))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] 2026-08-16 非交易日 (周末 (周日))，跳过报告生成
+[AAna] Git pull: Already up to date.
+[AAna] Git pull: Already up to date.
+[AAna] 清理过期报告: 2026-08-07-选股报告.md
+[AAna] 清理过期报告: 2026-08-09-基金周报.md
+[AAna] 共清理 2 个过期文件
+[AAna v2.5] 生成 2026-08-17 动态选股报告...
+[情绪] 涨停:63 跌停:6 上证:+0.41% [数据源:ths]
+[情绪] 回暖 | 涨停63 跌停6 平均涨跌+0.41%
+[Sina] Page 14 failed: Expecting value: line 1 column 1 (char 0)
+[情绪] 涨停:63 跌停:6 上证:+0.41% [数据源:ths]
+[情绪] 涨停股池失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna] 动态股票池: 135 只 (涨停警示 0 只)
+[资金流] 获取失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 获取 30 只资金数据
+[AAna] 获取 40 只股票数据...
+  [指数] 已补拉 4/4 个指数
+[情绪] 板块数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna Fund] 加载基金类型映射...
+[AAna Fund] 已加载 26298 只基金类型
+[AAna Fund] 获取 股票型 基金...
+[AAna Fund] 获取 混合型 基金...
+[AAna Fund] 获取 指数型 基金...
+[AAna Fund] 获取 债券型 基金...
+[AAna Fund] 获取 QDII 基金...
+[AAna Fund] 获取 FOF 基金...
+[AAna Fund] 共 1472 只基金，类型分布: {'混合型': 1041, '未知': 105, '指数型': 109, 'QDII': 15, '债券型': 192, 'FOF': 10}
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-08-17-选股报告.md
+[AAna v2.5] 生成 2026-08-17 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-08-17_09_00.json，跳过复盘报告
