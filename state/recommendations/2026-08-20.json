@@ -1,0 +1,103 @@
+{
+  "date": "2026-08-20",
+  "market_prediction": "🔥 乐观 积极布局，注意追高风险",
+  "sentiment": "🔥 乐观",
+  "focus_sectors": [
+    "半导体设备",
+    "AI算力/芯片",
+    "人形机器人"
+  ],
+  "recommended_stocks": [
+    {
+      "code": "600703",
+      "name": "三安光电",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002049",
+      "name": "紫光国微",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600584",
+      "name": "长电科技",
+      "sector": "semi",
+      "sector_name": "半导体设备",
+      "reason": "AI芯片国产替代+政策驱动",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002230",
+      "name": "科大讯飞",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "sector": "ai_chip",
+      "sector_name": "AI算力/芯片",
+      "reason": "DeepSeek带动算力需求爆发",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "603667",
+      "name": "五洲新春",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "002836",
+      "name": "新宏泽",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    },
+    {
+      "code": "600745",
+      "name": "*ST闻泰",
+      "sector": "robot",
+      "sector_name": "人形机器人",
+      "reason": "特斯拉Optimus Q1发布+政策扶持",
+      "expected_change": "+1~+5%",
+      "expected_high": 5.0,
+      "expected_low": 1.0
+    }
+  ],
+  "created_at": "2026-08-20T08:30:05.695061"
+}
