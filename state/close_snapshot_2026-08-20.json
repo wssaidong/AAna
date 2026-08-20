@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-08-20T14:45:04.934022",
+  "data": {
+    "timestamp": "2026-08-20T14:45:04.933542",
+    "index_data": [
+      {
+        "name": "上证指数",
+        "price": 11.27,
+        "change": 0.63
+      },
+      {
+        "name": "深证成指",
+        "price": 13890.152,
+        "change": -1.02
+      },
+      {
+        "name": "创业板指",
+        "price": 3473.493,
+        "change": -1.26
+      },
+      {
+        "name": "科创50",
+        "price": 30.97,
+        "change": -0.61
+      }
+    ],
+    "sector_perf": [
+      {
+        "name": "储能/绿电",
+        "avg_change": -0.1266666666666667,
+        "logic": "碳中和+装机旺季"
+      },
+      {
+        "name": "AI应用",
+        "avg_change": -0.235,
+        "logic": "端侧AI+智能汽车"
+      },
+      {
+        "name": "人形机器人",
+        "avg_change": -0.49749999999999994,
+        "logic": "特斯拉Optimus Q1发布+政策扶持"
+      },
+      {
+        "name": "AI算力/芯片",
+        "avg_change": -1.01,
+        "logic": "DeepSeek带动算力需求爆发"
+      },
+      {
+        "name": "半导体设备",
+        "avg_change": -1.8133333333333332,
+        "logic": "AI芯片国产替代+政策驱动"
+      }
+    ],
+    "strong_stocks": [],
+    "pullback_stocks": [],
+    "trend": "📉 尾盘小幅回落"
+  }
+}
