@@ -24,6 +24,7 @@ dependencies = [
     "akshare>=1.14.0",
     "backtrader>=1.9.0",
     "baostock>=0.8.9",
+    "duckdb>=1.0.0",  # v2026-08-23 Phase 8: analytics layer (零依赖直读 CSV/JSON)
     "pandas>=2.0.0",
     "requests>=2.31.0",
 ]

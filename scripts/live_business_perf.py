@@ -63,6 +63,20 @@ def load_feedback(days: int) -> list[dict]:
     return rows
 
 
+def load_feedback_duckdb(days: int) -> list[dict] | None:
+    """Phase 8C: DuckDB 版本的 load_feedback — 用作 A/B 验证。
+    失败时返回 None (caller 决定 fallback 到 pandas 版本)。
+    """
+    try:
+        from analytics_query import query_recent_recommendations
+        result = query_recent_recommendations(days=days)
+        if not result.get("ok"):
+            return None
+        return result.get("rows", [])
+    except Exception:
+        return None
+
+
 def calc_winrate(rows: list[dict], key: str = "ret_1d") -> dict:
     """通用胜率计算器: ret_key > 0 算赢"""
     wins, losses, total = 0, 0, 0
@@ -184,13 +198,46 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--days", type=int, default=30, help="回看天数 (默认 30)")
     p.add_argument("--json", action="store_true", help="同时输出 JSON")
+    p.add_argument("--skip-duckdb-check", action="store_true",
+                   help="跳过 DuckDB A/B crosscheck (Phase 8C)")
     args = p.parse_args()
 
-    print(f"📊 live_business_perf: 回看 {args.days} 日 ...")
+    print(f"📊 live_business_perf: 回看 {args.days} 日 ...", file=sys.stderr)
     rows = load_feedback(args.days)
     if not rows:
         print(f"⚠️  无 rec_feedback.csv 数据 (回看 {args.days} 日)")
         sys.exit(1)
+
+    # v2026-08-23 (Phase 8C): DuckDB A/B crosscheck — 同口径胜率应近似,差异大就 stderr WARN
+    if not args.skip_duckdb_check:
+        try:
+            from analytics_query import query_winrate as db_wr
+            db_total = db_wr(days=args.days, min_score=0)
+            db_high = db_wr(days=args.days, min_score=65)
+            raw = calc_winrate(rows)
+            diff_total = abs(raw['win_rate'] - db_total.get('win_rate', 0))
+            pandas_high = calc_winrate(
+                [r for r in rows if (_sf(r.get("score")) or 0) >= 65]
+            )['win_rate']
+            diff_high = abs(
+                pandas_high - db_high.get('win_rate', 0)
+            )
+            status = "✅" if (diff_total < 1.0 and diff_high < 5.0) else "⚠️"
+            print(
+                f"   [Phase 8C] DuckDB A/B crosscheck {status}: "
+                f"全样本 diff={diff_total:.1f}pp, "
+                f"score>=65 diff={diff_high:.1f}pp "
+                f"(pandas 全 {raw['win_rate']}% n={raw['sample_size']}, "
+                f"pandas>=65 {pandas_high}%, "
+                f"DuckDB 全 {db_total.get('win_rate')}%, "
+                f"DuckDB>=65 {db_high.get('win_rate')}%)",
+                file=sys.stderr,
+            )
+        except Exception as e:
+            print(
+                f"   [Phase 8C] DuckDB skip: {type(e).__name__}: {e}",
+                file=sys.stderr,
+            )
 
     stats = {
         "raw": calc_winrate(rows),
