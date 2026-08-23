@@ -69,6 +69,9 @@ class FeedbackRecord:
     expected_low: float
     hit: bool           # 是否符合预测
     created_at: str
+    # v2026-08-23: score 是否为反推估算 (从 ret_1d 反推的 score 不能进 score_band 统计,
+    # 否则循环论证 — 60-70 带 100% 胜率假象就是这么来的)
+    score_is_estimated: bool = False
 
 @dataclass
 class ScoreBandStats:
@@ -150,7 +153,17 @@ def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
                     # v2 格式：通过 ret_1d 反推 actual_change/score/hold_days
                     ret_1d_raw = row.get("ret_1d", "")
                     actual_change = float(ret_1d_raw) if ret_1d_raw else 0.0
-                    score = _estimate_score_from_ret(actual_change)
+                    # v2026-08-23 (防循环论证): 真实 score 优先; 只有 CSV 里 score 为空
+                    # 才反推估算。真实 score 是推荐时刻写入的,估算 score 是从收益
+                    # 反推的 — 拿后者算 "score 越高胜率越高" 是循环论证 (8/23 复盘发现
+                    # 97% 记录是估算值,把 60-70 带算成 100% 胜率假象)。
+                    score_raw = str(row.get("score", "")).strip()
+                    if score_raw and score_raw not in ("0", "0.0"):
+                        score = int(float(score_raw))
+                        score_is_estimated = False
+                    else:
+                        score = _estimate_score_from_ret(actual_change)
+                        score_is_estimated = True
                     hold_days = 1  # v2 默认持有 1 天（T+1）
 
                     # 尝试从 rec_date + recommendations.csv 获取 sector/name
@@ -172,6 +185,7 @@ def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
                         expected_low=0.0,
                         hit=actual_change > 0,
                         created_at="",
+                        score_is_estimated=score_is_estimated,
                     ))
                 else:
                     # v1 格式（原有逻辑）
@@ -382,9 +396,15 @@ def _save_feedback_csv(records: List[FeedbackRecord]):
 # ── 统计分析 ────────────────────────────────────────────────────────────────
 
 def calc_score_band_stats(records: List[FeedbackRecord]) -> Dict[str, ScoreBandStats]:
-    """按评分区间统计胜率"""
+    """按评分区间统计胜率
+
+    v2026-08-23: 只统计真实 score 的记录 (score_is_estimated=False)。
+    估算 score 从 ret_1d 反推,用它统计 "score 高→胜率高" 是循环论证。
+    """
     buckets = defaultdict(list)
     for r in records:
+        if r.score_is_estimated:
+            continue  # 反推估算的 score 不进 score_band 统计
         for band, lo, hi in DEFAULT_SCORE_BANDS:
             if lo <= r.score < hi:
                 buckets[band].append(r)
@@ -465,13 +485,20 @@ def calc_sector_stats(records: List[FeedbackRecord]) -> Dict[str, SectorStats]:
 
 
 def find_optimal_score_threshold(score_band_stats: Dict[str, ScoreBandStats]) -> int:
-    """找出胜率最高的评分区间，返回该区间的下限作为阈值"""
+    """找出胜率最高的评分区间，返回该区间的下限作为阈值
+
+    v2026-08-23: 加最小样本门槛 (MIN_BAND_SAMPLES=30)。
+    没有足量真实 score 数据时保持默认 65,不因小样本瞎调。
+    """
+    MIN_BAND_SAMPLES = 30
     if not score_band_stats:
-        return 60  # 默认
-    best_band = max(score_band_stats, key=lambda b: score_band_stats[b].win_rate)
+        return 65  # 默认 (v2.4 沿用)
+    qualified = {b: s for b, s in score_band_stats.items() if s.count >= MIN_BAND_SAMPLES}
+    if not qualified:
+        return 65  # 无足量样本,不调
+    best_band = max(qualified, key=lambda b: qualified[b].win_rate)
     band_defs = {b: (lo, hi) for b, lo, hi in DEFAULT_SCORE_BANDS}
     lo, hi = band_defs.get(best_band, (60, 70))
-    # 取该区间中胜率超过50%的最低分
     return lo
 
 

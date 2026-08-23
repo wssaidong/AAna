@@ -164,14 +164,25 @@ def test_vol_ratio_zero_avg_returns_none():
 # ───────────────── 修复 #3: 评分阈值 ≥65 ─────────────────
 
 def test_score_above_65_kept_below_65_dropped():
-    """screen 末尾应只保留 score >= 65（与报告"买入条件 ≥65"一致）"""
-    # 已在 screen_afternoon_stocks 内 if score >= 65: results.append
-    # 通过源码静态检查确认
+    """阈值断言 (v2026-08-23 数据驱动改造后):
+
+    阈值不再硬编码 `if score >= 65`,而是从 strategy_policy 动态读取:
+      - 默认/policy 失败 → 65 (v2.4 行为不变)
+      - 真实 score 样本足够时 rec_optimizer 可调, 钳制在 [55, 80]
+    源码静态断言改为验证: ① policy 加载代码存在 ② 回落默认 65 ③ 动态阈值判断。
+    """
     import inspect
     from aana_afternoon_screen import screen_afternoon_stocks
     src = inspect.getsource(screen_afternoon_stocks)
-    assert 'if score >= 65' in src, "screen 应使用 >= 65 阈值"
-    assert 'if score >= 60' not in src, "旧阈值 60 不应再出现"
+    assert 'from strategy_policy import get_today_policy' in src, \
+        "screen 必须从 strategy_policy 读策略参数 (数据驱动闭环)"
+    assert 'score_threshold = 65' in src, "policy 失败时必须回落默认 65"
+    assert 'if score >= score_threshold:' in src, "必须用动态阈值判断"
+    assert 'if score >= 60' not in src, "旧硬编码阈值 60 不应再出现"
+
+    # 行为验证: strategy_policy 默认值就是 65
+    from strategy_policy import DEFAULT_SCORE_THRESHOLD
+    assert DEFAULT_SCORE_THRESHOLD == 65
 
 
 # ───────────────── 修复 #4: 5.0% 边界严格 ─────────────────

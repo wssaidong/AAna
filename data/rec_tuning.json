@@ -1,5 +1,5 @@
 {
-  "recommended_score_threshold": 60,
+  "recommended_score_threshold": 65,
   "recommended_hold_days": 1,
   "weak_sectors": [
     "ai_app",
@@ -12,30 +12,14 @@
   "total_records": 897,
   "overall_win_rate": 28.87402452619844,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-08-23T22:03:50.425342",
+  "generated_at": "2026-08-23T23:12:56.763216",
   "score_band_stats": {
-    "40-50": {
-      "band": "40-50",
-      "count": 410,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -4.984829268292692,
-      "avg_hold_days": 1.0
-    },
-    "50-60": {
-      "band": "50-60",
-      "count": 351,
-      "win_count": 123,
-      "win_rate": 35.04273504273504,
-      "avg_change": 0.5106837606837606,
-      "avg_hold_days": 1.0
-    },
-    "60-70": {
-      "band": "60-70",
-      "count": 136,
-      "win_count": 136,
-      "win_rate": 100.0,
-      "avg_change": 8.11411764705883,
+    "70+": {
+      "band": "70+",
+      "count": 24,
+      "win_count": 2,
+      "win_rate": 8.333333333333332,
+      "avg_change": -1.8454166666666667,
       "avg_hold_days": 1.0
     }
   },

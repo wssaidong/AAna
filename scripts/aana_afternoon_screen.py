@@ -711,6 +711,27 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     4. 过滤并排序
     5. 优化 #3: 选中票写入 rec_feedback.csv
 
+    v2026-08-23 (数据驱动策略): 评分阈值 + 板块黑名单从 strategy_policy 读取
+    (rec_tuning.json ← rec_optimizer 复盘胜率,闭环自动化)。
+    policy 失败时回落 v2.4 硬编码 (65 / 无黑名单),不影响主流程。
+    """
+    # ── 策略参数 (数据驱动) ──
+    try:
+        from strategy_policy import get_today_policy, policy_banner
+        policy = get_today_policy()
+        score_threshold = policy.score_threshold
+        sector_blacklist = set(policy.sector_blacklist)
+        print(policy_banner(policy))
+        for note in policy.data_notes:
+            print(f"  [strategy_policy] {note}")
+    except Exception as _policy_err:
+        print(f"[strategy_policy] 加载失败回落默认: {_policy_err}")
+        score_threshold = 65
+        sector_blacklist = set()
+
+    filtered_by_sector = 0
+
+    """
     修复 #5 (P1): 候选池扩到全市场
        原版只看 top10 报告，会自限。今日改为：top10 + 新浪全市场涨幅榜（涨幅 -3~+5%）。
     修复 #3 (P1): 评分阈值从 60 改 65，与报告"买入条件 ≥ 65"一致
@@ -809,11 +830,20 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         # 获取K线（30天）
         klines = get_tencent_kline(code, count=30)
 
+        # v2026-08-23 (数据驱动): 板块黑名单过滤 — rec_tuning 复盘胜率 < 35% 的板块
+        # (样本 ≥ 10) 不进评分。候选池 dict 带 sector 字段 (STOCK_POOL 静态映射),
+        # 全市场粗筛来源无 sector 则跳过该过滤 (无数据不误杀)。
+        stock_sector = info.get('sector', '') or ''
+        if sector_blacklist and stock_sector and stock_sector in sector_blacklist:
+            filtered_by_sector += 1
+            continue
+
         # 评分（修复 #6: 传 sentiment_score）
         score, scored_info = score_afternoon_stock(info, klines, sentiment_score=sentiment_score)
 
-        # 修复 #3: 阈值统一为 65（与报告"买入条件 ≥ 65"一致）
-        if score >= 65:
+        # v2026-08-23 (数据驱动): 阈值从 strategy_policy 读取 (默认 65, 真实 score
+        # 样本 ≥ 30 且胜率数据支持时 rec_optimizer 会调)
+        if score >= score_threshold:
             results.append(scored_info)
 
     # 4. 排序
@@ -833,7 +863,7 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
             )
         print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
 
-    print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只")
+    print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只 (板块黑名单拦截 {filtered_by_sector} 只)")
     return top_n
 
 
