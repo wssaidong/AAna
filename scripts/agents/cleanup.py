@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.expanduser('~/code/AAna'))
 
-from agents.config import PROJECT_DIR, STATE_DIR, REPORTS_DIR
+from scripts.agents.config import PROJECT_DIR, STATE_DIR, REPORTS_DIR
 
 logging.basicConfig(level=logging.INFO, format='[cleanup] %(message)s')
 log = logging.getLogger('cleanup')

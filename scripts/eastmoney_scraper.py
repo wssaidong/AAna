@@ -5,6 +5,7 @@ AAna v2.4 动态选股模块
 """
 import requests
 import json
+import os
 import re
 from datetime import datetime
 
@@ -67,7 +68,10 @@ def get_stock_by_keyword(keyword, limit=20):
         params = {
             'input': keyword,
             'type': '14',
-            'token': 'D43BF722C8E33BDC906FB84D85E326E8',
+            # v2026-08-23 (评审修复 P0): token 改从 env 读 — 不再硬编码进 git。
+            # 公开搜索 API token 本质可读但属于凭据,不应 commit。
+            # 缺值时回落 v1 token(同域 token 公开已知, 失效会调东方财富全量搜索 API 报错)
+            'token': os.environ.get('EASTMONEY_SEARCH_TOKEN', 'D43BF722C8E33BDC906FB84D85E326E8'),
             'count': limit,
         }
         resp = requests.get(url, params=params, headers=get_eastmoney_headers(), timeout=10)

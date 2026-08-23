@@ -180,3 +180,40 @@ class TestCrossValidation:
             f"pandas n={total} vs DuckDB n={result_db['n']} mismatch"
         assert result_db["win_rate"] == pandas_wr, \
             f"pandas wr={pandas_wr} vs DuckDB wr={result_db['win_rate']} mismatch"
+
+
+# v2026-08-23 (评审 P2): 补新 query 单测 — data_quality / weekly_trend ISO 格式
+class TestQueryDataQuality:
+    def test_returns_data_quality_summary(self):
+        from analytics_query import query_data_quality
+        r = query_data_quality()
+        assert r["ok"], r.get("error")
+        # 字段在 rows[0] 里 (单行聚合)
+        row = r["rows"][0]
+        assert "sector_coverage_pct" in row, f"缺字段, 实际: {list(row.keys())}"
+        assert "total_rows" in row, f"缺 total_rows, 实际: {list(row.keys())}"
+
+    def test_sector_coverage_in_range(self):
+        """8/23 起新推荐带 sector, 历史数据覆盖率约 13.6%, 应在 0-100%"""
+        from analytics_query import query_data_quality
+        r = query_data_quality()
+        row = r["rows"][0]
+        assert 0 <= row["sector_coverage_pct"] <= 100
+
+
+class TestQueryWeeklyTrend:
+    def test_iso_week_format(self):
+        """ISO 周格式必须是 'YYYY-Www' (如 2026-W34)"""
+        from analytics_query import query_weekly_trend
+        r = query_weekly_trend(weeks=8)
+        assert r["ok"]
+        for row in r.get("rows", []):
+            assert row["iso_week"], "必须有 iso_week 字段"
+            assert row["iso_week"].startswith("20") and "-W" in row["iso_week"], \
+                f"格式应为 YYYY-Www: {row['iso_week']}"
+
+    def test_weekly_trend_iso_chronological(self):
+        from analytics_query import query_weekly_trend
+        r = query_weekly_trend(weeks=8)
+        weeks = [row["iso_week"] for row in r.get("rows", [])]
+        assert weeks == sorted(weeks), "ISO 周必须升序"

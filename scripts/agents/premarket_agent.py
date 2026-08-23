@@ -18,11 +18,11 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.expanduser('~/code/AAna'))
 
 from datetime import datetime
-from agents.config import (
+from scripts.agents.config import (
     PROJECT_DIR, REPORTS_DIR, STOCK_POOL, INDEX_CODES, get_today_str, get_time_str,
     is_trading_day
 )
-from agents.data_utils import (
+from scripts.agents.data_utils import (
     get_stock_data_sina, get_all_codes, get_sector_emoji,
     format_price, format_change, save_state, load_state,
     git_commit_and_push, save_report, get_ths_hot, get_industry_ranking,

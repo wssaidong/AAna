@@ -38,10 +38,11 @@ dev = [
 ]
 
 [project.scripts]
-# v2026-08-23 Phase 6A: agents 迁入 scripts/ 后,CLI 入口改为 scripts.agents.main_agent
-#   旧入口 "aana = agents.main_agent:main" 已经不被任何 cron 使用,改路径与现状对齐。
-#   同时用相对路径以便 pip install 后 import 路径是 scripts.agents.* 而不是根目录的 agents.*。
-aana = "scripts.agents.main_agent:main"
+# v2026-08-23 (评审修复 P0): main_agent 的实际函数名是 `run()`, 不是 `main()`。
+# 旧 aana entry "scripts.agents.main_agent:main" 会让 `aana` CLI 启动立刻
+# "AttributeError: module 'scripts.agents.main_agent' has no attribute 'main'"。
+# 修正: 入口指向真实存在的 `run()`。
+aana = "scripts.agents.main_agent:run"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]

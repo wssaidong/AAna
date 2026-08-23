@@ -302,6 +302,144 @@ def list_all_queries() -> list[str]:
     return [name for name in globals() if name.startswith("query_")]
 
 
+# ── 周复盘查询 (Phase 9: 每周复盘三维度) ──────────────────────────────────
+
+# 空字符串过滤 helper (DuckDB 不接受 col = '' 与 DOUBLE 列比较)
+_NON_EMPTY = "LENGTH(CAST({col} AS VARCHAR)) > 0"
+
+
+def query_dow_winrate(weeks: int = 4) -> dict[str, Any]:
+    """星期几胜率 — 按 rec_date 是周几拆分。
+
+    用途: 发现"周几推荐质量差"的模式 (如周一情绪未稳 / 周五避险)。
+    Args:
+        weeks: 回看周数 (默认 4)
+    """
+    if not REC_FEEDBACK.exists():
+        return {"ok": False, "error": "rec_feedback.csv not found", "rows": []}
+    cutoff = (datetime.now() - timedelta(weeks=weeks)).strftime("%Y-%m-%d")
+    sql = f"""
+        WITH cleaned AS (
+            SELECT
+                TRY_CAST(ret_1d AS DOUBLE) AS ret,
+                TRY_CAST(rec_date AS DATE) AS d,
+                COALESCE(TRY_CAST(score AS INTEGER), 0) AS score_v
+            FROM read_csv_auto(?)
+            WHERE ret_1d IS NOT NULL
+              AND {_NON_EMPTY.format(col='ret_1d')}
+              AND TRY_CAST(rec_date AS DATE) >= TRY_CAST(? AS DATE)
+        )
+        SELECT
+            CAST(strftime(d, '%A') AS VARCHAR) AS weekday,
+            strftime(d, '%u') AS dow,   -- 1=Mon ... 7=Sun
+            COUNT(*) AS n,
+            SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) AS wins,
+            ROUND(100.0 * SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS win_rate,
+            ROUND(AVG(ret), 2) AS avg_ret
+        FROM cleaned
+        GROUP BY weekday, dow
+        ORDER BY CAST(dow AS INTEGER)
+    """
+    result = _sql_safe(sql, (str(REC_FEEDBACK), cutoff))
+    if result.get("ok") and result["rows"]:
+        # 补充中文映射
+        zh = {"Monday": "周一", "Tuesday": "周二", "Wednesday": "周三",
+              "Thursday": "周四", "Friday": "周五", "Saturday": "周六", "Sunday": "周日"}
+        for row in result["rows"]:
+            row["weekday_zh"] = zh.get(row["weekday"], row["weekday"])
+    return result
+
+
+def query_hold_winrate(weeks: int = 4) -> dict[str, Any]:
+    """持有天数胜率 — ret_1d/ret_3d/ret_5d/ret_15d 四档对比。
+
+    用途: 回答"推荐股到底该拿几天" — 如果 ret_3d 胜率持续 > ret_1d,
+    说明 T+1 卖太早;反之 ret_1d > ret_3d 说明快进快出才是对的。
+    Args:
+        weeks: 回看周数 (默认 4)
+    """
+    if not REC_FEEDBACK.exists():
+        return {"ok": False, "error": "rec_feedback.csv not found", "rows": []}
+    cutoff = (datetime.now() - timedelta(weeks=weeks)).strftime("%Y-%m-%d")
+    sql = f"""
+        WITH base AS (
+            SELECT
+                TRY_CAST(ret_1d AS DOUBLE) AS r1,
+                TRY_CAST(ret_3d AS DOUBLE) AS r3,
+                TRY_CAST(ret_5d AS DOUBLE) AS r5,
+                TRY_CAST(ret_15d AS DOUBLE) AS r15,
+                COALESCE(TRY_CAST(score AS INTEGER), 0) AS score_v
+            FROM read_csv_auto(?)
+            WHERE TRY_CAST(rec_date AS DATE) >= TRY_CAST(? AS DATE)
+        ),
+        unpivot_source AS (
+            SELECT 1 AS hold_days, 'T+1 (次日)' AS label, r1 AS ret, score_v FROM base WHERE r1 IS NOT NULL AND {_NON_EMPTY.format(col='r1')}
+            UNION ALL
+            SELECT 3, 'T+3', r3, score_v FROM base WHERE r3 IS NOT NULL AND {_NON_EMPTY.format(col='r3')}
+            UNION ALL
+            SELECT 5, 'T+5', r5, score_v FROM base WHERE r5 IS NOT NULL AND {_NON_EMPTY.format(col='r5')}
+            UNION ALL
+            SELECT 15, 'T+15', r15, score_v FROM base WHERE r15 IS NOT NULL AND {_NON_EMPTY.format(col='r15')}
+        )
+        SELECT
+            hold_days,
+            label,
+            COUNT(*) AS n,
+            SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) AS wins,
+            ROUND(100.0 * SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS win_rate,
+            ROUND(AVG(ret), 2) AS avg_ret
+        FROM unpivot_source
+        GROUP BY hold_days, label
+        ORDER BY hold_days
+    """
+    return _sql_safe(sql, (str(REC_FEEDBACK), cutoff))
+
+
+def query_weekly_trend(weeks: int = 8) -> dict[str, Any]:
+    """每周推荐胜率趋势 — ISO 周聚合,看策略是否在退化/改善。
+
+    Args:
+        weeks: 回看周数 (默认 8)
+    """
+    if not REC_FEEDBACK.exists():
+        return {"ok": False, "error": "rec_feedback.csv not found", "rows": []}
+    cutoff = (datetime.now() - timedelta(weeks=weeks)).strftime("%Y-%m-%d")
+    sql = f"""
+        WITH cleaned AS (
+            SELECT
+                TRY_CAST(ret_1d AS DOUBLE) AS ret,
+                TRY_CAST(rec_date AS DATE) AS d,
+                COALESCE(TRY_CAST(score AS INTEGER), 0) AS score_v
+            FROM read_csv_auto(?)
+            WHERE ret_1d IS NOT NULL
+              AND {_NON_EMPTY.format(col='ret_1d')}
+              AND TRY_CAST(rec_date AS DATE) >= TRY_CAST(? AS DATE)
+        )
+        SELECT
+            strftime(d, '%G-W%V') AS iso_week,   -- ISO 年-周
+            MIN(d) AS week_start,
+            COUNT(*) AS n,
+            SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) AS wins,
+            ROUND(100.0 * SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS win_rate,
+            ROUND(AVG(ret), 2) AS avg_ret
+        FROM cleaned
+        GROUP BY iso_week
+        ORDER BY iso_week
+    """
+    return _sql_safe(sql, (str(REC_FEEDBACK), cutoff))
+
+
+def query_weekly_sector(weeks: int = 4, min_n: int = 3) -> dict[str, Any]:
+    """周复盘用板块胜率 — 复用 query_sector_stats 逻辑但窗口按周数。
+
+    Args:
+        weeks: 回看周数 (默认 4)
+        min_n: 板块最小样本 (周复盘窗口短,门槛比 90 日版低)
+    """
+    days = weeks * 7
+    return query_sector_stats(days=days, min_n=min_n)
+
+
 # ── 反射调试 helper ──────────────────────────────────────────────────────
 
 def describe_schema(table_csv: str) -> dict[str, Any]:
@@ -320,6 +458,7 @@ def main():
     p.add_argument("query", choices=list_all_queries() + ["list", "schema"],
                    help="要跑的 query 函数 (list 列出可用)")
     p.add_argument("--days", type=int, default=30, help="回看天数")
+    p.add_argument("--weeks", type=int, default=4, help="回看周数 (weekly 系列查询)")
     p.add_argument("--min-score", type=int, default=0, help="最低 score 门槛")
     p.add_argument("--csv", type=str, default=str(REC_FEEDBACK),
                    help="DESCRIBE 的 CSV 路径")
@@ -340,6 +479,10 @@ def main():
     # 按 query 名 dispatch kwargs
     if "min_score" in fn.__code__.co_varnames:
         result = fn(days=args.days, min_score=args.min_score)
+    elif "min_n" in fn.__code__.co_varnames and "weeks" in fn.__code__.co_varnames:
+        result = fn(weeks=args.weeks, min_n=3)
+    elif "weeks" in fn.__code__.co_varnames:
+        result = fn(weeks=args.weeks)
     elif "min_n" in fn.__code__.co_varnames:
         result = fn(days=args.days, min_n=max(args.days // 3, 20))  # 默认 min_n 与窗口联动
     elif "days" in fn.__code__.co_varnames:

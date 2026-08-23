@@ -11,8 +11,8 @@ warnings.filterwarnings('ignore')
 sys.path.insert(0, os.path.expanduser('~/code/AAna'))
 
 from datetime import datetime
-from agents.config import REPORTS_DIR, get_today_str, is_trading_day
-from agents.data_utils import git_commit_and_push
+from scripts.agents.config import REPORTS_DIR, get_today_str, is_trading_day
+from scripts.agents.data_utils import git_commit_and_push
 
 LOG_FILE = os.path.join(REPORTS_DIR, get_today_str(), 'main_agent.log')
 
@@ -42,21 +42,21 @@ def run():
     if hour < 9 or (hour == 9 and datetime.now().minute < 30):
         # 盘前阶段
         log("盘前阶段，触发盘前子Agent")
-        from agents.premarket_agent import run as premarket_run
+        from scripts.agents.premarket_agent import run as premarket_run
         premarket_run()
     elif hour < 15:
         # 盘中阶段
         log("盘中阶段，触发盘中子Agent")
-        from agents.intraday_agent import run as intraday_run
+        from scripts.agents.intraday_agent import run as intraday_run
         intraday_run()
     elif hour >= 21:
         # 复盘阶段
         log("复盘阶段，触发复盘子Agent")
-        from agents.postmarket_agent import run as postmarket_run
+        from scripts.agents.postmarket_agent import run as postmarket_run
         postmarket_run()
         # 复盘结束后滚动清理旧数据
         log("🧹 开始滚动清理...")
-        from agents.cleanup import run as cleanup_run
+        from scripts.agents.cleanup import run as cleanup_run
         cleanup_run()
     else:
         log("非活跃时段，无需执行")
