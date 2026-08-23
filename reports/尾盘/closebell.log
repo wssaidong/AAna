@@ -1,0 +1,1779 @@
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+/Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/closebell_agent.py': [Errno 2] No such file or directory
+[2026-06-10 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-10 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-10 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600667', '600237', '603618', '603311', '603938', '600397', '002645', '600895', '600410', '605488']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 120 只
+[AAna 尾盘] 候选股票总数: 130 只
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 28 只
+[2026-06-10 14:45:08] [daily_v24_recommend]   找到 10 只推荐
+[2026-06-10 14:45:08] [daily_v24_recommend]     603618 杭电股份 score=100
+[2026-06-10 14:45:08] [daily_v24_recommend]     002842 翔鹭钨业 score=100
+[2026-06-10 14:45:08] [daily_v24_recommend]     002645 华宏科技 score=95
+[2026-06-10 14:45:08] [daily_v24_recommend]     603713 密尔克卫 score=95
+[2026-06-10 14:45:08] [daily_v24_recommend]     603867 新化股份 score=95
+[2026-06-10 14:45:08] [daily_v24_recommend]     605566 福莱蒽特 score=90
+[2026-06-10 14:45:08] [daily_v24_recommend]     605020 永和股份 score=90
+[2026-06-10 14:45:08] [daily_v24_recommend]     603311 金海高科 score=85
+[2026-06-10 14:45:08] [daily_v24_recommend]     600895 张江高科 score=80
+[2026-06-10 14:45:08] [daily_v24_recommend]     605488 福莱新材 score=80
+[2026-06-10 14:45:08] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 603618 杭电股份 @39.97 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 002842 翔鹭钨业 @35.62 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 002645 华宏科技 @31.45 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 603713 密尔克卫 @55.51 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 603867 新化股份 @39.27 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 605566 福莱蒽特 @44.3 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 605020 永和股份 @32.81 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 603311 金海高科 @38.58 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 600895 张江高科 @31.43 100股
+[2026-06-10 14:45:08] [daily_v24_recommend]     建仓 605488 福莱新材 @35.65 100股
+[2026-06-10 14:45:08] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-10 14:45:08] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-10-v24-尾盘推荐.md
+[2026-06-10 14:45:08] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-10 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-10 14:45:08] [daily_v24_recommend] ✅ 完成
+[2026-06-10 14:45:08] [daily_v24_recommend] ============================================================
+[2026-06-11 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-11 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-11 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603103', '601009', '000859', '000001', '601318', '601872', '600641', '600887', '600535', '603213']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 82 只
+[AAna 尾盘] 候选股票总数: 92 只
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 13 只
+[2026-06-11 14:45:05] [daily_v24_recommend]   找到 10 只推荐
+[2026-06-11 14:45:05] [daily_v24_recommend]     601318 中国平安 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     001203 大中矿业 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     603226 菲林格尔 score=100
+[2026-06-11 14:45:05] [daily_v24_recommend]     600176 中国巨石 score=95
+[2026-06-11 14:45:05] [daily_v24_recommend]     600887 伊利股份 score=90
+[2026-06-11 14:45:05] [daily_v24_recommend]     600641 先导基电 score=75
+[2026-06-11 14:45:05] [daily_v24_recommend]     603139 康惠股份 score=75
+[2026-06-11 14:45:05] [daily_v24_recommend]     603203 快克智能 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend]     601698 中国卫通 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend]     601133 柏诚股份 score=70
+[2026-06-11 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 601318 中国平安 @52.6 100股
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 001203 大中矿业 @41.18 100股
+[2026-06-11 14:45:05] [daily_v24_recommend]     建仓 603226 菲林格尔 @54.8 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600176 中国巨石 @40.97 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600887 伊利股份 @25.59 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 600641 先导基电 @28.77 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 603139 康惠股份 @39.33 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 603203 快克智能 @58.0 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 601698 中国卫通 @31.95 100股
+[2026-06-11 14:45:06] [daily_v24_recommend]     建仓 601133 柏诚股份 @30.42 100股
+[2026-06-11 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-11 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-11-v24-尾盘推荐.md
+[2026-06-11 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-11 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-11 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-06-11 14:45:06] [daily_v24_recommend] ============================================================
+[2026-06-12 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-12 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-12 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600714', '002815', '603078', '600438', '603997', '603679', '600508', '603181', '000021', '000426']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-06-12 14:45:03] [daily_v24_recommend]   找到 2 只推荐
+[2026-06-12 14:45:03] [daily_v24_recommend]     600714 金瑞矿业 score=95
+[2026-06-12 14:45:03] [daily_v24_recommend]     000021 深科技 score=75
+[2026-06-12 14:45:03] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-12 14:45:03] [daily_v24_recommend]     建仓 600714 金瑞矿业 @27.85 100股
+[2026-06-12 14:45:03] [daily_v24_recommend]     建仓 000021 深科技 @37.0 100股
+[2026-06-12 14:45:03] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-12 14:45:03] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-12-v24-尾盘推荐.md
+[2026-06-12 14:45:03] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-12 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-12 14:45:03] [daily_v24_recommend] ✅ 完成
+[2026-06-12 14:45:03] [daily_v24_recommend] ============================================================
+[2026-06-13 14:45:05] [daily_v24_recommend] ============================================================
+[2026-06-13 14:45:05] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-13 14:45:05] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603015', '603039', '000831', '603588', '603861', '603260', '603596', '601069', '600141', '600111']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-13 14:45:09] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-13 14:45:09] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-14 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-14 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-14 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603015', '603039', '000831', '603588', '603861', '603260', '603596', '601069', '600141', '600111']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-14 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-14 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-15 14:45:05] [daily_v24_recommend] ============================================================
+[2026-06-15 14:45:05] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-15 14:45:05] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603015', '603039', '000831', '603588', '603861', '603260', '603596', '601069', '600141', '600111']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-15 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-15 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-16 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601137', '603225', '603527', '605006', '600522', '002125', '002203', '601168', '601021', '603031']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 4 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 4 只
+[2026-06-16 14:45:05] [daily_v24_recommend]   找到 4 只推荐
+[2026-06-16 14:45:05] [daily_v24_recommend]     002203 海亮股份 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     601021 春秋航空 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     603031 安孚科技 score=100
+[2026-06-16 14:45:05] [daily_v24_recommend]     601168 西部矿业 score=80
+[2026-06-16 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 002203 海亮股份 @24.41 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 601021 春秋航空 @46.88 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 603031 安孚科技 @53.2 100股
+[2026-06-16 14:45:05] [daily_v24_recommend]     建仓 601168 西部矿业 @30.84 100股
+[2026-06-16 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-16 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-16-v24-尾盘推荐.md
+[2026-06-16 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-16 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-16 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-06-16 14:45:05] [daily_v24_recommend] ============================================================
+[2026-06-17 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-17 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-17 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600367', '603588', '600667', '000859', '002171', '001696', '600869', '603155', '002971', '002125']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只
+[2026-06-17 14:45:08] [daily_v24_recommend]   找到 1 只推荐
+[2026-06-17 14:45:08] [daily_v24_recommend]     600869 远东股份 score=100
+[2026-06-17 14:45:08] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-17 14:45:08] [daily_v24_recommend]     建仓 600869 远东股份 @33.35 100股
+[2026-06-17 14:45:08] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-17 14:45:08] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-17-v24-尾盘推荐.md
+[2026-06-17 14:45:08] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-17 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-17 14:45:08] [daily_v24_recommend] ✅ 完成
+[2026-06-17 14:45:08] [daily_v24_recommend] ============================================================
+[2026-06-18 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-18 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-18 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603011', '603065', '002213', '002171', '002129', '002824', '601133', '002815', '002937', '601872']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 002213: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601133: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-18 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-18 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-19 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-19 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-19 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603166', '603500', '603588', '000970', '002910', '002601', '002611', '601633', '603859', '603269']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-19 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-19 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-20 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-20 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-20 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603166', '603500', '603588', '000970', '002910', '002601', '002611', '601633', '603859', '603269']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-20 14:45:17] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-20 14:45:18] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-21 14:45:01] [daily_v24_recommend] ============================================================
+[2026-06-21 14:45:01] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-21 14:45:01] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:01 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603166', '603500', '603588', '000970', '002910', '002601', '002611', '601633', '603859', '603269']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-21 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-21 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-22 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-22 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-22 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603166', '603500', '603588', '000970', '002910', '002601', '002611', '601633', '603859', '603269']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-06-22 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-06-22 14:45:04] [daily_v24_recommend]     603269 海鸥股份 score=100
+[2026-06-22 14:45:04] [daily_v24_recommend]     603859 能科科技 score=95
+[2026-06-22 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-22 14:45:04] [daily_v24_recommend]     建仓 603269 海鸥股份 @23.47 100股
+[2026-06-22 14:45:04] [daily_v24_recommend]     建仓 603859 能科科技 @52.22 100股
+[2026-06-22 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-22 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-22-v24-尾盘推荐.md
+[2026-06-22 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-22 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-22 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-06-22 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-23 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-23 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-23 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600711', '603110', '603260', '002179', '002824', '002213', '000593', '000063', '603311', '600732']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 25 只
+[AAna 尾盘] 候选股票总数: 35 只
+[K线] 603260: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002179: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002824: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000593: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000063: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603311: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只
+[2026-06-23 14:45:06] [daily_v24_recommend]   找到 1 只推荐
+[2026-06-23 14:45:06] [daily_v24_recommend]     002213 大为股份 score=70
+[2026-06-23 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-23 14:45:06] [daily_v24_recommend]     建仓 002213 大为股份 @39.74 100股
+[2026-06-23 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-23 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-23-v24-尾盘推荐.md
+[2026-06-23 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-23 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-23 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-06-23 14:45:06] [daily_v24_recommend] ============================================================
+[2026-06-24 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-24 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-24 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600961', '600769', '603065', '603082', '603588', '603201', '002657', '002536', '002083', '002174']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 603082: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-24 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-24 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-25 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-25 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-25 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600352', '600078', '600641', '600397', '603225', '600851', '002440', '001696', '002083', '002709']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 8 只
+[AAna 尾盘] 候选股票总数: 18 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-06-25 14:45:03] [daily_v24_recommend]   找到 2 只推荐
+[2026-06-25 14:45:03] [daily_v24_recommend]     600641 先导基电 score=100
+[2026-06-25 14:45:03] [daily_v24_recommend]     002709 天赐材料 score=100
+[2026-06-25 14:45:03] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-25 14:45:03] [daily_v24_recommend]     建仓 600641 先导基电 @37.2 100股
+[2026-06-25 14:45:03] [daily_v24_recommend]     建仓 002709 天赐材料 @55.23 100股
+[2026-06-25 14:45:03] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-25 14:45:03] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-25-v24-尾盘推荐.md
+[2026-06-25 14:45:03] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-25 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-25 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-06-25 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-26 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-26 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-26 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603225', '600392', '600497', '603068', '600958', '002549', '000623', '000686', '601136', '603995']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 75 只
+[AAna 尾盘] 候选股票总数: 85 只
+[K线] 603225: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600392: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603068: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603995: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-26 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-26 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-27 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-27 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-27 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-06-27-选股报告.md
+[Eastmoney] 报告 Top10: ['600497', '002643', '600237', '600900', '600760', '603341', '600397', '600246', '600346', '600460']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 93 只
+[AAna 尾盘] 候选股票总数: 103 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-27 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-27 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-28 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-28 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-28 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-06-28-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-06-27-选股报告.md
+  [源3] 全市场涨幅榜: 新增 93 只
+[AAna 尾盘] 候选股票总数: 93 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-28 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-28 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-29 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-29 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-29 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600497', '603341', '600397', '600058', '600877', '600160', '002643', '002842', '002430', '002745']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-06-29 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-06-29 14:45:04] [daily_v24_recommend]     603341 龙旗科技 score=100
+[2026-06-29 14:45:04] [daily_v24_recommend]     002842 翔鹭钨业 score=70
+[2026-06-29 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-06-29 14:45:04] [daily_v24_recommend]     建仓 603341 龙旗科技 @41.29 100股
+[2026-06-29 14:45:04] [daily_v24_recommend]     建仓 002842 翔鹭钨业 @48.79 100股
+[2026-06-29 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-06-29 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-06-29-v24-尾盘推荐.md
+[2026-06-29 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-06-29 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-06-29 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-06-29 14:45:04] [daily_v24_recommend] ============================================================
+[2026-06-30 14:45:00] [daily_v24_recommend] ============================================================
+[2026-06-30 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-06-30 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603399', '601211', '603977', '600459', '603668', '603223', '002430', '002617', '000776', '000510']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600459: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000510: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-06-30 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-06-30 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-01 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-01 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-01 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600877', '600895', '600366', '603726', '600732', '603978', '603399', '002643', '002745', '002158']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-07-01 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-07-01 14:45:04] [daily_v24_recommend]     603726 朗迪集团 score=100
+[2026-07-01 14:45:04] [daily_v24_recommend]     002158 汉钟精机 score=100
+[2026-07-01 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-01 14:45:04] [daily_v24_recommend]     建仓 603726 朗迪集团 @33.73 100股
+[2026-07-01 14:45:04] [daily_v24_recommend]     建仓 002158 汉钟精机 @36.25 100股
+[2026-07-01 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-01 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-01-v24-尾盘推荐.md
+[2026-07-01 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-01 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-01 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-07-01 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-02 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-02 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-02 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603067', '601233', '600531', '603906', '603978', '600160', '601211', '000776', '002549', '000623']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 50 只
+[AAna 尾盘] 候选股票总数: 60 只
+[K线] 601233: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000776: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002549: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只
+[2026-07-02 14:45:05] [daily_v24_recommend]   找到 1 只推荐
+[2026-07-02 14:45:05] [daily_v24_recommend]     600160 巨化股份 score=100
+[2026-07-02 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-02 14:45:05] [daily_v24_recommend]     建仓 600160 巨化股份 @54.64 100股
+[2026-07-02 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-02 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-02-v24-尾盘推荐.md
+[2026-07-02 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-02 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-02 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-07-02 14:45:05] [daily_v24_recommend] ============================================================
+[2026-07-03 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-03 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-03 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603698', '603456', '603068', '000970', '002468', '000703', '600857', '600316', '002517', '605168']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 3 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 3 只
+[2026-07-03 14:45:06] [daily_v24_recommend]   找到 3 只推荐
+[2026-07-03 14:45:06] [daily_v24_recommend]     603068 博通集成 score=100
+[2026-07-03 14:45:06] [daily_v24_recommend]     600316 洪都航空 score=100
+[2026-07-03 14:45:06] [daily_v24_recommend]     605168 三人行 score=95
+[2026-07-03 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-03 14:45:06] [daily_v24_recommend]     建仓 603068 博通集成 @39.32 100股
+[2026-07-03 14:45:06] [daily_v24_recommend]     建仓 600316 洪都航空 @29.17 100股
+[2026-07-03 14:45:06] [daily_v24_recommend]     建仓 605168 三人行 @51.22 100股
+[2026-07-03 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-03 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-03-v24-尾盘推荐.md
+[2026-07-03 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-03 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-03 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-03 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-04 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-04 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-04 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-04-选股报告.md
+[Eastmoney] 报告 Top10: ['605222', '600885', '603683', '603319', '600031', '600783', '600418', '600379', '603960', '603112']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-04 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-04 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-05 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-05 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-05 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-05-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-04-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-07-05 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-05 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-06 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-06 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-06 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600379', '002600', '002202', '000938', '002921', '600885', '603298', '603683', '603319', '603960']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 58 只
+[AAna 尾盘] 候选股票总数: 68 只
+[K线] 603319: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 3 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 3 只
+[2026-07-06 14:45:06] [daily_v24_recommend]   找到 3 只推荐
+[2026-07-06 14:45:06] [daily_v24_recommend]     002202 金风科技 score=100
+[2026-07-06 14:45:06] [daily_v24_recommend]     002921 联诚精密 score=70
+[2026-07-06 14:45:06] [daily_v24_recommend]     603683 晶华新材 score=70
+[2026-07-06 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 002202 金风科技 @23.92 100股
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 002921 联诚精密 @28.06 100股
+[2026-07-06 14:45:06] [daily_v24_recommend]     建仓 603683 晶华新材 @28.51 100股
+[2026-07-06 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-06 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-06-v24-尾盘推荐.md
+[2026-07-06 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-06 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-06 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-06 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-07 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-07 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-07 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600178', '605208', '000048', '002926', '600867', '002120', '002714', '600887', '601919', '600750']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 197 只
+[AAna 尾盘] 候选股票总数: 207 只
+[K线] 000048: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002714: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600887: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600750: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-07 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-07 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-08 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-08 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-08 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603903', '603722', '600379', '600895', '002643', '002057', '000818', '002020', '002180', '002415']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 136 只
+[AAna 尾盘] 候选股票总数: 146 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-07-08 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-07-08 14:45:04] [daily_v24_recommend]     600895 张江高科 score=100
+[2026-07-08 14:45:04] [daily_v24_recommend]     603722 阿科力 score=80
+[2026-07-08 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-08 14:45:04] [daily_v24_recommend]     建仓 600895 张江高科 @33.81 100股
+[2026-07-08 14:45:04] [daily_v24_recommend]     建仓 603722 阿科力 @41.39 100股
+[2026-07-08 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-08 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-08-v24-尾盘推荐.md
+[2026-07-08 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-08 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-08 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-07-08 14:45:05] [daily_v24_recommend] ============================================================
+[2026-07-09 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-09 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-09 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: ['603903', '603722', '600379', '600895', '002643', '002057', '000818', '002020', '002180', '002415']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-09 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-09 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-10 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-10 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-10 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600641', '002126', '600845', '600498', '600171', '600961', '603260', '600895', '603690', '600345']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 4 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 4 只
+[2026-07-10 14:45:05] [daily_v24_recommend]   找到 4 只推荐
+[2026-07-10 14:45:05] [daily_v24_recommend]     600171 上海贝岭 score=100
+[2026-07-10 14:45:05] [daily_v24_recommend]     603690 至纯科技 score=100
+[2026-07-10 14:45:05] [daily_v24_recommend]     600641 先导基电 score=95
+[2026-07-10 14:45:05] [daily_v24_recommend]     600961 株冶集团 score=95
+[2026-07-10 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-10 14:45:05] [daily_v24_recommend]     建仓 600171 上海贝岭 @28.5 100股
+[2026-07-10 14:45:05] [daily_v24_recommend]     建仓 603690 至纯科技 @33.59 100股
+[2026-07-10 14:45:05] [daily_v24_recommend]     建仓 600641 先导基电 @43.01 100股
+[2026-07-10 14:45:05] [daily_v24_recommend]     建仓 600961 株冶集团 @26.3 100股
+[2026-07-10 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-10 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-10-v24-尾盘推荐.md
+[2026-07-10 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-10 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-10 14:45:05] [daily_v24_recommend] ✅ 完成
+[2026-07-10 14:45:05] [daily_v24_recommend] ============================================================
+[2026-07-11 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-11 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-11 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-11-选股报告.md
+[Eastmoney] 报告 Top10: ['600641', '002126', '600845', '600498', '600171', '600961', '603260', '600895', '603690', '600345']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 5 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 5 只
+[2026-07-11 14:45:04] [daily_v24_recommend]   找到 5 只推荐
+[2026-07-11 14:45:04] [daily_v24_recommend]     600845 宝信软件 score=100
+[2026-07-11 14:45:04] [daily_v24_recommend]     600171 上海贝岭 score=100
+[2026-07-11 14:45:04] [daily_v24_recommend]     603690 至纯科技 score=100
+[2026-07-11 14:45:04] [daily_v24_recommend]     600641 先导基电 score=95
+[2026-07-11 14:45:04] [daily_v24_recommend]     600961 株冶集团 score=95
+[2026-07-11 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-11 14:45:04] [daily_v24_recommend]     建仓 600845 宝信软件 @20.0 100股
+[2026-07-11 14:45:04] [daily_v24_recommend]     建仓 600171 上海贝岭 @28.28 100股
+[2026-07-11 14:45:04] [daily_v24_recommend]     建仓 603690 至纯科技 @33.32 100股
+[2026-07-11 14:45:04] [daily_v24_recommend]     建仓 600641 先导基电 @42.7 100股
+[2026-07-11 14:45:04] [daily_v24_recommend]     建仓 600961 株冶集团 @26.52 100股
+[2026-07-11 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-11 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-11-v24-尾盘推荐.md
+[2026-07-11 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-11 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-11 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-07-11 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-12 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-12 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-12 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-12-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-11-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-07-12 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-12 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-13 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-13 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-13 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['001229', '002558', '002605', '001229', '002558', '002605']
+  [源1] 今日 Top10: 6 只
+  [源3] 全市场涨幅榜: 新增 218 只
+[AAna 尾盘] 候选股票总数: 224 只
+[AAna 尾盘] 已记录 4 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 4 只
+[2026-07-13 14:45:06] [daily_v24_recommend]   找到 4 只推荐
+[2026-07-13 14:45:06] [daily_v24_recommend]     001229 魅视科技 score=100
+[2026-07-13 14:45:06] [daily_v24_recommend]     002558 巨人网络 score=100
+[2026-07-13 14:45:06] [daily_v24_recommend]     001229 魅视科技 score=100
+[2026-07-13 14:45:06] [daily_v24_recommend]     002558 巨人网络 score=100
+[2026-07-13 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-13 14:45:06] [daily_v24_recommend]     建仓 001229 魅视科技 @46.51 100股
+[2026-07-13 14:45:06] [daily_v24_recommend]     建仓 002558 巨人网络 @28.28 100股
+[2026-07-13 14:45:06] [daily_v24_recommend]     跳过 001229 (已有持仓)
+[2026-07-13 14:45:06] [daily_v24_recommend]     跳过 002558 (已有持仓)
+[2026-07-13 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-13 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-13-v24-尾盘推荐.md
+[2026-07-13 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-13 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-13 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-13 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-14 14:45:01] [daily_v24_recommend] ============================================================
+[2026-07-14 14:45:01] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-14 14:45:01] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:01 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600862', '600196', '600900', '000651', '002714', '600066', '600845', '600887', '600660', '600862']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600066: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600660: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只
+[2026-07-14 14:45:06] [daily_v24_recommend]   找到 1 只推荐
+[2026-07-14 14:45:06] [daily_v24_recommend]     002714 牧原股份 score=100
+[2026-07-14 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-14 14:45:06] [daily_v24_recommend]     建仓 002714 牧原股份 @37.96 100股
+[2026-07-14 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-14 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-14-v24-尾盘推荐.md
+[2026-07-14 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-14 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-14 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-14 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-15 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-15 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-15 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603882', '603590', '600096', '600392', '603099', '000776', '002213', '002913', '600869', '603799']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 12 只
+[AAna 尾盘] 候选股票总数: 22 只
+[K线] 600392: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002213: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002913: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600869: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603799: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-15 14:45:11] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-15 14:45:11] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-16 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600276', '601628', '603882', '600196', '000963', '002714', '002536', '002262', '002768', '600690']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 145 只
+[AAna 尾盘] 候选股票总数: 155 只
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 6 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 6 只
+[2026-07-16 14:45:06] [daily_v24_recommend]   找到 6 只推荐
+[2026-07-16 14:45:06] [daily_v24_recommend]     601628 中国人寿 score=100
+[2026-07-16 14:45:06] [daily_v24_recommend]     603882 金域医学 score=100
+[2026-07-16 14:45:06] [daily_v24_recommend]     600196 复星医药 score=100
+[2026-07-16 14:45:06] [daily_v24_recommend]     002536 飞龙股份 score=100
+[2026-07-16 14:45:06] [daily_v24_recommend]     600690 海尔智家 score=82
+[2026-07-16 14:45:06] [daily_v24_recommend]     002768 国恩股份 score=70
+[2026-07-16 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 601628 中国人寿 @38.92 100股
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 603882 金域医学 @27.81 100股
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 600196 复星医药 @24.7 100股
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 002536 飞龙股份 @54.57 100股
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 600690 海尔智家 @21.02 100股
+[2026-07-16 14:45:06] [daily_v24_recommend]     建仓 002768 国恩股份 @55.13 100股
+[2026-07-16 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-16 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-16-v24-尾盘推荐.md
+[2026-07-16 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-16 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-16 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-07-16 14:45:06] [daily_v24_recommend] ============================================================
+[2026-07-17 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-17 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-17 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601168', '600988', '603288', '002396', '002714', '000739', '000538', '000999', '002558', '603236']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 246 只
+[AAna 尾盘] 候选股票总数: 256 只
+[K线] 601168: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600988: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603288: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002714: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000538: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000999: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002558: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603236: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-17 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-17 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-18 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-18 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-18 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-18-选股报告.md
+[Eastmoney] 报告 Top10: ['600900', '601225', '600660', '601088', '605090', '600036', '600298', '601628', '600887', '002142']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 236 只
+[AAna 尾盘] 候选股票总数: 246 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-18 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-18 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-19 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-19 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-19 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-19-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-18-选股报告.md
+  [源3] 全市场涨幅榜: 新增 243 只
+[AAna 尾盘] 候选股票总数: 243 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-19 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-19 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-20 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-20 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-20 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600900', '601225', '600660', '601088', '605090', '600036', '600298', '601628', '600887', '002142']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 116 只
+[AAna 尾盘] 候选股票总数: 126 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-20 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-20 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-21 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-21 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-21 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601088', '600276', '603369', '601628', '600900', '600887', '000963', '003010', '601318', '601899']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 601088: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601628: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000963: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003010: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601318: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-21 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-21 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-22 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-22 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-22 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601168', '600547', '600549', '600105', '600520', '600141', '000960', '002979', '002947', '002536']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 95 只
+[AAna 尾盘] 候选股票总数: 105 只
+[K线] 600549: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600105: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600141: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-22 14:45:06] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-22 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-23 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-23 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-23 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600036', '600660', '600976', '603369', '002829', '002415', '001317', '600036', '002829', '600660']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600976: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002829: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002829: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-23 14:45:09] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-23 14:45:09] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-24 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-24 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-24 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['000893', '002128', '002832', '600362', '603137', '603271', '002730', '600893', '601126', '603799']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 204 只
+[AAna 尾盘] 候选股票总数: 214 只
+[K线] 002128: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600362: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603271: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002730: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601126: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603799: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-24 14:45:09] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-24 14:45:10] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-25 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-25 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-25 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-25-选股报告.md
+[Eastmoney] 报告 Top10: ['600760', '600900', '600690', '601088', '600036', '000651', '601088', '600036', '600760', '600900']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 202 只
+[AAna 尾盘] 候选股票总数: 212 只
+[K线] 600760: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600690: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000651: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600760: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-25 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-25 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-26 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-26 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-26 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-26-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-07-25-选股报告.md
+  [源3] 全市场涨幅榜: 新增 202 只
+[AAna 尾盘] 候选股票总数: 202 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-26 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-26 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-27 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-27 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-27 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603496', '605028', '603983', '603823', '603496', '605028', '603983', '603823']
+  [源1] 今日 Top10: 8 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 8 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-27 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-27 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-28 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-28 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-28 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600206', '603137', '601126', '001331', '000960', '603308', '603876', '603063', '600487', '603538']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 179 只
+[AAna 尾盘] 候选股票总数: 189 只
+[K线] 001331: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000960: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603876: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603063: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603538: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-28 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-28 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-29 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-29 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-29 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600887', '600660', '603899', '002895', '601888', '600887', '600660', '601888', '603899', '002895']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 47 只
+[AAna 尾盘] 候选股票总数: 57 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-07-29 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-07-29 14:45:04] [daily_v24_recommend]     002895 川恒股份 score=100
+[2026-07-29 14:45:04] [daily_v24_recommend]     002895 川恒股份 score=100
+[2026-07-29 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-07-29 14:45:04] [daily_v24_recommend]     建仓 002895 川恒股份 @35.12 100股
+[2026-07-29 14:45:04] [daily_v24_recommend]     跳过 002895 (已有持仓)
+[2026-07-29 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-07-29 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-07-29-v24-尾盘推荐.md
+[2026-07-29 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-07-29 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-29 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-07-29 14:45:04] [daily_v24_recommend] ============================================================
+[2026-07-30 14:45:00] [daily_v24_recommend] ============================================================
+[2026-07-30 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-30 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600660', '600031', '002001', '000423', '002074', '000400', '603067', '000960', '603267', '601958']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 193 只
+[AAna 尾盘] 候选股票总数: 203 只
+[K线] 000960: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601958: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-30 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-30 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-07-31 14:45:02] [daily_v24_recommend] ============================================================
+[2026-07-31 14:45:02] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-07-31 14:45:02] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:03 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600900', '601899', '600406', '600096', '601088', '603529', '600529', '000651', '000893', '000999']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600096: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601088: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603529: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000651: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-07-31 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-07-31 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-01 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-01 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-01 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-01-选股报告.md
+[Eastmoney] 报告 Top10: ['600988', '002415', '000603', '600536', '603306', '002841', '002396', '002558', '002261', '002158']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-01 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-01 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-02 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-02 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-02 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-02-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-01-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-08-02 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-02 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-03 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-03 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-03 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600988', '002415', '000603', '600536', '603306', '002841', '002396', '002558', '002261', '002158']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 6 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 6 只
+[2026-08-03 14:45:05] [daily_v24_recommend]   找到 6 只推荐
+[2026-08-03 14:45:05] [daily_v24_recommend]     600988 赤峰黄金 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     600536 中国软件 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002396 星网锐捷 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002558 巨人网络 score=100
+[2026-08-03 14:45:05] [daily_v24_recommend]     002158 汉钟精机 score=90
+[2026-08-03 14:45:05] [daily_v24_recommend]     603306 华懋科技 score=80
+[2026-08-03 14:45:05] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 600988 赤峰黄金 @38.86 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 600536 中国软件 @32.85 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002396 星网锐捷 @24.83 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002558 巨人网络 @29.22 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 002158 汉钟精机 @24.83 100股
+[2026-08-03 14:45:05] [daily_v24_recommend]     建仓 603306 华懋科技 @56.07 100股
+[2026-08-03 14:45:05] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-03 14:45:05] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-03-v24-尾盘推荐.md
+[2026-08-03 14:45:05] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-03 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-03 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-08-03 14:45:06] [daily_v24_recommend] ============================================================
+[2026-08-04 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-04 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-04 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603816', '603260', '600118', '603728', '001314', '603881', '605088', '603666', '603197', '603092']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 已记录 5 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 5 只
+[2026-08-04 14:45:07] [daily_v24_recommend]   找到 5 只推荐
+[2026-08-04 14:45:07] [daily_v24_recommend]     603816 顾家家居 score=100
+[2026-08-04 14:45:07] [daily_v24_recommend]     603260 合盛硅业 score=100
+[2026-08-04 14:45:07] [daily_v24_recommend]     605088 冠盛股份 score=100
+[2026-08-04 14:45:07] [daily_v24_recommend]     603197 保隆科技 score=100
+[2026-08-04 14:45:07] [daily_v24_recommend]     603092 德力佳 score=100
+[2026-08-04 14:45:07] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-04 14:45:07] [daily_v24_recommend]     建仓 603816 顾家家居 @25.17 100股
+[2026-08-04 14:45:07] [daily_v24_recommend]     建仓 603260 合盛硅业 @35.12 100股
+[2026-08-04 14:45:07] [daily_v24_recommend]     建仓 605088 冠盛股份 @21.04 100股
+[2026-08-04 14:45:07] [daily_v24_recommend]     建仓 603197 保隆科技 @29.99 100股
+[2026-08-04 14:45:07] [daily_v24_recommend]     建仓 603092 德力佳 @50.9 100股
+[2026-08-04 14:45:07] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-04 14:45:07] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-04-v24-尾盘推荐.md
+[2026-08-04 14:45:07] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-04 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-04 14:45:07] [daily_v24_recommend] ✅ 完成
+[2026-08-04 14:45:07] [daily_v24_recommend] ============================================================
+[2026-08-05 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-05 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-05 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600961', '603067', '605358', '603119', '603678', '600549', '603688', '600176', '600367', '600487']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-05 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-05 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-06 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-06 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-06 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600547', '603993', '002827', '000831', '603726', '603283', '600895', '002653', '002841', '603308']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 41 只
+[AAna 尾盘] 候选股票总数: 51 只
+[AAna 尾盘] 已记录 2 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 2 只
+[2026-08-06 14:45:04] [daily_v24_recommend]   找到 2 只推荐
+[2026-08-06 14:45:04] [daily_v24_recommend]     603993 洛阳钼业 score=100
+[2026-08-06 14:45:04] [daily_v24_recommend]     600895 张江高科 score=100
+[2026-08-06 14:45:04] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-06 14:45:04] [daily_v24_recommend]     建仓 603993 洛阳钼业 @20.34 100股
+[2026-08-06 14:45:04] [daily_v24_recommend]     建仓 600895 张江高科 @32.65 100股
+[2026-08-06 14:45:04] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-06 14:45:04] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-06-v24-尾盘推荐.md
+[2026-08-06 14:45:04] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-06 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-06 14:45:04] [daily_v24_recommend] ✅ 完成
+[2026-08-06 14:45:04] [daily_v24_recommend] ============================================================
+[2026-08-07 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-07 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-07 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600801', '603068', '601858', '600489', '600547', '001337', '603220', '600301', '000426', '601225']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600801: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603068: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-07 14:45:06] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-07 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-08 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-08 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-08 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-08-选股报告.md
+[Eastmoney] 报告 Top10: ['600489', '601958', '001257', '600276', '600196', '603203', '002317', '000963', '600367', '603989']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-08 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-08 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-09 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-09 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-09 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-09-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-08-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-08-09 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-09 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-10 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-10 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-10 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600489', '601958', '001257', '600276', '600196', '603203', '002317', '000963', '600367', '603989']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603203: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002317: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603989: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-10 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-10 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-11 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-11 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-11 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603988', '603906', '601225', '600988', '600685', '601233', '002674', '000593', '003010', '001358']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 150 只
+[AAna 尾盘] 候选股票总数: 160 只
+[AAna 尾盘] 已记录 6 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 6 只
+[2026-08-11 14:45:06] [daily_v24_recommend]   找到 6 只推荐
+[2026-08-11 14:45:06] [daily_v24_recommend]     603988 中电电机 score=100
+[2026-08-11 14:45:06] [daily_v24_recommend]     601225 陕西煤业 score=100
+[2026-08-11 14:45:06] [daily_v24_recommend]     600685 中船防务 score=100
+[2026-08-11 14:45:06] [daily_v24_recommend]     601233 桐昆股份 score=100
+[2026-08-11 14:45:06] [daily_v24_recommend]     001358 兴欣新材 score=100
+[2026-08-11 14:45:06] [daily_v24_recommend]     002674 兴业科技 score=70
+[2026-08-11 14:45:06] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 603988 中电电机 @23.5 100股
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 601225 陕西煤业 @25.94 100股
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 600685 中船防务 @26.63 100股
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 601233 桐昆股份 @23.93 100股
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 001358 兴欣新材 @26.08 100股
+[2026-08-11 14:45:06] [daily_v24_recommend]     建仓 002674 兴业科技 @28.01 100股
+[2026-08-11 14:45:06] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-11 14:45:06] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-11-v24-尾盘推荐.md
+[2026-08-11 14:45:06] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-11 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-11 14:45:06] [daily_v24_recommend] ✅ 完成
+[2026-08-11 14:45:06] [daily_v24_recommend] ============================================================
+[2026-08-12 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-12 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-12 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603882', '603619', '603270', '600801', '002472', '001325', '002925', '603267', '600114', '603733']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 35 只
+[AAna 尾盘] 候选股票总数: 45 只
+[K线] 603882: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603619: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600801: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002472: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002925: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603267: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600114: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-12 14:45:06] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-12 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-13 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-13 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-13 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600673', '600547', '600895', '002842', '000426', '002674', '600459', '600330', '603011', '603920']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 152 只
+[AAna 尾盘] 候选股票总数: 162 只
+[K线] 600547: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002842: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 5 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 5 只
+[2026-08-13 14:45:08] [daily_v24_recommend]   找到 5 只推荐
+[2026-08-13 14:45:08] [daily_v24_recommend]     600895 张江高科 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     002674 兴业科技 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     600459 贵研铂业 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     603011 合锻智能 score=100
+[2026-08-13 14:45:08] [daily_v24_recommend]     000426 兴业银锡 score=70
+[2026-08-13 14:45:08] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 600895 张江高科 @32.78 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 002674 兴业科技 @28.76 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 600459 贵研铂业 @20.79 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 603011 合锻智能 @24.73 100股
+[2026-08-13 14:45:08] [daily_v24_recommend]     建仓 000426 兴业银锡 @37.98 100股
+[2026-08-13 14:45:08] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-13 14:45:08] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-13-v24-尾盘推荐.md
+[2026-08-13 14:45:08] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-13 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-13 14:45:08] [daily_v24_recommend] ✅ 完成
+[2026-08-13 14:45:08] [daily_v24_recommend] ============================================================
+[2026-08-14 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-14 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-14 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603127', '600298', '603039', '600673', '603496', '600196', '603995', '603099', '002294', '000026']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 106 只
+[AAna 尾盘] 候选股票总数: 116 只
+[K线] 603127: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600298: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603039: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600196: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603099: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002294: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000026: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-14 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-14 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-15 14:45:03] [daily_v24_recommend] ============================================================
+[2026-08-15 14:45:03] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-15 14:45:03] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-15-选股报告.md
+[Eastmoney] 报告 Top10: ['603156', '600301', '600188', '600330', '603358', '600988', '002364', '002674', '002827', '600498']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 70 只
+[AAna 尾盘] 候选股票总数: 80 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-15 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-15 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-16 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-16-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-15-选股报告.md
+  [源3] 全市场涨幅榜: 新增 72 只
+[AAna 尾盘] 候选股票总数: 72 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-16 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-16 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-17 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-17 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-17 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603156', '600301', '600188', '600330', '603358', '600988', '002364', '002674', '002827', '600498']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600188: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-17 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-17 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-18 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-18 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-18 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600489', '600667', '000975', '000426', '000593', '002202', '601231', '603005', '603031', '603308']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 65 只
+[AAna 尾盘] 候选股票总数: 75 只
+[K线] 600489: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600667: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000426: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601231: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603005: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603031: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603308: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-18 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-18 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-19 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-19 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-19 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['605133', '600206', '603358', '600938', '002648', '000593', '002827', '603283', '603067', '603663']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 250 只
+[AAna 尾盘] 候选股票总数: 260 只
+[K线] 603358: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600938: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002827: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-19 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-19 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-20 14:45:04] [daily_v24_recommend] ============================================================
+[2026-08-20 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-20 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600206', '603156', '603881', '600536', '002648', '600206', '603156', '603881', '600536', '002648']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600206: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603156: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600206: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603156: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-20 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-20 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-21 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-21 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-21 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['601069', '600330', '603009', '600536', '605488', '603068', '002929', '000975', '002142', '001221']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 110 只
+[AAna 尾盘] 候选股票总数: 120 只
+[K线] 600330: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600536: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603068: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002929: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002142: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001221: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-21 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-21 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-22 14:45:04] [daily_v24_recommend] ============================================================
+[2026-08-22 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-22 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-22-选股报告.md
+[Eastmoney] 报告 Top10: ['600482', '603666', '600547', '601233', '001211', '603920', '603688', '002965', '002436', '603882']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 96 只
+[AAna 尾盘] 候选股票总数: 106 只
+[AAna 尾盘] 筛选后候选: 0 只
+[2026-08-22 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-22 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
