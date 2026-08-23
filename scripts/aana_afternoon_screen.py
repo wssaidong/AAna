@@ -592,6 +592,10 @@ FEEDBACK_FIELDS = [
     "ret_1d", "ret_3d", "ret_5d", "ret_15d",
     # v2.2 扩展字段
     "score", "sentiment_score", "macd_gold", "macd_confirmed",
+    # v2026-08-23 (Phase 8 测试发现): 加 sector — recommendations.csv 的 sector 覆盖率
+    # 仅 13.6% (14/103, 全部来自 5/22 一天), 板块胜率 JOIN 大部分落 "(无板块)"。
+    # 让 feedback 表自己存 sector, query_sector_stats 优先从 fb 侧取。
+    "sector",
 ]
 
 
@@ -606,7 +610,7 @@ def _sf(v, default=None):
 
 
 def record_recommendation(code, name, score, sentiment_score=50,
-                           macd_gold=False, macd_confirmed=False):
+                           macd_gold=False, macd_confirmed=False, sector=""):
     """
     监控信号 hook（优化 #3）：把每次推荐写入 rec_feedback.csv + recommendations.csv
     真实收益由 feedback_loop.py 周期性补全。
@@ -617,6 +621,8 @@ def record_recommendation(code, name, score, sentiment_score=50,
     （之前两个源分裂：cron 走 screen_afternoon_stocks() 写 rec_feedback.csv，main() 走
     append_recommendations_batch 写 recommendations.csv —— 反馈循环只读 recommendations.csv
     时 7/29 起静默空跑 15 天）。现在统一在 record_recommendation 一处写双源。
+    v2026-08-23 (Phase 8): sector 参数 — 板块信息双表落地 (feedback + recommendations),
+    修 recommendations.csv sector 覆盖率 13.6% 的数据质量问题。
     """
     try:
         import csv
@@ -673,6 +679,8 @@ def record_recommendation(code, name, score, sentiment_score=50,
                     "sentiment_score": sentiment_score,
                     "macd_gold": macd_gold,
                     "macd_confirmed": macd_confirmed,
+                    # v2026-08-23 (Phase 8): sector 落地
+                    "sector": sector or "",
                 })
 
             # v2026-08-23 (Phase 1A): 同时写入 recommendations.csv —— 单一写入点
@@ -682,7 +690,7 @@ def record_recommendation(code, name, score, sentiment_score=50,
                 from data import append_recommendation as _append_rec
                 _append_rec(
                     code=code, name=name,
-                    sector="", sector_name="",
+                    sector=sector or "", sector_name="",
                     reason=f"AAna v2.4 尾盘评分 {score}",
                     expected_high=1.0, expected_low=-3.0,
                 )

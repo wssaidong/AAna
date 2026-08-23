@@ -173,40 +173,63 @@ def query_recent_no_ret() -> dict[str, Any]:
     return _sql_safe(sql, (str(REC_FEEDBACK),))
 
 
-def query_sector_stats(days: int = 90) -> dict[str, Any]:
-    """按板块算胜率(给 rec_optimizer.weak_sectors 用 — Phase 5B 闭环)"""
+def query_sector_stats(days: int = 90, min_n: int = 20) -> dict[str, Any]:
+    """按板块算胜率(给 rec_optimizer.weak_sectors 用 — Phase 5B 闭环)
+
+    Args:
+        days: 回看天数
+        min_n: 板块最小样本数,低于此数的板块不进结果 (防小样本 100% 误导)
+    """
     if not REC_FEEDBACK.exists():
         return {"ok": False, "error": "not found", "rows": []}
     if not RECOMMENDATIONS.exists():
         return {"ok": False, "error": "recommendations.csv missing, can't join", "rows": []}
     cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    # v2026-08-23 Phase 8: sector 优先从 fb 侧取 (Phase 8 起写入),fallback JOIN recommendations
+    # sector 在内层 CTE 算好,外层 GROUP BY 只用列名 (DuckDB 要求 GROUP BY 列或聚合)
     sql = """
         WITH fb AS (
             SELECT
                 code,
                 rec_date,
-                TRY_CAST(ret_1d AS DOUBLE) AS ret
+                TRY_CAST(ret_1d AS DOUBLE) AS ret,
+                sector AS fb_sector
             FROM read_csv_auto(?)
             WHERE ret_1d IS NOT NULL
+              AND LENGTH(CAST(ret_1d AS VARCHAR)) > 0
               AND TRY_CAST(rec_date AS DATE) >= TRY_CAST(? AS DATE)
         ),
         rec AS (
             SELECT code, sector, sector_name
             FROM read_csv_auto(?)
+            WHERE sector IS NOT NULL AND LENGTH(CAST(sector AS VARCHAR)) > 0
+        ),
+        joined AS (
+            SELECT
+                COALESCE(
+                    CASE WHEN fb.fb_sector IS NOT NULL AND LENGTH(CAST(fb.fb_sector AS VARCHAR)) > 0
+                         THEN fb.fb_sector END,
+                    rec.sector,
+                    '(无板块)'
+                ) AS sector,
+                COALESCE(rec.sector_name, rec.sector, '(无板块)') AS sector_name,
+                fb.ret AS ret
+            FROM fb
+            LEFT JOIN rec ON fb.code = rec.code
         )
         SELECT
-            COALESCE(rec.sector, '(无板块)') AS sector,
-            COALESCE(rec.sector_name, '(无板块)') AS sector_name,
+            sector,
+            sector_name,
             COUNT(*) AS n,
-            SUM(CASE WHEN fb.ret > 0 THEN 1 ELSE 0 END) AS wins,
-            ROUND(100.0 * SUM(CASE WHEN fb.ret > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS win_rate,
-            ROUND(AVG(fb.ret), 2) AS avg_ret
-        FROM fb
-        LEFT JOIN rec ON fb.code = rec.code
+            SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) AS wins,
+            ROUND(100.0 * SUM(CASE WHEN ret > 0 THEN 1 ELSE 0 END) / COUNT(*), 1) AS win_rate,
+            ROUND(AVG(ret), 2) AS avg_ret
+        FROM joined
         GROUP BY sector, sector_name
+        HAVING COUNT(*) >= ?
         ORDER BY win_rate ASC
     """
-    return _sql_safe(sql, (str(REC_FEEDBACK), cutoff, str(RECOMMENDATIONS)))
+    return _sql_safe(sql, (str(REC_FEEDBACK), cutoff, str(RECOMMENDATIONS), min_n))
 
 
 def query_today_signal() -> dict[str, Any]:
@@ -248,6 +271,30 @@ def query_recent_trades(days: int = 7) -> dict[str, Any]:
     # 按日期排序
     rows.sort(key=lambda x: (x.get("date", ""), x.get("action", "")), reverse=True)
     return {"ok": True, "rows": rows, "n": len(rows), "days": days}
+
+
+def query_data_quality() -> dict[str, Any]:
+    """数据质量体检 — Phase 8 测试发现的真问题:
+    recommendations.csv 的 sector 字段覆盖率极低 (14/103, 全部来自 2026-05-22 一天),
+    导致 query_sector_stats 的 LEFT JOIN 大部分落 '(无板块)'。
+    本查询暴露覆盖率,不藏问题。
+    """
+    if not RECOMMENDATIONS.exists():
+        return {"ok": False, "error": "recommendations.csv not found"}
+    sql = """
+        SELECT
+            COUNT(*) AS total_rows,
+            SUM(CASE WHEN sector IS NOT NULL AND LENGTH(CAST(sector AS VARCHAR)) > 0
+                     THEN 1 ELSE 0 END) AS rows_with_sector,
+            ROUND(100.0 * SUM(CASE WHEN sector IS NOT NULL AND LENGTH(CAST(sector AS VARCHAR)) > 0
+                     THEN 1 ELSE 0 END) / COUNT(*), 1) AS sector_coverage_pct,
+            MIN(TRY_CAST(date AS DATE)) AS first_date,
+            MAX(TRY_CAST(date AS DATE)) AS last_date_with_sector,
+            MAX(CASE WHEN sector IS NOT NULL AND LENGTH(CAST(sector AS VARCHAR)) > 0
+                     THEN TRY_CAST(date AS DATE) END) AS last_sector_date
+        FROM read_csv_auto(?)
+    """
+    return _sql_safe(sql, (str(RECOMMENDATIONS),))
 
 
 def list_all_queries() -> list[str]:
@@ -293,6 +340,8 @@ def main():
     # 按 query 名 dispatch kwargs
     if "min_score" in fn.__code__.co_varnames:
         result = fn(days=args.days, min_score=args.min_score)
+    elif "min_n" in fn.__code__.co_varnames:
+        result = fn(days=args.days, min_n=max(args.days // 3, 20))  # 默认 min_n 与窗口联动
     elif "days" in fn.__code__.co_varnames:
         result = fn(days=args.days)
     else:

@@ -713,10 +713,8 @@ def main():
     _try_run_rec_optimizer()
 
     # v2026-08-23 (Phase 8C): DuckDB 同口径交叉验证
-    #   feedback_loop 既有 pandas pipeline (calc_ret_3d/5d/15d 等) 计算胜率,
-    #   DuckDB 走相同口径的 SQL 算同样的胜率,二者不一致 → stderr WARN。
-    #   优势: SQL 是单点真理,业务面胜率计算以后可一只 DuckDB 接管。
-    _duckdb_crosscheck(stats)
+    #   v2: 传 all_feedback (CSV 全表),由 _duckdb_crosscheck 自行按 30 日口径过滤对比
+    _duckdb_crosscheck(all_feedback)
 
     # 6. 输出 Markdown 报告（详情表用 CSV 全表末尾 20 条，与统计分母对齐）
     report = build_markdown_report(rec_rows, all_feedback, stats, trend_stats)
@@ -755,15 +753,15 @@ def _try_run_rec_optimizer():
         print(f"   [Phase 5B] rec_optimizer 失败: {type(e).__name__}: {e}", file=sys.stderr)
 
 
-def _duckdb_crosscheck(pandas_stats):
+def _duckdb_crosscheck(all_feedback_rows):
     """Phase 8C: DuckDB 同口径交叉验证 — 不阻断,只是 stderr warn。
 
-    pandas_stats: feedback_loop.compute_stats() 返回的 (win_n, total, winrate, avg_win, avg_loss, profit_ratio)
-    DuckDB query_winrate() 返回 {n, wins, win_rate, avg_ret, ...}
-    同口径应得近似的 winrate (差几个小数点不影响决策):
-      - pandas: total = win+loss, winrate = win/total (基于 ret_1d, win=ret_1d>0, loss=ret_1d<=0)
-      - DuckDB : winrate = 100 * wins / n (基于 ret_1d, win=ret_1d>0, n=全样本, 包括 ret=0)
-    差异容忍: |pandas_winrate - duckdb_winrate| < 1.0pp
+    v2 (2026-08-23): 修正口径 bug — v1 拿 compute_stats(top_n=20 的"末尾20条")
+    与 DuckDB 30 日窗口比,样本天然不同(diff 1.1pp 假警报)。
+    现在传 all_feedback_rows (CSV 全表),自行用 30 日窗口过滤后与 DuckDB 对比,
+    两侧口径严格一致: ret_1d 非空 + rec_date >= today-30。
+
+    容忍: |pandas_wr - duckdb_wr| < 0.5pp 且 n 相同。
     """
     try:
         from analytics_query import query_winrate  # noqa: E402
@@ -771,15 +769,33 @@ def _duckdb_crosscheck(pandas_stats):
         if not db.get("ok"):
             print(f"   [Phase 8C] DuckDB query 跳过: {db.get('error')}", file=sys.stderr)
             return
-        pandas_wr = round(pandas_stats[2] * 100, 1) if len(pandas_stats) > 2 else 0.0
-        pandas_n = pandas_stats[1] if len(pandas_stats) > 1 else 0
+
+        # pandas 侧: 同口径 (30 日窗口 + ret_1d 非空可转 float)
+        cutoff = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        def _sf(v):
+            try:
+                s = str(v).replace("%", "").replace(",", "")
+                if s in ("", "-", "--", None):
+                    return None
+                return float(s)
+            except (ValueError, TypeError):
+                return None
+        sample = []
+        for r in all_feedback_rows or []:
+            rd = (r.get("rec_date") or "")[:10]
+            v = _sf(r.get("ret_1d"))
+            if rd >= cutoff and v is not None:
+                sample.append(v)
+        pandas_n = len(sample)
+        pandas_wr = round(100.0 * sum(1 for v in sample if v > 0) / pandas_n, 1) if pandas_n else 0.0
+
         db_wr = db.get("win_rate", 0.0)
         db_n = db.get("n", 0)
         diff = abs(pandas_wr - db_wr)
-        if diff > 1.0 or pandas_n != db_n:
+        if diff > 0.5 or pandas_n != db_n:
             print(
                 f"   [Phase 8C] ⚠️  不一致: pandas(30d, n={pandas_n}, wr={pandas_wr}%) "
-                f"vs DuckDB(n={db_n}, wr={db_wr}%), diff={diff}pp",
+                f"vs DuckDB(n={db_n}, wr={db_wr}%), diff={diff:.1f}pp",
                 file=sys.stderr,
             )
         else:
