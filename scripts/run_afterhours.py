@@ -8,6 +8,7 @@ A股盘后战报 端到端生成脚本
     python3 scripts/run_afterhours.py 2026-06-08 --dry   # 不推送飞书，只输出
 """
 import argparse
+import os
 import re
 import sys
 from collections import Counter
@@ -18,6 +19,14 @@ import requests
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 FEISHU_USER = "ou_5d0124d26ed21365f74764fcb9fa01b7"
 REPORT_DIR = "/Users/cai/code/AAna/reports"
+
+# v2026-08-23 Phase 3-2: log silenced() fallback
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
+    from _logger import silenced as _silenced
+except Exception:
+    def _silenced(label, exc):  # noqa: E731
+        pass
 
 
 def tencent_quote(codes):
@@ -44,8 +53,8 @@ def tencent_quote(codes):
                     "prev_close": float(parts[4]) if parts[4] else None,
                     "change_pct": float(parts[32]) if parts[32] else 0,
                 }
-            except Exception:
-                pass
+            except Exception as e:  # v2026-08-23 Phase 3-2: log instead of bare pass
+                _silenced("run_afterhours.tencent_quote parser", e)
     return result
 
 

@@ -281,7 +281,13 @@ def get_limit_counts() -> tuple:
         dt = max(0, round(zt / 10))
         return zt, dt, "ths"
     except Exception as e:
-        pass
+        # v2026-08-23 Phase 3-2: silent swallow 加 stderr 日志 — 不抛但留痕
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            from _logger import silenced
+            silenced("market_sentiment.py:283 ths_zt_dt fallback", e)
+        except Exception:
+            pass  # 日志模块没装也别炸
 
     # 源 3: 全部失败 — 返回 -1 触发 fallback 路径（main() 已有 sanity check）
     print("[情绪] 涨跌停统计：所有源失败，返回 -1")

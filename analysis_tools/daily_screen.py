@@ -10,6 +10,16 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../.openclaw/workspace/.agents/skills/china-stock-analysis/scripts'))
 
+# v2026-08-23 Phase 3-2: 配置 silenced() helper
+try:
+    _scripts_path = os.path.join(os.path.dirname(__file__), '..', 'scripts')
+    if _scripts_path not in sys.path:
+        sys.path.insert(0, _scripts_path)
+    from _logger import silenced as _log_silent  # noqa: E402
+except Exception:
+    def _log_silent(label, exc):  # noqa: E731
+        pass
+
 try:
     import akshare as ak
     import pandas as pd
@@ -71,8 +81,8 @@ def calculate_score_short(row):
             amount = vol * price
             if amount > 1e8: score += 5
 
-    except:
-        pass
+    except Exception as _e:  # v2026-08-23 Phase 3-2: 替换 bare except + log
+        _log_silent("daily_screen.calculate_score:74", _e)
     return max(0, min(100, score))
 
 def calculate_score_long(row):
@@ -115,8 +125,8 @@ def calculate_score_long(row):
             if debt < 50: score += 10
             elif debt > 80: score -= 10
 
-    except:
-        pass
+    except Exception as _e:  # v2026-08-23 Phase 3-2: 替换 bare except + log
+        _log_silent("daily_screen.calculate_score_long:118", _e)
     return max(0, min(100, score))
 
 def screen():

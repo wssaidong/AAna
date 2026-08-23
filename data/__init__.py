@@ -51,10 +51,13 @@ def _read_csv(path):
         return list(csv.DictReader(f))
 
 def _write_csv(path, fields, rows, mode="w"):
-    with open(path, mode, newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=fields)
-        w.writeheader()
-        w.writerows(rows)
+    # v2026-08-23 Phase 2: 走 safe_csv_dump —— 防 truncate 0 bytes (与 8/7 JSON dump fp= 同根)
+    # mode 参数保留兼容 (a=append 已经在 _read_csv 之后读出来再统一 mode='w' 重新写)。
+    # 实际所有调用方只传 mode='w' (全量重写)，保留接口签名。
+    import sys
+    sys.path.insert(0, str(PROJECT / "scripts"))
+    from _safe_io import safe_csv_dump
+    safe_csv_dump(str(path), fields, rows)
 
 # ── 推荐写入 ────────────────────────────────────────────────
 def append_recommendation(code, name, sector, sector_name,

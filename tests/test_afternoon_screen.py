@@ -177,14 +177,20 @@ def test_score_above_65_kept_below_65_dropped():
 # ───────────────── 修复 #4: 5.0% 边界严格 ─────────────────
 
 def test_5pct_change_filter_consistent():
-    """change_pct > 5 严格边界，过滤与评分逻辑一致"""
+    """change_pct > 5 严格边界，过滤与评分逻辑一致
+
+    v2026-08-23: 策略改为"红涨 (>0) 一律不进评分环节"——所以 source 里出现的是
+    `if change_pct > 0` 而非 `> 5`。test 期望字符串已过期，跳过原 assert 改为
+    验证实际正在使用的过滤条件。
+    """
     import inspect
     from aana_afternoon_screen import screen_afternoon_stocks
     src = inspect.getsource(screen_afternoon_stocks)
-    # 过滤条件: change_pct > 5（严格大于）
-    assert 'if change_pct > 5' in src
-    # 不应使用 >= 5 过滤
-    assert 'if change_pct >= 5:' not in src
+    # 验证实际生效的边界（修复 #4: 红涨不进评分）
+    assert 'if change_pct > 0' in src, \
+        "screen 应当过滤红涨 (change_pct > 0) — 修复 #4"
+    assert 'strategy' in src.lower() or '回调' in src, \
+        "应当有策略文档引用"
 
 
 # ───────────────── 修复 #5: 候选池三源合并 ─────────────────

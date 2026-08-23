@@ -9,6 +9,20 @@ import requests
 import subprocess
 from datetime import datetime, timedelta
 
+def api_call_dict(url, max_retries=2):
+    """
+    便捷 wrapper：解构 api_call 返回的 (dict, raw_text) tuple，直接返回 dict 部分。
+
+    v2026-08-23 Phase 1B-2: 解决 `'tuple' object has no attribute 'get'` 陷阱。
+    历史 5+ 处手动 `r, _ = api_call(url)` 的解构要改回来，只用这个 helper。
+
+    Usage:
+        r = api_call_dict(url)               # 不要 max_retries
+        r = api_call_dict(url, max_retries=5)  # 显式覆盖
+    """
+    return api_call(url, max_retries=max_retries)[0]
+
+
 # ============================================
 # 配置
 # ============================================
@@ -177,6 +191,7 @@ def add_stocks(gid, codes):
 
 def find_group_gid(target_name):
     """通过遍历 gid 范围找到指定名称的组合"""
+    _silenced = _safe_silenced()  # v2026-08-23 Phase 3-2
     for test_gid in range(100, 250):
         url = mkurl('gstkinfos', g=test_gid)
         try:
@@ -185,9 +200,18 @@ def find_group_gid(target_name):
                 stocks = result.get('data', {}).get('stkinfolist', [])
                 # 如果这个 gid 有股票，认为是有效组合
                 # 但我们无法直接知道组合名称，除非尝试用ag接口查询
-        except:
-            pass
+        except Exception as _e:  # v2026-08-23 Phase 3-2: bare except → Exception + log
+            _silenced(f"find_group_gid:test_gid={test_gid}", _e)
     return None
+
+
+# v2026-08-23 Phase 3-2: 提供 silenced() helper 局部包装
+def _safe_silenced():
+    try:
+        from _logger import silenced as _s
+        return _s
+    except Exception:
+        return lambda *_a, **_kw: None
 
 
 def find_existing_group_gid():
@@ -260,6 +284,7 @@ def get_or_create_group(group_name):
             return gid_from_response
         
         # 2b. 扫描全部 gid 范围找同名组合
+        _silenced = _safe_silenced()
         for test_gid in range(136, 400):
             url_check = mkurl('gstkinfos', g=test_gid)
             try:
@@ -273,8 +298,8 @@ def get_or_create_group(group_name):
                         if date_part == group_name:
                             print(f"[Eastmoney] 扫描找到 {group_name} 对应 gid={test_gid}")
                             return test_gid
-            except:
-                pass
+            except Exception as _e:  # v2026-08-23 Phase 3-2: log instead of bare pass
+                _silenced(f"get_or_create_group 2b:test_gid={test_gid}", _e)
         
         # 2c. 扫描也找不到，用 groups.json 历史最大值 + 步进作为兜底
         if os.path.exists(groups_file):
@@ -407,7 +432,23 @@ def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
 
     # 记录今日组合
     cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y%m%d")
-    groups_history[group_name] = {'gid': gid, 'date': today_str, 'stocks': stock_codes}
+    # v2026-08-23 Phase 1B-1: 修复 cleanup 用空 stocks 覆盖今日条目的 BUG (8/13 沉淀)
+    # 原版: groups_history[group_name] = {'gid': gid, 'date': today_str, 'stocks': stock_codes}
+    #      → 当 cleanup 调用时 stock_codes=[] → 今日条目 stocks 被清空。
+    # 修复: 已存在则只更新 gid（保留 stocks）；不存在再创建。
+    existing_entry = groups_history.get(group_name, {}) or {}
+    if existing_entry.get("stocks"):
+        groups_history[group_name] = {
+            "gid": gid,
+            "date": today_str,
+            "stocks": existing_entry["stocks"],  # 保留已有 stocks（不被 cleanup 清空）
+        }
+    else:
+        groups_history[group_name] = {
+            "gid": gid,
+            "date": today_str,
+            "stocks": list(stock_codes),  # 新建时给真实 codes
+        }
 
     # 找出要删除的旧组合
     to_delete = {name: info for name, info in groups_history.items()
@@ -418,8 +459,10 @@ def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
         delete_group(info.get('gid'))
         del groups_history[name]
 
-    with open(groups_file, 'w') as f:
-        json.dump(groups_history, f, indent=2, ensure_ascii=False)
+    # v2026-08-23 Phase 2: 切到 safe_json_dump —— 防 8/7 JSON dump fp= 双重参数陷阱
+    # (历史: 0 bytes groups.json truncate 永久清空)
+    from _safe_io import safe_json_dump
+    safe_json_dump(groups_file, groups_history)
 
     print(f"[Eastmoney] 完成！保留组合: {list(groups_history.keys())}")
     return True

@@ -608,11 +608,15 @@ def _sf(v, default=None):
 def record_recommendation(code, name, score, sentiment_score=50,
                            macd_gold=False, macd_confirmed=False):
     """
-    监控信号 hook（优化 #3）：把每次推荐写入 rec_feedback.csv
+    监控信号 hook（优化 #3）：把每次推荐写入 rec_feedback.csv + recommendations.csv
     真实收益由 feedback_loop.py 周期性补全。
     静默失败，不影响主流程。
 
     v2.2 增强：写之前会升级旧 header（旧 9 字段 → 新 13 字段）
+    v2026-08-23 修复（Phase 1A）: 同时 append recommendations.csv，让 feedback_loop 单源读取即可
+    （之前两个源分裂：cron 走 screen_afternoon_stocks() 写 rec_feedback.csv，main() 走
+    append_recommendations_batch 写 recommendations.csv —— 反馈循环只读 recommendations.csv
+    时 7/29 起静默空跑 15 天）。现在统一在 record_recommendation 一处写双源。
     """
     try:
         import csv
@@ -639,33 +643,52 @@ def record_recommendation(code, name, score, sentiment_score=50,
                     writer.writerows(upgraded)
 
         # 检查是否已存在（同日同股）
+        already_recorded = False
         if os.path.exists(feedback_csv):
             with open(feedback_csv, newline='', encoding='utf-8') as f:
                 for row in csv.DictReader(f):
                     if row.get('code') == code and row.get('rec_date', '').startswith(today):
-                        return  # 去重
-        # 追加
-        file_exists = os.path.exists(feedback_csv)
-        with open(feedback_csv, 'a', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=FEEDBACK_FIELDS, extrasaction='ignore')
-            if not file_exists:
-                writer.writeheader()
-            writer.writerow({
-                "date": now,
-                "code": code,
-                "name": name,
-                "rec_date": today,
-                "trend": "",           # 留给 feedback_loop 补
-                "ret_1d": "",
-                "ret_3d": "",
-                "ret_5d": "",
-                "ret_15d": "",
-                # v2.2 扩展
-                "score": score,
-                "sentiment_score": sentiment_score,
-                "macd_gold": macd_gold,
-                "macd_confirmed": macd_confirmed,
-            })
+                        already_recorded = True
+                        break
+
+        if not already_recorded:
+            # 追加到 rec_feedback.csv（细粒度追踪：含 score/sentiment/macd）
+            file_exists = os.path.exists(feedback_csv)
+            with open(feedback_csv, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=FEEDBACK_FIELDS, extrasaction='ignore')
+                if not file_exists:
+                    writer.writeheader()
+                writer.writerow({
+                    "date": now,
+                    "code": code,
+                    "name": name,
+                    "rec_date": today,
+                    "trend": "",           # 留给 feedback_loop 补
+                    "ret_1d": "",
+                    "ret_3d": "",
+                    "ret_5d": "",
+                    "ret_15d": "",
+                    # v2.2 扩展
+                    "score": score,
+                    "sentiment_score": sentiment_score,
+                    "macd_gold": macd_gold,
+                    "macd_confirmed": macd_confirmed,
+                })
+
+            # v2026-08-23 (Phase 1A): 同时写入 recommendations.csv —— 单一写入点
+            # 让 feedback_loop 永远能读到当日推荐，不再有"split-brain"。
+            # 复用 data.append_recommendation() 的去重逻辑（同日同股不重复）。
+            try:
+                from data import append_recommendation as _append_rec
+                _append_rec(
+                    code=code, name=name,
+                    sector="", sector_name="",
+                    reason=f"AAna v2.4 尾盘评分 {score}",
+                    expected_high=1.0, expected_low=-3.0,
+                )
+            except Exception as rec_err:
+                # recommendations.csv 写失败不阻断主流程 —— rec_feedback.csv 已落地
+                print(f"  [recommendations.csv 写失败] {code}: {rec_err}")
     except Exception as e:
         # 静默失败，不影响主流程
         print(f"  [记录失败] {code}: {e}")
@@ -1132,23 +1155,25 @@ def main():
             print(f"  {i}. {s['name']}({s['code']}) ¥{s['price']:.2f} {s['change_pct']:+.2f}% RSI={s.get('rsi','N/A')} 量比={s.get('vol_ratio','N/A')}x 评分={s['score']} {s['risk']}")
             print(f"     理由: 止损¥{s['stop_loss']} 目标¥{s['target_price']}")
 
-        # 同步到东方财富组合（改用每日报告 Top10 精选个股）
-        if EASTMONEY_ENABLED:
-            try:
-                from eastmoney_portfolio import get_snapshot_top10, sync_portfolio_to_eastmoney
-                today_str = datetime.now().strftime("%Y%m%d")
-                today_date = datetime.now().strftime("%Y-%m-%d")
-                codes = get_snapshot_top10(today_date)
-                if codes:
-                    # 尾盘组合命名规则：YYYYMMDDPP（区别于早盘的纯日期）
-                    afternoon_group = f"{today_str}PP"
-                    success = sync_portfolio_to_eastmoney(codes, group_name=afternoon_group)
-                    if success:
-                        print(f"\n✅ 已同步 Top10 精选到东方财富组合 {afternoon_group}")
-                else:
-                    print(f"\n⚠️ 快照无数据，跳过东方财富同步")
-            except Exception as e:
-                print(f"\n⚠️ 东方财富同步失败: {e}")
+        # v2026-08-23 Phase 1C: 移除末尾自动同步到东财 PP 组合的代码
+        # ─────────────────────────────────────────────────────────
+        # 根因: 该段自动调 sync_portfolio_to_eastmoney() 内部走
+        #   get_snapshot_top10() 解析**早盘** reports/{date}-选股报告.md
+        #   → 8/18 第 3 次复发实证: 跑出 4 只筛选股，末尾同步把 10 只早盘 raw
+        #   加进 PP 组合 (gid=1341)。三次复发(7/1 + 7/14 + 8/18)同根。
+        #
+        # 修复: 让 cron prompt `__main__` 块独占同步逻辑（已沉淀 in
+        # `~/.hermes/skills/a-stock/a-stock-system/SKILL.md` 8/18 实战 SOP），
+        # 本脚本只负责数据采集 + 报告生成，单一职责。
+        #
+        # 如果确实需要脚本内同步，明确传入报告路径:
+        #   success = sync_portfolio_to_eastmoney(
+        #       stock_codes=actual_screen_result_codes,  # ← 显式传入筛选后
+        #       group_name=f"{today_str}PP",
+        #   )
+        # 当前参数过于隐式（依赖 get_snapshot_top10 内部读早盘报告），放弃。
+        # ─────────────────────────────────────────────────────────
+
     else:
         print("\n⚠️ 今日暂无符合尾盘策略的股票，建议轻仓观望")
     

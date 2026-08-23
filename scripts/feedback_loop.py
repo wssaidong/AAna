@@ -242,36 +242,40 @@ def _calc_ret(entry_price, exit_price):
 
 def load_recent_recommendations(days=7):
     """
-    加载最近 N 日的推荐。
+    加载最近 N 日的推荐（单源：recommendations.csv）。
 
-    ⚠️ 2026-08-13 修复（写入/读取源分裂）：
-    尾盘主链路 daily_v24_recommend.py → aana_afternoon_screen.screen_afternoon_stocks()
-    只写 rec_feedback.csv（record_recommendation），**不写** recommendations.csv
-    （append_recommendations_batch 只在 aana_afternoon_screen.main() 里调，cron 走的是
-    screen_afternoon_stocks() 函数入口，绕过了 main）。
-    结果：recommendations.csv 自 2026-07-29 起再无新增 → 本脚本连续多日「0 条推荐」空跑。
+    v2026-08-23 修复（Phase 1A）:
+    原实现双源（recommendations.csv + rec_feedback.csv）的 merge 实际上是为了兼容
+    7/29 - 8/13 期间 cron 走 record_recommendation 而 main() 走 append_recommendations_batch
+    的"split-brain"问题。现在 record_recommendation() 已经统一双写（见
+    aana_afternoon_screen.record_recommendation 的 Phase 1A 改动），feedback_loop 可以
+    安全地**只读 recommendations.csv**——更简单、更一致、更可调试。
 
-    修复：两个源都读并按 (code, date) 合并去重。
+    同时 rec_feedback.csv 仍保留作为"细粒度追踪层"（含 score/sentiment_score/macd_*），
+    append_feedback() 继续负责把收益率/趋势补回 rec_feedback.csv。两份数据不冲突：
+    - recommendations.csv = 单一写入点（推荐源 = 真值之源）
+    - rec_feedback.csv = 反馈层（推荐 + 收益率 + 趋势 + 信号）
     """
     cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
 
-    merged = {}
-
-    # 源 1：recommendations.csv（早期 / main() 入口写入）
+    rows = []
     for r in _read_csv(REC_CSV):
         d = (r.get("date") or "")[:10]
         code = r.get("code", "")
         if d and code and d >= cutoff:
-            merged[(code, d)] = {"code": code, "name": r.get("name", ""), "date": d}
+            rows.append({"code": code, "name": r.get("name", ""), "date": d})
 
-    # 源 2：rec_feedback.csv 的 rec_date（尾盘 v2.4 主链路实际写入点）
-    for r in _read_csv(FEEDBACK_CSV):
-        d = (r.get("rec_date") or "")[:10]
-        code = r.get("code", "")
-        if d and code and d >= cutoff:
-            merged.setdefault((code, d), {"code": code, "name": r.get("name", ""), "date": d})
+    # 按 (date, code) 去重（推荐 batch 写入可能产重复行）
+    seen = set()
+    deduped = []
+    for r in rows:
+        key = (r["date"], r["code"])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(r)
 
-    return sorted(merged.values(), key=lambda x: (x["date"], x["code"]))
+    return sorted(deduped, key=lambda x: (x["date"], x["code"]))
 
 
 def load_positions():
@@ -672,9 +676,15 @@ def main():
     print(f"   历史交易记录: {len(trade_data)} 条", file=sys.stderr)
 
     if not rec_rows:
-        print("⚠️  无最近推荐数据，退出。", file=sys.stderr)
-        print("\n# 📈 推荐反馈报告\n\n> 暂无推荐数据。")
-        return
+        # v2026-08-23 (Phase 1A): 没有推荐是"已知无推荐",不是"静默成功"。
+        # exit 2 让 cron wrapper 能识别 — 否则 7/29 那种静默空跑 15 天的事还会复发。
+        print("⚠️  无最近推荐数据，exit 2（让 cron 能报警）", file=sys.stderr)
+        print("# 📈 推荐反馈报告\n\n> 暂无最近推荐数据。\n\n> 这通常意味着上游 `aana_afternoon_screen.record_recommendation()` "
+              "连续 N 日未触发或 `data/recommendations.csv` 写失败。"
+              " 排查：1) `python3 scripts/aana_afternoon_screen.py` 单跑一次；"
+              "2) `tail -f scripts/cron.log` 看 record_recommendation() 错误；"
+              "3) `head data/recommendations.csv` 看末行 mtime。")
+        sys.exit(2)
 
     # 3. 计算 N 日收益率
     print("📐 计算收益率...", file=sys.stderr)
@@ -682,8 +692,8 @@ def main():
     print(f"   计算完成: {len(feedback_rows)} 条", file=sys.stderr)
 
     # 4. 合并写入 CSV（新增 + 回填空字段）
-    append_feedback(feedback_rows)
-    print(f"   已写入: {FEEDBACK_CSV}", file=sys.stderr)
+    added, backfilled = append_feedback(feedback_rows)
+    print(f"   已写入: {FEEDBACK_CSV} (新增 {added} / 回填 {backfilled})", file=sys.stderr)
 
     # 5. 统计 — 读 CSV 全表末尾 20 条（而不是只统计当天新增的 feedback_rows，
     #    否则样本被压到当天 rec 条数，分母严重偏小 → 胜率误导）
@@ -699,6 +709,12 @@ def main():
     # 6. 输出 Markdown 报告（详情表用 CSV 全表末尾 20 条，与统计分母对齐）
     report = build_markdown_report(rec_rows, all_feedback, stats, trend_stats)
     print(report)
+
+    # v2026-08-23 (Phase 1A): exit code 区分
+    #   0 = 正常有推荐 + 反馈层计算完成
+    #   1 = 有推荐但样本太少（<3）只写反馈但 Markdown 提示
+    # 这里一律 exit 0，因为反馈层已经落地、Markdown 报告已输出。报警靠 stderr 而不是 exit code。
+    sys.exit(0)
 
 
 if __name__ == "__main__":
