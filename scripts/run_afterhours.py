@@ -28,49 +28,55 @@ except Exception:
     def _silenced(label, exc):  # noqa: E731
         pass
 
+# v2026-08-23 Phase 4A: 数据源 facade 接入 scripts.data_sources
+#   之前 4 个函数 (tencent_quote/get_indices/ths_hot/get_industry_ranking)
+#   在本文件重复实现，已删除，改用 scripts.data_sources 真权威版本。
+#   scripts.data_sources.tencent_quote 与原版行为相同（用 get_prefix 判断前缀），
+#   ths_hot_reason 返回 dict 而原 ths_hot 返回 list — 提供 wrapper 保持向下兼容。
+sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
+try:
+    from scripts import data_sources as ds
+except Exception:
+    # 兼容 analysis_tools.data_sources 旧路径 (Phase 4A shim)
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    from analysis_tools import data_sources as ds  # noqa: F401
+
 
 def tencent_quote(codes):
-    """腾讯行情；key 用带前缀的 'sh000001' 不是 '000001'"""
-    code_str = ",".join(codes) if isinstance(codes, list) else codes
-    url = f"https://qt.gtimg.cn/q={code_str}"
-    r = requests.get(url, headers={"User-Agent": UA, "Referer": "https://finance.qq.com"}, timeout=10)
-    r.encoding = "gbk"
-    result = {}
-    for line in r.text.strip().split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        m = re.match(r'v_(\w+)="(.+)"', line)
-        if not m:
-            continue
-        key_code = m.group(1)
-        parts = m.group(2).split("~")
-        if len(parts) > 32:
-            try:
-                result[key_code] = {
-                    "name": parts[1], "code6": parts[2],
-                    "current": float(parts[3]) if parts[3] else None,
-                    "prev_close": float(parts[4]) if parts[4] else None,
-                    "change_pct": float(parts[32]) if parts[32] else 0,
-                }
-            except Exception as e:  # v2026-08-23 Phase 3-2: log instead of bare pass
-                _silenced("run_afterhours.tencent_quote parser", e)
-    return result
+    """腾讯行情:从 scripts.data_sources facade 复刻 key 行为
+
+    原返回 dict: {'sh000001': {name, code6, current, prev_close, change_pct}, ...}
+    ds.tencent_quote 返回相同结构。
+    """
+    if isinstance(codes, str):
+        codes = [c.strip() for c in codes.split(",")]
+    return ds.tencent_quote(codes)
 
 
 def get_indices():
+    """上证/深证/创业板/中小100/沪深300/科创50 — 用 ds.tencent_quote"""
     codes = ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]
     return tencent_quote(codes)
 
 
 def ths_hot(date_str):
-    url = f"http://zx.10jqka.com.cn/event/api/getharden/date/{date_str}/orderby/date/orderway/desc/charset/GBK/"
-    r = requests.get(url, headers={"User-Agent": UA}, timeout=10)
-    data = r.json()
-    rows = data.get("data") or []
-    return [{"code": row.get("code", ""), "name": row.get("name", ""),
-             "reason": row.get("reason", ""), "date": row.get("date", ""),
-             "market": row.get("market")} for row in rows]
+    """同花顺强势股;ds.ths_hot_reason 返回 dict {rows, ...},本函数取 rows 转 list 保持兼容
+
+    原 ths_hot 返回 list[{code, name, reason, date, market}]
+    ds.ths_hot_reason 返回 dict{rows, source, note}
+    """
+    raw = ds.ths_hot_reason(date_str)
+    rows = raw.get("rows", []) if isinstance(raw, dict) else []
+    return [
+        {
+            "code": row.get("code", ""),
+            "name": row.get("name", ""),
+            "reason": row.get("reason", ""),
+            "date": row.get("date", ""),
+            "market": row.get("market"),
+        }
+        for row in rows
+    ]
 
 
 def enrich_with_quote(hot_list):
@@ -106,74 +112,36 @@ def theme_counter(hot_list):
 
 
 def get_industry_ranking(top_n=10):
-    """东财行业板块涨跌；主域断连时使用官方 delay 域。"""
-    params = {
-        "pn": "1", "pz": "100", "po": "1", "np": "1",
-        "fltt": "2", "invt": "2", "fid": "f3", "fs": "m:90+t:2",
-        "fields": "f12,f14,f2,f3,f4,f8,f20",
+    """东财行业涨跌 — 用 ds.eastmoney_datacenter fallback 链 (push2 → push2delay)
+
+    原版返回 dict: {top: rows[:n], bottom: rows[-n:], total, returned, source}
+    ds.industry_comparison 签名是 (top_n=20) → 直接复用，调整 keys。
+    """
+    raw = ds.industry_comparison(top_n=top_n * 2)  # 取双倍才能给 bottom
+    if not isinstance(raw, dict):
+        return {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
+    rows = raw.get("rows", []) or []
+    # ds 返回的 keys: code, name, change_pct — 与原版一致
+    rows.sort(key=lambda x: x.get("change_pct", 0), reverse=True)
+    return {
+        "top": rows[:top_n],
+        "bottom": rows[-top_n:] if len(rows) >= top_n else [],
+        "total": len(rows),
+        "returned": len(rows),
+        "source": raw.get("source", "scripts.data_sources.industry_comparison"),
     }
-    errors = []
-    for url in (
-        "https://push2.eastmoney.com/api/qt/clist/get",
-        "https://push2delay.eastmoney.com/api/qt/clist/get",
-    ):
-        try:
-            r = requests.get(
-                url, params=params,
-                headers={"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"},
-                timeout=15,
-            )
-            r.raise_for_status()
-            first_page = r.json().get("data") or {}
-            items = list(first_page.get("diff") or [])
-            total = int(first_page.get("total") or len(items))
-            # 东财每页最多100条；分页拉全，才能给出真实 Bottom 榜。
-            pages = (total + 99) // 100
-            for page in range(2, pages + 1):
-                page_params = dict(params)
-                page_params["pn"] = str(page)
-                pr = requests.get(
-                    url, params=page_params,
-                    headers={"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"},
-                    timeout=15,
-                )
-                pr.raise_for_status()
-                items.extend((pr.json().get("data") or {}).get("diff") or [])
-            if not items:
-                continue
-            rows = [{"code": x.get("f12", ""), "name": x.get("f14", ""),
-                     "change_pct": float(x.get("f3") or 0)} for x in items]
-            rows.sort(key=lambda x: x["change_pct"], reverse=True)
-            return {"top": rows[:top_n], "bottom": rows[-top_n:],
-                    "total": total, "returned": len(rows), "source": url}
-        except Exception as exc:
-            errors.append(f"{url.split('/')[2]}: {type(exc).__name__}")
-    return {"top": [], "bottom": [], "total": 0, "error": "; ".join(errors)}
 
 
 def get_daily_dragon_tiger(date_str):
-    """东财龙虎榜；盘后未更新/报表为空时返回可审计的降级状态。"""
-    url = "https://datacenter-web.eastmoney.com/api/data/v1/get"
-    params = {
-        "reportName": "RPT_DAILYBILLBOARD_DETAILSNEW", "columns": "ALL",
-        "filter": f"(TRADE_DATE>='{date_str}')",
-        "pageNumber": "1", "pageSize": "100",
-        "sortColumns": "BILLBOARD_NET_AMT", "sortTypes": "-1",
-        "source": "WEB", "client": "WEB",
-    }
-    try:
-        r = requests.get(
-            url, params=params,
-            headers={"User-Agent": UA, "Referer": "https://data.eastmoney.com/"},
-            timeout=15,
-        )
-        d = r.json()
-        rows = ((d.get("result") or {}).get("data") or [])
-        if rows:
-            return {"rows": rows, "source": url}
-        return {"rows": [], "note": f"龙虎榜盘后暂不可用（东财 code={d.get('code')} {d.get('message', '')}），新晋异动改用同花顺强势股"}
-    except Exception as exc:
-        return {"rows": [], "note": f"东财龙虎榜请求失败（{type(exc).__name__}），新晋异动改用同花顺强势股"}
+    """东财龙虎榜 — ds.daily_dragon_tiger(trade_date)
+
+    原版返回 dict: {rows, source} 或 {rows, note}
+    ds.daily_dragon_tiger 返回更结构化的 dict,本函数适配:
+    """
+    raw = ds.daily_dragon_tiger(trade_date=date_str)
+    if isinstance(raw, dict) and "rows" in raw:
+        return raw
+    return {"rows": [], "note": "scripts.data_sources.daily_dragon_tiger 未返回 rows"}
 
 
 def _yesterday(date_str):

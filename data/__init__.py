@@ -241,12 +241,33 @@ def migrate_from_state():
 
 # ── 实盘组合 ────────────────────────────────────────────────────────────────
 from data.portfolio import PortfolioTracker, Position, Trade, PortfolioState
-from data.paper_trading import (
-    record_buy, record_sell, mark_to_market,
-    auto_stop_loss, auto_take_profit_trail,
-    summary as paper_summary,
-    sync_from_recommendations,
-)
+# v2026-08-23 Phase 6B: paper_trading 从 data/ 迁移到 scripts/
+#   data/__init__.py 早期 `from data.paper_trading import ...` 已废,
+#   改 import scripts.paper_trading,保持向下兼容(用 try/except 容忍迁移期)
+import os
+import sys as _sys
+_sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "scripts"))
+try:
+    from paper_trading import (  # type: ignore
+        record_buy, record_sell, mark_to_market,
+        auto_stop_loss, auto_take_profit_trail,
+        summary as paper_summary,
+        sync_from_recommendations,
+    )
+except Exception as _e:  # paper_trading 不可用 → 占位
+    def _missing(name):  # noqa: E731
+        def _stub(*a, **kw):
+            raise NotImplementedError(
+                f"paper_trading.{name} not available — scripts/paper_trading.py 缺失或导入失败: {_e}"
+            )
+        return _stub
+    record_buy = _missing("record_buy")
+    record_sell = _missing("record_sell")
+    mark_to_market = _missing("mark_to_market")
+    auto_stop_loss = _missing("auto_stop_loss")
+    auto_take_profit_trail = _missing("auto_take_profit_trail")
+    paper_summary = _missing("summary")
+    sync_from_recommendations = _missing("sync_from_recommendations")
 from scripts.risk_rules import (
     check_concentration_risk,
     get_sentiment_position_ratio,

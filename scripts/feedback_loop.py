@@ -706,6 +706,12 @@ def main():
     if trend_stats:
         print(f"   趋势分布: " + ", ".join(f"{k}({v['count']}只,{v['winrate']}%)" for k, v in trend_stats.items()), file=sys.stderr)
 
+    # v2026-08-23 (Phase 5B): 后置 hook — 调 rec_optimizer 形成闭环
+    #   feedback_loop 每次跑完 (写入 N 条 ret_*) → 自动调 rec_optimizer 复盘
+    #   rec_optimizer 输出 TuningConfig → data/rec_tuning.json
+    #   下次 generate_report.py / aana_afternoon_screen.py 加载配置可参考
+    _try_run_rec_optimizer()
+
     # 6. 输出 Markdown 报告（详情表用 CSV 全表末尾 20 条，与统计分母对齐）
     report = build_markdown_report(rec_rows, all_feedback, stats, trend_stats)
     print(report)
@@ -715,6 +721,32 @@ def main():
     #   1 = 有推荐但样本太少（<3）只写反馈但 Markdown 提示
     # 这里一律 exit 0，因为反馈层已经落地、Markdown 报告已输出。报警靠 stderr 而不是 exit code。
     sys.exit(0)
+
+
+def _try_run_rec_optimizer():
+    """Phase 5B: 调用 rec_optimizer.run() 后置 hook — 失败不能阻断 feedback_loop
+    只会 stderr WARN + 静默退出 (rec_feedback.csv 已落地才是关键)。
+    """
+    try:
+        from rec_optimizer import RecOptimizer  # noqa: E402
+        optimizer = RecOptimizer()
+        cfg = optimizer.run()
+        optimizer.save_config()
+        weak = ", ".join(cfg.weak_sectors) if cfg.weak_sectors else "(none)"
+        print(
+            f"   [Phase 5B] rec_optimizer 复盘完成: "
+            f"score_threshold={cfg.recommended_score_threshold}, "
+            f"hold_days={cfg.recommended_hold_days}, "
+            f"weak_sectors=[{weak}], win_rate={cfg.overall_win_rate:.1f}%",
+            file=sys.stderr,
+        )
+    except SystemExit as e:
+        # rec_optimizer 在 --integrate 时可能 sys.exit，捕获到不抛
+        if e.code != 0:
+            print(f"   [Phase 5B] rec_optimizer 非零退出 ({e.code})，不阻断", file=sys.stderr)
+    except Exception as e:
+        # 任何异常都不阻断 feedback_loop 主流程
+        print(f"   [Phase 5B] rec_optimizer 失败: {type(e).__name__}: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":
