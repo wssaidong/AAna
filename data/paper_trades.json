@@ -1936,6 +1936,28 @@
       "reason": "止损/止盈/到期",
       "pnl": -116.0,
       "pnl_pct": -3.05
+    },
+    {
+      "date": "2026-08-24",
+      "code": "603882",
+      "name": "金域医学",
+      "action": "buy",
+      "price": 29.72,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 70",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-08-25",
+      "code": "603882",
+      "name": "金域医学",
+      "action": "sell",
+      "price": 29.59,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -13.0,
+      "pnl_pct": -0.44
     }
   ],
   "positions": {},

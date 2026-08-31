@@ -1777,3 +1777,99 @@
     "type": "config",
     "message": "not configured",
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-24 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-24 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-24 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=65 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.6d
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600482', '603666', '600547', '601233', '001211', '603920', '603688', '002965', '002436', '603882']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 182 只
+[AAna 尾盘] 候选股票总数: 192 只
+[K线] 600482: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603666: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600547: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601233: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001211: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603920: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603688: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002436: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 1 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 1 只 (板块黑名单拦截 0 只)
+[2026-08-24 14:45:07] [daily_v24_recommend]   找到 1 只推荐
+[2026-08-24 14:45:07] [daily_v24_recommend]     603882 金域医学 score=70
+[2026-08-24 14:45:07] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-08-24 14:45:07] [daily_v24_recommend]     建仓 603882 金域医学 @29.72 100股
+[2026-08-24 14:45:07] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-08-24 14:45:07] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-08-24-v24-尾盘推荐.md
+[2026-08-24 14:45:07] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-08-24 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-24 14:45:07] [daily_v24_recommend] ✅ 完成
+[2026-08-24 14:45:07] [daily_v24_recommend] ============================================================
+[2026-08-25 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-25 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-25 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=65 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603876', '601088', '603876', '601088']
+  [源1] 今日 Top10: 4 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 4 只
+[K线] 603876: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603876: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-08-25 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-25 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-29 14:45:00] [daily_v24_recommend] ============================================================
+[2026-08-29 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-29 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=65 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.5d
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-29-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-28-选股报告.md
+  [源3] 全市场涨幅榜: 新增 111 只
+[AAna 尾盘] 候选股票总数: 111 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-08-29 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-29 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-08-30 14:45:05] [daily_v24_recommend] ============================================================
+[2026-08-30 14:45:05] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-08-30 14:45:05] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=65 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=1.5d
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-30-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-08-29-选股报告.md
+  [源3] 全市场涨幅榜: 新增 111 只
+[AAna 尾盘] 候选股票总数: 111 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-08-30 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-08-30 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif

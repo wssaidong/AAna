@@ -9,27 +9,27 @@
     "semi",
     "robot"
   ],
-  "total_records": 897,
-  "overall_win_rate": 28.87402452619844,
+  "total_records": 898,
+  "overall_win_rate": 28.953229398663698,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-08-23T23:12:56.763216",
+  "generated_at": "2026-08-29T02:17:27.021008",
   "score_band_stats": {
     "70+": {
       "band": "70+",
-      "count": 24,
-      "win_count": 2,
-      "win_rate": 8.333333333333332,
-      "avg_change": -1.8454166666666667,
+      "count": 25,
+      "win_count": 3,
+      "win_rate": 12.0,
+      "avg_change": -2.5016000000000003,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 897,
-      "win_count": 259,
-      "win_rate": 28.87402452619844,
-      "avg_change": -0.8483946488294275
+      "count": 898,
+      "win_count": 260,
+      "win_rate": 28.953229398663698,
+      "avg_change": -0.8677728285077912
     }
   },
   "sector_stats": {

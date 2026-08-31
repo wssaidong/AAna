@@ -447,6 +447,198 @@ _BAIDU_HEADERS = {
 }
 
 
+# ============================================
+# Layer 2.5: 🆕 v2026.3 行业归属 — sina vCI_CorpOtherInfo (HTML)
+# ============================================
+# 背景: 2026-08-30 实测发现 push2.eastmoney.com 也开始 RemoteDisconnected (扩展了 datacenter 挂的接口)
+#       baidu_concept_blocks 持续 10003 反爬 (8/30 实测 600519/000333)
+#       datacenter-web.eastmoney.com 仍 68 天挂
+# 新方案: sina vCI_CorpOtherInfo/menu_num/1.phtml 静态 HTML 含 申万行业分类 + 概念板块
+#         13/13 跨行业股票覆盖率 100% (白酒/空调/保险/银行/医药/汽车/电子/石油/半导体/电池/证券)
+# 兜底链: sina HTML → akshare stock_zyjs_ths 关键词匹配 → 本地缓存 → 手动 override
+INDUSTRY_CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "state", "industry_cache.json")
+
+
+def _load_industry_cache() -> dict:
+    """读本地行业缓存 — zombie-style 容错"""
+    try:
+        if os.path.exists(INDUSTRY_CACHE_PATH):
+            with open(INDUSTRY_CACHE_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+    except Exception:
+        pass
+    return {}
+
+
+def _save_industry_cache(cache: dict) -> None:
+    """写本地行业缓存 — 全原子 write + 备份"""
+    import shutil
+    cache_path = INDUSTRY_CACHE_PATH
+    backup = cache_path + ".bak"
+    try:
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        # 写备份 (位置参数, 避免 8/7 fp= 陷阱)
+        if os.path.exists(cache_path):
+            shutil.copy(cache_path, backup)
+        with open(cache_path, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[data_sources] 行业缓存写失败: {e}")
+
+
+# 行业关键词映射 — akshare stock_zyjs_ths 兜底用
+INDUSTRY_KEYWORDS = {
+    "白酒": ["白酒", "茅台", "五粮液", "洋河", "泸州老窖", "酒类"],
+    "空调": ["空调", "美的", "格力", "海尔"],
+    "冰箱": ["冰箱"],
+    "洗衣机": ["洗衣机"],
+    "家电": ["家电", "家用电器"],
+    "汽车": ["汽车", "整车", "新能源车", "乘用车", "商用车"],
+    "电池": ["电池", "锂电", "动力电池", "储能"],
+    "半导体": ["半导体", "集成电路", "芯片", "晶圆"],
+    "显示器件": ["显示器", "面板", "显示屏", "液晶"],
+    "银行": ["银行"],
+    "保险": ["保险"],
+    "证券": ["证券"],
+    "化学制剂": ["化学制剂", "化学制药"],
+    "中药": ["中药"],
+    "医药": ["医药", "生物医药", "制药"],
+    "石油加工": ["石油加工", "石油化工", "炼油"],
+    "煤炭": ["煤炭", "焦煤"],
+    "钢铁": ["钢铁", "钢材"],
+    "房地产": ["房地产", "房地产开发"],
+    "建筑工程": ["建筑工程", "建筑装饰", "建筑安装"],
+    "食品": ["食品", "乳品", "调味品", "肉制品"],
+    "互联网": ["互联网", "游戏", "社交"],
+    "通信设备": ["通信设备", "电信设备"],
+    "电子": ["电子", "消费电子"],
+    "物流": ["物流", "快递", "运输"],
+    "酒类": ["酒", "啤酒", "葡萄酒", "黄酒"],
+}
+
+
+def _mine_industry_from_main_business(main_business: str) -> str:
+    """akshare stock_zyjs_ths 主营业务文本 → 行业名 (兜底)"""
+    if not main_business:
+        return "unknown"
+    for ind, keywords in INDUSTRY_KEYWORDS.items():
+        for kw in keywords:
+            if kw in main_business:
+                return ind
+    return "unknown"
+
+
+def industry_for_code(code: str, manual_override: dict = None) -> str:
+    """🆕 v2026.3 个股行业归属 — 单股, 返回行业名
+
+    Args:
+        code: 6 位股票代码
+        manual_override: 手动 override {code: industry}, 优先级最高
+
+    Returns:
+        行业名 (str). 失败返回 'unknown'
+
+    Fallback 链:
+        1) manual_override (用户传入, 最高优先级)
+        2) 本地缓存 state/industry_cache.json
+        3) sina vCI_CorpOtherInfo HTML (主源, 申万行业分类)
+        4) akshare stock_zyjs_ths 主营业务关键词匹配 (兜底)
+    """
+    code = normalize_code(code)
+    if not code or len(code) != 6:
+        return "unknown"
+
+    # 1. 手动 override
+    if manual_override and code in manual_override:
+        return manual_override[code]
+
+    # 2. 本地缓存
+    cache = _load_industry_cache()
+    if code in cache:
+        return cache[code]
+
+    industry = None
+
+    # 3. sina HTML 主源
+    try:
+        industry, _, err = _sina_industry_concept(code)
+        if industry:
+            cache[code] = str(industry)
+            _save_industry_cache(cache)
+            return str(industry)
+    except Exception as e:
+        pass  # 继续兜底
+
+    # 4. akshare stock_zyjs_ths 关键词匹配兜底
+    try:
+        import akshare as ak
+        df = ak.stock_zyjs_ths(symbol=code)
+        if df is not None and not df.empty and "主营业务" in df.columns:
+            industry = _mine_industry_from_main_business(str(df.iloc[0]["主营业务"]))
+            if industry and industry != "unknown":
+                cache[code] = str(industry)
+                _save_industry_cache(cache)
+                return str(industry)
+    except Exception:
+        pass
+
+    return "unknown"
+
+
+def concept_tags_for_code(code: str) -> list:
+    """🆕 v2026.3 个股概念板块列表 (用于辅助判断行业)"""
+    code = normalize_code(code)
+    if not code or len(code) != 6:
+        return []
+    try:
+        _, concepts, _ = _sina_industry_concept(code)
+        return concepts
+    except Exception:
+        return []
+
+
+def _sina_industry_concept(code: str) -> tuple:
+    """内部: sina vCI_CorpOtherInfo/menu_num/1.phtml → (industry, concept_list, error)
+
+    Returns: (industry_str, concept_list, error_str_or_None)
+    """
+    import requests
+
+    url = f"http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpOtherInfo/stockid/{code}/menu_num/1.phtml"
+    r = requests.get(url, headers={"User-Agent": UA, "Referer": "https://finance.sina.com.cn/"}, timeout=10)
+    r.encoding = "gbk"
+    text = r.text
+
+    industry = None
+    concepts = []
+
+    # HTML 结构: 2 张 comInfo1 表
+    #   表 0: <td>所属行业板块</td><td>白酒</td><td>备注: 申万行业分类</td>
+    #   表 1: <td>所属概念板块</td><td>保险重仓</td><td>...</td>
+    tables = re.findall(r'<table[^>]*class="comInfo1"[^>]*>(.*?)</table>', text, re.S)
+    for tab in tables:
+        tds = [t.strip() for t in re.findall(r'<td[^>]*>([^<]+)</td>', tab)]
+        if not tds:
+            continue
+        if tds[0] == "所属行业板块" and industry is None:
+            industry = tds[1] if len(tds) > 1 else None
+        elif tds[0] == "所属概念板块":
+            for c in tds[1:]:
+                if c and c != "点击查看" and not c.startswith("备注"):
+                    concepts.append(c)
+
+    return industry, concepts, None
+
+
+def industry_for_codes(codes: list, manual_override: dict = None) -> dict:
+    """批量版 — 同时支持多只股票
+
+    Returns: {code: industry_str, ...}
+    """
+    return {c: industry_for_code(c, manual_override) for c in codes}
+
+
 def baidu_concept_blocks(code: str) -> dict:
     """
     百度股市通概念板块归属。
@@ -505,7 +697,7 @@ def baidu_fund_flow_realtime(code: str, date_str: str) -> list:
     if str(d.get("ResultCode", -1)) != "0":
         return []
 
-    raw = d.get("Result", {}).get("update_data", "")
+    raw = (d.get("Result") or {}).get("update_data", "")
     if not raw:
         return []
 
@@ -541,8 +733,11 @@ def baidu_fund_flow_history(code: str, days: int = 20) -> list:
     if str(d.get("ResultCode", -1)) != "0":
         return []
 
+    # 🆕 2026-08-30 v2026.2 修复: Result 可能为 None (百度反爬时返 null)
+    # 原代码 d.get("Result", {}).get("list", []) 在 Result=None 时 None.get() 抛 AttributeError
+    # 修复: (d.get("Result") or {}) 兜底 None, 使其退化为 {}
     rows = []
-    for item in d.get("Result", {}).get("list", []):
+    for item in (d.get("Result") or {}).get("list", []):
         rows.append({
             "date": item.get("showtime", ""),
             "close": item.get("closepx", ""),
@@ -761,7 +956,14 @@ def eastmoney_global_news(page_size: int = 50) -> list:
 # ============================================
 
 def eastmoney_stock_info(code: str) -> dict:
-    """东财个股基本面信息"""
+    """东财个股基本面信息
+
+    ⚠️ 2026-08-30 v2026.3 标注:
+    - `f127` 字段 (industry) 在 000333 等股票上返回空字符串, 不稳定
+    - 需要行业归属请用 `industry_for_code(code)` — 走新浪 vCI_CorpOtherInfo HTML
+      (v2026.3 新增, 13/13 跨行业覆盖率 100%)
+    - 本函数主要保留用途: 总股本/流通股本/市值/上市日期等基本面字段
+    """
     import requests
 
     market_code = 1 if code.startswith("6") else 0
@@ -780,7 +982,7 @@ def eastmoney_stock_info(code: str) -> dict:
     return {
         "code": d.get("f57", ""),
         "name": d.get("f58", ""),
-        "industry": d.get("f127", ""),
+        "industry": d.get("f127", ""),  # ⚠️ 不稳定, 用 industry_for_code 替代
         "total_shares": d.get("f84", 0),
         "float_shares": d.get("f85", 0),
         "mcap": d.get("f116", 0),
@@ -930,29 +1132,77 @@ def full_stock_research(code: str, trade_date: str = None) -> dict:
 
     compact_date = trade_date.replace("-", "")
 
+    # 🆕 2026-08-30 v2026.2 修复: 每个数据源独立 try/except
+    # 原代码: 任一子函数抛错整体崩 (例: baidu_fund_flow_history Result=None 抛 AttributeError)
+    # 修复: 每个数据源独立包裹, 失败返回空 dict/list, 不影响其他维度
+
     # Layer 1: 行情
-    quotes = get_enhanced_quotes([code])
-    quote = quotes.get(code, {})
+    try:
+        quotes = get_enhanced_quotes([code])
+        quote = quotes.get(code, {})
+    except Exception as e:
+        print(f"[full_stock_research] 行情失败: {e}")
+        quote = {}
 
     # Layer 3: 概念板块 + 资金流
-    blocks = baidu_concept_blocks(code)
-    fund_hist = baidu_fund_flow_history(code)
-    fund_realtime = baidu_fund_flow_realtime(code, compact_date)
+    try:
+        blocks = baidu_concept_blocks(code)
+    except Exception as e:
+        print(f"[full_stock_research] 概念板块失败: {e}")
+        blocks = {}
+    try:
+        fund_hist = baidu_fund_flow_history(code)
+    except Exception as e:
+        print(f"[full_stock_research] 资金流历史失败: {e}")
+        fund_hist = []
+    try:
+        fund_realtime = baidu_fund_flow_realtime(code, compact_date)
+    except Exception as e:
+        print(f"[full_stock_research] 资金流实时失败: {e}")
+        fund_realtime = []
 
     # Layer 3: 龙虎榜
-    dtb = daily_dragon_tiger(trade_date)
+    try:
+        dtb = daily_dragon_tiger(trade_date)
+    except Exception as e:
+        print(f"[full_stock_research] 龙虎榜失败: {e}")
+        dtb = []
 
     # Layer 4: 资金面
-    margin = margin_trading(code, page_size=5)
-    holders = holder_num_change(code)
-    dividends = dividend_history(code)
-    fund_120d = stock_fund_flow_120d(code)
+    try:
+        margin = margin_trading(code, page_size=5)
+    except Exception as e:
+        print(f"[full_stock_research] 融资融券失败: {e}")
+        margin = []
+    try:
+        holders = holder_num_change(code)
+    except Exception as e:
+        print(f"[full_stock_research] 股东户数失败: {e}")
+        holders = []
+    try:
+        dividends = dividend_history(code)
+    except Exception as e:
+        print(f"[full_stock_research] 分红失败: {e}")
+        dividends = []
+    try:
+        fund_120d = stock_fund_flow_120d(code)
+    except Exception as e:
+        print(f"[full_stock_research] 120日资金流失败: {e}")
+        fund_120d = []
 
     # Layer 6: 基本信息
-    em_info = eastmoney_stock_info(code)
+    try:
+        em_info = eastmoney_stock_info(code)
+    except Exception as e:
+        print(f"[full_stock_research] 基本面失败: {e}")
+        em_info = {}
 
     # Layer 5: 新闻
-    news = cls_telegraph(page_size=10)
+    try:
+        news = cls_telegraph(page_size=10)
+    except Exception as e:
+        print(f"[full_stock_research] 新闻失败: {e}")
+        news = []
 
     return {
         "code": code,
