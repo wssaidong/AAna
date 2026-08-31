@@ -76,6 +76,11 @@ def get_prefix(code: str) -> str:
 def normalize_code(code: str) -> str:
     """代码归一化为6位纯数字（保留前导零用于 key 匹配）"""
     code = code.strip().upper()
+    # 2026-08-31 修复: 先剥离 sh/sz/bj 前缀(代码可能是 'sh000001' 而非 '000001.SH')
+    for prefix in ['SH', 'SZ', 'BJ']:
+        if code.startswith(prefix):
+            code = code[len(prefix):]
+            break
     for sep in ['.', 'SH', 'SZ', 'BJ']:
         if code.endswith(sep):
             code = code[:-len(sep)]
@@ -118,19 +123,65 @@ def tencent_quote(codes: list) -> dict:
     codes: ["688017", "300476", "002463"]
     也支持指数: ["000001", "000300", "399006"]
     也支持ETF: ["510050", "510300"]
+    也支持带前缀: ["sh000001", "sz399006"]  # 2026-08-31 新增
     返回: {code: {name, price, pe_ttm, pb, mcap_yi, float_mcap_yi, turnover_pct, limit_up, limit_down, ...}}
+
+    ⚠️ 重要 (2026-08-31 实修): 腾讯 API 对**指数代码**(000001/399006/000688)和**个股代码**(000001=深市000xxx/600xxx)
+    使用**相同的 6 位代码**,必须靠**市场前缀**区分:
+      - 上证指数 = sh000001  (若用 sz000001 会拿到平安银行)
+      - 深证成指 = sz399001  (sz 是对的)
+      - 创业板指 = sz399006  (sz 是对的)
+      - 沪深300 = sh000300 / sz399300 (都行,腾讯默认 sh)
+      - 科创50 = sh000688  (若用 sz000688 会拿到国城矿业)
+    本函数支持 callers 直接传 sh/sz/bj 前缀;未传时按以下优先前缀规则:
+      1. 已知指数代码 → 用其专属前缀 (避免混淆)
+      2. 6/9 开头 → sh (默认上交所)
+      3. 8 开头 → bj (北交所)
+      4. 其他 (0/2/3) → sz (深交所)
     """
     import requests
 
+    # 已知指数代码 → 专属前缀 (避免 sz000001 / sz000688 与个股冲突)
+    INDEX_PREFIX = {
+        "000001": "sh",  # 上证指数 (≠ sz000001=平安银行)
+        "000300": "sh",  # 沪深300
+        "000688": "sh",  # 科创50 (≠ sz000688=国城矿业)
+        "399001": "sz",  # 深证成指
+        "399006": "sz",  # 创业板指
+        "399005": "sz",  # 中小100
+    }
+
     prefixed = []
+    caller_prefix_map = {}  # raw_code_with_prefix → 已经前缀化的代码
     for c in codes:
-        c = normalize_code(c)
-        if c.startswith(("6", "9")):
-            prefixed.append(f"sh{c}")
-        elif c.startswith("8"):
-            prefixed.append(f"bj{c}")
+        raw = str(c).strip().upper()
+        # 检测 caller 是否已显式带前缀
+        explicit = None
+        if raw.startswith("SH"):
+            explicit = "sh"
+            bare = raw[2:]
+        elif raw.startswith("SZ"):
+            explicit = "sz"
+            bare = raw[2:]
+        elif raw.startswith("BJ"):
+            explicit = "bj"
+            bare = raw[2:]
         else:
-            prefixed.append(f"sz{c}")
+            bare = normalize_code(raw)  # 6-digit only
+        # 已知指数 → 用专属前缀 (避免 sz000001 拿平安银行)
+        if bare in INDEX_PREFIX:
+            chosen_prefix = INDEX_PREFIX[bare]
+        elif explicit:
+            chosen_prefix = explicit  # caller 已显式带前缀, 信任
+        else:
+            # 自动推断
+            if bare.startswith(("6", "9")):
+                chosen_prefix = "sh"
+            elif bare.startswith("8"):
+                chosen_prefix = "bj"
+            else:
+                chosen_prefix = "sz"
+        prefixed.append(f"{chosen_prefix}{bare}")
 
     result = {}
     try:
@@ -180,9 +231,17 @@ def tencent_quote(codes: list) -> dict:
                 "limit_down":    safe_float(vals[48]),
                 "vol_ratio":     safe_float(vals[49]),
                 "pe_static":     safe_float(vals[52]),
+                # 2026-08-31 新增: 同时保留原 prefix 让 callers 用 sh/sz 前缀查询
+                "key":           code,  # 6位数字(向后兼容)
+                "prefixed_key":  key,   # 含前缀 (新)
             }
         except (IndexError, ValueError):
             continue
+
+    # 2026-08-31 新增: 也用 prefixed_key 索引, 兼容 callers 用 sh/sz 前缀查询
+    # 用 prefixed_key → entry 的 mirror dict 让 consumers 两种查询方式都可用
+    indexed_by_prefix = {entry["prefixed_key"]: entry for entry in result.values()}
+    result.update(indexed_by_prefix)
 
     return result
 

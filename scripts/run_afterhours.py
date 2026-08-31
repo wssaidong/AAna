@@ -60,13 +60,13 @@ def get_indices():
 
 
 def ths_hot(date_str):
-    """同花顺强势股;ds.ths_hot_reason 返回 dict {rows, ...},本函数取 rows 转 list 保持兼容
+    """同花顺强势股;ds.ths_hot_reason 返回 dict {stocks, total, tag_freq, date},本函数取 stocks 转 list 保持兼容
 
     原 ths_hot 返回 list[{code, name, reason, date, market}]
-    ds.ths_hot_reason 返回 dict{rows, source, note}
+    ds.ths_hot_reason 返回 dict{stocks, total, tag_freq, date}
     """
     raw = ds.ths_hot_reason(date_str)
-    rows = raw.get("rows", []) if isinstance(raw, dict) else []
+    stocks = raw.get("stocks", []) if isinstance(raw, dict) else []
     return [
         {
             "code": row.get("code", ""),
@@ -75,7 +75,7 @@ def ths_hot(date_str):
             "date": row.get("date", ""),
             "market": row.get("market"),
         }
-        for row in rows
+        for row in stocks
     ]
 
 
@@ -95,10 +95,13 @@ def enrich_with_quote(hot_list):
         if not c:
             continue
         prefix = "sh" if c.startswith("6") or c.startswith("9") else "sz"
-        if f"{prefix}{c}" in q:
-            h["change_pct"] = q[f"{prefix}{c}"]["change_pct"]
-            h["current"] = q[f"{prefix}{c}"]["current"]
-            h["prev_close"] = q[f"{prefix}{c}"]["prev_close"]
+        # 2026-08-31 修复: ds.tencent_quote 用 price/last_close (而非 current/prev_close)
+        # 同时兼容两种命名: 优先 ds 标准字段, fallback 到旧字段
+        q_entry = q.get(f"{prefix}{c}") or q.get(c) or {}
+        if q_entry:
+            h["change_pct"] = q_entry.get("change_pct", 0)
+            h["current"] = q_entry.get("price", q_entry.get("current"))
+            h["prev_close"] = q_entry.get("last_close", q_entry.get("prev_close"))
     return hot_list
 
 
@@ -114,34 +117,45 @@ def theme_counter(hot_list):
 def get_industry_ranking(top_n=10):
     """东财行业涨跌 — 用 ds.eastmoney_datacenter fallback 链 (push2 → push2delay)
 
-    原版返回 dict: {top: rows[:n], bottom: rows[-n:], total, returned, source}
-    ds.industry_comparison 签名是 (top_n=20) → 直接复用，调整 keys。
+    ds.industry_comparison 返回 dict: {top: [...], bottom: [...], total: int}
+    本函数适配返回结构并打上 source 标记。
     """
     raw = ds.industry_comparison(top_n=top_n * 2)  # 取双倍才能给 bottom
     if not isinstance(raw, dict):
         return {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
-    rows = raw.get("rows", []) or []
-    # ds 返回的 keys: code, name, change_pct — 与原版一致
-    rows.sort(key=lambda x: x.get("change_pct", 0), reverse=True)
+    # 2026-08-31 修复: ds.industry_comparison 已直接返回 sorted rows 在 top/ bottom keys,
+    # 不再二次提取 raw["rows"],否则会失去排序后的行业列表
+    top = raw.get("top", []) or []
+    bottom = raw.get("bottom", []) or []
     return {
-        "top": rows[:top_n],
-        "bottom": rows[-top_n:] if len(rows) >= top_n else [],
-        "total": len(rows),
-        "returned": len(rows),
-        "source": raw.get("source", "scripts.data_sources.industry_comparison"),
+        "top": top[:top_n],
+        "bottom": bottom[-top_n:] if len(bottom) >= top_n else [],
+        "total": raw.get("total", len(top) + len(bottom)),
+        "returned": len(top) + len(bottom),
+        "source": "scripts.data_sources.industry_comparison",
     }
 
 
 def get_daily_dragon_tiger(date_str):
     """东财龙虎榜 — ds.daily_dragon_tiger(trade_date)
 
-    原版返回 dict: {rows, source} 或 {rows, note}
-    ds.daily_dragon_tiger 返回更结构化的 dict,本函数适配:
+    ds.daily_dragon_tiger 返回 {date, total_records, stocks, [note]}
+    本函数适配为 {rows, source} 接口约定,以便下游消费方拿到统一格式。
     """
     raw = ds.daily_dragon_tiger(trade_date=date_str)
-    if isinstance(raw, dict) and "rows" in raw:
-        return raw
-    return {"rows": [], "note": "scripts.data_sources.daily_dragon_tiger 未返回 rows"}
+    if isinstance(raw, dict):
+        # 2026-08-31 修复: ds 返回 key 是 "stocks", 转换为 "rows" 兼容下游
+        if "rows" in raw:
+            return raw
+        if "stocks" in raw:
+            return {
+                "rows": raw.get("stocks", []),
+                "date": raw.get("date", date_str),
+                "total_records": raw.get("total_records", 0),
+                "source": "scripts.data_sources.daily_dragon_tiger",
+                "note": raw.get("note", ""),
+            }
+    return {"rows": [], "note": "scripts.data_sources.daily_dragon_tiger 未返回 rows", "date": date_str}
 
 
 def _yesterday(date_str):
@@ -476,7 +490,8 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                 "sz399005": "中小100", "sz399300": "沪深300", "sh000688": "科创50"}
     for k in ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]:
         v = indices.get(k, {})
-        cur = v.get("current", 0) or 0
+        # 2026-08-31 修复: ds.tencent_quote 用 price/last_close 而非 current/prev_close
+        cur = v.get("price", v.get("current", 0)) or 0
         md += f"- {name_map[k]} {cur:.2f} ({v.get('change_pct', 0):+.2f}%)\n"
 
     md += "\n━━━ **候选池命中率** ━━━\n\n"
@@ -593,7 +608,8 @@ def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
 """
     for k in ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]:
         v = indices.get(k, {})
-        cur = v.get("current", 0) or 0
+        # 2026-08-31 修复: ds.tencent_quote 用 price/last_close 而非 current/prev_close
+        cur = v.get("price", v.get("current", 0)) or 0
         pct = v.get("change_pct", 0)
         md += f"| {name_map[k]} | {cur:.2f} | {pct:+.2f}% | {eval_index(pct)} |\n"
 
