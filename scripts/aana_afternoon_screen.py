@@ -769,6 +769,33 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         score_threshold = 65
         sector_blacklist = set()
 
+    # ── v2026-09-09 (Phase 12): 叠加 next_day_strategy.json ──
+    # daily_root_cause 昨日根因触发的额外调参:
+    #   1. score_threshold / position 已经在 strategy_policy 优先 (auto_tune_next_day 写)
+    #   2. cold_sectors 单独叠加到 sector_blacklist (板块样本<3 但被命中, 一票否决)
+    try:
+        from pathlib import Path as _P
+        import json as _json
+        _nd_path = _P(__file__).parent.parent / "data" / "next_day_strategy.json"
+        if _nd_path.exists():
+            _nd = _json.loads(_nd_path.read_text(encoding="utf-8"))
+            _cold = _nd.get("cold_sectors") or []
+            _watch = _nd.get("watchlist") or []
+            # cold_sectors 是一组**未在 enum 里**的中文行业名 (如 "园林工程"), 直接拒绝
+            # watchlist 是 enum (如 "energy"), 已通过 sector_blacklist 拦截 (rec_tuning 已覆盖)
+            if _cold:
+                # 把 cold_sectors 加入 cn_blacklist (set[str] 中文)
+                cn_blacklist = set(_cold)
+                print(f"  [next_day_strategy] 加载 cold_sectors: {_cold[:5]}"
+                      + (f" (+{len(_cold)-5} more)" if len(_cold) > 5 else ""))
+            else:
+                cn_blacklist = set()
+        else:
+            cn_blacklist = set()
+    except Exception as _nd_err:
+        print(f"  [next_day_strategy] 加载失败: {_nd_err}")
+        cn_blacklist = set()
+
     filtered_by_sector = 0
 
     """
@@ -897,6 +924,13 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         stock_sector_enum = _cn_sector_to_enum(stock_sector_raw)
         if sector_blacklist and stock_sector_enum and stock_sector_enum in sector_blacklist:
             filtered_by_sector += 1
+            continue
+        # v2026-09-09 (Phase 12): next_day_strategy.json 的 cold_sectors 拦截
+        # 这是一组**未映射到 enum**的中文行业名 (如 "园林工程"), enum 是空字符串,
+        # 上面的 enum 检查拦截不到, 必须直接比较 cn.
+        if cn_blacklist and stock_sector_raw in cn_blacklist:
+            filtered_by_sector += 1
+            print(f"  [cold_sector] 拦截 {code} {info.get('name', code)}: 板块 '{stock_sector_raw}' 在 cold_sectors 中")
             continue
 
         # 评分（修复 #6: 传 sentiment_score）

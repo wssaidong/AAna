@@ -106,24 +106,48 @@ def get_today_policy() -> StrategyPolicy:
             pass
 
     # ── 冷启动保护 ────────────────────────────────────────────────
-    total = int(tuning.get("total_records", 0) or 0)
-    if total < MIN_TOTAL_RECORDS:
+    cold_start = int(tuning.get("total_records", 0) or 0) < MIN_TOTAL_RECORDS
+    if cold_start:
         policy.data_notes.append(
-            f"样本 {total} < {MIN_TOTAL_RECORDS} (冷启动) → 默认参数")
-        return policy
+            f"样本 {tuning.get('total_records', 0)} < {MIN_TOTAL_RECORDS} (冷启动) → weak_sectors 不加载, 但 next_day_strategy 阈值仍生效"
+        )
 
-    # ── score 阈值 (钳制边界内才采纳) ─────────────────────────────
+    # ── score 阈值 (优先级: next_day_strategy > rec_tuning > DEFAULT) ──
+    # v2026-09-09 (Phase 12): 优先读 next_day_strategy.json (含昨日根因调参)
+    raw_th = DEFAULT_SCORE_THRESHOLD
+    nd_score_threshold = None
     try:
-        raw_th = int(tuning.get("recommended_score_threshold", DEFAULT_SCORE_THRESHOLD))
-    except (TypeError, ValueError):
-        raw_th = DEFAULT_SCORE_THRESHOLD
+        from pathlib import Path as _P
+        import json as _json
+        _nd_path = _P(__file__).parent.parent / "data" / "next_day_strategy.json"
+        if _nd_path.exists():
+            _nd = _json.loads(_nd_path.read_text(encoding="utf-8"))
+            nd_score_threshold = _nd.get("score_threshold")
+            if isinstance(nd_score_threshold, (int, float)):
+                raw_th = int(nd_score_threshold)
+                policy.data_notes.append(
+                    f"阈值 {DEFAULT_SCORE_THRESHOLD}→{raw_th} (next_day_strategy, 含昨日根因调参)"
+                )
+    except Exception as _nd_err:
+        policy.data_notes.append(f"next_day_strategy 加载失败: {_nd_err}")
+
+    # 如果 next_day_strategy 没有, 回退到 rec_tuning
+    if nd_score_threshold is None:
+        try:
+            tuning_th = int(tuning.get("recommended_score_threshold", DEFAULT_SCORE_THRESHOLD))
+            if MIN_SCORE_THRESHOLD <= tuning_th <= MAX_SCORE_THRESHOLD:
+                raw_th = tuning_th
+                if raw_th != DEFAULT_SCORE_THRESHOLD:
+                    policy.data_notes.append(f"阈值 {DEFAULT_SCORE_THRESHOLD}→{raw_th} (rec_tuning)")
+        except (TypeError, ValueError):
+            pass
     if MIN_SCORE_THRESHOLD <= raw_th <= MAX_SCORE_THRESHOLD:
-        if raw_th != DEFAULT_SCORE_THRESHOLD:
-            policy.data_notes.append(f"阈值 {DEFAULT_SCORE_THRESHOLD}→{raw_th} (rec_tuning)")
         policy.score_threshold = raw_th
     else:
         policy.data_notes.append(
-            f"阈值 {raw_th} 越界 [{MIN_SCORE_THRESHOLD},{MAX_SCORE_THRESHOLD}] → 保持默认")
+            f"阈值 {raw_th} 越界 [{MIN_SCORE_THRESHOLD},{MAX_SCORE_THRESHOLD}] → 保持默认"
+        )
+        policy.score_threshold = DEFAULT_SCORE_THRESHOLD
 
     # ── 持有天数 ──────────────────────────────────────────────────
     try:

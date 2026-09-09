@@ -572,6 +572,55 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         # 外发正文只保留数据源文件名，不泄露本机绝对路径。
         gap_md = re.sub(r"(?<=数据源：)(?:/[^\s（]+/)+", "", gap_md)
         md += gap_md
+
+    # v2026-09-09 (Phase 12): 根因分析 + 次日调参摘要
+    # 读 data/daily_root_cause.json + data/next_day_strategy.json, 拼成飞书卡片
+    try:
+        from pathlib import Path as _P
+        import json as _json
+        _nd = None
+        _rc = None
+        _DATA = _P(__file__).parent.parent / "data"
+        _rc_path = _DATA / "daily_root_cause.json"
+        _nd_path = _DATA / "next_day_strategy.json"
+        if _rc_path.exists():
+            _rc = _json.loads(_rc_path.read_text(encoding="utf-8"))
+        if _nd_path.exists():
+            _nd = _json.loads(_nd_path.read_text(encoding="utf-8"))
+
+        if _rc and _nd:
+            md += "\n\n━━━ **🔬 昨日根因分析 → 次日调参** ━━━\n\n"
+            # 命中根因
+            hit = _rc.get("hit_causes", [])
+            if hit:
+                md += f"📊 **根因命中：** {' / '.join(hit)}\n"
+                for ck, cv in _rc.get("causes", {}).items():
+                    if cv.get("hit"):
+                        md += f"- **{ck}**：{cv.get('summary', '')}\n"
+                        for it in cv.get("items", [])[:3]:
+                            cn = it.get("sector_cn") or it.get("sector_enum") or "?"
+                            ret = it.get("ret_1d")
+                            md += f"  · `{it.get('code', '')} {it.get('name', '')}` ({cn}) 1D={ret:+.2f}%\n" if ret is not None else ""
+            else:
+                md += "📊 **根因命中：** ✅ 无显著根因\n"
+
+            # 次日调参
+            md += f"\n🎯 **次日策略:**\n"
+            md += f"- 推荐阈值: **{_nd.get('score_threshold', '—')}** (基准 70)\n"
+            md += f"- 建议仓位: **{_nd.get('position_final', '—')}%** (基准 50%)\n"
+            if _nd.get("weak_sectors"):
+                md += f"- 板块黑名单: {', '.join(_nd['weak_sectors'])}\n"
+            if _nd.get("cold_sectors"):
+                md += f"- ⚠️ 冷启动盲区: {', '.join(_nd['cold_sectors'][:5])} (新板块样本<3, 一票否决)\n"
+            # 决策依据
+            for entry in _nd.get("tuning_log", []):
+                if entry.get("source") == "daily_root_cause":
+                    for r in entry.get("reasons", []):
+                        md += f"- 依据: {r}\n"
+            md += "\n📁 **明日开机动作:** 推荐前 16:05 跑 `python3 scripts/daily_root_cause.py` + `auto_tune_next_day.py` → 自动覆盖 `data/next_day_strategy.json`\n"
+    except Exception as _phase12_err:
+        md += f"\n⚠️ Phase 12 根因 section 加载失败: {_phase12_err}\n"
+
     md += "\n⚠️ **仅供参考，不构成投资建议**\n"
     return md
 
