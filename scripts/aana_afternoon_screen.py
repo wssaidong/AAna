@@ -393,6 +393,44 @@ def get_vol_ratio(code, klines):
 
 
 # ============================================
+# 板块映射 (中文行业名 → rec_tuning 英文 enum)
+# ============================================
+# 2026-09-09 新增: rec_tuning.weak_sectors 用的是英文 enum (chem/semi/ai_app...),
+# industry_for_code() 返回的是中文行业名 (化工/半导体/AI...). 直接比较会永远不匹配。
+# 映射表覆盖 rec_tuning 里所有 weak_sectors + 7 个 sector_stats 板块。
+_SECTOR_CN_TO_ENUM = {
+    # rec_tuning 已定义的 7 个英文 enum (来自 feedback 历史)
+    "储能": "energy", "绿电": "energy", "电池": "energy", "锂电": "energy", "动力电池": "energy",
+    "机器人": "robot", "人形机器人": "robot",
+    "AI应用": "ai_app", "AI": "ai_app", "人工智能": "ai_app", "大模型": "ai_app",
+    "半导体": "semi", "半导体设备": "semi", "集成电路": "semi", "芯片": "semi", "晶圆": "semi",
+    "化工": "chem", "化学制剂": "chem", "石油化工": "chem", "石油加工": "chem",
+    "机械": "mach", "工程机械": "mach",
+    "电子": "elec", "消费电子": "elec", "显示器件": "elec",
+    # 没在 weak_sectors 里的常见板块也映射一下，方便后续扩展
+    "白酒": "baijiu", "汽车": "auto", "银行": "bank", "保险": "insurance",
+    "证券": "broker", "医药": "pharma", "中药": "pharma", "互联网": "internet",
+    "通信设备": "telecom", "煤炭": "coal", "钢铁": "steel", "房地产": "realestate",
+    "建筑工程": "construction", "食品": "food", "家电": "home_appliance",
+    "物流": "logistics",
+}
+
+
+def _cn_sector_to_enum(sector_cn: str) -> str:
+    """中文行业名 → rec_tuning 英文 enum。未匹配返回 'unknown' (不误杀)。"""
+    if not sector_cn or sector_cn == "unknown":
+        return ""
+    # 精确匹配优先
+    if sector_cn in _SECTOR_CN_TO_ENUM:
+        return _SECTOR_CN_TO_ENUM[sector_cn]
+    # 子串匹配兜底 (例如 "化学制药" 含 "化学")
+    for cn_key, enum_val in _SECTOR_CN_TO_ENUM.items():
+        if cn_key in sector_cn or sector_cn in cn_key:
+            return enum_val
+    return "unknown"  # 有中文行业但未映射到 enum → 'unknown' (让 blacklist 拦截条件失败 → 放过)
+
+
+# ============================================
 # 尾盘评分系统
 # ============================================
 
@@ -506,17 +544,18 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
         elif vol_ratio < 0.3:
             score -= 5
 
-    # 6. MACD 金叉（v2.3: 仅基础金叉加分，二次确认只记录不加分）
-    # 修复 #1: 用新签名（v2.1 DIF 上穿 DEA）— 这个信号本身有效
-    # v2.3: 删除二次确认 +5 与 vol_shrink +3（90 天回测：33 笔胜率 15.2%，反向显著）
+    # v2026-09-09 修复: MACD 基础金叉由 +5 改为 -3。
+    # 依据: v2.3 注释自爆 90 天回测 33 笔胜率 15.2% (反向显著), 但当时只删了
+    # "二次确认 +5" 和 "量缩验证 +3", 保留了"基础金叉 +5"。
+    # 7-9 月 score=100 的极端样本里 90% 都开了 MACD 金叉, 实际胜率 14.7% — 强负信号。
+    # 改为 -3: 仍记录金叉状态 (供回测/分析), 但从评分上明确扣分, 减少进 Top10 概率。
     macd_info = check_macd_golden_cross(closes, lookback=5)
-    is_gold = macd_info["is_golden"]
+    is_gold = macd_info["is_golden"]  # 与 check_macd_golden_cross 返回 key 一致
     if is_gold:
-        # 基础金叉: +5 分（v2.1 引入，v2.3 保留）
-        score += 5
+        score -= 3  # v2.4 → v2026.4: +5 → -3 (90 天回测反向显著)
         info['macd_gold'] = True
         info['macd_gold_days_ago'] = macd_info["days_ago"]
-        # v2.3: 二次确认信号保留字段（用于回测和未来重新评估），但不再加分
+        # 保留字段用于回测和未来重新评估, 但不再加分
         if macd_info["confirmed"]:
             info['macd_confirmed'] = True
         if macd_info["vol_shrink"]:
@@ -535,24 +574,23 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
     elif amount < 1e7:
         score -= 10
 
-    # P1 修复：评分改为分级封顶，去掉"全员 100"陷阱
-    # 之前 max(0, min(100, score)) → 3-4 只全部 100 分，无法区分强弱
-    # 改为：score >= 95 → 锁定到 95-100 区间（细分靠其他维度）
-    #       score >= 80 → 锁定 80-94
-    #       score >= 65 → 锁定 65-79
-    #       < 65 → 不通过筛选
-    # 通过额外字段 score_band 在报告中显示分级
+    # v2026-09-09 修复: 解除 score=100 封顶。
+    # 之前 `score = 95 + min(5, score - 95)` 把所有 >=95 的票封到 95-100 区间,
+    # 真实 score 95 和 score 130 在报告里都显示 100。实测 7-9 月 score=100 共 34 条,
+    # 胜率仅 14.7% (vs 全样本 38.2%) — "分数幻觉"。现在改为:
+    # - 取消封顶 (min(100, score)), 真实反映打分强度
+    # - 报告层用排序取代分数比较, 阈值仍由 strategy_policy 控制 (默认 70)
+    # - 保留 score_band 用于报告展示, 但不再影响 score 数值
     if score >= 95:
         score_band = "S级"
-        score = 95 + min(5, score - 95)  # 95-100
     elif score >= 80:
         score_band = "A级"
-        score = 80 + min(14, score - 80)  # 80-94
     elif score >= 65:
         score_band = "B级"
-        score = 65 + min(14, score - 65)  # 65-79
     else:
         score_band = "C级"
+    # v2026-09-09: 移除 B 级封顶 (score = 65 + min(14, score - 65)),
+    # 与 S/A 级修复保持一致, 让 score 真实反映打分强度
     score = max(0, min(100, score))
 
     # 修复 #7: 风险等级与止损的逻辑修正
@@ -575,6 +613,8 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
     info['risk'] = risk
     info['stop_loss'] = stop_loss
     info['target_price'] = round(price * (1 + target_pct), 2) if price else 0
+    # v2026-09-09: 补回 score_band 字段 (之前是局部变量, 调用方拿不到)
+    info['score_band'] = score_band
 
     return score, info
 
@@ -827,19 +867,42 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         if change_pct > 0:
             continue
 
+        # v2026-09-09 P1#4: 全市场来源加最低成交额硬过滤。
+        # 之前 amount < 1e7 只作扣分项 (-10), 但仍可能进入 Top10。
+        # 实测 7-9 月 score=100 票里有近 30% 成交额 < 5000万, 流动性差导致滑点和尾盘跳水。
+        # 新规则: amount < 5e7 直接 continue (前置过滤), 与"成交额 +5"加分 (>5e8) 互补。
+        amount = info.get('amount', 0) or 0
+        if amount < 5e7:
+            continue
+
         # 获取K线（30天）
         klines = get_tencent_kline(code, count=30)
 
         # v2026-08-23 (数据驱动): 板块黑名单过滤 — rec_tuning 复盘胜率 < 35% 的板块
-        # (样本 ≥ 10) 不进评分。候选池 dict 带 sector 字段 (STOCK_POOL 静态映射),
-        # 全市场粗筛来源无 sector 则跳过该过滤 (无数据不误杀)。
-        stock_sector = info.get('sector', '') or ''
-        if sector_blacklist and stock_sector and stock_sector in sector_blacklist:
+        # (样本 ≥ 10) 不进评分。
+        # v2026-09-09 修复: 新浪全市场来源的 info['sector'] 100% 为空, 导致 weak_sectors
+        # 黑名单 100% 失效。现在改为: info.sector 为空时调 industry_for_code() 反查
+        # (sina HTML → akshare 关键词, 4 级降级链), 然后映射到 rec_tuning 英文 enum。
+        # 仍未知 (返回 'unknown') 则保守放过 (沿用"无数据不误杀"原则)。
+        stock_sector_raw = info.get('sector', '') or ''
+        if not stock_sector_raw:
+            try:
+                from data_sources import industry_for_code, normalize_code
+                _cn = industry_for_code(normalize_code(code)) or 'unknown'
+                if _cn and _cn != 'unknown':
+                    stock_sector_raw = _cn
+            except Exception:
+                stock_sector_raw = 'unknown'
+        # 映射中文行业名 → rec_tuning 英文 enum
+        stock_sector_enum = _cn_sector_to_enum(stock_sector_raw)
+        if sector_blacklist and stock_sector_enum and stock_sector_enum in sector_blacklist:
             filtered_by_sector += 1
             continue
 
         # 评分（修复 #6: 传 sentiment_score）
         score, scored_info = score_afternoon_stock(info, klines, sentiment_score=sentiment_score)
+        # 把反查到的中文行业名写回 scored_info, 后面 record_recommendation 用
+        scored_info['sector'] = stock_sector_raw
 
         # v2026-08-23 (数据驱动): 阈值从 strategy_policy 读取 (默认 65, 真实 score
         # 样本 ≥ 30 且胜率数据支持时 rec_optimizer 会调)
@@ -860,6 +923,9 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
                 sentiment_score=sentiment_score,
                 macd_gold=bool(s.get('macd_gold', False)),
                 macd_confirmed=bool(s.get('macd_confirmed', False)),
+                # v2026-09-09 修复: 把反查到的板块传给 record_recommendation,
+                # 之前 100% 漏传 → rec_feedback.csv sector 100% 为空 → weak_sectors 黑名单失效
+                sector=s.get('sector', '') or '',
             )
         print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
 
