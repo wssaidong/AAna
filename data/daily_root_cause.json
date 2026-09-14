@@ -1,0 +1,78 @@
+{
+  "date": "2026-09-08",
+  "total_recs": 2,
+  "win_count": 1,
+  "fail_count": 1,
+  "no_data": 0,
+  "win_rate": 50.0,
+  "baseline": null,
+  "causes": {
+    "A_板块错配": {
+      "hit": false,
+      "items": [],
+      "summary": "无弱板块命中"
+    },
+    "B_题材错配": {
+      "hit": false,
+      "items": [],
+      "summary": "无"
+    },
+    "C_技术面虚高": {
+      "hit": false,
+      "items": [],
+      "summary": "无"
+    },
+    "D_大盘错配": {
+      "hit": false,
+      "items": [],
+      "summary": "无大盘数据"
+    },
+    "E_冷启动盲区": {
+      "hit": true,
+      "items": [
+        {
+          "code": "603067",
+          "name": "振华股份",
+          "sector_cn": "无机盐",
+          "sector_enum": "",
+          "n": 0,
+          "ret_1d": 1.65,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600641",
+          "name": "先导基电",
+          "sector_cn": "房地产开发",
+          "sector_enum": "realestate",
+          "n": 0,
+          "ret_1d": -6.16,
+          "note": "板块 房地产开发 (enum=realestate) 未在 sec_stats 里, cold sector risk"
+        }
+      ],
+      "watchlist": [],
+      "cold_sectors": [
+        "无机盐",
+        "房地产开发"
+      ],
+      "summary": "2 只命中冷启动板块 (2 个不同板块), 单次冷板块: ['无机盐', '房地产开发']"
+    }
+  },
+  "hit_causes": [
+    "E_冷启动盲区"
+  ],
+  "tuning_suggestion": {
+    "score_threshold_delta": 3,
+    "hold_days_delta": 0,
+    "weak_sectors_add": [],
+    "weak_sectors_remove": [],
+    "watchlist": [],
+    "position_delta": -5,
+    "reasons": [
+      "E. 冷启动盲区: 2 只来自 2 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['无机盐', '房地产开发']"
+    ],
+    "cold_sectors": [
+      "无机盐",
+      "房地产开发"
+    ]
+  }
+}

@@ -9,27 +9,27 @@
     "semi",
     "robot"
   ],
-  "total_records": 913,
-  "overall_win_rate": 28.915662650602407,
+  "total_records": 918,
+  "overall_win_rate": 28.86710239651416,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-09-07T20:00:38.284100",
+  "generated_at": "2026-09-11T20:00:33.456632",
   "score_band_stats": {
     "70+": {
       "band": "70+",
-      "count": 40,
-      "win_count": 7,
-      "win_rate": 17.5,
-      "avg_change": -1.87225,
+      "count": 45,
+      "win_count": 8,
+      "win_rate": 17.77777777777778,
+      "avg_change": -1.968222222222222,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 913,
-      "win_count": 264,
-      "win_rate": 28.915662650602407,
-      "avg_change": -0.867042716319821
+      "count": 918,
+      "win_count": 265,
+      "win_rate": 28.86710239651416,
+      "avg_change": -0.8772222222222186
     }
   },
   "sector_stats": {
@@ -88,6 +88,30 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": -14.60181818181818
+    },
+    "被动元件": {
+      "sector": "被动元件",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -3.95
+    },
+    "磁性材料": {
+      "sector": "磁性材料",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -3.58
+    },
+    "农药": {
+      "sector": "农药",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.64
     }
   }
 }

@@ -1,0 +1,46 @@
+{
+  "date_for": "2026-09-10",
+  "score_threshold": 73,
+  "hold_days": 1,
+  "weak_sectors": [
+    "chem"
+  ],
+  "position_final": 45,
+  "position_base": 50,
+  "watchlist": [],
+  "cold_sectors": [
+    "无机盐",
+    "房地产开发"
+  ],
+  "tuning_log": [
+    {
+      "source": "rec_tuning",
+      "action": "baseline",
+      "threshold": 70,
+      "hold_days": 1,
+      "weak_sectors": [
+        "chem"
+      ]
+    },
+    {
+      "source": "daily_root_cause",
+      "action": "applied",
+      "threshold_delta": 3,
+      "position_delta": -5,
+      "weak_sectors_added": [],
+      "watchlist": [],
+      "cold_sectors": [
+        "无机盐",
+        "房地产开发"
+      ],
+      "reasons": [
+        "E. 冷启动盲区: 2 只来自 2 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['无机盐', '房地产开发']"
+      ]
+    }
+  ],
+  "generated_at": "2026-09-10T01:52:56",
+  "source_files": {
+    "rec_tuning": "rec_tuning.json",
+    "daily_root_cause": "daily_root_cause.json"
+  }
+}
