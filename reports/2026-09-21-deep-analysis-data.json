@@ -2,8 +2,8 @@
   "report_date": "2026-09-18",
   "today": "2026-09-21",
   "today_weekday": "周一 (交易日, 9/21 选股报告尚未生成)",
-  "reuse_note": "周一交易日, 9/21 选股报告 17:01 收盘后生成, 9/21 早 08:30 autopilot 触发时复用 9/18 周五报告 (沿用 9/13/9/19/9/20 复用模式)",
-  "run_id": "01a0bf9a-cd73-780e-b7c2-6a1cd3cd2e62",
+  "reuse_note": "9/21 周一交易日, 9/21 选股报告尚未生成 (9/21 早 08:30 autopilot 触发, 沿用 9/18 周五报告)",
+  "run_id": "01a0c15f-0349-743b-a107-da64f7b8f91f",
   "candidates_count": 10,
   "results": [
     {
@@ -206,5 +206,8 @@
       "composite_score": 12.06,
       "tech_score_report": 56
     }
-  ]
+  ],
+  "autopilot_run_id": "01a0c15f-0349-743b-a107-da64f7b8f91f",
+  "generated_at": "2026-09-21T08:30:00+08:00",
+  "selection_report_date": "2026-09-18"
 }
