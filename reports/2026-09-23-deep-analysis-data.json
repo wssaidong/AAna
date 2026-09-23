@@ -1,0 +1,132 @@
+{
+  "date": "2026-09-23",
+  "today": "2026-09-23",
+  "report_date": "2026-09-23",
+  "report_path": "/Users/cai/code/AAna/reports/2026-09-23-选股报告.md",
+  "report_size_bytes": 5476,
+  "report_gen_time": "2026-09-23 08:01:22",
+  "top10_count": 0,
+  "top10_codes": [],
+  "top1": {
+    "code": "600362",
+    "name": "江西铜业",
+    "price": 45.1,
+    "change_pct_9_22": 1.94,
+    "score_6d": 12,
+    "industry": "铜",
+    "phase10_sector": "energy",
+    "phase10_win_rate": 100.0,
+    "pe": 13.5,
+    "rsi14": 45.4,
+    "vol_ratio": 1.34,
+    "chg_60d_pct": 5.4,
+    "chg_5d_pct": 4.96,
+    "net_profit_2026q1_yi": 28.18,
+    "net_profit_yoy": 44.31,
+    "revenue_2026q1_yi": 1391.24,
+    "revenue_yoy": 25.39,
+    "industry_rank_revenue": 1,
+    "industry_rank_profit": 2,
+    "total_shares_yi": 34.63,
+    "market_type": "超大盘股",
+    "entry_range": "¥44.60-45.50",
+    "target_price": 48.0,
+    "stop_loss": 43.5,
+    "position_recommendation": 0.3
+  },
+  "top2_3": [
+    {
+      "rank": 2,
+      "code": "603886",
+      "name": "元祖股份",
+      "score_6d": 9,
+      "industry": "食品加工",
+      "phase10_sector": "neutral",
+      "phase10_win_rate": 0.0
+    },
+    {
+      "rank": 3,
+      "code": "000737",
+      "name": "北方铜业",
+      "score_6d": 9,
+      "industry": "其他化学制品",
+      "phase10_sector": "chem",
+      "phase10_win_rate": 0.0,
+      "warning": "黑名单不重仓"
+    },
+    {
+      "rank": 4,
+      "code": "002295",
+      "name": "精艺股份",
+      "score_6d": 7,
+      "industry": "铜",
+      "phase10_sector": "energy",
+      "phase10_win_rate": 100.0,
+      "warning": "PE亏损不重仓"
+    }
+  ],
+  "sector_winners": {
+    "energy": "100.0%",
+    "robot": "36.4%",
+    "semi": "3.0%",
+    "chem": "0%",
+    "mach": "0%",
+    "elec": "0%",
+    "ai_app": "0%"
+  },
+  "eastmoney_group": "20260923ZZ",
+  "eastmoney_gid": 1631,
+  "eastmoney_stocks": [
+    "600362"
+  ],
+  "feishu_pushed": true,
+  "kimi_analyzed": false,
+  "kimi_note": "kimi-cli 未安装, 使用 akshare + 腾讯 + 同花顺行业 + 6维评分 替代",
+  "deep_analysis_method": "aana-deep-analysis-autopilot 自主筛选 (sina 800 只 + 主板过滤 + 6维评分 + Phase 10 板块胜率)",
+  "deep_analysis_skipped_reason": null,
+  "run_id": "01a0cbab-b864-71ed-aec6-fa2473e8599b",
+  "autopilot_run_count_today": 1,
+  "first_run_commit": null,
+  "second_run_commit": null,
+  "market_status": "open",
+  "market_status_reason": "正常交易日 (autopilot 误判中秋节休市 P0 第 8 个实战日已修正: 9/22-9/24 正常开市, 2026 中秋 9/25-9/27)",
+  "next_trading_day": "2026-09-24",
+  "sentiment_score": 63,
+  "sentiment_label": "回暖",
+  "sh_index": 3952.13,
+  "sh_index_chg_pct": 0.06,
+  "position_recommendation": 0.45,
+  "score_threshold": 70,
+  "weak_sectors": [
+    "ai_app",
+    "chem",
+    "mach",
+    "elec",
+    "semi",
+    "robot"
+  ],
+  "cold_sectors": [
+    "无机盐",
+    "房地产开发"
+  ],
+  "root_cause": "E. 冷启动盲区延续 + 资金流 API 连续 3 日挂 (9/21+9/22+9/23)",
+  "sina_pool": {
+    "raw": 800,
+    "mainboard_filtered": 287,
+    "normal_pool_5pct_band": 235,
+    "risk_pool_chase": 52,
+    "top15_for_6d": 15
+  },
+  "deep_analysis_top1_pick_verified": {
+    "code": "600362",
+    "name": "江西铜业",
+    "verdict": "唯一强推 (6维评分 +12, 板块胜率 100%)",
+    "eastmoney_synced": true,
+    "gid": 1631,
+    "group_name": "20260923ZZ"
+  },
+  "note": "9/23 周三交易日, 选股报告 Top10=0 推荐, 触发 aana-deep-analysis-autopilot 自主筛选补救, 江西铜业 Score 12 唯一强推, 已同步东财 20260923ZZ (gid=1631) 1 只",
+  "generated_at": "2026-09-23T08:35:00+08:00",
+  "feishu_message_id": "om_x100b6405bffa4534c2462ff180234e1",
+  "feishu_send_time": "2026-09-23 08:36:35"
+}
