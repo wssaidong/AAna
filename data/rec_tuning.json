@@ -12,14 +12,14 @@
   "total_records": 920,
   "overall_win_rate": 28.804347826086957,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-09-15T20:00:28.998051",
+  "generated_at": "2026-09-22T20:00:35.866163",
   "score_band_stats": {
     "70+": {
       "band": "70+",
       "count": 47,
       "win_count": 8,
       "win_rate": 17.02127659574468,
-      "avg_change": -1.8844680851063829,
+      "avg_change": -1.9421276595744679,
       "avg_hold_days": 1.0
     }
   },
@@ -29,7 +29,7 @@
       "count": 920,
       "win_count": 265,
       "win_rate": 28.804347826086957,
-      "avg_change": -0.8753152173913007
+      "avg_change": -0.8782608695652138
     }
   },
   "sector_stats": {
@@ -119,7 +119,7 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -1.19
     },
     "汽车零部件": {
       "sector": "汽车零部件",
@@ -127,7 +127,7 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -1.52
     }
   }
 }

@@ -1,9 +1,14 @@
 {
-  "date_for": "2026-09-10",
+  "date_for": "2026-09-16",
   "score_threshold": 73,
   "hold_days": 1,
   "weak_sectors": [
-    "chem"
+    "ai_app",
+    "chem",
+    "elec",
+    "mach",
+    "robot",
+    "semi"
   ],
   "position_final": 45,
   "position_base": 50,
@@ -19,7 +24,12 @@
       "threshold": 70,
       "hold_days": 1,
       "weak_sectors": [
-        "chem"
+        "ai_app",
+        "chem",
+        "mach",
+        "elec",
+        "semi",
+        "robot"
       ]
     },
     {
@@ -38,7 +48,7 @@
       ]
     }
   ],
-  "generated_at": "2026-09-10T01:52:56",
+  "generated_at": "2026-09-16T15:00:34",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
