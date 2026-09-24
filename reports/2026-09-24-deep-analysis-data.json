@@ -104,7 +104,7 @@
   "eastmoney_gid": 1636,
   "eastmoney_stocks_planned": ["603979", "600886"],
   "eastmoney_stocks_synced": ["603979", "600886"],
-  "feishu_pushed": false,
+  "feishu_pushed": true,
   "kimi_analyzed": false,
   "kimi_note": "kimi-cli 未安装, 使用 sina 800 + 腾讯实时 + 同花顺行业 + 6维评分 + Phase 10 板块胜率 + web_search 业务验证 替代",
   "deep_analysis_method": "aana-deep-analysis-autopilot 自主筛选 (sina 800 只 + 主板过滤 + 腾讯验证 + 6维评分 + Phase 10 板块胜率 + web_search 业务验证)",
@@ -145,6 +145,6 @@
   },
   "note": "9/24 周三交易日, 选股报告 Top10=0 推荐, 触发 aana-deep-analysis-autopilot 自主筛选补救, 金诚信 (603979) Score 11 唯一强推首选, 国投电力 (600886) 同分 11 节前防御备选, 计划同步东财 20260924ZZ",
   "generated_at": "2026-09-24T08:30:00+08:00",
-  "feishu_message_id": null,
-  "feishu_send_time": null
+  "feishu_message_id": "om_x100b64734a6ebca8de72c927c2afe1b",
+  "feishu_send_time": "2026-09-24 08:35:22"
 }
