@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-25",
+  "decision": "0 推荐铁律触发",
+  "sentiment": {
+    "score": 35,
+    "label": "冰点",
+    "zt": 51,
+    "dt": 5,
+    "avg_change": -1.99
+  },
+  "threshold": 70,
+  "weak_sectors": [
+    "ai_app",
+    "chem",
+    "mach",
+    "elec",
+    "semi",
+    "robot"
+  ],
+  "candidate_pool_size": 373,
+  "passed_filter": 19,
+  "max_composite_score": 65,
+  "top_candidate": "605358 立昂微",
+  "actions_skipped": [
+    "create_group",
+    "add_stocks",
+    "groups.json write",
+    "sync_portfolio_to_eastmoney",
+    "cleanup"
+  ],
+  "reason": "0 推荐铁律触发 — 情绪冰点 + 阈值 70 双重过滤后 0 候选",
+  "reference": "a-stock-system SKILL.md 「0 推荐不调下游副作用」铁律 (2026-09-01)",
+  "git_push_skipped": true
+}
