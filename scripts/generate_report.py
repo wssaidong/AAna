@@ -42,6 +42,7 @@ try:
     from fund_screener import screen_funds, format_fund_report
     from fund_tracker import get_tracker_report as get_fund_tracker_report
     from fund_comparison import get_comparison_report as get_fund_comparison_report
+    from rec_optimizer import get_tuning_config  # v2.6: 统一调参源, 修复 REC_TUNING 三副本冲突
     NEW_MODULES = True
 except ImportError as e:
     print(f"[AAna] 新模块加载失败: {e}，使用简化版")
@@ -86,7 +87,9 @@ _HOLIDAY_2026 = {
     '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05',
     # 端午: 6/19-21 (周五-周日) — 6/22 周一实际是工作日
     '2026-06-19', '2026-06-20', '2026-06-21',
-    # 中秋+国庆: 10/1-7
+    # 中秋节: 9/25-27 (周五-周日, 共3天, 不调休)
+    '2026-09-25', '2026-09-26', '2026-09-27',
+    # 国庆节: 10/1-7 (共7天, 调休 9/20 日 + 10/10 六上班)
     '2026-10-01', '2026-10-02', '2026-10-03',
     '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07',
 }
@@ -710,16 +713,14 @@ def generate_report():
     filename = get_report_filename()
 
     # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
-    # 2026-08-07 调整：hold_days 1→14 (2 周持仓 / 中线策略)
-    # 配套：score_threshold 50→55 (略提高门槛，过滤短线追板噪声)
-    REC_TUNING = {
-        "score_threshold": 55,
-        "hold_days": 14,
-        "weak_sectors": ['ai_app', 'semi', 'chem', 'mach', 'elec', 'robot'],
-        "overall_win_rate": 21.2,
-        "total_records": 354,
-        "generated_at": "2026-08-07T10:30:00.000000",
-    }
+    # v2.6 修复：删除函数内局部 REC_TUNING (原 715-722 行)，改从 data/rec_tuning.json 读取
+    # 之前的局部字典遮蔽了文件尾 RecOptimizer 自动写入的全局值 (45 天空转)
+    _tuning = get_tuning_config() if NEW_MODULES else None
+    score_thresh = _tuning.recommended_score_threshold if _tuning else 50
+    weak_sectors = list(_tuning.weak_sectors) if _tuning else []
+    print(f"[AAna] 调参生效: threshold={score_thresh}, weak_sectors={weak_sectors} "
+          f"(generated_at={_tuning.generated_at if _tuning else 'N/A'}, "
+          f"total_records={_tuning.total_records if _tuning else 0})")
 
     # 生成报告前清理过期文件（保留7天）
     cleanup_old_reports(days=7)
@@ -878,8 +879,7 @@ def generate_report():
             info['emoji'] = get_sector_emoji(info.get('name', ''))
 
             # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
-            score_thresh = REC_TUNING.get('score_threshold', 50)
-            weak_sectors = REC_TUNING.get('weak_sectors', [])
+            # v2.6 改用函数顶部 _tuning 局部变量(来自 data/rec_tuning.json)
             sector = info.get('category', '') or info.get('sector', '')
             if 综合评分 < score_thresh:
                 continue  # 评分低于阈值，跳过
@@ -1584,6 +1584,13 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
@@ -1592,6 +1599,6 @@ REC_TUNING = {
     "weak_sectors": ['ai_app', 'chem', 'mach', 'elec', 'semi', 'robot'],
     "overall_win_rate": 28.8,
     "total_records": 920,
-    "generated_at": "2026-09-15T20:00:28.998051",
+    "generated_at": "2026-09-24T20:01:01.143691",
 }
 # === REC_OPTIMIZER_TUNING_END ===
