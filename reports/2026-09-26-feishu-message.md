@@ -127,3 +127,14 @@
 
 📌 *本报告仅供参考, 不构成投资建议*
 🤖 *AAna v2.5 + aana-deep-analysis-autopilot skill | 2026-09-26 08:30 | 节假日休市 Day 2 + 0 推荐铁律 (第 10 次) + P0 BUG 修复二次复验 + 9/28 节后预案 v3 升级*
+---
+
+## 十一、autopilot 推送确认
+
+- **飞书 message_id**: `om_x100b6445676fb4a4c4b09b29fd83de6`
+- **发送时间**: 2026-09-26 08:32:26
+- **chat_id**: `oc_936c9bc353220399455da6c1a919eb62`
+- **bot 身份**: lark-cli bot (as bot)
+- **idempotency_key**: `aana-deep-analysis-2026-09-26-<unix_ts>`
+- **状态**: ✅ 推送成功
+- **autopilot run_id**: `01a0db1e-a2a4-72f4-a75f-3e62a01a784f`
