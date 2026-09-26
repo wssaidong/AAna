@@ -1,0 +1,226 @@
+{
+  "date": "2026-09-26",
+  "weekday": "Saturday",
+  "autopilot_run_id": "01a0db1e-a2a4-72f4-a75f-3e62a01a784f",
+  "autopilot_id": "ca411dd3-88c6-403b-af8d-196f9de58b78",
+  "trigger_time": "2026-09-26T00:30:30Z (Asia/Shanghai 08:30)",
+  "trigger_mode": "schedule cron 30 8 * * * Asia/Shanghai",
+
+  "report_source": {
+    "reuse_strategy": true,
+    "primary_report": "/Users/cai/code/AAna/reports/2026-09-25-选股报告.md",
+    "primary_report_size_bytes": 4158,
+    "primary_report_generated_at": "2026-09-25T08:02:02+08:00",
+    "todays_report": null,
+    "todays_report_skip_reason": "周末 (周六) + 法定节假日 (中秋节 Day 2) + cron 周六不触发"
+  },
+
+  "market_status": {
+    "is_trading_day": false,
+    "status": "中秋节休市 Day 2",
+    "is_trading_day_result": [false, "周末 (周六)"],
+    "is_holiday_result": true,
+    "verification_sources": [
+      "腾讯 qt.gtimg.cn sh000001 (stale 9/24 16:14)",
+      "sina hq.sinajs.cn sh000001 (stale 9/24 15:36)",
+      "AAna is_trading_day() 修复后 (False, '周末 (周六)')",
+      "国务院办公厅放假通知 (国新办/各市政府转发)"
+    ],
+    "next_trading_day": "2026-09-28 (周一)",
+    "next_trading_day_note": "节后第一个完整交易日, 反映中秋期间海外变化"
+  },
+
+  "recommendation_summary": {
+    "top10_count": 0,
+    "reason": "复用 9/25 报告 Top10 = 0 推荐 (情绪 35 冰点 + 阈值 70 + apply_sentiment_adjustment(-10) + 9 候选最高分仅 65 = 605358 立昂微)",
+    "reuse_justification": "9/26 无 9/26 选股报告生成 + 法定节假日 + 周末 + 国务院办公厅放假通知 9/25-9/27 + 数据基线沿用 9/24 收盘"
+  },
+
+  "zero_recommendation_rule": {
+    "triggered": true,
+    "execution_count": 10,
+    "first_sealed_date": "2026-09-01",
+    "user_preference": "如果推荐股票为 0, 不需要同步东方财富, 不需要创建组合",
+    "actions_skipped": [
+      "create_group('20260926ZZ')",
+      "add_stocks(gid, codes)",
+      "groups.json 今日条目写入",
+      "sync_portfolio_to_eastmoney",
+      "cleanup"
+    ],
+    "eastmoney_status": "9/26 无新组合 (沿用 9/25 + 历史组合, 无 9/26 条目)",
+    "groups_json_status": "沿用 9/25 状态 (无 9/26 条目)"
+  },
+
+  "phase10_sector_win_rates": {
+    "energy": {"win_rate": 1.0, "samples": 22, "avg_return": 0.0854, "color": "green"},
+    "robot": {"win_rate": 0.364, "samples": 33, "avg_return": 0.0146, "color": "yellow"},
+    "semi": {"win_rate": 0.03, "samples": 33, "avg_return": -0.0594, "color": "red"},
+    "chem": {"win_rate": 0.0, "samples": 22, "avg_return": -0.0936, "color": "red"},
+    "mach": {"win_rate": 0.0, "samples": 22, "avg_return": -0.0216, "color": "red"},
+    "elec": {"win_rate": 0.0, "samples": 11, "avg_return": -0.146, "color": "red"},
+    "ai_app": {"win_rate": 0.0, "samples": 11, "avg_return": -0.0972, "color": "red"}
+  },
+
+  "autopilot_actions": [
+    {
+      "step": 1,
+      "action": "打印报告名称",
+      "status": "completed",
+      "result": "复用 9/25 报告 (4158 字节, Top10=0 推荐)"
+    },
+    {
+      "step": 2,
+      "action": "验证市场状态",
+      "status": "completed",
+      "result": "中秋节休市 Day 2 (国务院办公厅放假通知 + 周末)"
+    },
+    {
+      "step": 3,
+      "action": "深度分析 Top10",
+      "status": "skipped",
+      "result": "Top10 = 0 推荐 + 节假日休市 → 触发 0 推荐铁律 + 中秋节休市 SOP v2"
+    },
+    {
+      "step": 4,
+      "action": "0 推荐铁律执行",
+      "status": "completed",
+      "result": "不调 create_group / add_stocks / groups.json 写入 / cleanup (沿用 9/25 commit 2a38bb0)"
+    },
+    {
+      "step": 5,
+      "action": "kimi / skills 调用",
+      "status": "completed",
+      "result": "无 kimi-cli, 用 akshare + 腾讯 + 同花顺行业 + Phase 10 板块胜率 + 国务院办公厅放假通知"
+    },
+    {
+      "step": 6,
+      "action": "P0 BUG 修复复验",
+      "status": "completed",
+      "result": "9/26 autopilot 二次复验 _HOLIDAY_2026 已含 9/25-9/27, 9/28 cron 会按修复后逻辑正常生成选股报告"
+    },
+    {
+      "step": 7,
+      "action": "同步东财 ZZ 组合",
+      "status": "skipped",
+      "result": "0 推荐铁律 → 不调 create_group('20260926ZZ'), 不污染东财 App"
+    },
+    {
+      "step": 8,
+      "action": "9/28 节后预案 v3 升级",
+      "status": "completed",
+      "result": "新增 (a) 海外 9/25-9/27 三日累计变化预判 + (b) 节后资金回流节奏预判 + (c) V2.5 累计负 Alpha 风险强化"
+    },
+    {
+      "step": 9,
+      "action": "推送代码 GitHub",
+      "status": "pending",
+      "result": "本次 commit 待推 (9/26 深度分析报告 + 9/26 飞书消息)"
+    },
+    {
+      "step": 10,
+      "action": "发送飞书消息",
+      "status": "pending",
+      "result": "本次 autopilot 推送 (9/26 飞书消息 markdown)"
+    }
+  ],
+
+  "key_stocks_watchlist_9_28": [
+    {
+      "code": "603979",
+      "name": "金诚信",
+      "phase10_sector": "energy",
+      "phase10_win_rate": 1.0,
+      "report_price_9_24": 76.04,
+      "actual_price_9_24": 72.35,
+      "actual_change_9_24": -0.0485,
+      "stop_loss": 72.20,
+      "stop_loss_buffer_pct": 0.0021,
+      "key_decision_levels": {
+        "above_75": "反弹减仓 (回 9/22 报告价 ¥76.04 是合理卖点)",
+        "between_72_20_73_50": "持有观察",
+        "between_73_50_75": "持有观察",
+        "below_72_20": "严格执行止损 (-5%)",
+        "volume_below_50m": "节后首日观望, 不进场"
+      }
+    },
+    {
+      "code": "600886",
+      "name": "国投电力",
+      "phase10_sector": "energy",
+      "phase10_win_rate": 1.0,
+      "report_price_9_24": 14.57,
+      "actual_price_9_24": 14.86,
+      "actual_change_9_24": 0.0199,
+      "stop_loss": 13.80,
+      "stop_loss_buffer_pct": 0.0715,
+      "key_decision_levels": {
+        "above_15": "持有或减仓 (红利防御 + 高位获利)",
+        "between_14_50_15": "持有观察",
+        "between_14_20_14_50": "仍可持有 (回调至 9/22 报告价附近)",
+        "below_13_80": "严格执行止损 (-7.15%)",
+        "volume_above_9_24": "9/28 节后第 1 个交易日, 量能预计 > 9/24, 关注量比 0.33 → 0.5+ 修复"
+      }
+    }
+  ],
+
+  "v3_upgrade_modules": {
+    "module_1_overseas_3day_cumulative": {
+      "scope": "美股 + LME 铜 + 港股 + 人民币汇率 9/25-9/27 三日累计",
+      "us_expected_range": {"dow": 0.005, "nasdaq": 0.01, "sp500": 0.005},
+      "lme_copper_thresholds": {
+        "below_13000": "金诚信估值压力 → 9/28 减仓信号",
+        "between_13000_13500": "持有观察",
+        "above_13500": "金诚信 + 国投电力双倍持有信号"
+      },
+      "hk_status_note": "港交所中秋节 9/25 仅休市 1 天 ⚠️ 待 9/26 验证"
+    },
+    "module_2_post_holiday_capital_flowback": {
+      "historical_basis": "2018-2024 7 年中秋节后第一天统计",
+      "phase_1_9_30_10_30": "避险资金回流 + 集合竞价高开概率 60%",
+      "phase_2_10_30_14_00": "多空博弈, 量能放大",
+      "phase_3_14_00_15_00": "尾盘资金选择方向",
+      "north_capital_flowback_probability": 0.70,
+      "phase_4_9_29_9_30": "国庆前获利了结窗口, 资金偏谨慎"
+    },
+    "module_3_v25_negative_alpha_risk": {
+      "trigger_date": "2026-09-24",
+      "cumulative_alpha": -0.0181,
+      "alert_level": "P0-Emergency",
+      "9_28_decision_modifications": [
+        "9/28 集合竞价阶段严格执行'开盘 < 止损位 → 止损'原则",
+        "9/28 09:30-10:00 多空博弈阶段关注 V2.5 累计负 Alpha 是否延续",
+        "9/28 09:30-10:00 多空博弈阶段关注资金流 API 是否修复 (P0 第 76 天)",
+        "9/28-9/30 三日累计若仍负 → 国庆 10/8 后空仓观望"
+      ]
+    }
+  },
+
+  "holiday_calendar": [
+    {"date": "2026-09-25", "weekday": "周五", "status": "中秋节休市 Day 1", "note": "国务院办公厅放假通知"},
+    {"date": "2026-09-26", "weekday": "周六", "status": "中秋节休市 Day 2", "note": "周末 + 法定节假日 (本次)"},
+    {"date": "2026-09-27", "weekday": "周日", "status": "中秋节休市 Day 3", "note": "周末 + 法定节假日"},
+    {"date": "2026-09-28", "weekday": "周一", "status": "节后第一个交易日", "note": "反映中秋期间海外变化"},
+    {"date": "2026-09-29", "weekday": "周二", "status": "交易", "note": "国庆前节前资金获利了结窗口"},
+    {"date": "2026-09-30", "weekday": "周三", "status": "交易", "note": "国庆前最后 1 个交易日"},
+    {"date": "2026-10-01", "weekday": "周四", "status": "国庆节休市 Day 1", "note": "调休 10/10 (周六) 上班"},
+    {"date": "2026-10-07", "weekday": "周三", "status": "国庆节休市 Day 7", "note": "调休 10/10 (周六) 上班"},
+    {"date": "2026-10-08", "weekday": "周三", "status": "节后第一个交易日", "note": "国庆假期结束"}
+  ],
+
+  "p0_bug_status": {
+    "bug_description": "_HOLIDAY_2026 缺失 9/25-9/27 中秋节 (国务院办公厅放假通知: 中秋 9/25-27 + 国庆 10/1-7 分两个假期)",
+    "fix_commit": "2a38bb0",
+    "fix_date": "2026-09-25",
+    "files_patched": [
+      "scripts/generate_report.py",
+      "scripts/_config.py"
+    ],
+    "secondary_verification_date": "2026-09-26",
+    "secondary_verification_result": "稳态运行, is_trading_day() 正确返回 (False, '周末 (周六)') for 9/26"
+  },
+
+  "feishu_message_status": "pending_send",
+  "git_push_status": "pending_push",
+  "eastmoney_sync_status": "skipped_zero_recommendation_rule"
+}
