@@ -113,14 +113,14 @@
     {
       "step": 9,
       "action": "推送代码 GitHub",
-      "status": "pending",
-      "result": "本次 commit 待推 (9/27 深度分析报告 + 9/27 飞书消息)"
+      "status": "completed",
+      "result": "commit 4befa57 feat(深度分析): 2026-09-27 ... + push main (2026-09-27 08:31)"
     },
     {
       "step": 10,
       "action": "发送飞书消息",
-      "status": "pending",
-      "result": "本次 autopilot 推送 (9/27 飞书消息 markdown)"
+      "status": "completed",
+      "result": "message_id om_x100b64b27192d4a4c24cf693fbbcbb9 (2026-09-27 08:31:50)"
     }
   ],
 
@@ -242,7 +242,7 @@
     "note": "创 2026 年内单月最长连续 0 推荐记录"
   },
 
-  "feishu_message_status": "pending_send",
-  "git_push_status": "pending_push",
+  "feishu_message_status": "completed",
+  "git_push_status": "completed",
   "eastmoney_sync_status": "skipped_zero_recommendation_rule"
 }
