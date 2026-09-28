@@ -177,7 +177,10 @@
     "9_28_cron": "已生成当日选股报告 (Top10=0 符合预期, P0 BUG 修复后逻辑正常)"
   },
 
-  "feishu_pushed": false,
-  "github_pushed": false,
+  "feishu_pushed": true,
+  "feishu_message_id": "om_x100b64af2493f8a0c3d333794908a47",
+  "feishu_pushed_at": "2026-09-28T08:36:54+08:00",
+  "github_pushed": true,
+  "github_commit": "2e40091",
   "ts": "2026-09-28T08:35:00+08:00"
 }
