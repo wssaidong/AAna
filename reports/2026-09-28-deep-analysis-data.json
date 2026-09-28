@@ -1,0 +1,183 @@
+{
+  "date": "2026-09-28",
+  "weekday": "Monday",
+  "autopilot_run_id": "01a0e56b-5afe-77ea-aee4-9acda913e5e9",
+  "autopilot_id": "ca411dd3-88c6-403b-af8d-196f9de58b78",
+  "trigger_time": "2026-09-28T00:30:13Z (Asia/Shanghai 08:30)",
+  "trigger_mode": "schedule cron 30 8 * * * Asia/Shanghai",
+
+  "report_source": {
+    "reuse_strategy": false,
+    "todays_report": "/Users/cai/code/AAna/reports/2026-09-28-选股报告.md",
+    "todays_report_size_bytes": 5443,
+    "todays_report_generated_at": "2026-09-28T08:02:06+08:00",
+    "primary_report": "/Users/cai/code/AAna/reports/2026-09-28-选股报告.md",
+    "primary_report_size_bytes": 5443,
+    "primary_report_generated_at": "2026-09-28T08:02:06+08:00"
+  },
+
+  "market_status": {
+    "is_trading_day": true,
+    "status": "节后第一个交易日",
+    "is_holiday_result": false,
+    "verification_sources": [
+      "腾讯 qt.gtimg.cn sh000001 (stale 9/24 16:14, 节前最后交易日)",
+      "AAna HOLIDAYS_2026.is_holiday('2026-09-28') = False ✅",
+      "国务院办公厅放假通知 + 沪深北交易所 9/17 公告",
+      "港股通 9/28 (周一) 起恢复正常服务"
+    ],
+    "context": "中秋节 9/25-9/27 休市结束, 节前 9/24 收盘 6 大核心 -2.15% 6/6 普跌"
+  },
+
+  "recommendation_summary": {
+    "top10_count": 0,
+    "reason": "当日新报告 Top10 = 0 推荐 (情绪 35 冰点 + 阈值 70 + apply_sentiment_adjustment(-10) + 候选均不达)",
+    "autonomous_screening_triggered": true,
+    "autonomous_screening_method": "aana-deep-analysis-autopilot skill 触发条件 #1 — Top10 表格完全为空 → 走自主筛选补救流程"
+  },
+
+  "zero_recommendation_rule": {
+    "triggered": true,
+    "execution_count": 12,
+    "execution_variant": "0 推荐 + 自主筛选补救 (不是纯 0 推荐触发'不创建组合')",
+    "autonomous_screening_remediation": {
+      "pool_pulled_sina_pages": 20,
+      "pool_pulled_count": 800,
+      "after_mainboard_filter": 358,
+      "after_tencent_validation": 358,
+      "scoring_6d_strong_8plus": 3,
+      "scoring_6d_strong_8plus_codes": ["002602", "600887", "601799"],
+      "after_business_validation_unique_strong_pick": 1,
+      "unique_strong_pick_code": "002602",
+      "unique_strong_pick_name": "世纪华通",
+      "excluded_codes_business_failure": ["600887", "601799"],
+      "excluded_reasons": {
+        "600887": "Q2 净利润环比 -93% 暴跌 + 商誉减值",
+        "601799": "业绩转负 -5.26% + 校招解约 107 人 (24.32%) + 现金恶化 -17.30%"
+      }
+    }
+  },
+
+  "unique_strong_pick": {
+    "code": "002602",
+    "name": "世纪华通",
+    "six_dim_score": 8,
+    "current_price_9_24": 14.23,
+    "chg_pct_9_24": -0.0021,
+    "industry": "互联网信息服务",
+    "industry_enum": "internet",
+    "industry_blacklisted": false,
+    "performance_h1_2026": {
+      "revenue_yi": 220,
+      "revenue_yoy_pct": 28,
+      "net_profit_yi_range": "43-47.7",
+      "net_profit_yoy_pct_range": "61.87-79.57"
+    },
+    "valuation": {
+      "pe_ttm": 14.1,
+      "pb": 3.12,
+      "mcap_yi": 792
+    },
+    "key_strengths": [
+      "业绩暴增 +62~80% (点点互动 + Century Games 海外游戏)",
+      "板块 internet 不在 6 个黑名单内",
+      "6 维评分 +8 满分档",
+      "中盘 792 亿资金容量充足",
+      "游戏出海板块不受国内消费疲软影响"
+    ],
+    "trading_plan": {
+      "entry_price_range": "¥14.10-14.30",
+      "target_price_short": "¥15.00-15.50 (+5%~+9%)",
+      "stop_loss": "¥13.52 (-5% 严格执行)",
+      "position_size_pct": "10-15% (总仓位 20% 的一半)"
+    }
+  },
+
+  "phase10_sector_win_rate": {
+    "energy": {"win_rate": 100.0, "count": 22, "9_28_candidate": "金诚信 + 国投电力 (9/24 持仓延续观察, 不再 9/28ZZ 同步)"},
+    "robot": {"win_rate": 36.4, "count": 33, "9_28_candidate": "关注 9/28 机器人主线是否回归"},
+    "semi": {"win_rate": 3.0, "status": "黑名单"},
+    "chem": {"win_rate": 0.0, "status": "黑名单"},
+    "mach": {"win_rate": 0.0, "status": "黑名单"},
+    "elec": {"win_rate": 0.0, "status": "黑名单"},
+    "ai_app": {"win_rate": 0.0, "status": "黑名单"}
+  },
+
+  "carryover_from_9_24": {
+    "金诚信_603979": {
+      "phase10_sector": "energy 100%",
+      "9_24_actual": "¥72.35 (-4.85%) 🔴 触及止损 ¥72.20 之上 0.21%",
+      "9_28_decision_5_tier": {
+        "green": "¥75+ 减仓",
+        "yellow_high": "¥73.50-75.00 持有观察",
+        "yellow_low": "¥72.20-73.50 持有观察",
+        "red": "< ¥72.20 严格执行止损",
+        "warning": "集合竞价成交额 < 5000万: 节后首日观望, 不进场"
+      }
+    },
+    "国投电力_600886": {
+      "phase10_sector": "energy 100%",
+      "9_24_actual": "¥14.86 (+1.99%) 🟢 跑赢上证 +3.21pp",
+      "9_28_decision_5_tier": {
+        "green": "¥15.00+ 持有或减仓",
+        "yellow_high": "¥14.50-15.00 区间整理",
+        "yellow_low": "¥14.20-14.50 回调至 9/22 报告价附近",
+        "red": "< ¥13.80 严格执行止损",
+        "warning": "9/28 节后第 1 个交易日, 量能预计 > 9/24, 关注量比 0.33 → 0.5+ 修复"
+      }
+    }
+  },
+
+  "eastmoney_sync": {
+    "group_name": "20260928ZZ",
+    "gid": 1641,
+    "stocks": ["002602"],
+    "stocks_count": 1,
+    "type": "deep_analysis_zz",
+    "validation": "gstkinfos 验证 gid=1641 含 1 只: ['002602'] ✅",
+    "cleanup": {
+      "KEEP_DAYS": 3,
+      "cutoff_date": "20260925",
+      "deleted_gids": [1621, 1626, 1631, 1636],
+      "deleted_names": ["20260920ZZ", "20260921ZZ", "20260923ZZ", "20260924ZZ"],
+      "results": {
+        "1621": "state=-119 (服务端已失效)",
+        "1626": "state=-119 (服务端已失效)",
+        "1631": "state=0 ✅",
+        "1636": "state=0 ✅"
+      }
+    },
+    "groups_json_after": ["20260928ZZ"]
+  },
+
+  "market_context": {
+    "previous_close_index": {
+      "shanghai": 3888.37,
+      "shenzhen": 13316.97,
+      "chinext": 3288.95,
+      "csi300": 4439.14,
+      "star50": 1621.87,
+      "average_change_pct": -2.15
+    },
+    "sentiment_score": 35,
+    "sentiment_label": "冰点",
+    "suggested_position_pct": 20,
+    "trading_advice": "停止交易 (沿用 9/24 选股报告)"
+  },
+
+  "v25_alert": {
+    "cumulative_alpha_pp": -1.81,
+    "severity": "P0-Emergency",
+    "9_28_action": "集合竞价阶段严格执行'开盘 < 止损位 → 止损'原则"
+  },
+
+  "p0_bug_status": {
+    "holiday_2026_fix": "稳态运行 (commit 2a38bb0)",
+    "verification_count": 4,
+    "9_28_cron": "已生成当日选股报告 (Top10=0 符合预期, P0 BUG 修复后逻辑正常)"
+  },
+
+  "feishu_pushed": false,
+  "github_pushed": false,
+  "ts": "2026-09-28T08:35:00+08:00"
+}
