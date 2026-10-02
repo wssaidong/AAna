@@ -81,10 +81,15 @@ def main(dry_run=False):
         return False
 
     if not recs:
-        log("⚠️  无推荐（score>=65 的票）")
+        # v2026-09-28 修复：阈值跟 strategy_policy 走 (默认 70, 不是硬编码 65)
+        # 文档注释"score>=65"已过期 — 实际由 aana_afternoon_screen.screen_afternoon_stocks
+        # 内部从 strategy_policy.get_today_policy().score_threshold 读取
+        from strategy_policy import get_today_policy
+        _p = get_today_policy()
+        log(f"⚠️  无推荐（score<{_p.score_threshold} 的票全部过滤）")
         push_feishu(
             "**AAna 尾盘推荐** · " + datetime.now().strftime("%Y-%m-%d %H:%M") +
-            "\n\n⚠️ 今日无推荐（score<65 的票全部过滤）"
+            f"\n\n⚠️ 今日无推荐（score<{_p.score_threshold} 的票全部过滤）"
         )
         return True
 

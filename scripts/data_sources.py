@@ -277,8 +277,15 @@ def sina_quote(codes: list) -> dict:
             if len(parts) < 10:
                 results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
                 continue
-            price = safe_float(parts[2]) or 0
-            yesterday_close = safe_float(parts[1]) or 0
+            # sina 真实字段下标 (用 sh600519 验证):
+            #   parts[1]=open  parts[2]=yc(昨收)  parts[3]=current_price
+            #   parts[4]=high  parts[5]=low  parts[7]=amount(单位:百万元)
+            # v2026-10-02 B2 修复: open 用 parts[1] (而非 parts[3]=current)
+            #                 amount 用 parts[7] * 1e6 (单位百万元→元)
+            #                 (而非 parts[9]=bid1_price, 也非 parts[7] * 1e4 的二次错位)
+            #                 茅台 9/30 真实成交 12.59 亿 = parts[7]=1258.65 × 1e6 = 12.59 亿 ✓
+            price = safe_float(parts[3]) or 0
+            yesterday_close = safe_float(parts[2]) or 0
             if price and yesterday_close:
                 change_pct = round((price - yesterday_close) / yesterday_close * 100, 2)
             else:
@@ -288,12 +295,12 @@ def sina_quote(codes: list) -> dict:
                 'name': parts[0],
                 'price': price,
                 'yesterday_close': yesterday_close,
-                'open': safe_float(parts[3]),
+                'open': safe_float(parts[1]),
                 'high': safe_float(parts[4]),
                 'low': safe_float(parts[5]),
                 'change_pct': change_pct,
                 'change_amt': round(price - yesterday_close, 2) if price and yesterday_close else 0,
-                'amount': (safe_float(parts[9]) or 0) * 10000,
+                'amount': (safe_float(parts[7]) or 0) * 1e6,
             }
     except Exception as e:
         print(f"[data_sources] 新浪API失败: {e}")

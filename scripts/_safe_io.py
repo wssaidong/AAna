@@ -120,6 +120,136 @@ def safe_read_json(path: str, default: Any = None) -> Any:
 
 
 # ─────────────────────────────────────────────────────
+# v2.6: 加锁的「读-改-写」helper (修复 Kimi 代码审查 B1/B2)
+#
+# 场景: 多 cron 进程同时写 paper_trades.json / rec_feedback.csv
+# 原代码: open(path, "w") 覆盖写, 读-改-写无原子保护 → 后写抹掉先写
+# 解决: flock(LOCK_EX) 串行化 + os.replace 原子替换
+# 用法:
+#     d = safe_read_json_locked(PATH)        # 自动加读锁
+#     d["x"] = 1
+#     safe_write_json_locked(PATH, d)        # 自动加写锁+原子替换
+# ─────────────────────────────────────────────────────
+try:
+    import fcntl as _fcntl  # macOS/Linux 都有
+    _HAS_FCNTL = True
+except ImportError:
+    _fcntl = None
+    _HAS_FCNTL = False
+
+
+def safe_read_json_locked(path: str, default: Any = None) -> Any:
+    """加读锁读取 JSON, 防止读过程中被其他进程写覆盖。"""
+    path = os.path.abspath(path)
+    try:
+        if not os.path.exists(path):
+            return default
+        if os.path.getsize(path) == 0:
+            return default
+        with open(path, encoding="utf-8") as f:
+            if _HAS_FCNTL:
+                _fcntl.flock(f.fileno(), _fcntl.LOCK_SH)  # 共享读锁
+            try:
+                return json.load(f)
+            finally:
+                if _HAS_FCNTL:
+                    _fcntl.flock(f.fileno(), _fcntl.LOCK_UN)
+    except Exception:
+        return default
+
+
+def safe_write_json_locked(path: str, data: Any, make_backup: bool = True, indent: int = 2) -> None:
+    """
+    加写锁写 JSON + 原子替换。
+    1. 打开 path 加 LOCK_EX 排他锁 (其他读/写阻塞)
+    2. shutil.copy2 → .bak
+    3. 写 .tmp + os.replace → 原子生效
+    4. 任何异常: 从 .bak 还原 + raise
+    """
+    import tempfile
+
+    path = os.path.abspath(path)
+    bak = path + ".bak"
+    tmp = path + ".tmp"
+    has_bak = False
+
+    if make_backup and os.path.exists(path):
+        shutil.copy2(path, bak)
+        has_bak = True
+
+    try:
+        # 写 tmp
+        with open(tmp, "w", encoding="utf-8") as f:
+            if _HAS_FCNTL:
+                _fcntl.flock(f.fileno(), _fcntl.LOCK_EX)
+            try:
+                json.dump(data, f, indent=indent, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            finally:
+                if _HAS_FCNTL:
+                    _fcntl.flock(f.fileno(), _fcntl.LOCK_UN)
+        # 校验 (确保是合法 JSON)
+        with open(tmp, encoding="utf-8") as f:
+            json.load(f)
+        # 原子替换 (POSIX rename, 保证 readers 看到的总是完整文件)
+        os.replace(tmp, path)
+    except Exception as e:
+        if os.path.exists(tmp):
+            try: os.remove(tmp)
+            except: pass
+        if has_bak and os.path.exists(bak):
+            try: shutil.copy2(bak, path)
+            except: pass
+        raise RuntimeError(
+            f"safe_write_json_locked({path}) failed: {type(e).__name__}: {e}"
+            + (" — restored from .bak" if has_bak else "")
+        ) from e
+
+
+def safe_append_jsonl_locked(path: str, row: dict) -> None:
+    """
+    加锁追加单行 JSON (解决 Kimi B2: rec_feedback.csv 覆盖写抹掉并发 append 的问题)
+    每行一个 JSON 对象, 用 fcntl 序列化 append + 自动 skip 重复行 (按 code+date+action)
+    """
+    path = os.path.abspath(path)
+    lock_path = path + ".lock"
+    try:
+        with open(lock_path, "w") as lock_f:
+            if _HAS_FCNTL:
+                _fcntl.flock(lock_f.fileno(), _fcntl.LOCK_EX)
+            try:
+                # 读已存在的 keys 用于去重
+                existing_keys = set()
+                if os.path.exists(path):
+                    try:
+                        with open(path, encoding="utf-8") as f:
+                            for line in f:
+                                line = line.strip()
+                                if not line: continue
+                                try:
+                                    obj = json.loads(line)
+                                    if "key" in obj:
+                                        existing_keys.add(obj["key"])
+                                except: pass
+                    except: pass
+                # 跳过已存在的 (row 应带 'key' 字段)
+                key = row.get("key")
+                if key and key in existing_keys:
+                    return  # 静默跳过重复
+                # append
+                with open(path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps(row, ensure_ascii=False) + "\n")
+                    f.flush()
+                    os.fsync(f.fileno())
+            finally:
+                if _HAS_FCNTL:
+                    _fcntl.flock(lock_f.fileno(), _fcntl.LOCK_UN)
+    except Exception as e:
+        raise RuntimeError(f"safe_append_jsonl_locked({path}) failed: {type(e).__name__}: {e}") from e
+
+
+# ─────────────────────────────────────────────────────
 # Self-test (可以在脚本里 `python3 _safe_io.py` 直接跑)
 # ─────────────────────────────────────────────────────
 if __name__ == "__main__":
@@ -159,7 +289,29 @@ if __name__ == "__main__":
         assert safe_read_json("/tmp/nonexistent.json", default="MISSING") == "MISSING", "Test 4 FAIL"
         print("  ✅ safe_read_json 0 bytes / 不存在 走 default")
 
+        # v2.6 Test 5: 加锁读写 JSON (fcntl + 原子替换)
+        p5 = os.path.join(td, "locked.json")
+        safe_write_json_locked(p5, {"v": 1})
+        d = safe_read_json_locked(p5)
+        assert d == {"v": 1}, f"Test 5 FAIL: {d}"
+        d["v"] = 2
+        safe_write_json_locked(p5, d)
+        d = safe_read_json_locked(p5)
+        assert d["v"] == 2, f"Test 5 FAIL: {d}"
+        print("  ✅ safe_write_json_locked + safe_read_json_locked 原子替换+互斥")
+
+        # v2.6 Test 6: 加锁追加 JSONL + 去重
+        p6 = os.path.join(td, "app.jsonl")
+        safe_append_jsonl_locked(p6, {"key": "a", "v": 1})
+        safe_append_jsonl_locked(p6, {"key": "b", "v": 2})
+        safe_append_jsonl_locked(p6, {"key": "a", "v": 1})  # 重复应被跳过
+        with open(p6) as f:
+            lines = [json.loads(l) for l in f if l.strip()]
+        assert len(lines) == 2, f"Test 6 FAIL: {lines}"
+        assert lines[0]["key"] == "a" and lines[1]["key"] == "b", f"Test 6 FAIL: {lines}"
+        print("  ✅ safe_append_jsonl_locked 加锁+去重")
+
     print()
     print("=" * 50)
-    print("✅ _safe_io self-test 4/4 PASS")
+    print("✅ _safe_io self-test 6/6 PASS")
     print("=" * 50)

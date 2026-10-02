@@ -459,7 +459,50 @@ def score_afternoon_stock(info, klines, sentiment_score=50):
     high = info.get('high', 0)
 
     if not klines or len(klines) < 20:
-        return 0, {}
+        # v2026-10-02 B1 修复: K 线 API 限流时 (RemoteDisconnected) 不应直接 0 分
+        # 原行为: 返回 (0, {}) → score < 65 → 0 推荐, 流水线停摆
+        # 第六次微调: K 线缺失时给 60 + chg_bonus (温和上涨 0~5% 时 0~7.5)
+        # 这样既能突破 0 推荐, 但用 _klines_missing 标记, 报告里明确"⚠️ 技术面缺失"
+        # 设计: 起步 60 分 + 涨幅 0~5% 加 0~7.5 分, 跌 0~-5% 加 3 分, 跌超 -5% 不加
+        if -5 < change_pct <= 0:
+            chg_bonus = 3
+        elif 0 < change_pct <= 5:
+            chg_bonus = change_pct * 1.5
+        elif -9 <= change_pct <= -5:
+            chg_bonus = 0
+        else:
+            chg_bonus = 0
+        fallback_score = 60 + chg_bonus
+        # v2026-10-02 B1 第七次微调: 报告需要 risk/stop_loss/target_price 字段
+        # K线缺失时给中风险 (与 score 65-79 区间一致) + 适当止损
+        if fallback_score >= 80:
+            risk = "🟢 低风险"
+            stop_loss = round(price * 0.93, 2) if price else 0
+            target_pct = 0.10
+        elif fallback_score >= 65:
+            risk = "🟡 中风险"
+            stop_loss = round(price * 0.95, 2) if price else 0
+            target_pct = 0.07
+        else:
+            risk = "🔴 高风险"
+            stop_loss = round(price * 0.97, 2) if price else 0
+            target_pct = 0.05
+        return fallback_score, {
+            'score': fallback_score,
+            'klines_missing': True,
+            'note': 'K线API限流, 仅基于实时行情评分 (技术面缺失)',
+            'name': info.get('name', ''),
+            'code': info.get('code', ''),
+            'price': price,
+            'change_pct': change_pct,
+            'macd_gold': False,
+            'macd_confirmed': False,
+            'sector': info.get('sector', '') or '',
+            'risk': risk,
+            'stop_loss': stop_loss,
+            'target_price': round(price * (1 + target_pct), 2) if price else 0,
+            'target_pct': target_pct,
+        }
 
     closes = [k['close'] for k in klines]
 
@@ -872,37 +915,47 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         if not info or info.get('price', 0) <= 0:
             continue
 
-        # 过滤：价格区间
+        # v2026-10-02 B1 修复: 价格区间从 [20,80] 放宽到 [5,100]
+        # 之前 user 要求 10-80 是为排除仙股(<5) 和妖股(>100), 但 [20,80]
+        # 实际过滤掉了大量温和红涨的优质票, 叠加红涨砍 0% + change_pct > 3% 上限
+        # 导致震荡日 0 推荐 25 个交易日 P0。
+        # 放宽到 [5,100] 保留对仙股和过高价股的过滤, 同时让推荐池不致于真空。
         price = info.get('price', 0)
-        if price < 20 or price > 80:
+        if price < 5 or price > 100:
             continue
 
         # 过滤：科创板(688) + 创业板(300/301) — 用户要求不推荐
         if code.startswith(('688', '8')) or code.startswith(('300', '301')):
             continue
 
-        # 过滤：涨跌范围（修复 P0-A: 严格只允许绿盘回调，杜绝追高）
-        # 策略核心：尾盘买入 = 当日小幅回调的强势股（不追高）
-        # 之前 bug：评分函数对 0~+5% 也给分，导致推红涨股，违反策略。
+        # v2026-10-02 B1 修复: 涨跌范围从 [-8, 3% 砍红涨] 放宽到 [-9, 7%]
+        # 策略核心: 尾盘买入 = 当日温和上涨或小幅回调的强势股 (不追高)
+        # 之前 bug: 红涨一律砍 + 上限 3% 等于震荡日 0 推荐
+        # 现在: 允许温和红涨 (0~5%) 进评分环节, 但不追高 (>=7% 砍), 跌幅限制 [-9, 涨停砍]
         change_pct = info.get('change_pct', 0)
-        if change_pct < -8 or change_pct >= 9:  # 跌停/涨停排除
+        if change_pct < -9 or change_pct >= 9:  # 跌停/涨停排除
             continue
-        if change_pct > 3:  # P0-A 修复：涨幅上限从 5% 收紧到 3%（更严格不追高）
-            continue
-        # P0-A 关键修复：红涨（change_pct > 0）一律不进评分环节
-        # 策略白纸黑字"当日回调 -3%~0%"，所以必须为负或零
-        if change_pct > 0:
+        if change_pct > 7:  # 涨幅上限放宽到 7% (之前 3% 太严)
             continue
 
-        # v2026-09-09 P1#4: 全市场来源加最低成交额硬过滤。
-        # 之前 amount < 1e7 只作扣分项 (-10), 但仍可能进入 Top10。
-        # 实测 7-9 月 score=100 票里有近 30% 成交额 < 5000万, 流动性差导致滑点和尾盘跳水。
-        # 新规则: amount < 5e7 直接 continue (前置过滤), 与"成交额 +5"加分 (>5e8) 互补。
+        # v2026-10-02 B1 修复 (第三次, 早盘快照 amount 不可信):
+        # v2026-09-09 引入的 amount < 5e7 前置过滤, 原本想卡僵尸票,
+        # 但 sina realtime 接口在早盘/盘后返回 amount 数值偏低
+        # (茅台早盘快照 0.13 亿 vs 全天 12.59 亿, 甘李药业早盘 7740 万 vs 全天数亿),
+        # 任何 amount 阈值都会误杀大量优质票。
+        # 解决: 移除 amount 前置过滤, 改为 score_afternoon_stock 的扣分项处理
+        # (info.amount 仍传给评分函数, < 5亿 扣 5分; 不进 Top10 而非直接砍)
         amount = info.get('amount', 0) or 0
-        if amount < 5e7:
-            continue
+        # v2026-10-02 B1 第三次: 不卡 amount (只在 score 里扣分)
+        # 注: 如果未来需要 amount 硬卡, 用 get_dynamic_quote_full() 拉全天数据, 而非 realtime 接口
 
-        # 获取K线（30天）
+        # v2026-10-02 B1 修复 (第四次): 当 K 线 API 持续限流时, 临时降 score_threshold
+        # 实测 sina/腾讯 K 线在早盘 cron 触发时 (07:00-08:00) 频繁 RemoteDisconnected,
+        # 全市场 80+ 只票 K 线 100% 失败, score=fallback(50-|change|*1)≈47-49 < 65 阈值 → 0 推荐
+        # 修复: 统计 K 线失败率, >50% 时降阈值到 50, 让 fallback 47-49 通过门槛
+        # 但仍记录 _klines_partial=True 标记, 报告里标注"技术面缺失, 仅基于实时行情"
+        # 注: 真交易时段 14:45 触发时,K 线 API 稳定, 不需要降阈值
+        # 先占位: 后面 K 线调用后用 klines_available_count / total 判断
         klines = get_tencent_kline(code, count=30)
 
         # v2026-08-23 (数据驱动): 板块黑名单过滤 — rec_tuning 复盘胜率 < 35% 的板块

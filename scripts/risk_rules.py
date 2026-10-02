@@ -42,8 +42,11 @@ STOP_LOSS_HARD_PCT = 0.05      # -5% 必须清仓（不允许幻想）
 TAKE_PROFIT_TRAIL_PCT = 0.06   # 从最高点回落 6% 止盈
 
 # 过滤规则
-PRICE_MIN = 20.0
-PRICE_MAX = 80.0
+# v2026-09-28 修复：与 dynamic_stocks.PRICE_MIN/MAX (5-100) 对齐。
+# 之前 20-80 跟 dynamic_stocks 不一致，候选池 50 只里有 21 只 (53%) 在这里被砍，
+# 导致评分池只有 19 只，再叠加阈值 70，9/28 报告 Top10=0 全空。
+PRICE_MIN = 5.0
+PRICE_MAX = 100.0
 TURNOVER_MIN = 1e7             # 成交额下限 1000万
 TURNOVER_RATE_MAX = 30.0       # 换手率上限 30%（筹码太散）
 FLOAT_MARKET_CAP_MIN = 30e8   # 流通市值下限 30亿

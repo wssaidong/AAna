@@ -190,16 +190,16 @@ def test_score_above_65_kept_below_65_dropped():
 def test_5pct_change_filter_consistent():
     """change_pct > 5 严格边界，过滤与评分逻辑一致
 
-    v2026-08-23: 策略改为"红涨 (>0) 一律不进评分环节"——所以 source 里出现的是
-    `if change_pct > 0` 而非 `> 5`。test 期望字符串已过期，跳过原 assert 改为
-    验证实际正在使用的过滤条件。
+    v2026-10-02 修正: B1 修复移除了"红涨 >0 一律砍"的硬过滤,
+    改为"涨幅 > 7% 不砍但不加分 (温和红涨允许进评分)"。
+    测试应验证实际的过滤条件 (change_pct > 7) 而非旧的 > 0 砍红涨。
     """
     import inspect
     from aana_afternoon_screen import screen_afternoon_stocks
     src = inspect.getsource(screen_afternoon_stocks)
-    # 验证实际生效的边界（修复 #4: 红涨不进评分）
-    assert 'if change_pct > 0' in src, \
-        "screen 应当过滤红涨 (change_pct > 0) — 修复 #4"
+    # v2026-10-02: 验证 B1 修复后的边界条件
+    assert 'if change_pct > 7' in src, \
+        "screen 应当过滤涨幅 > 7% 的票 (B1 修复 — 温和红涨允许, 7% 以上砍)"
     assert 'strategy' in src.lower() or '回调' in src, \
         "应当有策略文档引用"
 
@@ -350,11 +350,19 @@ def test_score_clamps_to_0_100():
 
 
 def test_score_insufficient_klines_returns_0():
-    """K线 < 20 根时返回 0"""
+    """K线 < 20 根时返回 fallback score (而非 0)
+
+    v2026-10-02 B1 修复: K线 API 限流时硬返回 (0, {}) 会让推荐流水线 0 推荐 25 天。
+    改为 fallback_score = 60 + chg_bonus, 让"技术面缺失"也能进 Top10。
+    测试验证 fallback 行为, 而非旧的 0。
+    """
     klines = _make_klines([22] * 10)
-    info = _make_info()
-    score, _ = score_afternoon_stock(info, klines)
-    assert score == 0
+    info = _make_info(change_pct=-1.0)
+    score, scored = score_afternoon_stock(info, klines)
+    # v2026-10-02: K线不足返回 fallback (60 + chg_bonus), 而不是 0
+    assert scored.get('klines_missing') is True, "K线 < 20 应标记 klines_missing=True"
+    assert score >= 60, f"K线缺失 fallback 应 >= 60 分, 实际 {score}"
+    assert score <= 70, f"K线缺失 fallback 应 <= 70 分, 实际 {score}"
 
 
 # ───────────────── 集成测试 ─────────────────

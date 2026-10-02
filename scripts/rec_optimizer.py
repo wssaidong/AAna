@@ -217,6 +217,11 @@ def _estimate_score_from_ret(actual_change: float) -> int:
     """
     根据实际收益率估算综合评分（用于 v2 格式无 score 字段的情况）。
     规则：收益率越高评分越高，参考 _estimate_score 的逆逻辑。
+
+    v2.6 修复 (Kimi 代码审查 B4): 原代码 `elif actual_change <= -10: score -= 10` 永远进不去，
+    因为同一个 actual_change 不可能既不满足 <= -5 又满足 <= -10。改为按跌幅阶梯累计扣分：
+      -5%~-10% 额外 -5 → 总 -10
+      <-10%    额外 -10 → 总 -15
     """
     score = 50
     if actual_change >= 5:
@@ -229,10 +234,10 @@ def _estimate_score_from_ret(actual_change: float) -> int:
         score += 0
     else:
         score -= 5
-        if actual_change <= -5:
-            score -= 5
-        elif actual_change <= -10:
-            score -= 10
+        if actual_change <= -10:
+            score -= 10  # <-10% 总扣 15
+        elif actual_change <= -5:
+            score -= 5   # -5%~-10% 总扣 10
     return max(0, min(100, score))
 
 

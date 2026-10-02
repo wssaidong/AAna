@@ -107,6 +107,7 @@ def real_time_monitor():
 
                 # 涨跌停检测（使用相对误差判断）
                 if limit_up and limit_down:
+                    # v2.6 修复 (Kimi B6): 跌停分支补 limit_down>0 保护, 避免 limit_down=0/None 时误触发或 TypeError
                     if limit_up > 0 and abs(price - limit_up) / limit_up < 0.001:
                         alerts.append({
                             'type': 'limit_up',
@@ -117,7 +118,7 @@ def real_time_monitor():
                             'msg': f'涨停！({limit_up})'
                         })
                         continue
-                    elif abs(price - limit_down) < 0.01:
+                    elif limit_down > 0 and abs(price - limit_down) / limit_down < 0.001:
                         alerts.append({
                             'type': 'limit_down',
                             'name': info['name'],

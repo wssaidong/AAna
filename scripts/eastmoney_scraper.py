@@ -65,13 +65,21 @@ def get_stock_by_keyword(keyword, limit=20):
     """按关键词搜索股票"""
     try:
         url = "https://searchapi.eastmoney.com/api/suggest/get"
+        # v2026-08-23 (评审修复 P0): token 改从 env 读 — 不再硬编码进 git
+        # v2026-10-02 B7 修复: 缺值时 throw, 不再 fallback 硬编码 token (半成品修复 → 真修复)
+        # 之前 bug: 评审说"已修复", 但 fallback 仍是硬编码, 等于没修 (凭据仍在 git)
+        # 现在: 缺值时 raise EnvironmentError, 让调用方知道要配 env (推荐 setup 文档)
+        _token = os.environ.get('EASTMONEY_SEARCH_TOKEN')
+        if not _token:
+            raise EnvironmentError(
+                "[AAna] EASTMONEY_SEARCH_TOKEN 环境变量未设置。"
+                "请在 ~/.zshrc 或 .env 中 export EASTMONEY_SEARCH_TOKEN=<your_token>"
+                "(token 估值指南见 5_secret 中 README)"
+            )
         params = {
             'input': keyword,
             'type': '14',
-            # v2026-08-23 (评审修复 P0): token 改从 env 读 — 不再硬编码进 git。
-            # 公开搜索 API token 本质可读但属于凭据,不应 commit。
-            # 缺值时回落 v1 token(同域 token 公开已知, 失效会调东方财富全量搜索 API 报错)
-            'token': os.environ.get('EASTMONEY_SEARCH_TOKEN', 'D43BF722C8E33BDC906FB84D85E326E8'),
+            'token': _token,
             'count': limit,
         }
         resp = requests.get(url, params=params, headers=get_eastmoney_headers(), timeout=10)
@@ -83,6 +91,9 @@ def get_stock_by_keyword(keyword, limit=20):
                 'name': item.get('Name', ''),
             })
         return stocks
+    except EnvironmentError:
+        # 配置错误, 往上抛 (调用方知道是 token 问题, 不是网络问题)
+        raise
     except Exception as e:
         print(f"[AAna] 搜索股票失败: {e}")
         return []

@@ -14,7 +14,7 @@ import pytest
 # 被测模块在 scripts/_safe_io.py
 import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scripts'))
-from _safe_io import safe_json_dump, safe_csv_dump, safe_read_json
+from _safe_io import safe_json_dump, safe_csv_dump, safe_read_json, safe_write_json_locked, safe_read_json_locked, safe_append_jsonl_locked  # v2.6
 
 
 class TestSafeJsonDump:
@@ -96,3 +96,69 @@ class TestSafeReadJson:
         p = tmp_path / "bad.json"
         p.write_text("{not valid json", encoding="utf-8")
         assert safe_read_json(str(p), default="MISSING") == "MISSING"
+
+
+# v2.6: 加锁的读-改-写 helper (修复 Kimi 代码审查 B1/B2)
+class TestSafeWriteJsonLocked:
+    def test_basic_roundtrip(self, tmp_path):
+        p = str(tmp_path / "locked.json")
+        safe_write_json_locked(p, {"v": 1})
+        assert safe_read_json_locked(p) == {"v": 1}
+        safe_write_json_locked(p, {"v": 2})
+        assert safe_read_json_locked(p)["v"] == 2
+
+    def test_creates_bak_on_overwrite(self, tmp_path):
+        p = str(tmp_path / "x.json")
+        safe_write_json_locked(p, {"v": 1})
+        safe_write_json_locked(p, {"v": 2})
+        bak = str(tmp_path / "x.json.bak")
+        assert os.path.exists(bak)
+        assert safe_read_json(bak) == {"v": 1}
+
+    def test_serial_writes_dont_lose_data(self, tmp_path):
+        """模拟 Kimi B1 场景: 串行多次写, 每次结果都应保留"""
+        p = str(tmp_path / "paper.json")
+        for i in range(20):
+            d = safe_read_json_locked(p, default={"seq": []})
+            d["seq"].append(i)
+            safe_write_json_locked(p, d)
+        assert safe_read_json_locked(p)["seq"] == list(range(20))
+
+
+class TestSafeAppendJsonlLocked:
+    def test_basic_append(self, tmp_path):
+        p = str(tmp_path / "app.jsonl")
+        safe_append_jsonl_locked(p, {"key": "a", "v": 1})
+        safe_append_jsonl_locked(p, {"key": "b", "v": 2})
+        with open(p) as f:
+            lines = [json.loads(l) for l in f if l.strip()]
+        assert len(lines) == 2
+        assert lines[0]["key"] == "a"
+        assert lines[1]["key"] == "b"
+
+    def test_dedupes_by_key(self, tmp_path):
+        p = str(tmp_path / "app.jsonl")
+        safe_append_jsonl_locked(p, {"key": "a", "v": 1})
+        safe_append_jsonl_locked(p, {"key": "a", "v": 999})  # 同 key 应跳过
+        safe_append_jsonl_locked(p, {"key": "b", "v": 2})
+        with open(p) as f:
+            lines = [json.loads(l) for l in f if l.strip()]
+        assert len(lines) == 2
+        assert lines[0]["v"] == 1  # 第一次写的保留
+
+    def test_concurrent_writes_dont_lose_lines(self, tmp_path):
+        """v2.6 修复 B2: 并发追加不丢行"""
+        import threading
+        p = str(tmp_path / "conc.jsonl")
+        threads = []
+        for i in range(10):
+            t = threading.Thread(target=safe_append_jsonl_locked, args=(p, {"key": f"k{i}", "v": i}))
+            threads.append(t)
+            t.start()
+        for t in threads:
+            t.join()
+        with open(p) as f:
+            lines = [json.loads(l) for l in f if l.strip()]
+        assert len(lines) == 10
+        keys = {l["key"] for l in lines}
+        assert keys == {f"k{i}" for i in range(10)}

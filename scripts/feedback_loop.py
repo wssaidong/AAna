@@ -49,12 +49,27 @@ def _read_csv(path):
 FEEDBACK_FIELDS = ["date", "code", "name", "rec_date", "trend", "ret_1d", "ret_3d", "ret_5d", "ret_15d"]
 
 
-def _sf(val):
-    """安全转浮点数"""
+def _safe_float(v, default=None):
+    """
+    安全转 float (v2.6 修复 B7: 统一 _sf 三处重复定义为单一权威版)
+    - 处理 None / '' / '--' / '-' 返回 default
+    - 去除 % 和 , 噪声 (百分号/千分位)
+    - 失败返回 default (非 0), 调用方可明确区分 "0" 与 "无数据"
+    位置: line 52 是权威版, line 224 / line 797 是历史遗留 → 都改成 _safe_float
+    """
+    if v is None or v == '' or v == '--' or v == '-':
+        return default
     try:
-        return float(val)
+        return float(str(v).replace('%', '').replace(',', ''))
     except (TypeError, ValueError):
-        return None
+        return default
+
+
+def _sf(val, default=None):
+    """v2.6 向后兼容别名, 推荐新代码用 _safe_float
+    v2026-10-02 B5 修复: 增加 default 参数, 与 _safe_float 签名对齐 (B7 修复时漏了)
+    """
+    return _safe_float(val, default=default)
 
 def _detect_trend(klines):
     """
@@ -219,16 +234,6 @@ def _future_close(code: str, base_date: str, n_bars: int) -> tuple:
     if p is None:
         return None, None
     return p, kl.get("date", "")[:10]
-
-
-def _sf(v, default=None):
-    """安全转 float"""
-    if v is None or v == '' or v == '--' or v == '-':
-        return default
-    try:
-        return float(str(v).replace('%', '').replace(',', ''))
-    except (ValueError, TypeError):
-        return default
 
 
 def _calc_ret(entry_price, exit_price):
@@ -423,15 +428,37 @@ def append_feedback(rows):
     print(f"   新增 {added} 条 / 回填 {backfilled} 条历史空记录", file=sys.stderr)
 
     # 写前备份 + 写后校验（沿用 SKILL.md「缓存是真理之源」预防 SOP）
+    # v2.6 已知并发风险 (Kimi 代码审查 B2): 此处使用 mode="w" 整表覆盖写,
+    #   若 aana_afternoon_screen.py:703 同时段用 mode="a" 追加, 后写覆盖会静默抹掉
+    #   当日推荐。短期 fix: 加 .lock 文件的 fcntl 排他锁保护; 长期 fix: 改用
+    #   _safe_io.safe_append_jsonl_locked (jsonl append-only + key 去重)。
     if FEEDBACK_CSV.exists():
         shutil.copy2(FEEDBACK_CSV, str(FEEDBACK_CSV) + ".bak")
-    _write_csv(FEEDBACK_CSV, fields, existing, mode="w")
-    check = _read_csv(FEEDBACK_CSV)
-    if len(check) != len(existing):
-        # 写坏了就还原，绝不让一次失败的写抹掉历史
-        if os.path.exists(str(FEEDBACK_CSV) + ".bak"):
-            shutil.copy2(str(FEEDBACK_CSV) + ".bak", FEEDBACK_CSV)
-        raise RuntimeError(f"rec_feedback.csv 写后校验失败（{len(check)} != {len(existing)}），已从 .bak 还原")
+    _lock_path = str(FEEDBACK_CSV) + ".lock"
+    _lock_fd = None
+    try:
+        import fcntl as _fl
+        _lock_fd = open(_lock_path, "w")
+        _fl.flock(_lock_fd.fileno(), _fl.LOCK_EX)
+    except (ImportError, OSError):
+        # Windows 等不支持 fcntl, 或 lock 文件创建失败 → 无锁继续 (但不崩溃)
+        _lock_fd = None
+    try:
+        _write_csv(FEEDBACK_CSV, fields, existing, mode="w")
+        check = _read_csv(FEEDBACK_CSV)
+        if len(check) != len(existing):
+            # 写坏了就还原，绝不让一次失败的写抹掉历史
+            if os.path.exists(str(FEEDBACK_CSV) + ".bak"):
+                shutil.copy2(str(FEEDBACK_CSV) + ".bak", FEEDBACK_CSV)
+            raise RuntimeError(f"rec_feedback.csv 写后校验失败（{len(check)} != {len(existing)}），已从 .bak 还原")
+    finally:
+        if _lock_fd is not None:
+            try:
+                import fcntl as _fl2
+                _fl2.flock(_lock_fd.fileno(), _fl2.LOCK_UN)
+            except Exception:
+                pass
+            _lock_fd.close()
 
     return added, backfilled
 
@@ -772,18 +799,11 @@ def _duckdb_crosscheck(all_feedback_rows):
 
         # pandas 侧: 同口径 (30 日窗口 + ret_1d 非空可转 float)
         cutoff = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
-        def _sf(v):
-            try:
-                s = str(v).replace("%", "").replace(",", "")
-                if s in ("", "-", "--", None):
-                    return None
-                return float(s)
-            except (ValueError, TypeError):
-                return None
+        # v2.6: 删嵌套 _sf 定义, 直接用模块级 _safe_float
         sample = []
         for r in all_feedback_rows or []:
             rd = (r.get("rec_date") or "")[:10]
-            v = _sf(r.get("ret_1d"))
+            v = _safe_float(r.get("ret_1d"))
             if rd >= cutoff and v is not None:
                 sample.append(v)
         pandas_n = len(sample)

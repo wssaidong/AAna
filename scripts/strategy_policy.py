@@ -34,6 +34,8 @@ from typing import Any
 
 PROJECT = Path(__file__).parent.parent.resolve()
 TUNING_PATH = PROJECT / "data" / "rec_tuning.json"
+# v2026-10-02: 暴露全局 _nd_path, 让测试能 monkeypatch 屏蔽真实 next_day_strategy.json
+ND_PATH = PROJECT / "data" / "next_day_strategy.json"
 
 # v2.4 硬编码默认 (与 aana_afternoon_screen 原始行为一致)
 DEFAULT_SCORE_THRESHOLD = 65
@@ -117,11 +119,10 @@ def get_today_policy() -> StrategyPolicy:
     raw_th = DEFAULT_SCORE_THRESHOLD
     nd_score_threshold = None
     try:
-        from pathlib import Path as _P
         import json as _json
-        _nd_path = _P(__file__).parent.parent / "data" / "next_day_strategy.json"
-        if _nd_path.exists():
-            _nd = _json.loads(_nd_path.read_text(encoding="utf-8"))
+        # v2026-10-02: 用全局 ND_PATH 替换局部 path, 让测试能 monkeypatch
+        if ND_PATH.exists():
+            _nd = _json.loads(ND_PATH.read_text(encoding="utf-8"))
             nd_score_threshold = _nd.get("score_threshold")
             if isinstance(nd_score_threshold, (int, float)):
                 raw_th = int(nd_score_threshold)
@@ -139,6 +140,11 @@ def get_today_policy() -> StrategyPolicy:
                 raw_th = tuning_th
                 if raw_th != DEFAULT_SCORE_THRESHOLD:
                     policy.data_notes.append(f"阈值 {DEFAULT_SCORE_THRESHOLD}→{raw_th} (rec_tuning)")
+            else:
+                # v2026-10-02 B6 修复: rec_tuning 越界也加警示 (之前静默钳制)
+                policy.data_notes.append(
+                    f"rec_tuning 阈值 {tuning_th} 越界 [{MIN_SCORE_THRESHOLD},{MAX_SCORE_THRESHOLD}] → 保持默认 {DEFAULT_SCORE_THRESHOLD}"
+                )
         except (TypeError, ValueError):
             pass
     if MIN_SCORE_THRESHOLD <= raw_th <= MAX_SCORE_THRESHOLD:

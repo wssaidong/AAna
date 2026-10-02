@@ -36,7 +36,7 @@ import argparse
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 PROJECT = Path(__file__).parent.parent.resolve()
@@ -148,7 +148,7 @@ def main():
         final_weak = []
 
     strategy = {
-        "date_for": datetime.now().strftime("%Y-%m-%d"),
+        "date_for": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
         "score_threshold": threshold_final,
         "hold_days": base_hold_days,
         "weak_sectors": final_weak,

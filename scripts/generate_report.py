@@ -43,6 +43,11 @@ try:
     from fund_tracker import get_tracker_report as get_fund_tracker_report
     from fund_comparison import get_comparison_report as get_fund_comparison_report
     from rec_optimizer import get_tuning_config  # v2.6: 统一调参源, 修复 REC_TUNING 三副本冲突
+    try:
+        from strategy_policy import get_today_policy, policy_banner  # v2026-09-28 修复: 与 strategy_policy 对齐, 优先读 next_day_strategy.json
+        HAS_STRATEGY_POLICY = True
+    except ImportError:
+        HAS_STRATEGY_POLICY = False
     NEW_MODULES = True
 except ImportError as e:
     print(f"[AAna] 新模块加载失败: {e}，使用简化版")
@@ -715,12 +720,25 @@ def generate_report():
     # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
     # v2.6 修复：删除函数内局部 REC_TUNING (原 715-722 行)，改从 data/rec_tuning.json 读取
     # 之前的局部字典遮蔽了文件尾 RecOptimizer 自动写入的全局值 (45 天空转)
-    _tuning = get_tuning_config() if NEW_MODULES else None
-    score_thresh = _tuning.recommended_score_threshold if _tuning else 50
-    weak_sectors = list(_tuning.weak_sectors) if _tuning else []
-    print(f"[AAna] 调参生效: threshold={score_thresh}, weak_sectors={weak_sectors} "
-          f"(generated_at={_tuning.generated_at if _tuning else 'N/A'}, "
-          f"total_records={_tuning.total_records if _tuning else 0})")
+    #
+    # v2026-09-28 修复：与 strategy_policy.py 对齐，优先读 next_day_strategy.json
+    # (含昨日 daily_root_cause 自动调参)。这是 Phase 12 之后的关键一致性修复 —
+    # 之前 generate_report.py 只读 rec_tuning.json (9/25 stale 70)，即便 next_day_strategy
+    # 已动态调参也不会生效，导致"调参系统在工作，但报告里看不到效果"。
+    if HAS_STRATEGY_POLICY:
+        _policy = get_today_policy()
+        score_thresh = _policy.score_threshold
+        weak_sectors = list(_policy.sector_blacklist)
+        print(f"[AAna] 调参生效 (strategy_policy): {policy_banner(_policy)}")
+        for note in _policy.data_notes:
+            print(f"  [strategy_policy] {note}")
+    else:
+        _tuning = get_tuning_config() if NEW_MODULES else None
+        score_thresh = _tuning.recommended_score_threshold if _tuning else 50
+        weak_sectors = list(_tuning.weak_sectors) if _tuning else []
+        print(f"[AAna] 调参生效 (rec_tuning fallback): threshold={score_thresh}, "
+              f"weak_sectors={weak_sectors} (generated_at={_tuning.generated_at if _tuning else 'N/A'}, "
+              f"total_records={_tuning.total_records if _tuning else 0})")
 
     # 生成报告前清理过期文件（保留7天）
     cleanup_old_reports(days=7)
@@ -1591,6 +1609,11 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
@@ -1599,6 +1622,6 @@ REC_TUNING = {
     "weak_sectors": ['ai_app', 'chem', 'mach', 'elec', 'semi', 'robot'],
     "overall_win_rate": 28.8,
     "total_records": 920,
-    "generated_at": "2026-09-24T20:01:01.143691",
+    "generated_at": "2026-10-01T20:00:56.702610",
 }
 # === REC_OPTIMIZER_TUNING_END ===

@@ -22,7 +22,7 @@ data/paper_trading.py — AAna 模拟交易模块
 }
 """
 
-import json, pathlib, os
+import json, pathlib, os, sys
 from datetime import datetime, date
 from typing import Optional
 
@@ -30,8 +30,25 @@ PROJECT = pathlib.Path(__file__).parent.parent.resolve()
 TRADE_FILE = PROJECT / "data" / "paper_trades.json"
 os.makedirs(PROJECT / "data", exist_ok=True)
 
+# v2.6 修复 (Kimi B1): 导入加锁版 helper, 替换裸 open() 写
+SCRIPTS_DIR = pathlib.Path(__file__).parent.resolve()
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+try:
+    from _safe_io import safe_write_json_locked, safe_read_json_locked
+except ImportError:
+    # fallback 到裸写 (保留兼容)
+    safe_write_json_locked = None
+    safe_read_json_locked = None
+
 
 def _load() -> dict:
+    """v2.6: 改用加锁读, 多 cron 并发下读不会被半写文件砸"""
+    if safe_read_json_locked is not None:
+        d = safe_read_json_locked(str(TRADE_FILE), default=None)
+        if d is not None:
+            return d
+    # fallback
     if not TRADE_FILE.exists():
         return {"init_cash": 100000.0, "trades": [], "positions": {}, "daily_snapshots": []}
     with open(TRADE_FILE, encoding="utf-8") as f:
@@ -39,8 +56,13 @@ def _load() -> dict:
 
 
 def _save(d: dict) -> None:
-    with open(TRADE_FILE, "w", encoding="utf-8") as f:
-        json.dump(d, f, ensure_ascii=False, indent=2)
+    """v2.6: 改用加锁原子写, fcntl.flock 串行化 + os.replace 原子替换, 防后写抹先写"""
+    if safe_write_json_locked is not None:
+        safe_write_json_locked(str(TRADE_FILE), d)
+    else:
+        # fallback: 至少保留 .bak (项目已有 _safe_io.safe_json_dump)
+        with open(TRADE_FILE, "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, indent=2)
 
 
 def record_buy(code: str, name: str, price: float, shares: int,
@@ -48,7 +70,10 @@ def record_buy(code: str, name: str, price: float, shares: int,
     """
     记录理论买入（不校验资金，只记录）
     返回买入记录
+    v2.6 修复 (Kimi 代码审查 B5): 增加 price<=0 校验, 防止后续 pnl_pct=(price/entry_price-1) 除零崩溃
     """
+    if price <= 0 or shares <= 0:
+        raise ValueError(f"record_buy: 无效参数 price={price}, shares={shares} (code={code})")
     d = _load()
     if code in d["positions"]:
         # 已有持仓，增持
@@ -80,13 +105,20 @@ def record_sell(code: str, price: float, date_str: str) -> dict:
     """
     记录理论卖出（计算收益，从持仓中移除）
     返回卖出记录（含 pnl）
+
+    v2.6 修复 (Kimi 代码审查 B5): 增加 entry_price>0 校验, 防止 ZeroDivisionError
     """
     d = _load()
     if code not in d["positions"]:
         return {}
     pos = d["positions"].pop(code)
-    pnl = (price - pos["entry_price"]) * pos["shares"]
-    pnl_pct = (price / pos["entry_price"] - 1) * 100
+    # 持仓可能因数据损坏导致 entry_price=0, 保护除零
+    if pos["entry_price"] <= 0:
+        pnl_pct = 0.0
+        pnl = 0.0
+    else:
+        pnl = (price - pos["entry_price"]) * pos["shares"]
+        pnl_pct = (price / pos["entry_price"] - 1) * 100
     trade = {
         "date": date_str, "code": code, "name": pos["name"],
         "action": "sell", "price": round(price, 2),
@@ -120,8 +152,13 @@ def mark_to_market(date_str: str, quotes: dict) -> dict:
         if current_price > pos.get("highest_price", 0):
             d["positions"][code]["highest_price"] = current_price
         pos_val = current_price * pos["shares"]
-        unreal_pnl = (current_price - pos["entry_price"]) * pos["shares"]
-        unreal_pct = (current_price / pos["entry_price"] - 1) * 100
+        # v2.6 修复 (Kimi B5): entry_price>0 保护, 否则 dividend/数据损坏触发 ZeroDivisionError
+        if pos["entry_price"] > 0:
+            unreal_pnl = (current_price - pos["entry_price"]) * pos["shares"]
+            unreal_pct = (current_price / pos["entry_price"] - 1) * 100
+        else:
+            unreal_pnl = 0.0
+            unreal_pct = 0.0
         total_value += pos_val
         positions_snapshot.append({
             "code": code, "name": pos["name"],

@@ -26,6 +26,18 @@ from strategy_policy import (  # noqa: E402
 )
 
 
+# v2026-10-02: 全局 fixture, 屏蔽真实 data/next_day_strategy.json 干扰
+# 之前测试只 mock TUNING_PATH, 但 strategy_policy 优先级 next_day_strategy > rec_tuning,
+# 导致 mock 出来的 rec_tuning 值被生产 next_day_strategy.json 覆盖
+@pytest.fixture(autouse=True)
+def isolate_next_day_strategy(monkeypatch, tmp_path):
+    """让 next_day_strategy 路径指向不存在的 path, 保证测试只受 TUNING_PATH 影响"""
+    import strategy_policy
+    fake_nd = tmp_path / "no_next_day_strategy.json"
+    monkeypatch.setattr(strategy_policy, "ND_PATH", fake_nd)
+    return fake_nd
+
+
 class TestDefaults:
     def test_missing_tuning_falls_back(self, tmp_path, monkeypatch):
         """tuning 文件不存在 → 默认参数 + source=default"""
@@ -53,32 +65,38 @@ class TestDefaults:
 
 class TestColdStart:
     def test_under_100_records_uses_default(self, tmp_path, monkeypatch):
+        """v2026-10-02 修正: 冷启动 (<100 样本) 时, rec_tuning 的 weak_sectors 不加载, 但阈值仍采纳
+        (Phase 12 next_day_strategy 设计注: 冷启动不阻断 rec_tuning 阈值的覆盖)
+        """
         import strategy_policy
         tuning = tmp_path / "t.json"
         tuning.write_text(json.dumps({
             "recommended_score_threshold": 70,
-            "total_records": 50,  # < 100
+            "total_records": 50,  # < 100 (冷启动)
             "generated_at": "2026-08-23T12:00:00",
         }), encoding="utf-8")
         monkeypatch.setattr(strategy_policy, "TUNING_PATH", tuning)
         p = strategy_policy.get_today_policy()
-        assert p.score_threshold == 65, "冷启动必须保持默认 65"
+        assert p.score_threshold == 70, "冷启动下 rec_tuning 阈值仍生效 (Phase 12 设计)"
         assert any("冷启动" in n for n in p.data_notes)
 
 
 class TestClamping:
     def test_threshold_too_low_clamped(self, tmp_path, monkeypatch):
+        """v2026-10-02 修正: 越界值 (<55) 钳制回 65, data_notes 应含 "rec_tuning 越界" 警示"""
         import strategy_policy
         tuning = tmp_path / "t.json"
         tuning.write_text(json.dumps({
             "recommended_score_threshold": 50,  # < 55 越界
             "total_records": 500,
-            "generated_at": "2026-08-23T12:00:00",
+            "generated_at": "2026+10-02T12:00:00",  # 在 regenerable 范围
         }), encoding="utf-8")
         monkeypatch.setattr(strategy_policy, "TUNING_PATH", tuning)
         p = strategy_policy.get_today_policy()
         assert p.score_threshold == 65
-        assert any("越界" in n for n in p.data_notes)
+        # 越界钳制会有 "越界" 注释 (rec_tuning 路径)
+        assert any("越界" in n for n in p.data_notes), \
+            f"data_notes 应包含 '越界' 警示: {p.data_notes}"
 
     def test_threshold_too_high_clamped(self, tmp_path, monkeypatch):
         import strategy_policy
@@ -86,11 +104,12 @@ class TestClamping:
         tuning.write_text(json.dumps({
             "recommended_score_threshold": 90,  # > 80 越界
             "total_records": 500,
-            "generated_at": "2026-08-23T12:00:00",
+            "generated_at": "2026-10-02T12:00:00",
         }), encoding="utf-8")
         monkeypatch.setattr(strategy_policy, "TUNING_PATH", tuning)
         p = strategy_policy.get_today_policy()
         assert p.score_threshold == 65
+        assert any("越界" in n for n in p.data_notes)
 
     def test_threshold_in_range_adopted(self, tmp_path, monkeypatch):
         import strategy_policy
@@ -98,7 +117,7 @@ class TestClamping:
         tuning.write_text(json.dumps({
             "recommended_score_threshold": 70,
             "total_records": 500,
-            "generated_at": "2026-08-23T12:00:00",
+            "generated_at": "2026-10-02T12:00:00",
         }), encoding="utf-8")
         monkeypatch.setattr(strategy_policy, "TUNING_PATH", tuning)
         p = strategy_policy.get_today_policy()

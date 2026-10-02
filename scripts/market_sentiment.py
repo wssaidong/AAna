@@ -410,25 +410,20 @@ def get_money_flow(codes: list) -> dict:
     获取个股超大单资金流向
     codes: 股票代码列表
     返回: {code: {super_big_in, super_big_out, net_in, net_in_pct}}
+
+    v2026-09-28 修复：东财 push2 RemoteDisconnected 频繁 (9/21-9/28 连续 8 天)，
+    增加 retry + 腾讯×3 数据源 fallback (qt.gtimg.cn ff.fh 等字段)。
     """
     if not codes:
         return {}
+
     result = {}
+
+    # ── 数据源 1: 东财 push2.clist (主力, 包含超大单) ──
     try:
-        # 东方财富资金流向接口
-        fs = '+'.join([f'b:{c}' for c in codes])
-        url = "https://push2.eastmoney.com/api/qt/stock/get"
-        params = {
-            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-            "fltt": 2, "invt": 2,
-            "fields": "f12,f14,f62,f66,f72,f184",
-            "secids": f"1.{codes[0]}" if codes[0].startswith('6') else f"0.{codes[0]}",
-            "_": int(datetime.now().timestamp() * 1000),
-        }
-        # 批量用另一个接口
-        url2 = "https://push2.eastmoney.com/api/qt/clist/get"
+        url = "https://push2.eastmoney.com/api/qt/clist/get"
         code_str = ','.join([f'b:{c}' for c in codes])
-        params2 = {
+        params = {
             "pn": 1, "pz": len(codes), "po": 1, "np": 1,
             "ut": "bd1d9ddb04089700cf9c27f6f7426281",
             "fltt": 2, "invt": 2, "fid": "f62",
@@ -436,24 +431,95 @@ def get_money_flow(codes: list) -> dict:
             "fields": "f12,f14,f62,f66,f72",
             "_": int(datetime.now().timestamp() * 1000),
         }
-        resp = requests.get(url2, params=params2, headers=HEADERS, timeout=10)
-        for item in resp.json().get('data', {}).get('diff', []):
-            code = str(item.get('f12', ''))
-            super_big_in = float(item.get('f62', 0) or 0)   # 超大单流入（万元）
-            super_big_out = float(item.get('f66', 0) or 0)  # 超大单流出
-            net = super_big_in + super_big_out  # 流出是负数
-            result[code] = {
-                'super_big_in': super_big_in,
-                'super_big_out': super_big_out,
-                'net_in': net,
-                'net_in_pct': round(net / (abs(super_big_in) + abs(super_big_out) + 1) * 100, 2),
-            }
+        for attempt in range(3):  # 3 次重试 (修 RemoteDisconnected 第 77 天)
+            try:
+                resp = requests.get(url, params=params, headers=HEADERS,
+                                    timeout=8)
+                if resp.status_code == 200:
+                    for item in resp.json().get('data', {}).get('diff', []):
+                        code = str(item.get('f12', ''))
+                        if not code:
+                            continue
+                        super_big_in = float(item.get('f62', 0) or 0)
+                        super_big_out = float(item.get('f66', 0) or 0)
+                        net = super_big_in + super_big_out  # 流出是负数
+                        result[code] = {
+                            'super_big_in': super_big_in,
+                            'super_big_out': super_big_out,
+                            'net_in': net,
+                            'net_in_pct': round(net / (abs(super_big_in) + abs(super_big_out) + 1) * 100, 2),
+                            '_source': 'eastmoney',
+                        }
+                    break  # 拿到数据就退出 retry loop
+            except Exception as _e:
+                print(f"[资金流] 东财重试 {attempt+1}/3 失败: {type(_e).__name__}: {_e}")
+                if attempt < 2:
+                    import time as _t; _t.sleep(1 + attempt)  # 递增退避
+                continue
+        if result:
+            print(f"[资金流] 东财拿到 {len(result)}/{len(codes)} 只")
     except Exception as e:
-        print(f"[资金流] 获取失败: {e}")
-    # 补全未查到的股票
+        print(f"[资金流] 东财获取失败: {type(e).__name__}: {e}")
+
+    # ── 数据源 2: 腾讯 qt.gtimg.cn 主力净流入 (补漏) ──
+    # 字段映射: 腾讯 hq_str_sz000001 第 6 段=主力净流入 (单位: 元)
+    if len(result) < len(codes):
+        missing = [c for c in codes if c not in result]
+        try:
+            mkt_codes = []
+            for c in missing:
+                mkt = 'sh' if c.startswith(('6', '9')) else 'sz'
+                mkt_codes.append(f"{mkt}{c}")
+            url = f"https://qt.gtimg.cn/q={','.join(mkt_codes)}"
+            for attempt in range(2):
+                try:
+                    resp = requests.get(url, headers={
+                        **HEADERS, "Referer": "https://gu.qq.com/"
+                    }, timeout=6)
+                    if resp.status_code == 200:
+                        text = resp.content.decode('gbk', errors='ignore')
+                        for line, code in zip(text.strip().split('\n'), missing):
+                            if '=' not in line:
+                                continue
+                            parts = line.split('=')[1].strip('";\n ').split(',')
+                            if len(parts) < 50:
+                                continue
+                            try:
+                                # 腾讯资金流字段: parts[37]=主力净流入(手), parts[40]=超大单
+                                # 实测: parts[49] = 主力净流入 (万元近似)
+                                net_in_wan = float(parts[49] or 0) if len(parts) > 49 else 0
+                                result[code] = {
+                                    'super_big_in': max(net_in_wan, 0),
+                                    'super_big_out': max(-net_in_wan, 0),
+                                    'net_in': net_in_wan,
+                                    'net_in_pct': 0,
+                                    '_source': 'tencent',
+                                }
+                            except (ValueError, IndexError):
+                                continue
+                        break
+                except Exception as _e:
+                    print(f"[资金流] 腾讯重试 {attempt+1}/2 失败: {type(_e).__name__}: {_e}")
+                    if attempt < 1:
+                        import time as _t; _t.sleep(1)
+                    continue
+        except Exception as e:
+            print(f"[资金流] 腾讯获取失败: {type(e).__name__}: {e}")
+
+    # 补全: 仍查不到的代码以空数据填 (标记 _source=None 让 composite_score 知情)
+    fallback_count = 0
     for code in codes:
         if code not in result:
-            result[code] = {'super_big_in': 0, 'super_big_out': 0, 'net_in': 0, 'net_in_pct': 0}
+            result[code] = {
+                'super_big_in': 0, 'super_big_out': 0,
+                'net_in': 0, 'net_in_pct': 0,
+                '_source': None,
+            }
+            fallback_count += 1
+    if fallback_count > 0:
+        print(f"[资金流] ⚠️ {fallback_count}/{len(codes)} 只 fallback (接口全挂), "
+              f"composite_score 会用 net_in=0 (中性 50 分)")
+
     return result
 
 
