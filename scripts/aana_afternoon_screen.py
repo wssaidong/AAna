@@ -1239,6 +1239,15 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
 # ============================================
 
 def main():
+    # ── 🆕 假期守卫 (2026-10-06): 非交易日直接短路, 禁止写推荐/反馈 ──
+    # 教训: 10/02 (国庆假期) cron 仍执行, 用 9/30 陈旧数据+fallback_empty
+    # 写入 11 条假日推荐 → 污染 rec_tuning 统计。与 generate_report.py 同守卫。
+    from generate_report import is_trading_day
+    is_trade, non_trade_reason = is_trading_day()
+    if not is_trade:
+        print(f"[AAna 尾盘] 📅 今日非交易日 ({non_trade_reason}), 跳过选股, 不写任何推荐/反馈")
+        return []
+
     # ── 市场情绪（v2.5）─────────────────────────────────────
     sentiment_label = '乐观'
     sentiment_score = 50
