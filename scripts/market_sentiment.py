@@ -8,6 +8,8 @@ AAna v2.5 市场情绪 + 板块轮动模块
   4. 北向资金（沪深港通）
 """
 
+import os
+import sys
 import requests
 import json
 import subprocess
