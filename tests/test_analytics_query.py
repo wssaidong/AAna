@@ -113,11 +113,35 @@ class TestQueryWinrate:
 class TestQueryRecentRecommendations:
     """读 recommendations.csv 最近 N 日 + dedup"""
 
-    def test_basic_returns_ok(self):
+    def test_basic_returns_ok(self, tmp_path):
+        """mock 数据隔离 (2026-10-06): 不再依赖生产 CSV 近 7 日有数据
+        假期/0 推荐期生产 CSV 近 7 日为空 → 断言 n>0 必挂 (测试 vs 生产基线漂移)
+        改为 tmp_path 写 mock 数据验证行为, 与 test_missing_file_returns_error 同模式
+        """
+        import csv as _csv
         from analytics_query import query_recent_recommendations
-        result = query_recent_recommendations(days=7)
+        mock = tmp_path / "recommendations.csv"
+        with open(mock, "w", newline="", encoding="utf-8") as f:
+            w = _csv.DictWriter(f, fieldnames=[
+                "date", "code", "name", "sector", "sector_name",
+                "reason", "expected_high", "expected_low", "actual_change",
+                "hit", "created_at"])
+            w.writeheader()
+            w.writerows([
+                {"date": "2026-10-06", "code": "600000", "name": "测试A", "sector": "chem",
+                 "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
+                 "actual_change": "", "hit": "", "created_at": "2026-10-06T10:00:00"},
+                {"date": "2026-10-06", "code": "600000", "name": "测试A", "sector": "chem",
+                 "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
+                 "actual_change": "", "hit": "", "created_at": "2026-10-06T10:01:00"},
+                {"date": "2026-10-05", "code": "000001", "name": "测试B", "sector": "semi",
+                 "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
+                 "actual_change": "", "hit": "", "created_at": "2026-10-05T10:00:00"},
+            ])
+        with patch("analytics_query.RECOMMENDATIONS", mock):
+            result = query_recent_recommendations(days=7)
         assert result["ok"]
-        assert result["n"] > 0
+        assert result["n"] == 2, f"dedup 后应 2 条 (600000 重复行去重): {result['n']}"
         # 每条都有 code/name/date
         for row in result["rows"]:
             assert "code" in row
