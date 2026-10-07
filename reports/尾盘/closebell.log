@@ -2311,3 +2311,880 @@
     "type": "config",
     "message": "not configured",
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-16 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-16 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-16 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['600026', '002436', '002179', '603606', '605168', '603738', '000831', '002407', '002436', '603606']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600026: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605168: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-16 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-16 14:45:05] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-17 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-17 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-17 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603011', '603353', '002436', '002138', '603678', '002119', '601231', '601020', '603738', '603156']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 127 只
+[AAna 尾盘] 候选股票总数: 137 只
+[K线] 603011: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002436: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002138: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603678: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002119: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603738: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 2 只)
+[2026-09-17 14:45:06] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-17 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-18 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-18 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-18 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['603119', '603657', '600184', '002579', '603489', '603786', '600114', '603823', '002192', '002577']
+  [源1] 今日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[K线] 600184: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603823: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002192: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 1 只)
+[2026-09-18 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-18 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-19 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-19 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-19 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-19-选股报告.md
+[Eastmoney] 报告 Top10: ['002436', '002518', '000962', '603203', '603663', '002912', '600367', '600482', '603009', '600961']
+  [源2] 昨日 Top10: 10 只
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票总数: 10 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-19 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-19 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-20 14:45:03] [daily_v24_recommend] ============================================================
+[2026-09-20 14:45:03] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-20 14:45:03] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=1.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-20-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-19-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-09-20 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-20 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-21 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-21 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-21 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=2.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-20-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-09-21 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-21 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-22 14:45:04] [daily_v24_recommend] ============================================================
+[2026-09-22 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-22 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 104 只
+[AAna 尾盘] 候选股票总数: 104 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-22 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-22 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-23 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-23 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-23 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['无机盐', '房地产开发']
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 107 只
+[AAna 尾盘] 候选股票总数: 107 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-23 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-23 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-24 14:45:03] [daily_v24_recommend] ============================================================
+[2026-09-24 14:45:03] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-24 14:45:03] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 218 只
+[AAna 尾盘] 候选股票总数: 218 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-24 14:45:13] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-24 14:45:13] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-25 14:45:02] [daily_v24_recommend] ============================================================
+[2026-09-25 14:45:02] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-25 14:45:02] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:02 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 207 只
+[AAna 尾盘] 候选股票总数: 207 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-25 14:45:05] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-25 14:45:06] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-26 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-26 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-26 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-26-选股报告.md
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 207 只
+[AAna 尾盘] 候选股票总数: 207 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-26 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-26 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-27 14:45:03] [daily_v24_recommend] ============================================================
+[2026-09-27 14:45:03] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-27 14:45:03] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=1.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:03 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-27-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-26-选股报告.md
+  [源3] 全市场涨幅榜: 新增 207 只
+[AAna 尾盘] 候选股票总数: 207 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-27 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score>=65 的票）
+[2026-09-27 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-28 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-28 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-28 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=2.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-09-27-选股报告.md
+  [源3] 全市场涨幅榜: 新增 243 只
+[AAna 尾盘] 候选股票总数: 243 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-28 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-09-28 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-29 14:45:04] [daily_v24_recommend] ============================================================
+[2026-09-29 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-29 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 105 只
+[AAna 尾盘] 候选股票总数: 105 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-29 14:45:08] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-09-29 14:45:08] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-09-30 14:45:00] [daily_v24_recommend] ============================================================
+[2026-09-30 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-09-30 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 161 只
+[AAna 尾盘] 候选股票总数: 161 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-09-30 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-09-30 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-01 14:45:04] [daily_v24_recommend] ============================================================
+[2026-10-01 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-01 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-01-选股报告.md
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-10-01 14:45:09] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-10-01 14:45:09] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-02 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-02 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-02 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=65 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→65 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-02-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-01-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[Sina] Error: HTTPSConnectionPool(host='hq.sinajs.cn', port=443): Read timed out. (read timeout=10)
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 0 只)
+[2026-10-02 14:45:13] [daily_v24_recommend] ⚠️  无推荐（score<65 的票全部过滤）
+[2026-10-02 14:45:14] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-03 14:45:04] [daily_v24_recommend] ============================================================
+[2026-10-03 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-03 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['黄酒', '水电', '建筑装饰', '汽车零部件', '路桥施工'] (+4 more)
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-03-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-02-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[K线] 002176: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600616: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 600616 金枫酒业: 板块 '黄酒' 在 cold_sectors 中
+[K线] 000993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000993 闽东电力: 板块 '水电' 在 cold_sectors 中
+[K线] 002789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002789 *ST建艺: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605255 天普股份: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000498 山东路桥: 板块 '路桥施工' 在 cold_sectors 中
+[K线] 000019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000019 深粮控股: 板块 '贸易' 在 cold_sectors 中
+[K线] 002991: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002991 甘源食品: 板块 '食品综合' 在 cold_sectors 中
+[K线] 603982: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 603982 泉峰汽车: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002531 天顺风能: 板块 '风电设备' 在 cold_sectors 中
+[K线] 000739: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000739 普洛药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 000756: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000756 新华制药: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 600803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002580: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600313: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600802: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601238: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002430: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000568: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002422: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002550: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605116: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605116 奥锐特: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 002928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600438: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600352: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002946: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000713: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002761: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600585: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603173: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600161: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600315: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603004: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603707: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002273: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002083: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000683: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600064: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000682: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605100: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002365: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002365 永安药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 601811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600021: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600345: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603816: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600664: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600645: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601609: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001322: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000505: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601777: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603087: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603198: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600415: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002811 郑中设计: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 603079: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002907: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600873: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 22 只)
+[2026-10-03 14:45:17] [daily_v24_recommend] ⚠️  无推荐（score<73 的票全部过滤）
+[2026-10-03 14:45:17] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-04 14:45:05] [daily_v24_recommend] ============================================================
+[2026-10-04 14:45:05] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-04 14:45:05] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=1.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['黄酒', '水电', '建筑装饰', '汽车零部件', '路桥施工'] (+4 more)
+[AAna 尾盘] 14:45:05 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-04-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-03-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[K线] 002176: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600616: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 600616 金枫酒业: 板块 '黄酒' 在 cold_sectors 中
+[K线] 000993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000993 闽东电力: 板块 '水电' 在 cold_sectors 中
+[K线] 002789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002789 *ST建艺: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605255 天普股份: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000498 山东路桥: 板块 '路桥施工' 在 cold_sectors 中
+[K线] 000019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000019 深粮控股: 板块 '贸易' 在 cold_sectors 中
+[K线] 002991: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002991 甘源食品: 板块 '食品综合' 在 cold_sectors 中
+[K线] 603982: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 603982 泉峰汽车: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002531 天顺风能: 板块 '风电设备' 在 cold_sectors 中
+[K线] 000739: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000739 普洛药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 000756: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000756 新华制药: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 600803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002580: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600313: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600802: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601238: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002430: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000568: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002422: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002550: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605116: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605116 奥锐特: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 002928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600438: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600352: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002946: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000713: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002761: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600585: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603173: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600161: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600315: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603004: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603707: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002273: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002083: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000683: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600064: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000682: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605100: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002365: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002365 永安药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 601811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600021: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600345: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603816: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600664: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600645: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601609: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001322: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000505: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601777: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603087: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603198: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600415: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002811 郑中设计: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 603079: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002907: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600873: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 22 只)
+[2026-10-04 14:45:18] [daily_v24_recommend] ⚠️  无推荐（score<73 的票全部过滤）
+[2026-10-04 14:45:18] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-05 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-05 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-05 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=2.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['黄酒', '水电', '建筑装饰', '汽车零部件', '路桥施工'] (+4 more)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-05-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-04-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[K线] 002176: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600616: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 600616 金枫酒业: 板块 '黄酒' 在 cold_sectors 中
+[K线] 000993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000993 闽东电力: 板块 '水电' 在 cold_sectors 中
+[K线] 002789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002789 *ST建艺: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605255 天普股份: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000498 山东路桥: 板块 '路桥施工' 在 cold_sectors 中
+[K线] 000019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000019 深粮控股: 板块 '贸易' 在 cold_sectors 中
+[K线] 002991: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002991 甘源食品: 板块 '食品综合' 在 cold_sectors 中
+[K线] 603982: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 603982 泉峰汽车: 板块 '汽车零部件' 在 cold_sectors 中
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002531 天顺风能: 板块 '风电设备' 在 cold_sectors 中
+[K线] 000739: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000739 普洛药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 000756: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000756 新华制药: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 600803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002580: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600313: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600802: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601238: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002430: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000568: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002422: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002550: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605116: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 605116 奥锐特: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 002928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600438: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600352: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002946: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000713: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002761: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600585: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603173: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600161: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600315: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603004: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603707: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002273: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002083: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000683: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600064: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000682: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605100: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002365: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002365 永安药业: 板块 '化学原料药' 在 cold_sectors 中
+[K线] 601811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600021: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600345: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603816: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600664: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600645: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601609: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001322: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000505: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601777: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603087: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603198: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600415: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002811 郑中设计: 板块 '建筑装饰' 在 cold_sectors 中
+[K线] 603079: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002907: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600873: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 22 只)
+[2026-10-05 14:45:16] [daily_v24_recommend] ⚠️  无推荐（score<73 的票全部过滤）
+[2026-10-05 14:45:16] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-06 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-06 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-06 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-06-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-05-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[K线] 002176: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600616: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002991: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603982: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000739: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000756: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002580: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600313: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600802: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601238: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002430: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000568: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002422: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002550: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605116: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600438: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600352: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002946: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000713: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002761: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600585: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603173: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600161: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600315: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603004: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603707: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002273: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002083: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000683: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600064: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000682: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605100: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002365: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600021: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600345: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603816: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600664: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600645: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601609: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001322: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000505: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601777: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603087: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603198: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600415: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603079: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002907: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600873: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 8 只)
+[2026-10-06 14:45:18] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-10-06 14:45:18] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-07 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-07 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-07 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-07-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-06-选股报告.md
+  [源3] 全市场涨幅榜: 新增 173 只
+[AAna 尾盘] 候选股票总数: 173 只
+[K线] 002176: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600616: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002991: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603982: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000739: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000756: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002580: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600313: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600802: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002020: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603520: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601238: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603657: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002430: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000568: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002422: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002550: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605116: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002893: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600438: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600352: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002946: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000713: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002761: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600585: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603173: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600161: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600315: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603004: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603707: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002273: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002083: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000683: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600064: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000682: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605100: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002365: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600021: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600345: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603816: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600664: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600645: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603369: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601609: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001322: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600276: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000505: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601777: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603087: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603606: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603198: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600415: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603079: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002907: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600873: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 筛选后候选: 0 只 (板块黑名单拦截 8 只)
+[2026-10-07 14:45:13] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-10-07 14:45:15] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
