@@ -320,6 +320,10 @@ def _rebuild_from_existing() -> List[FeedbackRecord]:
                 expected_low=expected_low,
                 hit=row.get("hit", "") == "True",
                 created_at=rec.get("created_at", row.get("updated_at", "")),
+                # v2026-10-07 review: _estimate_score(...actual_change) 是反推估算的 score
+                # 必须显式标 score_is_estimated=True, 否则 calc_score_band_stats 会
+                # 把这批"反推 score"当真分数统计胜率, 形成循环论证。
+                score_is_estimated=True,
             ))
 
     return records

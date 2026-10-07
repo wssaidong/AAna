@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-import csv
+"""清理 recommendations.csv 中的创业板/科创板记录.
 
-path = "/Users/cai/code/AAna/data/recommendations.csv"
+修复 #11 (v2026-10-07 review): 路径改用 __file__ 相对定位, 不再硬编码 /Users/cai/...
+"""
+import csv
+import os
+
+path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "recommendations.csv")
 with open(path, newline="", encoding="utf-8") as f:
     rows = list(csv.DictReader(f))
 

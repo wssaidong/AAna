@@ -1039,9 +1039,11 @@ def cleanup_old_reports(days=7):
     """
     清理超过 days 天的旧报告
     修复 #10: 增加早盘/盘中报告匹配
+    修复 #11 (v2026-10-07 review): 使用模块级 AANA_DIR 常量, 避免重复硬编码
     """
-    import glob, time
-    report_dir = os.path.expanduser("~/code/AAna/reports")
+    import glob
+    import time
+    report_dir = os.path.join(AANA_DIR, "reports")
     cutoff = time.time() - days * 86400
     patterns = [
         f"{report_dir}/*-选股报告.md",
@@ -1062,12 +1064,14 @@ def cleanup_old_reports(days=7):
 
 
 def generate_report(stocks, index_data=None, sentiment_label='中性', position_ratio=0.5, market_status='待定', avg_change=0.0, hot_str='', hot_sects=None):
-    """生成尾盘选股报告 v2.5"""
+    """生成尾盘选股报告 v2.5
+    修复 #11 (v2026-10-07 review): report_dir 改用模块级 AANA_DIR 常量
+    """
     today = get_today_str()
     now = datetime.now()
     hot_sects = hot_sects or []
 
-    report_dir = os.path.expanduser("~/code/AAna/reports")
+    report_dir = os.path.join(AANA_DIR, "reports")
     os.makedirs(report_dir, exist_ok=True)
     filename = "{}/{}-尾盘选股.md".format(report_dir, today)
 
