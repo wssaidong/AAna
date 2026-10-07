@@ -150,17 +150,75 @@ def load_state(state_name):
 # ============================================
 # Git 操作
 # ============================================
+# v2026-10-04 评审修复 (P0 B1): 改为白名单路径 + push 前数量守卫
+# 旧版用 `git add .` 等价 `git add -A`,会 stage 工作区所有变化(新增/修改/删除),
+# 包括: 删除 reports/*.md、修改 scripts/*.py、改 .gitignore、改 pyproject.toml 等
+# 已被多个 cron agent(premarket/intraday/postmarket)调用,风险敞口大。
+# 新版:
+#   - 只 stage 白名单路径(reports/ + data/ + state/)— cron 产出物
+#   - 绝不 stage scripts/ tests/ config/ strategies/ analysis_tools/ .venv/ docs/
+#     references/ backtest/ prompts/ pyproject.toml uv.lock
+#   - commit 前统计 stage 后的 diff,删除文件数 > DELETE_GUARD 报警并取消 push
+#   - 接口签名保持兼容 (message, filepath=None), 老调用无需改
+DELETE_GUARD = 50  # 单次 commit 删除文件超过此数 → 取消 push 报警
+GIT_STAGE_ALLOWLIST = ("reports/", "data/", "state/")
+
 def git_commit_and_push(message, filepath=None):
-    """Git 提交并推送"""
+    """Git 提交并推送（白名单 + 数量守卫）
+
+    v2026-10-04 修复: 替换原 `git add .` 全量 stage,改为只 stage reports/data/state
+    三类路径;commit 前检查删除文件数,超阈值则拒绝 push。
+    """
     try:
         os.chdir(PROJECT_DIR)
-        subprocess.run(["git", "add", "."], check=True, capture_output=True)
+        # 1) 只 stage 白名单路径(精确目录,避免误伤根目录文件)
+        for path in GIT_STAGE_ALLOWLIST:
+            subprocess.run(
+                ["git", "add", "--", path],
+                check=True, capture_output=True,
+            )
+        # 2) 删除文件也需 stage(否则 git rm 才能让 index 知道)
+        #    用 `git add -u` 仅更新已 tracked 文件的删除/修改 — 配合上面 -- 限定范围
+        #    注意: `git add -u` 不带路径会作用于整个工作区,但带路径只作用于路径下,
+        #    所以我们对每个白名单路径都跑一次 `git add -u -- <path>`。
+        for path in GIT_STAGE_ALLOWLIST:
+            subprocess.run(
+                ["git", "add", "-u", "--", path],
+                check=True, capture_output=True,
+            )
+        # 4) commit 前检查删除数量(数量守卫)
+        staged_diff = subprocess.run(
+            ["git", "diff", "--cached", "--name-only", "--diff-filter=D"],
+            check=True, capture_output=True, text=True,
+        ).stdout
+        deletions = [l for l in staged_diff.splitlines() if l.strip()]
+        if len(deletions) > DELETE_GUARD:
+            print(
+                f"[git] ⚠️ 守卫触发: 本次 stage 含 {len(deletions)} 个删除 "
+                f"(>{DELETE_GUARD} 阈值),取消 commit 防止误删\n"
+                f"  删除文件示例:\n    " + "\n    ".join(deletions[:10])
+            )
+            subprocess.run(["git", "reset"], capture_output=True)
+            return False
+        # 5) 如果 stage 后没有任何变化 → 跳过 commit(避免空 commit)
+        staged_any = subprocess.run(
+            ["git", "diff", "--cached", "--name-only"],
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+        if not staged_any:
+            print(f"[git] 无变化, 跳过 commit: {message}")
+            return True
+        # 6) 实际 commit + push
         subprocess.run(["git", "commit", "-m", message], check=True, capture_output=True)
         subprocess.run(["git", "push", "origin", "main"], check=True, capture_output=True)
-        print(f"[git] 已推送: {message}")
+        print(f"[git] 已推送: {message} (staged={len(staged_any.splitlines())} files)")
         return True
     except subprocess.CalledProcessError as e:
         print(f"[git] 失败: {e}")
+        try:
+            subprocess.run(["git", "reset"], capture_output=True)
+        except Exception:
+            pass
         return False
 
 
