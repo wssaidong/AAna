@@ -9,27 +9,27 @@
     "semi",
     "robot"
   ],
-  "total_records": 920,
-  "overall_win_rate": 28.804347826086957,
+  "total_records": 930,
+  "overall_win_rate": 28.49462365591398,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-10-07T20:00:25.443151",
+  "generated_at": "2026-10-08T16:00:32.118488",
   "score_band_stats": {
     "70+": {
       "band": "70+",
-      "count": 47,
+      "count": 57,
       "win_count": 8,
-      "win_rate": 17.02127659574468,
-      "avg_change": -1.9421276595744679,
+      "win_rate": 14.035087719298245,
+      "avg_change": -1.6014035087719296,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 920,
+      "count": 930,
       "win_count": 265,
-      "win_rate": 28.804347826086957,
-      "avg_change": -0.8782608695652138
+      "win_rate": 28.49462365591398,
+      "avg_change": -0.8688172043010717
     }
   },
   "sector_stats": {
@@ -128,6 +128,78 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": -1.52
+    },
+    "煤炭开采": {
+      "sector": "煤炭开采",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "男装": {
+      "sector": "男装",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "食品综合": {
+      "sector": "食品综合",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "纺织服装": {
+      "sector": "纺织服装",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "包装印刷": {
+      "sector": "包装印刷",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "新能源发电": {
+      "sector": "新能源发电",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "日用化学产品": {
+      "sector": "日用化学产品",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "建筑装饰": {
+      "sector": "建筑装饰",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "钢结构": {
+      "sector": "钢结构",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
     }
   }
 }

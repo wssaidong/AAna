@@ -74,8 +74,14 @@ def main(dry_run=False):
     log("[1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...")
     try:
         from aana_afternoon_screen import screen_afternoon_stocks
-        recs = screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5,
+        _ret = screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5,
                                         record_feedback=True)
+        # v2026-10-08: screen_afternoon_stocks 现在返回 (top_n, confidence_note) tuple
+        # (数据源健康度修复 #12)，兼容旧 list 返回
+        if isinstance(_ret, tuple):
+            recs = _ret[0]
+        else:
+            recs = _ret
     except Exception as e:
         log(f"❌ 评分失败: {e}")
         return False
