@@ -12,13 +12,13 @@
         "weekday_zh": "周二"
       },
       {
-        "weekday": "Wednesday",
-        "dow": "3",
-        "n": 3,
-        "wins": 0,
-        "win_rate": 0.0,
-        "avg_ret": -3.06,
-        "weekday_zh": "周三"
+        "weekday": "Thursday",
+        "dow": "4",
+        "n": 10,
+        "wins": 5,
+        "win_rate": 50.0,
+        "avg_ret": 0.36,
+        "weekday_zh": "周四"
       }
     ],
     "n": 2
@@ -29,26 +29,26 @@
       {
         "hold_days": 1,
         "label": "T+1 (次日)",
-        "n": 5,
-        "wins": 0,
-        "win_rate": 0.0,
-        "avg_ret": -2.38
+        "n": 12,
+        "wins": 5,
+        "win_rate": 41.7,
+        "avg_ret": 0.07
       },
       {
         "hold_days": 3,
         "label": "T+3",
-        "n": 5,
+        "n": 2,
         "wins": 2,
-        "win_rate": 40.0,
-        "avg_ret": -3.13
+        "win_rate": 100.0,
+        "avg_ret": 4.5
       },
       {
         "hold_days": 5,
         "label": "T+5",
-        "n": 5,
-        "wins": 3,
-        "win_rate": 60.0,
-        "avg_ret": 2.43
+        "n": 2,
+        "wins": 2,
+        "win_rate": 100.0,
+        "avg_ret": 8.4
       }
     ],
     "n": 3
@@ -61,14 +61,6 @@
   "trend": {
     "ok": true,
     "rows": [
-      {
-        "iso_week": "2026-W33",
-        "week_start": "2026-08-13",
-        "n": 5,
-        "wins": 1,
-        "win_rate": 20.0,
-        "avg_ret": -1.53
-      },
       {
         "iso_week": "2026-W34",
         "week_start": "2026-08-18",
@@ -108,10 +100,18 @@
         "wins": 0,
         "win_rate": 0.0,
         "avg_ret": -1.36
+      },
+      {
+        "iso_week": "2026-W41",
+        "week_start": "2026-10-08",
+        "n": 10,
+        "wins": 5,
+        "win_rate": 50.0,
+        "avg_ret": 0.36
       }
     ],
     "n": 6
   },
   "weeks": 4,
-  "generated_at": "2026-10-07T23:15:36"
+  "generated_at": "2026-10-10T09:00:28"
 }
