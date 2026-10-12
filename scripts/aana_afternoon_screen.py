@@ -908,6 +908,15 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     # 2. 获取实时行情
     prices = get_stock_data_sina(candidate_codes)
 
+    # ── v2026-10-08 修复 (#12): 数据源健康度追踪 ──
+    # 背景: 10/1-10/6 多个交易日"东财资金流 + 新浪 K 线 + 同花顺涨停股池 + 板块数据"全挂,
+    # 导致 fallback score 47-49 < 阈值 65 → 0 推荐(用户从 A 股 Top 10 表头发现"真空")。
+    # 修复: 统计各数据源 ok/fail, fail 率 > 50% 时降阈值, 报告里加置信度提示。
+    data_health = {
+        'kline': {'ok': 0, 'fail': 0},
+        'fund_flow': {'ok': 0, 'fail': 0},  # 评分函数内部 fail 计数由 score_afternoon_stock 返回的 'klines_missing' 间接推断
+    }
+
     # 3. 逐只评分
     results = []
     for code in candidate_codes:
@@ -956,7 +965,12 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         # 但仍记录 _klines_partial=True 标记, 报告里标注"技术面缺失, 仅基于实时行情"
         # 注: 真交易时段 14:45 触发时,K 线 API 稳定, 不需要降阈值
         # 先占位: 后面 K 线调用后用 klines_available_count / total 判断
+        # v2026-10-08 修复 (#12): 真实追踪 K 线成功/失败
         klines = get_tencent_kline(code, count=30)
+        if klines and len(klines) >= 5:
+            data_health['kline']['ok'] += 1
+        else:
+            data_health['kline']['fail'] += 1
 
         # v2026-08-23 (数据驱动): 板块黑名单过滤 — rec_tuning 复盘胜率 < 35% 的板块
         # (样本 ≥ 10) 不进评分。
@@ -993,11 +1007,35 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
 
         # v2026-08-23 (数据驱动): 阈值从 strategy_policy 读取 (默认 65, 真实 score
         # 样本 ≥ 30 且胜率数据支持时 rec_optimizer 会调)
-        if score >= score_threshold:
-            results.append(scored_info)
+        # v2026-10-08 修复 (#12): 改为先收下, 在循环外根据数据源健康度动态过滤
+        # 原因: 早盘 cron 多源全挂时硬阈值 65 会得到 0 推荐; 健康度差时需降阈值
+        results.append(scored_info)
 
     # 4. 排序
     results.sort(key=lambda x: x['score'], reverse=True)
+
+    # ── v2026-10-08 修复 (#12): 数据源健康度 → 动态降阈值 ──
+    # 现实: 多源全挂时硬阈值 65 是 0 推荐; 健康度差时改软阈值
+    total_kline = data_health['kline']['ok'] + data_health['kline']['fail']
+    fail_rate_kline = (data_health['kline']['fail'] / total_kline) if total_kline else 0.0
+    if fail_rate_kline > 0.7:
+        # 70% K 线失败 → 大幅降阈值(技术面缺失, 容忍低置信度)
+        adjusted_threshold = 45
+        confidence = '低'
+    elif fail_rate_kline > 0.5:
+        # 50% K 线失败 → 适度降阈值
+        adjusted_threshold = max(50, score_threshold - 15)
+        confidence = '中'
+    else:
+        adjusted_threshold = score_threshold
+        confidence = '高'
+    if adjusted_threshold != score_threshold:
+        print(f"  [data_health] K线 fail 率 {fail_rate_kline:.0%}, 阈值 {score_threshold} → {adjusted_threshold} (置信度:{confidence})")
+        score_threshold = adjusted_threshold
+
+    # 用新阈值重新过滤
+    results = [r for r in results if r.get('score', 0) >= score_threshold]
+
     top_n = results[:10]
 
     # 5. 优化 #3: 监控信号 — 写入 rec_feedback.csv
@@ -1017,7 +1055,7 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
         print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
 
     print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只 (板块黑名单拦截 {filtered_by_sector} 只)")
-    return top_n
+    return top_n, f"K线失败率 {fail_rate_kline:.0%} (置信度:{confidence})" if fail_rate_kline > 0.5 else None
 
 
 # ============================================
@@ -1063,7 +1101,7 @@ def cleanup_old_reports(days=7):
         print(f"[AAna] 共清理 {removed} 个过期文件")
 
 
-def generate_report(stocks, index_data=None, sentiment_label='中性', position_ratio=0.5, market_status='待定', avg_change=0.0, hot_str='', hot_sects=None):
+def generate_report(stocks, index_data=None, sentiment_label='中性', position_ratio=0.5, market_status='待定', avg_change=0.0, hot_str='', hot_sects=None, confidence_note=None):
     """生成尾盘选股报告 v2.5
     修复 #11 (v2026-10-07 review): report_dir 改用模块级 AANA_DIR 常量
     """
@@ -1106,6 +1144,8 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
         "> **情绪评分：** {} | **建议仓位：** {:.0f}%\n\n".format(
             sentiment_label, position_ratio * 100
         ) +
+        # v2026-10-08 修复 (#12): 数据源健康度警告显式写到报告头部
+        ("⚠️ **数据源异常：** {}\n\n".format(confidence_note) if confidence_note else "") +
         "---\n\n"
         "## 一、大盘环境 + 情绪\n\n"
         "| 指标 | 涨跌幅 | 状态 |\n"
@@ -1316,18 +1356,19 @@ def main():
             market_status='冰点',
             avg_change=avg_change,
             hot_str='',
-            hot_sects=[]
+            hot_sects=[],
+            confidence_note=None,  # 冰点分支无选股, 不需要数据源警告
         )
         print(f"[AAna 尾盘] 📝 冰点日报已生成: {filename}")
         print(f"[AAna 尾盘] 🛑 不推送推荐，不同步东财，不写入推荐池")
         return []
 
     # 选股（修复 #6: 传 sentiment_score / position_ratio 进评分）
-    stocks = screen_afternoon_stocks(
+    stocks, confidence_note = screen_afternoon_stocks(
         sentiment_score=sentiment_score,
         position_ratio=position_ratio,
     )
-    
+
     # 生成报告
     market_status = sentiment_label if sentiment_label else '待定'
     # avg_change 已在上方算过
@@ -1340,7 +1381,8 @@ def main():
         market_status=market_status,
         avg_change=avg_change,
         hot_str=hot_str,
-        hot_sects=hot_sects
+        hot_sects=hot_sects,
+        confidence_note=confidence_note,  # v2026-10-08 修复 (#12): 数据源健康度写到报告
     )
 
     # 持久化到 data/ 层

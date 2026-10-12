@@ -3188,3 +3188,309 @@
     "type": "config",
     "message": "not configured",
     "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-08 14:45:04] [daily_v24_recommend] ============================================================
+[2026-10-08 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-08 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-07-选股报告.md
+  [源3] 全市场涨幅榜: 新增 176 只
+[AAna 尾盘] 候选股票总数: 176 只
+[K线] 000301: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605007: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603085: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002911: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600818: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000968: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605366: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601026: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002709: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002780: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000703: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002467: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605128: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603822: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603967: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002182: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605133: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002959: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000158: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603669: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000498: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600027: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603665: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605338: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600671: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600746: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603301: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603248: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603848: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002647: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603619: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600619: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600753: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600727: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603393: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002487: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001266: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600028: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603373: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600977: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002382: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603165: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000803: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601139: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002923: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002479: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603701: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603210: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002180: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603399: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600642: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002136: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600989: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603219: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600661: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002233: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000985: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002988: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603711: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603886: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603318: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002032: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600398: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600251: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600737: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601857: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603037: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601965: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000722: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002270: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002940: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000833: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600703: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000554: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600789: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601107: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603418: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002531: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600023: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001333: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002648: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [data_health] K线 fail 率 73%, 阈值 70 → 45 (置信度:低)
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 103 只 (板块黑名单拦截 7 只)
+[2026-10-08 14:45:52] [daily_v24_recommend]   找到 2 只推荐
+Traceback (most recent call last):
+  File "/Users/cai/code/AAna/scripts/daily_v24_recommend.py", line 190, in <module>
+    main(dry_run=args.dry_run)
+  File "/Users/cai/code/AAna/scripts/daily_v24_recommend.py", line 98, in main
+    log(f"    {r.get('code', '?')} {r.get('name', '?')} score={r.get('score', 0)}")
+               ^^^^^
+AttributeError: 'list' object has no attribute 'get'
+[2026-10-09 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-09 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-09 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['煤炭开采', '男装', '食品综合', '纺织服装', '包装印刷'] (+4 more)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-10-09 14:45:04] [daily_v24_recommend] ⚠️  无推荐（score<73 的票全部过滤）
+[2026-10-09 14:45:04] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-10 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-10 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-10 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-10-选股报告.md
+[Eastmoney] 报告 Top10: []
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-10-10 14:45:03] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-10-10 14:45:03] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-11 14:45:04] [daily_v24_recommend] ============================================================
+[2026-10-11 14:45:04] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-11 14:45:04] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=1.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:04 开始尾盘选股...
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-11-选股报告.md
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-10-选股报告.md
+  [源3] 全市场涨幅榜: 新增 0 只
+[AAna 尾盘] 候选股票池为空，跳过尾盘选股
+[2026-10-11 14:45:07] [daily_v24_recommend] ⚠️  无推荐（score<70 的票全部过滤）
+[2026-10-11 14:45:07] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-12 14:45:00] [daily_v24_recommend] ============================================================
+[2026-10-12 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[2026-10-12 14:45:00] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=70 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=2.8d
+  [strategy_policy] 阈值 65→70 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna 尾盘] 14:45:00 开始尾盘选股...
+[Eastmoney] 报告 Top10: []
+[Eastmoney] 报告不存在: /Users/cai/code/AAna/reports/2026-10-11-选股报告.md
+  [源3] 全市场涨幅榜: 新增 195 只
+[AAna 尾盘] 候选股票总数: 195 只
+[K线] 605058: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601077: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002549: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002668: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601963: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002541: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000601: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002115: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002912: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603939: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600295: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002027: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603948: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002827: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000582: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003030: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601928: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603810: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603598: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603980: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600066: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002366: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603976: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603103: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603200: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603757: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002311: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002866: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600689: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001229: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605080: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600573: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603105: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603855: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000911: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000635: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000681: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001269: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600757: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001216: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002712: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603202: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002972: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002983: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603556: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000917: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600031: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000710: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603602: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605259: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600298: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601988: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601939: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600993: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000425: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601633: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600036: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600350: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601998: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002058: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001285: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600167: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601033: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601858: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000429: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601288: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600933: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601019: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601825: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603110: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000811: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601398: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600718: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600398: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603218: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601187: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600621: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002733: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603721: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603456: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002335: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603985: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600373: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600510: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601009: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600012: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601098: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601900: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000099: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605255: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601658: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603233: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600007: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603298: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001225: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000909: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [data_health] K线 fail 率 97%, 阈值 70 → 45 (置信度:低)
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 90 只 (板块黑名单拦截 10 只)
+[2026-10-12 14:45:42] [daily_v24_recommend]   找到 10 只推荐
+[2026-10-12 14:45:42] [daily_v24_recommend]     002142 宁波银行 score=100
+[2026-10-12 14:45:42] [daily_v24_recommend]     001206 依依股份 score=73
+[2026-10-12 14:45:42] [daily_v24_recommend]     605058 澳弘电子 score=67.282099343955
+[2026-10-12 14:45:42] [daily_v24_recommend]     601077 渝农商行 score=67.19640179910046
+[2026-10-12 14:45:42] [daily_v24_recommend]     002549 凯美特气 score=67.06168831168831
+[2026-10-12 14:45:42] [daily_v24_recommend]     002668 TCL智家 score=66.94915254237289
+[2026-10-12 14:45:42] [daily_v24_recommend]     601963 重庆银行 score=66.87442713107241
+[2026-10-12 14:45:42] [daily_v24_recommend]     002541 鸿路钢构 score=66.76810073452259
+[2026-10-12 14:45:42] [daily_v24_recommend]     000601 韶能股份 score=66.6611842105263
+[2026-10-12 14:45:42] [daily_v24_recommend]     600295 鄂尔多斯 score=66.47236941710824
+[2026-10-12 14:45:42] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 002142 宁波银行 @36.11 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 001206 依依股份 @19.5 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 605058 澳弘电子 @55.94 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 601077 渝农商行 @6.99 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 002549 凯美特气 @12.9 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 002668 TCL智家 @9.26 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 601963 重庆银行 @11.41 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 002541 鸿路钢构 @19.92 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 000601 韶能股份 @6.35 100股
+[2026-10-12 14:45:42] [daily_v24_recommend]     建仓 600295 鄂尔多斯 @13.78 100股
+[2026-10-12 14:45:42] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-10-12 14:45:42] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-10-12-v24-尾盘推荐.md
+[2026-10-12 14:45:42] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-10-12 14:45:42] [daily_v24_recommend] ❌ 飞书推送失败: {
+  "ok": false,
+  "identity": "bot",
+  "error": {
+    "type": "config",
+    "message": "not configured",
+    "hint": "run `lark-cli config init --new` in the background. It blocks and outputs a verif
+[2026-10-12 14:45:42] [daily_v24_recommend] ✅ 完成
+[2026-10-12 14:45:42] [daily_v24_recommend] ============================================================

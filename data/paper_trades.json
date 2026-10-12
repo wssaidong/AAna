@@ -2200,8 +2200,199 @@
       "reason": "止损/止盈/到期",
       "pnl": 6.0,
       "pnl_pct": 0.28
+    },
+    {
+      "date": "2026-10-12",
+      "code": "002142",
+      "name": "宁波银行",
+      "action": "buy",
+      "price": 36.11,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "001206",
+      "name": "依依股份",
+      "action": "buy",
+      "price": 19.5,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 73",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "605058",
+      "name": "澳弘电子",
+      "action": "buy",
+      "price": 55.94,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.282099343955",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "601077",
+      "name": "渝农商行",
+      "action": "buy",
+      "price": 6.99,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.19640179910046",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "002549",
+      "name": "凯美特气",
+      "action": "buy",
+      "price": 12.9,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.06168831168831",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "002668",
+      "name": "TCL智家",
+      "action": "buy",
+      "price": 9.26,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.94915254237289",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "601963",
+      "name": "重庆银行",
+      "action": "buy",
+      "price": 11.41,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.87442713107241",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "002541",
+      "name": "鸿路钢构",
+      "action": "buy",
+      "price": 19.92,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.76810073452259",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "000601",
+      "name": "韶能股份",
+      "action": "buy",
+      "price": 6.35,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.6611842105263",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-12",
+      "code": "600295",
+      "name": "鄂尔多斯",
+      "action": "buy",
+      "price": 13.78,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.47236941710824",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "002142": {
+      "date": "2026-10-12",
+      "name": "宁波银行",
+      "shares": 100,
+      "entry_price": 36.11,
+      "highest_price": 36.11,
+      "entry_date": "2026-10-12"
+    },
+    "001206": {
+      "date": "2026-10-12",
+      "name": "依依股份",
+      "shares": 100,
+      "entry_price": 19.5,
+      "highest_price": 19.5,
+      "entry_date": "2026-10-12"
+    },
+    "605058": {
+      "date": "2026-10-12",
+      "name": "澳弘电子",
+      "shares": 100,
+      "entry_price": 55.94,
+      "highest_price": 55.94,
+      "entry_date": "2026-10-12"
+    },
+    "601077": {
+      "date": "2026-10-12",
+      "name": "渝农商行",
+      "shares": 100,
+      "entry_price": 6.99,
+      "highest_price": 6.99,
+      "entry_date": "2026-10-12"
+    },
+    "002549": {
+      "date": "2026-10-12",
+      "name": "凯美特气",
+      "shares": 100,
+      "entry_price": 12.9,
+      "highest_price": 12.9,
+      "entry_date": "2026-10-12"
+    },
+    "002668": {
+      "date": "2026-10-12",
+      "name": "TCL智家",
+      "shares": 100,
+      "entry_price": 9.26,
+      "highest_price": 9.26,
+      "entry_date": "2026-10-12"
+    },
+    "601963": {
+      "date": "2026-10-12",
+      "name": "重庆银行",
+      "shares": 100,
+      "entry_price": 11.41,
+      "highest_price": 11.41,
+      "entry_date": "2026-10-12"
+    },
+    "002541": {
+      "date": "2026-10-12",
+      "name": "鸿路钢构",
+      "shares": 100,
+      "entry_price": 19.92,
+      "highest_price": 19.92,
+      "entry_date": "2026-10-12"
+    },
+    "000601": {
+      "date": "2026-10-12",
+      "name": "韶能股份",
+      "shares": 100,
+      "entry_price": 6.35,
+      "highest_price": 6.35,
+      "entry_date": "2026-10-12"
+    },
+    "600295": {
+      "date": "2026-10-12",
+      "name": "鄂尔多斯",
+      "shares": 100,
+      "entry_price": 13.78,
+      "highest_price": 13.78,
+      "entry_date": "2026-10-12"
+    }
+  },
   "daily_snapshots": []
 }

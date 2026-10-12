@@ -1,6 +1,6 @@
 {
-  "date_for": "2026-10-08",
-  "score_threshold": 70,
+  "date_for": "2026-10-13",
+  "score_threshold": 73,
   "hold_days": 1,
   "weak_sectors": [
     "ai_app",
@@ -8,12 +8,23 @@
     "elec",
     "mach",
     "robot",
-    "semi"
+    "semi",
+    "银行"
   ],
-  "position_final": 50,
+  "position_final": 45,
   "position_base": 50,
-  "watchlist": [],
-  "cold_sectors": [],
+  "watchlist": [
+    "银行"
+  ],
+  "cold_sectors": [
+    "造纸",
+    "印制电路板",
+    "其他化学制品",
+    "冰箱",
+    "钢结构",
+    "公用事业",
+    "其他采掘"
+  ],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -25,6 +36,7 @@
         "chem",
         "mach",
         "elec",
+        "银行",
         "semi",
         "robot"
       ]
@@ -32,15 +44,27 @@
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 0,
-      "position_delta": 0,
+      "threshold_delta": 3,
+      "position_delta": -5,
       "weak_sectors_added": [],
-      "watchlist": [],
-      "cold_sectors": [],
-      "reasons": []
+      "watchlist": [
+        "银行"
+      ],
+      "cold_sectors": [
+        "造纸",
+        "印制电路板",
+        "其他化学制品",
+        "冰箱",
+        "钢结构",
+        "公用事业",
+        "其他采掘"
+      ],
+      "reasons": [
+        "E. 冷启动盲区: 10 只来自 7 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=['银行'], cold=['造纸', '印制电路板', '其他化学制品', '冰箱', '钢结构']"
+      ]
     }
   ],
-  "generated_at": "2026-10-07T16:10:23",
+  "generated_at": "2026-10-12T16:10:53",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"

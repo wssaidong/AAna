@@ -1,26 +1,26 @@
 {
-  "date": "2026-10-07",
-  "total_recs": 0,
+  "date": "2026-10-12",
+  "total_recs": 10,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 0,
+  "no_data": 10,
   "win_rate": 0,
   "baseline": null,
   "causes": {
     "A_板块错配": {
       "hit": false,
       "items": [],
-      "summary": "无 weak_sectors 或无当日推荐"
+      "summary": "无弱板块命中"
     },
     "B_题材错配": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "C_技术面虚高": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "D_大盘错配": {
       "hit": false,
@@ -28,19 +28,137 @@
       "summary": "无大盘数据"
     },
     "E_冷启动盲区": {
-      "hit": false,
-      "items": [],
-      "summary": "无冷启动命中"
+      "hit": true,
+      "items": [
+        {
+          "code": "002142",
+          "name": "宁波银行",
+          "sector_cn": "银行",
+          "sector_enum": "bank",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "001206",
+          "name": "依依股份",
+          "sector_cn": "造纸",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "605058",
+          "name": "澳弘电子",
+          "sector_cn": "印制电路板",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "601077",
+          "name": "渝农商行",
+          "sector_cn": "银行",
+          "sector_enum": "bank",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "002549",
+          "name": "凯美特气",
+          "sector_cn": "其他化学制品",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "002668",
+          "name": "TCL智家",
+          "sector_cn": "冰箱",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "601963",
+          "name": "重庆银行",
+          "sector_cn": "银行",
+          "sector_enum": "bank",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "002541",
+          "name": "鸿路钢构",
+          "sector_cn": "钢结构",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "000601",
+          "name": "韶能股份",
+          "sector_cn": "公用事业",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600295",
+          "name": "鄂尔多斯",
+          "sector_cn": "其他采掘",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        }
+      ],
+      "watchlist": [
+        "银行"
+      ],
+      "cold_sectors": [
+        "造纸",
+        "印制电路板",
+        "其他化学制品",
+        "冰箱",
+        "钢结构",
+        "公用事业",
+        "其他采掘"
+      ],
+      "summary": "10 只命中冷启动板块 (8 个不同板块), watchlist: ['银行'], 单次冷板块: ['造纸', '印制电路板', '其他化学制品', '冰箱', '钢结构']"
     }
   },
-  "hit_causes": [],
+  "hit_causes": [
+    "E_冷启动盲区"
+  ],
   "tuning_suggestion": {
-    "score_threshold_delta": 0,
+    "score_threshold_delta": 3,
     "hold_days_delta": 0,
     "weak_sectors_add": [],
     "weak_sectors_remove": [],
-    "watchlist": [],
-    "position_delta": 0,
-    "reasons": []
+    "watchlist": [
+      "银行"
+    ],
+    "position_delta": -5,
+    "reasons": [
+      "E. 冷启动盲区: 10 只来自 7 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=['银行'], cold=['造纸', '印制电路板', '其他化学制品', '冰箱', '钢结构']"
+    ],
+    "cold_sectors": [
+      "造纸",
+      "印制电路板",
+      "其他化学制品",
+      "冰箱",
+      "钢结构",
+      "公用事业",
+      "其他采掘"
+    ]
   }
 }

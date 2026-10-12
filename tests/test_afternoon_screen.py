@@ -177,7 +177,11 @@ def test_score_above_65_kept_below_65_dropped():
     assert 'from strategy_policy import get_today_policy' in src, \
         "screen 必须从 strategy_policy 读策略参数 (数据驱动闭环)"
     assert 'score_threshold = 65' in src, "policy 失败时必须回落默认 65"
-    assert 'if score >= score_threshold:' in src, "必须用动态阈值判断"
+    # v2026-10-08 修复 (#12): 数据源健康度 → 动态降阈值, 过滤移到循环外
+    assert 'results.append(scored_info)' in src, \
+        "score 收下后循环外统一过滤 (data_health 调整阈值后再过滤)"
+    assert 'r.get(' in src and '>= score_threshold' in src, \
+        "循环外过滤必须用动态阈值 score_threshold"
     assert 'if score >= 60' not in src, "旧硬编码阈值 60 不应再出现"
 
     # 行为验证: strategy_policy 默认值就是 65

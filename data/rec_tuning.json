@@ -6,30 +6,39 @@
     "chem",
     "mach",
     "elec",
+    "银行",
     "semi",
     "robot"
   ],
-  "total_records": 930,
-  "overall_win_rate": 28.49462365591398,
+  "total_records": 940,
+  "overall_win_rate": 28.723404255319153,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-10-08T16:00:32.118488",
+  "generated_at": "2026-10-12T16:00:25.146813",
   "score_band_stats": {
+    "60-70": {
+      "band": "60-70",
+      "count": 8,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0,
+      "avg_hold_days": 1.0
+    },
     "70+": {
       "band": "70+",
-      "count": 57,
-      "win_count": 8,
-      "win_rate": 14.035087719298245,
-      "avg_change": -1.6014035087719296,
+      "count": 59,
+      "win_count": 13,
+      "win_rate": 22.033898305084744,
+      "avg_change": -1.4861016949152541,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 930,
-      "win_count": 265,
-      "win_rate": 28.49462365591398,
-      "avg_change": -0.8688172043010717
+      "count": 940,
+      "win_count": 270,
+      "win_rate": 28.723404255319153,
+      "avg_change": -0.8557446808510604
     }
   },
   "sector_stats": {
@@ -116,10 +125,10 @@
     "印制电路板": {
       "sector": "印制电路板",
       "sector_name": "",
-      "count": 1,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -1.19
+      "avg_change": -0.595
     },
     "汽车零部件": {
       "sector": "汽车零部件",
@@ -133,17 +142,17 @@
       "sector": "煤炭开采",
       "sector_name": "",
       "count": 2,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 0.905
     },
     "男装": {
       "sector": "男装",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.46
     },
     "食品综合": {
       "sector": "食品综合",
@@ -151,7 +160,7 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -1.57
     },
     "纺织服装": {
       "sector": "纺织服装",
@@ -159,31 +168,31 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -3.6
     },
     "包装印刷": {
       "sector": "包装印刷",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.87
     },
     "新能源发电": {
       "sector": "新能源发电",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.71
     },
     "日用化学产品": {
       "sector": "日用化学产品",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 4.43
     },
     "建筑装饰": {
       "sector": "建筑装饰",
@@ -191,10 +200,58 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -0.29
     },
     "钢结构": {
       "sector": "钢结构",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.61
+    },
+    "银行": {
+      "sector": "银行",
+      "sector_name": "",
+      "count": 3,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "造纸": {
+      "sector": "造纸",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "其他化学制品": {
+      "sector": "其他化学制品",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "冰箱": {
+      "sector": "冰箱",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "公用事业": {
+      "sector": "公用事业",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": 0.0
+    },
+    "其他采掘": {
+      "sector": "其他采掘",
       "sector_name": "",
       "count": 1,
       "win_count": 0,
