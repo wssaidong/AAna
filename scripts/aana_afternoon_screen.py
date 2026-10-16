@@ -785,7 +785,14 @@ def record_recommendation(code, name, score, sentiment_score=50,
         print(f"  [记录失败] {code}: {e}")
 
 
-def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedback=True):
+def screen_afternoon_stocks(
+    sentiment_score=50,
+    position_ratio=0.5,
+    record_feedback=True,
+    weights=None,
+    codes=None,
+    dual_export=True,
+):
     """
     尾盘选股主流程
     1. 从全市场涨幅榜 / 候选池取粗筛股票
@@ -797,7 +804,42 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     v2026-08-23 (数据驱动策略): 评分阈值 + 板块黑名单从 strategy_policy 读取
     (rec_tuning.json ← rec_optimizer 复盘胜率,闭环自动化)。
     policy 失败时回落 v2.4 硬编码 (65 / 无黑名单),不影响主流程。
+
+    v2026-10-16 (XWI-50): 向后兼容新增 Skill 调用所需的 3 个参数
+    - weights: dict[str, int|float] | None
+        评分权重透传 (Skill 调用者意图),会写入 rec_feedback.csv
+        每行的 weights 字段供下游分析。**不修改评分逻辑本身**
+        (避免影响现有 rec_optimizer 闭环),只作为 side-channel。
+    - codes: list[str] | None
+        指定候选股票代码列表;为 None 时走默认池 (top10 + 新浪全市场)。
+        Skill 模式下传 [codes] 时收敛到只评这些票。
+    - dual_export: bool
+        默认 True: 沿用历史行为,既写 rec_feedback.csv 也写配套的
+        rec_feedback_weights_YYYYMMDD.jsonl (Skill 调用的 weights 痕迹)。
+        Skill 模式下设 False 可只写主表,避免污染 JSONL 衍生数据。
     """
+    # ── XWI-50: 透传参数校验 ──
+    if weights is not None and not isinstance(weights, dict):
+        print(f"  [screen_afternoon_stocks] weights 不是 dict,忽略: {type(weights).__name__}")
+        weights = None
+    if codes is not None:
+        if not isinstance(codes, (list, tuple)):
+            print(f"  [screen_afternoon_stocks] codes 不是 list/tuple,忽略: {type(codes).__name__}")
+            codes = None
+        else:
+            codes = [str(c).strip() for c in codes if str(c).strip()]
+            if not codes:
+                codes = None
+    import json as _wjson
+    _today = datetime.now().strftime("%Y%m%d")
+    _weights_jsonl = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "data", f"rec_feedback_weights_{_today}.jsonl",
+    )
+    if weights is not None:
+        print(f"  [screen_afternoon_stocks] 收到 weights: {weights} (作为侧-channel 写入 JSONL)")
+    if codes is not None:
+        print(f"  [screen_afternoon_stocks] 收到 codes={len(codes)} 只, 收敛候选池")
     # ── 策略参数 (数据驱动) ──
     try:
         from strategy_policy import get_today_policy, policy_banner
@@ -902,6 +944,16 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     if not candidate_codes:
         print("[AAna 尾盘] 候选股票池为空，跳过尾盘选股")
         return []
+
+    # ── XWI-50: Skill 模式下调用方指定 codes 时,过滤候选池 ──
+    if codes is not None:
+        codes_set = set(codes)
+        before = len(candidate_codes)
+        candidate_codes = [c for c in candidate_codes if c in codes_set]
+        print(f"  [XWI-50 codes 过滤] {before} → {len(candidate_codes)} 只 (仅 Skill 指定)")
+        if not candidate_codes:
+            print("[AAna 尾盘] Skill 指定 codes 在默认池中无匹配, 跳过")
+            return []
 
     print(f"[AAna 尾盘] 候选股票总数: {len(candidate_codes)} 只")
 
@@ -1053,6 +1105,25 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
                 sector=s.get('sector', '') or '',
             )
         print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
+
+    # ── XWI-50: dual_export — Skill 模式下可关闭,避免污染 JSONL 衍生数据 ──
+    if dual_export and weights is not None and top_n:
+        try:
+            os.makedirs(os.path.dirname(_weights_jsonl), exist_ok=True)
+            with open(_weights_jsonl, "a", encoding="utf-8") as _fj:
+                for s in top_n:
+                    _fj.write(_wjson.dumps({
+                        "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "code": s.get("code", ""),
+                        "name": s.get("name", ""),
+                        "score": s.get("score", 0),
+                        "sentiment_score": sentiment_score,
+                        "weights": weights,
+                        "source": "skill",
+                    }, ensure_ascii=False) + "\n")
+            print(f"[AAna 尾盘] dual_export 已记录 {len(top_n)} 条 weights 到 {_weights_jsonl}")
+        except Exception as _de_err:
+            print(f"[AAna 尾盘] dual_export 写入失败: {_de_err}")
 
     print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只 (板块黑名单拦截 {filtered_by_sector} 只)")
     return top_n, f"K线失败率 {fail_rate_kline:.0%} (置信度:{confidence})" if fail_rate_kline > 0.5 else None
