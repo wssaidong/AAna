@@ -83,6 +83,10 @@ class TestQueryWinrate:
         # 数据驱动: 有 score >= 65 的票即合法, 数量可能为 0 (停摆日)
         assert result["n"] >= 0
         # 交叉验证 pandas
+        # v2026-10-16 修正: score 列自 10/12 起含浮点串 (如 '67.282...')。
+        # int('67.282') 抛 ValueError → 丢行 → n 比真实少; DuckDB TRY_CAST 接受浮点串。
+        # pandas 侧改 float() 解析 (TRY_CAST(x AS INTEGER) 语义 = float 串截断取整),
+        # 与 SQL 口径严格对齐。
         import csv as _csv
         from datetime import datetime, timedelta
         cutoff = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
@@ -93,10 +97,11 @@ class TestQueryWinrate:
                 ret_1d = r.get('ret_1d', '')
                 if rec_date >= cutoff and ret_1d and ret_1d.strip():
                     try:
-                        if int(r.get('score') or 0) >= 65:
-                            valid_high.append((r, float(ret_1d)))
-                    except ValueError:
-                        pass
+                        score = int(float(r.get('score') or 0))
+                    except (ValueError, TypeError):
+                        score = 0
+                    if score >= 65:
+                        valid_high.append((r, float(ret_1d)))
         n_pandas = len(valid_high)
         assert result["n"] == n_pandas, f"score>=65 n={result['n']} vs pandas n={n_pandas}"
 
@@ -117,9 +122,17 @@ class TestQueryRecentRecommendations:
         """mock 数据隔离 (2026-10-06): 不再依赖生产 CSV 近 7 日有数据
         假期/0 推荐期生产 CSV 近 7 日为空 → 断言 n>0 必挂 (测试 vs 生产基线漂移)
         改为 tmp_path 写 mock 数据验证行为, 与 test_missing_file_returns_error 同模式
+
+        v2026-10-16 修正: mock 日期从硬编码 '2026-10-06' 改为动态生成。
+        硬编码日期会随时间滑出 days=7 窗口 (n=0) → 时间炸弹, 今日已实际引爆。
         """
         import csv as _csv
+        from datetime import datetime, timedelta
         from analytics_query import query_recent_recommendations
+
+        def _d(days_ago: int) -> str:
+            return (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
+
         mock = tmp_path / "recommendations.csv"
         with open(mock, "w", newline="", encoding="utf-8") as f:
             w = _csv.DictWriter(f, fieldnames=[
@@ -128,15 +141,15 @@ class TestQueryRecentRecommendations:
                 "hit", "created_at"])
             w.writeheader()
             w.writerows([
-                {"date": "2026-10-06", "code": "600000", "name": "测试A", "sector": "chem",
+                {"date": _d(1), "code": "600000", "name": "测试A", "sector": "chem",
                  "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
-                 "actual_change": "", "hit": "", "created_at": "2026-10-06T10:00:00"},
-                {"date": "2026-10-06", "code": "600000", "name": "测试A", "sector": "chem",
+                 "actual_change": "", "hit": "", "created_at": _d(1) + "T10:00:00"},
+                {"date": _d(1), "code": "600000", "name": "测试A", "sector": "chem",
                  "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
-                 "actual_change": "", "hit": "", "created_at": "2026-10-06T10:01:00"},
-                {"date": "2026-10-05", "code": "000001", "name": "测试B", "sector": "semi",
+                 "actual_change": "", "hit": "", "created_at": _d(1) + "T10:01:00"},
+                {"date": _d(2), "code": "000001", "name": "测试B", "sector": "semi",
                  "sector_name": "", "reason": "t", "expected_high": "1", "expected_low": "-3",
-                 "actual_change": "", "hit": "", "created_at": "2026-10-05T10:00:00"},
+                 "actual_change": "", "hit": "", "created_at": _d(2) + "T10:00:00"},
             ])
         with patch("analytics_query.RECOMMENDATIONS", mock):
             result = query_recent_recommendations(days=7)

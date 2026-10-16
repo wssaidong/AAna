@@ -353,12 +353,18 @@ def calculate_returns(rec_rows, trade_rows):
         base_date = rec_close_date or rec_date
         base_price = rec_close
 
-        # ⚠️ 2026-08-13 修复（复权基准混用）：
-        # paper_trades.json 里的 entry_price 是**未复权**成交价（如 603269 = 23.47），
-        # 而 K 线走的是 qfq **前复权**序列（同日 close = 15.847）。
-        # 两者直接相除会算出 -34.61% 这种假暴跌（该笔实际是 +2.9%）。
-        # 因此：持仓记录只用来对齐【建仓日期】，价格一律取同一条 qfq 序列，保证基准一致。
-        if pos and pos.get("entry_date"):
+        # ⚠️ 2026-10-16 修复（旧仓位劫持基线）：只有推荐日当天或之后的建仓
+        # 才能作为该条推荐的收益基准。position_map 只存每 code 的【最后一笔 buy】，
+        # 不看是否已卖出 —— 若老仓位 buy 在 rec_date 之前（早已平仓），
+        # base_date 会被拉回数月前，当日推荐立刻"算出"全套历史收益
+        # （实证 2026-10-16 001229 被其 7/13 已平仓仓位劫持，当日即得
+        # ret_1d=-6.01% / ret_15d=-27.37%，实际 T+1 根本未发生）。
+        if pos and pos.get("entry_date") and pos["entry_date"][:10] >= rec_date[:10]:
+            # ⚠️ 2026-08-13 修复（复权基准混用）：
+            # paper_trades.json 里的 entry_price 是**未复权**成交价（如 603269 = 23.47），
+            # 而 K 线走的是 qfq **前复权**序列（同日 close = 15.847）。
+            # 两者直接相除会算出 -34.61% 这种假暴跌（该笔实际是 +2.9%）。
+            # 因此：持仓记录只用来对齐【建仓日期】，价格一律取同一条 qfq 序列，保证基准一致。
             entry_close, entry_date = _get_kline_close(code, pos["entry_date"][:10])
             if entry_close is not None:
                 base_price = entry_close
