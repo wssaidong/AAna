@@ -1,0 +1,1033 @@
+{
+  "normal": [
+    {
+      "code": "000651",
+      "name": "格力电器",
+      "price": 39.59,
+      "change_pct": 1.957,
+      "amount": 1608906705.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600621",
+      "name": "华鑫股份",
+      "price": 14.76,
+      "change_pct": 1.934,
+      "amount": 1149559222.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000993",
+      "name": "闽东电力",
+      "price": 18.21,
+      "change_pct": 1.789,
+      "amount": 1396001488.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600406",
+      "name": "国电南瑞",
+      "price": 22.8,
+      "change_pct": 1.786,
+      "amount": 1022816770.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002714",
+      "name": "牧原股份",
+      "price": 41.78,
+      "change_pct": 1.605,
+      "amount": 1100837449.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "price": 12.56,
+      "change_pct": 1.536,
+      "amount": 1411872224.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601179",
+      "name": "中国西电",
+      "price": 11.83,
+      "change_pct": 1.458,
+      "amount": 1399885573.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601225",
+      "name": "陕西煤业",
+      "price": 27.35,
+      "change_pct": 1.409,
+      "amount": 1020965460.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601898",
+      "name": "中煤能源",
+      "price": 14.59,
+      "change_pct": 1.39,
+      "amount": 788528477.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601601",
+      "name": "中国太保",
+      "price": 31.57,
+      "change_pct": 1.348,
+      "amount": 988654007.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "price": 29.38,
+      "change_pct": 1.345,
+      "amount": 3167226141.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000538",
+      "name": "云南白药",
+      "price": 52.07,
+      "change_pct": 1.304,
+      "amount": 567707515.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "price": 17.37,
+      "change_pct": 1.283,
+      "amount": 669150706.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
+      "price": 23.49,
+      "change_pct": 1.25,
+      "amount": 1406067699.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002317",
+      "name": "众生药业",
+      "price": 25.8,
+      "change_pct": 1.216,
+      "amount": 1386046178.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "price": 11.73,
+      "change_pct": 1.208,
+      "amount": 1243459833.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601919",
+      "name": "中远海控",
+      "price": 16.87,
+      "change_pct": 1.2,
+      "amount": 1242272150.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601628",
+      "name": "中国人寿",
+      "price": 36.58,
+      "change_pct": 1.189,
+      "amount": 650536194.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002352",
+      "name": "顺丰控股",
+      "price": 31.19,
+      "change_pct": 1.102,
+      "amount": 640569381.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600887",
+      "name": "伊利股份",
+      "price": 27.96,
+      "change_pct": 1.085,
+      "amount": 1237943160.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002517",
+      "name": "恺英网络",
+      "price": 16.37,
+      "change_pct": 0.987,
+      "amount": 580210794.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600089",
+      "name": "特变电工",
+      "price": 17.9,
+      "change_pct": 0.902,
+      "amount": 1297059787.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002882",
+      "name": "金龙羽",
+      "price": 27.18,
+      "change_pct": 0.891,
+      "amount": 790505134.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601688",
+      "name": "华泰证券",
+      "price": 18.13,
+      "change_pct": 0.89,
+      "amount": 674897911.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600690",
+      "name": "海尔智家",
+      "price": 20.99,
+      "change_pct": 0.865,
+      "amount": 608077886.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "price": 33.24,
+      "change_pct": 0.819,
+      "amount": 1474004189.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002430",
+      "name": "杭氧股份",
+      "price": 25.02,
+      "change_pct": 0.806,
+      "amount": 608963613.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601318",
+      "name": "中国平安",
+      "price": 53.24,
+      "change_pct": 0.776,
+      "amount": 2971178568.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600633",
+      "name": "浙数文化",
+      "price": 10.39,
+      "change_pct": 1.963,
+      "amount": 233388928.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002438",
+      "name": "江苏神通",
+      "price": 13.85,
+      "change_pct": 1.913,
+      "amount": 105086826.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600686",
+      "name": "金龙汽车",
+      "price": 11.25,
+      "change_pct": 1.902,
+      "amount": 224523167.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000999",
+      "name": "华润三九",
+      "price": 25.28,
+      "change_pct": 1.853,
+      "amount": 347107811.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "603171",
+      "name": "税友股份",
+      "price": 40.53,
+      "change_pct": 1.834,
+      "amount": 287709981.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002736",
+      "name": "国信证券",
+      "price": 10.02,
+      "change_pct": 1.829,
+      "amount": 279138104.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002949",
+      "name": "华阳国际",
+      "price": 13.02,
+      "change_pct": 1.798,
+      "amount": 113564348.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "003029",
+      "name": "吉大正元",
+      "price": 18.24,
+      "change_pct": 1.786,
+      "amount": 114283572.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600323",
+      "name": "XD瀚蓝环",
+      "price": 30.04,
+      "change_pct": 1.727,
+      "amount": 117582863.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "605128",
+      "name": "上海沿浦",
+      "price": 25.08,
+      "change_pct": 1.703,
+      "amount": 191282336.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002647",
+      "name": "仁东控股",
+      "price": 11.39,
+      "change_pct": 1.696,
+      "amount": 327558716.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000007",
+      "name": "全新好",
+      "price": 10.88,
+      "change_pct": 1.682,
+      "amount": 123031259.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600285",
+      "name": "羚锐制药",
+      "price": 19.99,
+      "change_pct": 1.679,
+      "amount": 221230598.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "001269",
+      "name": "欧晶科技",
+      "price": 19.0,
+      "change_pct": 1.659,
+      "amount": 111866197.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002258",
+      "name": "利尔化学",
+      "price": 14.22,
+      "change_pct": 1.644,
+      "amount": 221349404.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002777",
+      "name": "久远银海",
+      "price": 13.21,
+      "change_pct": 1.615,
+      "amount": 139131584.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "601026",
+      "name": "道生天合",
+      "price": 15.19,
+      "change_pct": 1.605,
+      "amount": 100276049.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "001965",
+      "name": "招商公路",
+      "price": 10.26,
+      "change_pct": 1.584,
+      "amount": 134901769.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000708",
+      "name": "中信特钢",
+      "price": 13.27,
+      "change_pct": 1.53,
+      "amount": 160187469.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600660",
+      "name": "福耀玻璃",
+      "price": 54.82,
+      "change_pct": 1.519,
+      "amount": 494670075.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002318",
+      "name": "久立特材",
+      "price": 18.05,
+      "change_pct": 1.519,
+      "amount": 118265970.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002674",
+      "name": "兴业科技",
+      "price": 20.73,
+      "change_pct": 1.518,
+      "amount": 334047789.0,
+      "composite_score": 33.0
+    }
+  ],
+  "risk": [
+    {
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "price": 5.34,
+      "change_pct": 10.103,
+      "amount": 1258263822.0,
+      "composite_score": -28.0
+    },
+    {
+      "code": "002692",
+      "name": "远程股份",
+      "price": 5.24,
+      "change_pct": 10.084,
+      "amount": 266233014.0,
+      "composite_score": -30.0
+    },
+    {
+      "code": "001330",
+      "name": "博纳影业",
+      "price": 7.67,
+      "change_pct": 10.043,
+      "amount": 1572119116.0,
+      "composite_score": -28.0
+    },
+    {
+      "code": "600693",
+      "name": "东百集团",
+      "price": 11.18,
+      "change_pct": 10.039,
+      "amount": 302864557.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "002441",
+      "name": "众业达",
+      "price": 9.21,
+      "change_pct": 10.036,
+      "amount": 254621752.0,
+      "composite_score": -27.0
+    },
+    {
+      "code": "600241",
+      "name": "时代万恒",
+      "price": 12.94,
+      "change_pct": 10.034,
+      "amount": 1199299592.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603968",
+      "name": "醋化股份",
+      "price": 13.05,
+      "change_pct": 10.034,
+      "amount": 321073559.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "002343",
+      "name": "慈文传媒",
+      "price": 6.69,
+      "change_pct": 10.033,
+      "amount": 189454780.0,
+      "composite_score": -30.0
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "price": 20.42,
+      "change_pct": 10.022,
+      "amount": 653535811.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "002908",
+      "name": "德生科技",
+      "price": 8.02,
+      "change_pct": 10.014,
+      "amount": 232753947.0,
+      "composite_score": -27.0
+    },
+    {
+      "code": "603232",
+      "name": "格尔软件",
+      "price": 18.68,
+      "change_pct": 10.012,
+      "amount": 744347910.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "600560",
+      "name": "金自天正",
+      "price": 12.53,
+      "change_pct": 10.009,
+      "amount": 80256859.0,
+      "composite_score": -25.0
+    },
+    {
+      "code": "001231",
+      "name": "农心科技",
+      "price": 25.61,
+      "change_pct": 10.009,
+      "amount": 192490606.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "002990",
+      "name": "盛视科技",
+      "price": 55.95,
+      "change_pct": 10.008,
+      "amount": 681227389.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "605287",
+      "name": "德才股份",
+      "price": 44.2,
+      "change_pct": 10.005,
+      "amount": 103640160.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "601127",
+      "name": "赛力斯",
+      "price": 51.24,
+      "change_pct": 10.004,
+      "amount": 2642317671.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "price": 14.63,
+      "change_pct": 10.0,
+      "amount": 825104569.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603336",
+      "name": "宏辉果蔬",
+      "price": 10.45,
+      "change_pct": 10.0,
+      "amount": 326095524.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "605577",
+      "name": "龙版传媒",
+      "price": 17.82,
+      "change_pct": 10.0,
+      "amount": 252983433.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "002264",
+      "name": "新 华 都",
+      "price": 8.14,
+      "change_pct": 10.0,
+      "amount": 1122462178.0,
+      "composite_score": -25.0
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "price": 23.0,
+      "change_pct": 9.995,
+      "amount": 1264841567.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "002576",
+      "name": "通达动力",
+      "price": 16.07,
+      "change_pct": 9.993,
+      "amount": 141156693.0,
+      "composite_score": -22.0
+    },
+    {
+      "code": "600192",
+      "name": "长城电工",
+      "price": 7.93,
+      "change_pct": 9.986,
+      "amount": 150851604.0,
+      "composite_score": -30.0
+    },
+    {
+      "code": "002591",
+      "name": "恒大高新",
+      "price": 7.16,
+      "change_pct": 9.985,
+      "amount": 259630736.0,
+      "composite_score": -30.0
+    },
+    {
+      "code": "601595",
+      "name": "上海电影",
+      "price": 27.21,
+      "change_pct": 9.984,
+      "amount": 753730740.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603528",
+      "name": "多伦科技",
+      "price": 7.05,
+      "change_pct": 9.984,
+      "amount": 106282238.0,
+      "composite_score": -30.0
+    },
+    {
+      "code": "603533",
+      "name": "掌阅科技",
+      "price": 27.98,
+      "change_pct": 9.984,
+      "amount": 2096530444.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603096",
+      "name": "新经典",
+      "price": 19.06,
+      "change_pct": 9.983,
+      "amount": 70752073.0,
+      "composite_score": -25.0
+    },
+    {
+      "code": "002242",
+      "name": "九阳股份",
+      "price": 16.64,
+      "change_pct": 9.98,
+      "amount": 1996903757.0,
+      "composite_score": -20.0
+    },
+    {
+      "code": "603992",
+      "name": "松霖科技",
+      "price": 20.94,
+      "change_pct": 9.979,
+      "amount": 157046556.0,
+      "composite_score": -22.0
+    }
+  ],
+  "filtered": [
+    {
+      "code": "000651",
+      "name": "格力电器",
+      "price": 39.59,
+      "change_pct": 1.957,
+      "amount": 1608906705.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600621",
+      "name": "华鑫股份",
+      "price": 14.76,
+      "change_pct": 1.934,
+      "amount": 1149559222.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000993",
+      "name": "闽东电力",
+      "price": 18.21,
+      "change_pct": 1.789,
+      "amount": 1396001488.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600406",
+      "name": "国电南瑞",
+      "price": 22.8,
+      "change_pct": 1.786,
+      "amount": 1022816770.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002714",
+      "name": "牧原股份",
+      "price": 41.78,
+      "change_pct": 1.605,
+      "amount": 1100837449.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "price": 12.56,
+      "change_pct": 1.536,
+      "amount": 1411872224.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601179",
+      "name": "中国西电",
+      "price": 11.83,
+      "change_pct": 1.458,
+      "amount": 1399885573.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601225",
+      "name": "陕西煤业",
+      "price": 27.35,
+      "change_pct": 1.409,
+      "amount": 1020965460.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601898",
+      "name": "中煤能源",
+      "price": 14.59,
+      "change_pct": 1.39,
+      "amount": 788528477.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601601",
+      "name": "中国太保",
+      "price": 31.57,
+      "change_pct": 1.348,
+      "amount": 988654007.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600900",
+      "name": "长江电力",
+      "price": 29.38,
+      "change_pct": 1.345,
+      "amount": 3167226141.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000538",
+      "name": "云南白药",
+      "price": 52.07,
+      "change_pct": 1.304,
+      "amount": 567707515.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600926",
+      "name": "杭州银行",
+      "price": 17.37,
+      "change_pct": 1.283,
+      "amount": 669150706.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002119",
+      "name": "康强电子",
+      "price": 23.49,
+      "change_pct": 1.25,
+      "amount": 1406067699.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002317",
+      "name": "众生药业",
+      "price": 25.8,
+      "change_pct": 1.216,
+      "amount": 1386046178.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "price": 11.73,
+      "change_pct": 1.208,
+      "amount": 1243459833.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601919",
+      "name": "中远海控",
+      "price": 16.87,
+      "change_pct": 1.2,
+      "amount": 1242272150.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601628",
+      "name": "中国人寿",
+      "price": 36.58,
+      "change_pct": 1.189,
+      "amount": 650536194.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002352",
+      "name": "顺丰控股",
+      "price": 31.19,
+      "change_pct": 1.102,
+      "amount": 640569381.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600887",
+      "name": "伊利股份",
+      "price": 27.96,
+      "change_pct": 1.085,
+      "amount": 1237943160.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002517",
+      "name": "恺英网络",
+      "price": 16.37,
+      "change_pct": 0.987,
+      "amount": 580210794.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600089",
+      "name": "特变电工",
+      "price": 17.9,
+      "change_pct": 0.902,
+      "amount": 1297059787.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002882",
+      "name": "金龙羽",
+      "price": 27.18,
+      "change_pct": 0.891,
+      "amount": 790505134.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601688",
+      "name": "华泰证券",
+      "price": 18.13,
+      "change_pct": 0.89,
+      "amount": 674897911.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600690",
+      "name": "海尔智家",
+      "price": 20.99,
+      "change_pct": 0.865,
+      "amount": 608077886.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002415",
+      "name": "海康威视",
+      "price": 33.24,
+      "change_pct": 0.819,
+      "amount": 1474004189.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "002430",
+      "name": "杭氧股份",
+      "price": 25.02,
+      "change_pct": 0.806,
+      "amount": 608963613.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "601318",
+      "name": "中国平安",
+      "price": 53.24,
+      "change_pct": 0.776,
+      "amount": 2971178568.0,
+      "composite_score": 35.0
+    },
+    {
+      "code": "600633",
+      "name": "浙数文化",
+      "price": 10.39,
+      "change_pct": 1.963,
+      "amount": 233388928.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002438",
+      "name": "江苏神通",
+      "price": 13.85,
+      "change_pct": 1.913,
+      "amount": 105086826.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600686",
+      "name": "金龙汽车",
+      "price": 11.25,
+      "change_pct": 1.902,
+      "amount": 224523167.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000999",
+      "name": "华润三九",
+      "price": 25.28,
+      "change_pct": 1.853,
+      "amount": 347107811.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "603171",
+      "name": "税友股份",
+      "price": 40.53,
+      "change_pct": 1.834,
+      "amount": 287709981.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002736",
+      "name": "国信证券",
+      "price": 10.02,
+      "change_pct": 1.829,
+      "amount": 279138104.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002949",
+      "name": "华阳国际",
+      "price": 13.02,
+      "change_pct": 1.798,
+      "amount": 113564348.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "003029",
+      "name": "吉大正元",
+      "price": 18.24,
+      "change_pct": 1.786,
+      "amount": 114283572.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600323",
+      "name": "XD瀚蓝环",
+      "price": 30.04,
+      "change_pct": 1.727,
+      "amount": 117582863.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "605128",
+      "name": "上海沿浦",
+      "price": 25.08,
+      "change_pct": 1.703,
+      "amount": 191282336.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002647",
+      "name": "仁东控股",
+      "price": 11.39,
+      "change_pct": 1.696,
+      "amount": 327558716.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000007",
+      "name": "全新好",
+      "price": 10.88,
+      "change_pct": 1.682,
+      "amount": 123031259.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600285",
+      "name": "羚锐制药",
+      "price": 19.99,
+      "change_pct": 1.679,
+      "amount": 221230598.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002258",
+      "name": "利尔化学",
+      "price": 14.22,
+      "change_pct": 1.644,
+      "amount": 221349404.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002777",
+      "name": "久远银海",
+      "price": 13.21,
+      "change_pct": 1.615,
+      "amount": 139131584.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "601026",
+      "name": "道生天合",
+      "price": 15.19,
+      "change_pct": 1.605,
+      "amount": 100276049.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "000708",
+      "name": "中信特钢",
+      "price": 13.27,
+      "change_pct": 1.53,
+      "amount": 160187469.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "600660",
+      "name": "福耀玻璃",
+      "price": 54.82,
+      "change_pct": 1.519,
+      "amount": 494670075.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002318",
+      "name": "久立特材",
+      "price": 18.05,
+      "change_pct": 1.519,
+      "amount": 118265970.0,
+      "composite_score": 33.0
+    },
+    {
+      "code": "002674",
+      "name": "兴业科技",
+      "price": 20.73,
+      "change_pct": 1.518,
+      "amount": 334047789.0,
+      "composite_score": 33.0
+    }
+  ],
+  "ts": "2026-10-13T08:33:35.325430"
+}

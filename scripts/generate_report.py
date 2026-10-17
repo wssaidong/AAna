@@ -1620,14 +1620,19 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
     "score_threshold": 70,
     "hold_days": 1,
-    "weak_sectors": ['ai_app', 'chem', 'mach', 'elec', 'semi', 'robot'],
-    "overall_win_rate": 29.0,
-    "total_records": 930,
-    "generated_at": "2026-10-09T20:01:01.623312",
+    "weak_sectors": ['ai_app', 'chem', 'mach', 'elec', '汽车零部件', 'semi', '印制电路板', 'robot'],
+    "overall_win_rate": 30.2,
+    "total_records": 973,
+    "generated_at": "2026-10-16T20:00:56.261134",
 }
 # === REC_OPTIMIZER_TUNING_END ===
