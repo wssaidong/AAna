@@ -1,0 +1,626 @@
+{
+ "date": "2026-10-18",
+ "base_date": "2026-10-16",
+ "base_report": "/Users/cai/code/AAna/reports/2026-10-16-选股报告.md",
+ "generated": "08:34:00",
+ "overall_win_rate": 30.215827338129497,
+ "total_records": 973,
+ "results": [
+  {
+   "code": "002270",
+   "name": "华明装备",
+   "price": 18.85,
+   "pe_ttm": 23.11,
+   "pb": 5.39,
+   "mcap_yi": 168.94,
+   "v24_score": 93,
+   "src": "尾盘v2.5#5",
+   "tech_score": 55,
+   "fund_score": 15,
+   "val_score": 9,
+   "total": 77.0,
+   "rating": "买入",
+   "target": 19.79,
+   "stop": 17.47,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=58 健康",
+    "20日区间位置 91% 突破区",
+    "60日涨幅 +9% 健康",
+    "量能比 0.80 正常"
+   ],
+   "fund_notes": [
+    "ROE 10.9% 良好",
+    "净利增速 +6%",
+    "营收增速 +14%"
+   ],
+   "val_notes": [
+    "PE 23 合理",
+    "PB 5.39 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 58.0,
+    "pos20": 91.0,
+    "chg60": 9.4,
+    "vol_ratio_5d": 0.8,
+    "ma5": 18.39,
+    "ma20": 17.9,
+    "ma60": 18.83,
+    "hi20": 19.08,
+    "lo20": 16.52,
+    "chg_1d": 4.09,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 10.94,
+    "ni_growth": 5.794271,
+    "rev_growth": 14.248941
+   },
+   "chg_pct": 4.09,
+   "chg_date": "2026-10-16",
+   "industry": "电网设备-分接开关",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "603101",
+   "name": "汇嘉时代",
+   "price": 7.82,
+   "pe_ttm": 34.06,
+   "pb": 2.51,
+   "mcap_yi": 36.79,
+   "v24_score": 93,
+   "src": "尾盘v2.5#3+v24",
+   "tech_score": 46,
+   "fund_score": 19,
+   "val_score": 12,
+   "total": 76.8,
+   "rating": "买入",
+   "target": 8.58,
+   "stop": 7.25,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=57 健康",
+    "20日区间位置 43% 偏低",
+    "60日涨幅 +9% 健康",
+    "量能比 0.76 正常"
+   ],
+   "fund_notes": [
+    "ROE 6.8% 一般",
+    "净利增速 +46%",
+    "营收增速 +5%"
+   ],
+   "val_notes": [
+    "PE 34 偏高",
+    "PB 2.51 合理"
+   ],
+   "tech_stat": {
+    "rsi": 56.7,
+    "pos20": 43.0,
+    "chg60": 8.9,
+    "vol_ratio_5d": 0.76,
+    "ma5": 7.76,
+    "ma20": 7.52,
+    "ma60": 7.41,
+    "hi20": 8.79,
+    "lo20": 7.1,
+    "chg_1d": 3.99,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 6.81,
+    "ni_growth": 46.39934,
+    "rev_growth": 4.982962
+   },
+   "chg_pct": 3.99,
+   "chg_date": "2026-10-16",
+   "industry": "商超零售-新疆",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "002674",
+   "name": "兴业科技",
+   "price": 21.15,
+   "pe_ttm": 55.39,
+   "pb": 2.56,
+   "mcap_yi": 61.88,
+   "v24_score": 100,
+   "src": "尾盘v2.5#1+v24",
+   "tech_score": 45,
+   "fund_score": 15,
+   "val_score": 9,
+   "total": 67.9,
+   "rating": "增持",
+   "target": 22.37,
+   "stop": 19.63,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=60 健康",
+    "20日区间位置 71% 中上",
+    "60日涨幅 -18% 弱势",
+    "量能比 0.99 正常"
+   ],
+   "fund_notes": [
+    "ROE 1.8% 弱",
+    "净利增速 +37%",
+    "营收增速 +4%"
+   ],
+   "val_notes": [
+    "PE 55 高",
+    "PB 2.56 合理"
+   ],
+   "tech_stat": {
+    "rsi": 60.0,
+    "pos20": 71.0,
+    "chg60": -18.2,
+    "vol_ratio_5d": 0.99,
+    "ma5": 20.98,
+    "ma20": 19.98,
+    "ma60": 23.25,
+    "hi20": 22.37,
+    "lo20": 18.18,
+    "chg_1d": 4.96,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 1.75,
+    "ni_growth": 36.608387,
+    "rev_growth": 3.889268
+   },
+   "chg_pct": 4.96,
+   "chg_date": "2026-10-16",
+   "industry": "纺织服装-皮革",
+   "sector_stat_key": "纺织服装",
+   "sector_win_rate": "0% (0/1)"
+  },
+  {
+   "code": "002264",
+   "name": "新华都",
+   "price": 7.81,
+   "pe_ttm": 34.28,
+   "pb": 2.73,
+   "mcap_yi": 50.84,
+   "v24_score": 93,
+   "src": "尾盘v2.5#4+v24",
+   "tech_score": 44,
+   "fund_score": 10,
+   "val_score": 12,
+   "total": 66.0,
+   "rating": "增持",
+   "target": 8.55,
+   "stop": 7.26,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=55 健康",
+    "20日区间位置 59% 中上",
+    "60日涨幅 +26% 健康",
+    "量能比 0.91 正常"
+   ],
+   "fund_notes": [
+    "ROE 6.8% 一般",
+    "净利增速 -4% 负增长",
+    "营收增速 +16%"
+   ],
+   "val_notes": [
+    "PE 34 偏高",
+    "PB 2.73 合理"
+   ],
+   "tech_stat": {
+    "rsi": 55.4,
+    "pos20": 59.0,
+    "chg60": 25.6,
+    "vol_ratio_5d": 0.91,
+    "ma5": 7.85,
+    "ma20": 7.52,
+    "ma60": 6.87,
+    "hi20": 8.55,
+    "lo20": 6.76,
+    "chg_1d": 3.86,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 6.84,
+    "ni_growth": -3.737715,
+    "rev_growth": 16.325072
+   },
+   "chg_pct": 3.86,
+   "chg_date": "2026-10-16",
+   "industry": "互联网零售",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "600737",
+   "name": "中粮糖业",
+   "price": 14.05,
+   "pe_ttm": 26.96,
+   "pb": 2.68,
+   "mcap_yi": 300.51,
+   "v24_score": 88,
+   "src": "尾盘v2.5#7+v24",
+   "tech_score": 31,
+   "fund_score": 16,
+   "val_score": 15,
+   "total": 64.2,
+   "rating": "中性",
+   "target": 15.33,
+   "stop": 12.99,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=45 健康",
+    "20日区间位置 16% 偏低",
+    "60日涨幅 +23% 健康",
+    "量能比 0.77 正常"
+   ],
+   "fund_notes": [
+    "ROE 5.2% 一般",
+    "净利增速 +37%",
+    "营收增速 -21%"
+   ],
+   "val_notes": [
+    "PE 27 合理",
+    "PB 2.68 合理"
+   ],
+   "tech_stat": {
+    "rsi": 45.4,
+    "pos20": 16.0,
+    "chg60": 22.7,
+    "vol_ratio_5d": 0.77,
+    "ma5": 14.92,
+    "ma20": 14.85,
+    "ma60": 14.25,
+    "hi20": 17.6,
+    "lo20": 13.37,
+    "chg_1d": 4.77,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 5.19,
+    "ni_growth": 36.74944,
+    "rev_growth": -21.164016
+   },
+   "chg_pct": 4.77,
+   "chg_date": "2026-10-16",
+   "industry": "制糖-农产品加工",
+   "sector_stat_key": "食品综合",
+   "sector_win_rate": "0% (0/1)"
+  },
+  {
+   "code": "002679",
+   "name": "福建金森",
+   "price": 12.21,
+   "pe_ttm": 191.14,
+   "pb": 3.86,
+   "mcap_yi": 28.79,
+   "v24_score": 83,
+   "src": "v24",
+   "tech_score": 51,
+   "fund_score": 12,
+   "val_score": 4,
+   "total": 63.7,
+   "rating": "中性",
+   "target": 12.82,
+   "stop": 11.39,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=60 健康",
+    "20日区间位置 80% 突破区",
+    "60日涨幅 +46% 偏热",
+    "量能比 0.97 正常"
+   ],
+   "fund_notes": [
+    "ROE -1.8% 弱",
+    "净利增速 +30%",
+    "营收增速 -9%"
+   ],
+   "val_notes": [
+    "PE 191 过高/异常",
+    "PB 3.86 中等"
+   ],
+   "tech_stat": {
+    "rsi": 59.5,
+    "pos20": 80.0,
+    "chg60": 45.9,
+    "vol_ratio_5d": 0.97,
+    "ma5": 11.89,
+    "ma20": 11.31,
+    "ma60": 10.04,
+    "hi20": 12.73,
+    "lo20": 10.11,
+    "chg_1d": 4.09,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": -1.8,
+    "ni_growth": 30.030472,
+    "rev_growth": -9.49507
+   },
+   "chg_pct": 4.09,
+   "chg_date": "2026-10-16",
+   "industry": "林业",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "002454",
+   "name": "松芝股份",
+   "price": 5.16,
+   "pe_ttm": 19.71,
+   "pb": 1.13,
+   "mcap_yi": 45.27,
+   "v24_score": 83,
+   "src": "v24",
+   "tech_score": 39,
+   "fund_score": 3,
+   "val_score": 15,
+   "total": 58.5,
+   "rating": "中性",
+   "target": 5.63,
+   "stop": 4.77,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=55 健康",
+    "20日区间位置 23% 偏低",
+    "60日涨幅 +6% 健康",
+    "量能比 0.90 正常"
+   ],
+   "fund_notes": [
+    "ROE 3.1% 弱",
+    "净利增速 -12% 负增长",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE 20 合理",
+    "PB 1.13 合理"
+   ],
+   "tech_stat": {
+    "rsi": 54.9,
+    "pos20": 23.0,
+    "chg60": 6.2,
+    "vol_ratio_5d": 0.9,
+    "ma5": 5.14,
+    "ma20": 5.15,
+    "ma60": 5.03,
+    "hi20": 6.17,
+    "lo20": 4.85,
+    "chg_1d": 5.52,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 3.06,
+    "ni_growth": -12.210906,
+    "rev_growth": 2.150123
+   },
+   "chg_pct": 5.52,
+   "chg_date": "2026-10-16",
+   "industry": "汽车热管理",
+   "sector_stat_key": "汽车零部件",
+   "sector_win_rate": "0% (0/4)"
+  },
+  {
+   "code": "001229",
+   "name": "魅视科技",
+   "price": 40.83,
+   "pe_ttm": 107.25,
+   "pb": 5.86,
+   "mcap_yi": 30.11,
+   "v24_score": 93,
+   "src": "尾盘v2.5#6",
+   "tech_score": 51,
+   "fund_score": 6,
+   "val_score": 1,
+   "total": 53.7,
+   "rating": "中性",
+   "target": 43.98,
+   "stop": 37.94,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=52 健康",
+    "20日区间位置 68% 中上",
+    "60日涨幅 +3% 健康",
+    "量能比 1.01 正常"
+   ],
+   "fund_notes": [
+    "ROE 0.4% 弱",
+    "净利增速 -78% 负增长",
+    "营收增速 +49%"
+   ],
+   "val_notes": [
+    "PE 107 过高/异常",
+    "PB 5.86 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 52.3,
+    "pos20": 68.0,
+    "chg60": 3.2,
+    "vol_ratio_5d": 1.01,
+    "ma5": 40.37,
+    "ma20": 38.37,
+    "ma60": 39.12,
+    "hi20": 43.98,
+    "lo20": 34.2,
+    "chg_1d": 3.73,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 0.42,
+    "ni_growth": -77.950993,
+    "rev_growth": 48.923289
+   },
+   "chg_pct": 3.73,
+   "chg_date": "2026-10-16",
+   "industry": "专业视听显控",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "003006",
+   "name": "百亚股份",
+   "price": 24.09,
+   "pe_ttm": 52.03,
+   "pb": 7.19,
+   "mcap_yi": 103.24,
+   "v24_score": 83,
+   "src": "尾盘v2.5#9+v24",
+   "tech_score": 40,
+   "fund_score": 11,
+   "val_score": 3,
+   "total": 51.4,
+   "rating": "中性",
+   "target": 25.29,
+   "stop": 22.23,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=67 偏热",
+    "20日区间位置 94% 突破区",
+    "60日涨幅 +73% 严重透支",
+    "量能比 1.18 正常"
+   ],
+   "fund_notes": [
+    "ROE 11.8% 良好",
+    "净利增速 -5% 负增长",
+    "营收增速 +6%"
+   ],
+   "val_notes": [
+    "PE 52 高",
+    "PB 7.19 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 67.3,
+    "pos20": 94.0,
+    "chg60": 73.3,
+    "vol_ratio_5d": 1.18,
+    "ma5": 23.19,
+    "ma20": 21.6,
+    "ma60": 16.66,
+    "hi20": 24.5,
+    "lo20": 17.18,
+    "chg_1d": 5.57,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 11.76,
+    "ni_growth": -4.819408,
+    "rev_growth": 6.039341
+   },
+   "chg_pct": 5.57,
+   "chg_date": "2026-10-16",
+   "industry": "个护用品",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "603982",
+   "name": "泉峰汽车",
+   "price": 6.41,
+   "pe_ttm": -6.8,
+   "pb": 1.15,
+   "mcap_yi": 21.77,
+   "v24_score": 83,
+   "src": "v24",
+   "tech_score": 46,
+   "fund_score": 0,
+   "val_score": 7,
+   "total": 51.2,
+   "rating": "中性",
+   "target": 6.99,
+   "stop": 5.92,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=56 健康",
+    "20日区间位置 40% 偏低",
+    "60日涨幅 +12% 健康",
+    "量能比 0.79 正常"
+   ],
+   "fund_notes": [
+    "ROE -8.6% 弱",
+    "净利增速 -11% 负增长",
+    "营收增速 -4%"
+   ],
+   "val_notes": [
+    "PE -7 过高/异常",
+    "PB 1.15 合理"
+   ],
+   "tech_stat": {
+    "rsi": 56.0,
+    "pos20": 40.0,
+    "chg60": 12.3,
+    "vol_ratio_5d": 0.79,
+    "ma5": 6.35,
+    "ma20": 6.34,
+    "ma60": 6.07,
+    "hi20": 7.13,
+    "lo20": 5.93,
+    "chg_1d": 5.25,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": -8.64,
+    "ni_growth": -10.576295,
+    "rev_growth": -4.03166
+   },
+   "chg_pct": 5.25,
+   "chg_date": "2026-10-16",
+   "industry": "汽车零部件-工具",
+   "sector_stat_key": "汽车零部件",
+   "sector_win_rate": "0% (0/4)"
+  },
+  {
+   "code": "600081",
+   "name": "东风科技",
+   "price": 10.4,
+   "pe_ttm": 88.32,
+   "pb": 1.23,
+   "mcap_yi": 57.51,
+   "v24_score": 83,
+   "src": "尾盘v2.5#10",
+   "tech_score": 31,
+   "fund_score": 12,
+   "val_score": 7,
+   "total": 49.5,
+   "rating": "减持",
+   "target": 11.4,
+   "stop": 9.63,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=51 健康",
+    "20日区间位置 25% 偏低",
+    "60日涨幅 +9% 健康",
+    "量能比 0.76 正常"
+   ],
+   "fund_notes": [
+    "ROE 1.9% 弱",
+    "净利增速 +107%",
+    "营收增速 -8%"
+   ],
+   "val_notes": [
+    "PE 88 过高/异常",
+    "PB 1.23 合理"
+   ],
+   "tech_stat": {
+    "rsi": 50.7,
+    "pos20": 25.0,
+    "chg60": 8.6,
+    "vol_ratio_5d": 0.76,
+    "ma5": 10.22,
+    "ma20": 10.49,
+    "ma60": 10.19,
+    "hi20": 11.89,
+    "lo20": 9.89,
+    "chg_1d": 4.31,
+    "last_date": "2026-10-16"
+   },
+   "fund_stat": {
+    "roe": 1.93,
+    "ni_growth": 107.485053,
+    "rev_growth": -7.959558
+   },
+   "chg_pct": 4.31,
+   "chg_date": "2026-10-16",
+   "industry": "汽车零部件-内饰",
+   "sector_stat_key": "汽车零部件",
+   "sector_win_rate": "0% (0/4)"
+  }
+ ]
+}
