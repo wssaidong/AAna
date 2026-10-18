@@ -3190,88 +3190,308 @@
       "reason": "AAna v2.4 尾盘评分 66.94275274056028",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603861",
+      "name": "白云电器",
+      "action": "sell",
+      "price": 11.27,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -53.0,
+      "pnl_pct": -4.49
+    },
+    {
+      "date": "2026-10-18",
+      "code": "001221",
+      "name": "悍高集团",
+      "action": "sell",
+      "price": 31.43,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -107.0,
+      "pnl_pct": -3.29
+    },
+    {
+      "date": "2026-10-18",
+      "code": "600933",
+      "name": "爱柯迪",
+      "action": "sell",
+      "price": 12.74,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -39.0,
+      "pnl_pct": -2.97
+    },
+    {
+      "date": "2026-10-18",
+      "code": "601689",
+      "name": "拓普集团",
+      "action": "sell",
+      "price": 38.59,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -121.0,
+      "pnl_pct": -3.04
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002929",
+      "name": "润建股份",
+      "action": "sell",
+      "price": 41.44,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -74.0,
+      "pnl_pct": -1.75
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603755",
+      "name": "日辰股份",
+      "action": "sell",
+      "price": 25.72,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -123.0,
+      "pnl_pct": -4.56
+    },
+    {
+      "date": "2026-10-18",
+      "code": "600199",
+      "name": "金种子酒",
+      "action": "sell",
+      "price": 7.61,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -51.0,
+      "pnl_pct": -6.28
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002343",
+      "name": "慈文传媒",
+      "action": "sell",
+      "price": 9.65,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 32.0,
+      "pnl_pct": 3.43
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603596",
+      "name": "伯特利",
+      "action": "sell",
+      "price": 25.3,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -77.0,
+      "pnl_pct": -2.95
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002297",
+      "name": "博云新材",
+      "action": "sell",
+      "price": 16.79,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -39.0,
+      "pnl_pct": -2.27
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603861",
+      "name": "白云电器",
+      "action": "buy",
+      "price": 11.8,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.47330960854093",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "001221",
+      "name": "悍高集团",
+      "action": "buy",
+      "price": 32.5,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.46124031007751",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "600933",
+      "name": "爱柯迪",
+      "action": "buy",
+      "price": 13.13,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.43405275779378",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "601689",
+      "name": "拓普集团",
+      "action": "buy",
+      "price": 39.8,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.39520168731873",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002929",
+      "name": "润建股份",
+      "action": "buy",
+      "price": 42.18,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.23161033797216",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603755",
+      "name": "日辰股份",
+      "action": "buy",
+      "price": 26.95,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.17340590979782",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "600199",
+      "name": "金种子酒",
+      "action": "buy",
+      "price": 8.12,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.16129032258063",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002343",
+      "name": "慈文传媒",
+      "action": "buy",
+      "price": 9.33,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.07070707070707",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "603596",
+      "name": "伯特利",
+      "action": "buy",
+      "price": 26.07,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 67.04819277108435",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-18",
+      "code": "002297",
+      "name": "博云新材",
+      "action": "buy",
+      "price": 17.18,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 66.94275274056028",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
   "positions": {
     "603861": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "白云电器",
       "shares": 100,
       "entry_price": 11.8,
       "highest_price": 11.8,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "001221": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "悍高集团",
       "shares": 100,
       "entry_price": 32.5,
       "highest_price": 32.5,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "600933": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "爱柯迪",
       "shares": 100,
       "entry_price": 13.13,
       "highest_price": 13.13,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "601689": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "拓普集团",
       "shares": 100,
       "entry_price": 39.8,
       "highest_price": 39.8,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "002929": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "润建股份",
       "shares": 100,
       "entry_price": 42.18,
       "highest_price": 42.18,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "603755": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "日辰股份",
       "shares": 100,
       "entry_price": 26.95,
       "highest_price": 26.95,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "600199": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "金种子酒",
       "shares": 100,
       "entry_price": 8.12,
       "highest_price": 8.12,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "002343": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "慈文传媒",
       "shares": 100,
       "entry_price": 9.33,
       "highest_price": 9.33,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "603596": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "伯特利",
       "shares": 100,
       "entry_price": 26.07,
       "highest_price": 26.07,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     },
     "002297": {
-      "date": "2026-10-17",
+      "date": "2026-10-18",
       "name": "博云新材",
       "shares": 100,
       "entry_price": 17.18,
       "highest_price": 17.18,
-      "entry_date": "2026-10-17"
+      "entry_date": "2026-10-18"
     }
   },
   "daily_snapshots": []
