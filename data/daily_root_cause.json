@@ -1,10 +1,10 @@
 {
-  "date": "2026-10-16",
-  "total_recs": 13,
+  "date": "2026-10-20",
+  "total_recs": 6,
   "win_count": 0,
-  "fail_count": 1,
-  "no_data": 12,
-  "win_rate": 0.0,
+  "fail_count": 0,
+  "no_data": 6,
+  "win_rate": 0,
   "baseline": null,
   "causes": {
     "A_板块错配": {
@@ -31,139 +31,70 @@
       "hit": true,
       "items": [
         {
-          "code": "002674",
-          "name": "兴业科技",
-          "sector_cn": "辅料",
+          "code": "601963",
+          "name": "重庆银行",
+          "sector_cn": "银行",
+          "sector_enum": "bank",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600011",
+          "name": "华能国际",
+          "sector_cn": "火电",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "000909",
-          "name": "*ST数源",
-          "sector_cn": "房地产开发",
-          "sector_enum": "realestate",
+          "code": "603533",
+          "name": "掌阅科技",
+          "sector_cn": "移动互联网服务",
+          "sector_enum": "internet",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "002264",
-          "name": "新 华 都",
-          "sector_cn": "超市",
+          "code": "000848",
+          "name": "承德露露",
+          "sector_cn": "软饮料",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "603101",
-          "name": "汇嘉时代",
-          "sector_cn": "百货",
-          "sector_enum": "unknown",
+          "code": "000423",
+          "name": "东阿阿胶",
+          "sector_cn": "中药",
+          "sector_enum": "pharma",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "600737",
-          "name": "中粮糖业",
-          "sector_cn": "农林牧渔",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "603838",
-          "name": "*ST四通",
-          "sector_cn": "其他家用轻工",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "003006",
-          "name": "百亚股份",
-          "sector_cn": "造纸",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002454",
-          "name": "松芝股份",
-          "sector_cn": "汽车零部件",
-          "sector_enum": "auto",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "603982",
-          "name": "泉峰汽车",
-          "sector_cn": "汽车零部件",
-          "sector_enum": "auto",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002679",
-          "name": "福建金森",
-          "sector_cn": "林业",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002270",
-          "name": "华明装备",
-          "sector_cn": "线缆部件及其他",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "001229",
-          "name": "魅视科技",
-          "sector_cn": "软件开发",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": -6.01,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "600081",
-          "name": "东风科技",
-          "sector_cn": "汽车零部件",
-          "sector_enum": "auto",
+          "code": "002956",
+          "name": "西麦食品",
+          "sector_cn": "食品综合",
+          "sector_enum": "food",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         }
       ],
-      "watchlist": [
-        "汽车零部件"
-      ],
+      "watchlist": [],
       "cold_sectors": [
-        "辅料",
-        "房地产开发",
-        "超市",
-        "百货",
-        "农林牧渔",
-        "其他家用轻工",
-        "造纸",
-        "林业",
-        "线缆部件及其他",
-        "软件开发"
+        "银行",
+        "火电",
+        "移动互联网服务",
+        "软饮料",
+        "中药",
+        "食品综合"
       ],
-      "summary": "13 只命中冷启动板块 (11 个不同板块), watchlist: ['汽车零部件'], 单次冷板块: ['辅料', '房地产开发', '超市', '百货', '农林牧渔']"
+      "summary": "6 只命中冷启动板块 (6 个不同板块), 单次冷板块: ['银行', '火电', '移动互联网服务', '软饮料', '中药']"
     }
   },
   "hit_causes": [
@@ -174,24 +105,18 @@
     "hold_days_delta": 0,
     "weak_sectors_add": [],
     "weak_sectors_remove": [],
-    "watchlist": [
-      "汽车零部件"
-    ],
+    "watchlist": [],
     "position_delta": -5,
     "reasons": [
-      "E. 冷启动盲区: 13 只来自 10 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=['汽车零部件'], cold=['辅料', '房地产开发', '超市', '百货', '农林牧渔']"
+      "E. 冷启动盲区: 6 只来自 6 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['银行', '火电', '移动互联网服务', '软饮料', '中药']"
     ],
     "cold_sectors": [
-      "辅料",
-      "房地产开发",
-      "超市",
-      "百货",
-      "农林牧渔",
-      "其他家用轻工",
-      "造纸",
-      "林业",
-      "线缆部件及其他",
-      "软件开发"
+      "银行",
+      "火电",
+      "移动互联网服务",
+      "软饮料",
+      "中药",
+      "食品综合"
     ]
   }
 }

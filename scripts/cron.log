@@ -10975,3 +10975,187 @@ hint: preference for all repositories. You can also pass --rebase, --no-rebase,
 hint: or --ff-only on the command line to override the configured default per
 hint: invocation.
 fatal: Need to specify how to reconcile divergent branches.
+[AAna] Git pull 失败: From github.com:wssaidong/AAna
+ * branch            main       -> FETCH_HEAD
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+[AAna] 调参生效 (strategy_policy): [strategy_policy] source=rec_tuning threshold=73 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=2.5d
+  [strategy_policy] 阈值 65→73 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna] 清理过期报告: 2026-10-09-选股报告.md
+[AAna] 清理过期报告: 2026-10-11-基金周报.md
+[AAna] 共清理 2 个过期文件
+[AAna v2.5] 生成 2026-10-19 动态选股报告...
+[情绪] 涨停:59 跌停:6 上证:-0.04% [数据源:ths]
+[情绪] 回暖 | 涨停59 跌停6 平均涨跌-0.04%
+[情绪] 涨停:59 跌停:6 上证:-0.04% [数据源:ths]
+[情绪] 涨停股池失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna] 动态股票池: 313 只 (涨停警示 0 只)
+[资金流] 东财重试 1/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 2/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 3/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] ⚠️ 30/30 只 fallback (接口全挂), composite_score 会用 net_in=0 (中性 50 分)
+[资金流] 获取 30 只资金数据
+[AAna] 获取 40 只股票数据...
+  [指数] 已补拉 4/4 个指数
+[情绪] 板块数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna Fund] 加载基金类型映射...
+[AAna Fund] 已加载 26845 只基金类型
+[AAna Fund] 获取 股票型 基金...
+[AAna Fund] 获取 混合型 基金...
+[AAna Fund] 获取 指数型 基金...
+[AAna Fund] 获取 债券型 基金...
+[AAna Fund] 获取 QDII 基金...
+[AAna Fund] 获取 FOF 基金...
+[AAna Fund] 共 1481 只基金，类型分布: {'指数型': 251, '混合型': 885, '未知': 107, 'QDII': 32, 'FOF': 9, '债券型': 197}
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-10-19-选股报告.md
+[AAna v2.5] 生成 2026-10-19 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-10-19_09_00.json，跳过复盘报告
+[AAna] Git pull 失败: From github.com:wssaidong/AAna
+ * branch            main       -> FETCH_HEAD
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+[AAna] 调参生效 (strategy_policy): [strategy_policy] source=rec_tuning threshold=63 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.0d
+  [strategy_policy] 阈值 65→63 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna v2.5] 生成 2026-10-19 动态选股报告...
+[情绪] 涨停:49 跌停:5 上证:-0.08% [数据源:ths]
+[情绪] 分歧 | 涨停49 跌停5 平均涨跌-0.08%
+[情绪] 涨停:49 跌停:5 上证:-0.08% [数据源:ths]
+[情绪] 涨停股池失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna] 动态股票池: 357 只 (涨停警示 0 只)
+[资金流] 东财重试 1/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 2/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 3/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] ⚠️ 30/30 只 fallback (接口全挂), composite_score 会用 net_in=0 (中性 50 分)
+[资金流] 获取 30 只资金数据
+[AAna] 获取 40 只股票数据...
+  [指数] 已补拉 4/4 个指数
+[情绪] 板块数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna Fund] 加载基金类型映射...
+[AAna Fund] 已加载 26848 只基金类型
+[AAna Fund] 获取 股票型 基金...
+[AAna Fund] 获取 混合型 基金...
+[AAna Fund] 获取 指数型 基金...
+[AAna Fund] 获取 债券型 基金...
+[AAna Fund] 获取 QDII 基金...
+[AAna Fund] 获取 FOF 基金...
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-10-19-选股报告.md
+[AAna v2.5] 生成 2026-10-19 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-10-19_09_00.json，跳过复盘报告
+[AAna] Git pull 失败: From github.com:wssaidong/AAna
+ * branch            main       -> FETCH_HEAD
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+[AAna] 调参生效 (strategy_policy): [strategy_policy] source=rec_tuning threshold=63 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.5d
+  [strategy_policy] 阈值 65→63 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna] 清理过期报告: 2026-10-12-选股报告.md
+[AAna] 共清理 1 个过期文件
+[AAna v2.5] 生成 2026-10-20 动态选股报告...
+[情绪] 涨停:49 跌停:5 上证:-0.08% [数据源:ths]
+[情绪] 分歧 | 涨停49 跌停5 平均涨跌-0.08%
+[情绪] 涨停:49 跌停:5 上证:-0.08% [数据源:ths]
+[情绪] 涨停股池失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna] 动态股票池: 357 只 (涨停警示 0 只)
+[资金流] 东财重试 1/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 2/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 3/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] ⚠️ 30/30 只 fallback (接口全挂), composite_score 会用 net_in=0 (中性 50 分)
+[资金流] 获取 30 只资金数据
+[AAna] 获取 40 只股票数据...
+  [指数] 已补拉 4/4 个指数
+[情绪] 板块数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna Fund] 加载基金类型映射...
+[AAna Fund] 已加载 26848 只基金类型
+[AAna Fund] 获取 股票型 基金...
+[AAna Fund] 获取 混合型 基金...
+[AAna Fund] 获取 指数型 基金...
+[AAna Fund] 获取 债券型 基金...
+[AAna Fund] 获取 QDII 基金...
+[AAna Fund] 获取 FOF 基金...
+[AAna Fund] 共 1479 只基金，类型分布: {'混合型': 746, '未知': 100, '指数型': 385, '债券型': 200, 'QDII': 41, 'FOF': 7}
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-10-20-选股报告.md
+[AAna v2.5] 生成 2026-10-20 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-10-20_09_00.json，跳过复盘报告
+[AAna] Git pull 失败: From github.com:wssaidong/AAna
+ * branch            main       -> FETCH_HEAD
+hint: You have divergent branches and need to specify how to reconcile them.
+hint: You can do so by running one of the following commands sometime before
+hint: your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+fatal: Need to specify how to reconcile divergent branches.
+[AAna] 调参生效 (strategy_policy): [strategy_policy] source=rec_tuning threshold=63 top_n=10 hold=1d blacklist=[ai_app,chem,elec,mach,semi] tuning_age=0.0d
+  [strategy_policy] 阈值 65→63 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 5 个: ai_app,semi,chem,mach,elec (样本≥10 且胜率<35%)
+[AAna v2.5] 生成 2026-10-20 动态选股报告...
+[情绪] 涨停:56 跌停:6 上证:-0.21% [数据源:ths]
+[情绪] 回暖 | 涨停56 跌停6 平均涨跌-0.21%
+[情绪] 涨停:56 跌停:6 上证:-0.21% [数据源:ths]
+[情绪] 涨停股池失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna] 动态股票池: 133 只 (涨停警示 0 只)
+[资金流] 东财重试 1/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 2/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] 东财重试 3/3 失败: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[资金流] ⚠️ 30/30 只 fallback (接口全挂), composite_score 会用 net_in=0 (中性 50 分)
+[资金流] 获取 30 只资金数据
+[AAna] 获取 40 只股票数据...
+  [指数] 已补拉 4/4 个指数
+[情绪] 板块数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[情绪] 北向资金失败: 'NoneType' object has no attribute 'get'
+[AAna Fund] 加载基金类型映射...
+[AAna Fund] 已加载 26848 只基金类型
+[AAna Fund] 获取 股票型 基金...
+[AAna Fund] 获取 混合型 基金...
+[AAna Fund] 获取 指数型 基金...
+[AAna Fund] 获取 债券型 基金...
+[AAna Fund] 获取 QDII 基金...
+[AAna Fund] 获取 FOF 基金...
+[AAna Fund] 共 1480 只基金，类型分布: {'混合型': 737, '未知': 92, '指数型': 402, '债券型': 200, 'QDII': 42, 'FOF': 7}
+[AAna] 选股报告已生成: /Users/cai/code/AAna/reports/2026-10-20-选股报告.md
+[AAna v2.5] 生成 2026-10-20 复盘评分报告...
+[AAna] 早盘快照不存在: /Users/cai/code/AAna/reports/.snapshot_2026-10-20_09_00.json，跳过复盘报告
