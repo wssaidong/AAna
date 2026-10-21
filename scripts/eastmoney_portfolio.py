@@ -346,13 +346,64 @@ def get_group_stocks(gid):
     return stocks
 
 
+def parse_top10_from_report(content):
+    """
+    从选股报告 markdown 内容解析 "🏆 重点关注 Top 10" 表格的 6 位股票代码。
+
+    v2026-10-21 修复 (P0 静默空跑):
+      旧实现用 `## 三、精选个股.*?(?=^---)` 切小节, 但 2026-08-07 commit fd7b691
+      在 "## 三、精选个股" 标题后插入了 "### ⏱ 持仓策略" 块 + 一条 `---` 分隔线,
+      于是非贪婪匹配在 Top10 表格 **之前** 就被 `---` 截断 → 永远返回 []。
+      后果: sync_top10_v9.py 内部同步自 8/7 起静默空跑 (~33 个交易日),
+            generate_report.py 里的自动同步同样完全失效, 且无任何报错。
+
+      新实现: 先按标题切到 "重点关注 Top 10" 小节 (到下一个 ### / ## 为止),
+      再按行解析表格, 取第 3 列的 6 位代码; 找不到小节时回退到全文表格扫描。
+      同一只股票在多个小节出现时只保留第一次 (去重)。
+    """
+    import re
+
+    def _rows(block):
+        out = []
+        for line in block.split('\n'):
+            ls = line.strip()
+            if not ls.startswith('|') or ls.startswith('|:'):
+                continue
+            cells = [c.strip() for c in ls.strip('|').split('|')]
+            if len(cells) < 3:
+                continue
+            # 表头行含中文列名, 跳过
+            if any('代码' in c or '排名' in c for c in cells[:3]):
+                continue
+            code = cells[2]
+            if re.match(r'^\d{6}$', code):
+                out.append(code)
+        return out
+
+    top10 = []
+    m = re.search(r'###\s*[^\n]*重点关注\s*Top\s*10(.*?)(?=\n###|\n##\s|\Z)', content, re.DOTALL)
+    if m:
+        # 小节存在 → 只解析该小节。表格为空 = 当天真的 0 候选 (0 推荐铁律),
+        # 绝不能回退到全文扫描, 否则会把基金表/持仓表里的代码误当成推荐。
+        top10 = _rows(m.group(1))
+    else:
+        # 老报告无 🏆 标题 → 回退全文表格扫描
+        top10 = _rows(content)
+
+    # 3) 去重保序 + 截断到 10 只
+    seen, uniq = set(), []
+    for c in top10:
+        if c not in seen:
+            seen.add(c)
+            uniq.append(c)
+    return uniq[:10]
+
+
 def get_snapshot_top10(date_str=None):
     """
     从每日选股报告 .md 文件解析 Top 10 精选个股（按综合评分排序）
     date_str: yyyy-MM-dd 格式，默认为昨天
     """
-    import re
-
     if date_str is None:
         date_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -365,35 +416,7 @@ def get_snapshot_top10(date_str=None):
     with open(report_md) as f:
         content = f.read()
 
-    # 解析 Markdown 表格中的 Top 10（"重点关注 Top 10" 章节之后）
-    # 表格格式: | 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 | 信号 | 风险 |
-    top10 = []
-    in_top10_section = False
-    for line in content.split('\n'):
-        if '重点关注 Top 10' in line or '🏆 重点关注' in line:
-            in_top10_section = True
-            continue
-        if in_top10_section and line.startswith('|') and '|' in line.strip() and not line.strip().startswith('|:'):
-            # 跳过表头行
-            if '排名' in line or '代码' in line:
-                continue
-            parts = [p.strip() for p in line.split('|')]
-            if len(parts) >= 4:
-                # parts: ['', '1', '📊name', 'code', ...]
-                code = None
-                for p in parts:
-                    # 代码是纯数字或6位字符串
-                    if p and re.match(r'^\d{6}$', p):
-                        code = p
-                        break
-                if code:
-                    top10.append(code)
-                    if len(top10) >= 10:
-                        break
-        elif in_top10_section and line.startswith('## '):
-            # 进入下一章节，停止解析
-            break
-
+    top10 = parse_top10_from_report(content)
     print(f"[Eastmoney] 报告 Top10: {top10}")
     return top10
 
