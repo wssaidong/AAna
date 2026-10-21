@@ -56,7 +56,15 @@ def tencent_quote(codes):
 def get_indices():
     """上证/深证/创业板/中小100/沪深300/科创50 — 用 ds.tencent_quote"""
     codes = ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]
-    return tencent_quote(codes)
+    q = tencent_quote(codes)
+    # ⚠️ 2026-10-21 修复: ds.tencent_quote 同时返回裸 6 位 key 和带前缀 key
+    # （2026-08-31 兼容性改造），6 个指数会变成 12 个条目。
+    # 旧代码 `len(indices) != 6` 因此永远误报 "只拉到 12/6 个指数"。
+    # 正确做法: 按实际需要的 6 个带前缀 key 判断覆盖率。
+    missing = [c for c in codes if c not in q]
+    if missing:
+        print(f"⚠️  指数缺失: {missing}")
+    return q
 
 
 def ths_hot(date_str):
@@ -115,24 +123,28 @@ def theme_counter(hot_list):
 
 
 def get_industry_ranking(top_n=10):
-    """东财行业涨跌 — 用 ds.eastmoney_datacenter fallback 链 (push2 → push2delay)
+    """东财行业涨跌 — 用 ds.industry_comparison（已内置 fid=f3 排序 + 全量分页）
 
-    ds.industry_comparison 返回 dict: {top: [...], bottom: [...], total: int}
-    本函数适配返回结构并打上 source 标记。
+    ds.industry_comparison 返回 dict: {top, bottom, total, fetched, source}
+    契约（2026-10-21 修复后）:
+      - top:    涨幅榜，按 change_pct 降序
+      - bottom: 跌幅榜，按 change_pct 升序（**最差在前**）
+    ⚠️ 旧代码用 `bottom[-top_n:]` 取跌幅榜，在 bottom 已按升序排列后会拿到
+    "跌幅榜里最不差的那几条"，反而丢掉真正的跌幅榜 → 榜单标签与内容相反。
     """
-    raw = ds.industry_comparison(top_n=top_n * 2)  # 取双倍才能给 bottom
+    raw = ds.industry_comparison(top_n=top_n)  # ds 已同时给出 top/bottom 各 top_n 条
     if not isinstance(raw, dict):
         return {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
-    # 2026-08-31 修复: ds.industry_comparison 已直接返回 sorted rows 在 top/ bottom keys,
-    # 不再二次提取 raw["rows"],否则会失去排序后的行业列表
     top = raw.get("top", []) or []
     bottom = raw.get("bottom", []) or []
     return {
         "top": top[:top_n],
-        "bottom": bottom[-top_n:] if len(bottom) >= top_n else [],
+        "bottom": bottom[:top_n],  # bottom 已是"最差在前"，直接取头部
         "total": raw.get("total", len(top) + len(bottom)),
-        "returned": len(top) + len(bottom),
-        "source": "scripts.data_sources.industry_comparison",
+        "returned": raw.get("fetched", len(top) + len(bottom)),
+        "universe": raw.get("universe", raw.get("total", 0)),
+        "source": raw.get("source", "scripts.data_sources.industry_comparison"),
+        "error": raw.get("error", ""),
     }
 
 
@@ -214,6 +226,28 @@ def parse_top10_with_baseline(date_str):
     return rows
 
 
+def resolve_theme_label(reason, final_priority):
+    """从同花顺 reason 解析题材标签。
+
+    规则:
+      1. 命中 final_priority（当日热度 Top5 + 硬编码 20 项）→ 用该 priority 词；
+         但若标的自身标签里有更具体的包含该词的标签，取**最长的那个**
+         （reason="人形机器人" + priority 含"机器人" → 显示"人形机器人"，
+          不显示"机器人"，避免丢掉"人形机器人当日 ↓5"这类信息）。
+      2. 未命中 priority → 取 reason 首个非 ST 标签（保证新题材 20cm 涨停能入榜）。
+      3. 无任何标签 → None（调用方跳过该股）。
+    """
+    tags = [t.strip() for t in str(reason or "").split("+")
+            if t.strip() and t.strip() != "ST板块"]
+    matched = next((theme for theme in (final_priority or []) if theme in str(reason or "")), None)
+    if matched:
+        cands = [t for t in tags if matched in t]
+        if cands:
+            return max(cands, key=len)
+        return matched
+    return tags[0] if tags else None
+
+
 def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
                             other_5_avg=None):
     """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。"""
@@ -228,6 +262,17 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
         return "📈 假平稳真急涨型（v1.22第五层）"
     if min_delta <= -3.5:
         return "📉 假突破后尾盘跳水型（v1.22第四层）"
+    # ⚠️ 2026-10-21 新增（v1.28）: 单点 V 型反转层
+    # 触发条件: 某个指数 14:45→15:00 **跨越零点**（正负号翻转）且 |Δ| >= 2pp，
+    # 同时大盘整体为负（其余指数在跌）→ 该指数是当日唯一逆势方向。
+    # 与 v1.24 第六层（科创50 单点跳水）是**镜像场景**: 那次是 kc50 独跌，
+    # 这次是 kc50 独涨/翻红，v1.14/v1.22/v1.24 六层检测全部落空 →
+    # 战报会写"震荡"，掩盖"盘中冰点读数被收盘推翻"的关键信息。
+    for name, v1445, v1500, delta in (gap_rows or []):
+        if (v1445 < 0 < v1500) or (v1500 < 0 < v1445):
+            if abs(delta) >= 2.0 and market_avg < 0:
+                direction = "翻红" if v1500 > 0 else "翻绿"
+                return f"🔄 单点V型反转型（{name} 尾盘{direction} {delta:+.2f}pp，其余指数普跌）"
     if sh_pct < -1.5 and kc50_pct < -5:
         return "📉 平稳转急跌型（模式⑦）"
     if other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
@@ -250,8 +295,13 @@ def eval_index(pct):
 def generate_full_report(date_str):
     print(f"[1/5] 拉大盘指数…")
     indices = get_indices()
-    if len(indices) != 6:
-        print(f"⚠️  只拉到 {len(indices)}/6 个指数")
+    # ⚠️ 2026-10-21 修复: ds.tencent_quote 同时返回裸 key + 带前缀 key，
+    # len(indices) 恒为 12（6 指数 × 2），旧的 `!= 6` 判据永远误报。
+    # 改为按实际需要的 6 个带前缀 key 统计覆盖率。
+    _expect = ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]
+    _got = sum(1 for k in _expect if k in indices)
+    if _got != len(_expect):
+        print(f"⚠️  只拉到 {_got}/{len(_expect)} 个指数")
 
     print(f"[2/5] 拉强势股…")
     hot = ths_hot(date_str)
@@ -337,12 +387,9 @@ def generate_full_report(date_str):
         if len(selected) >= 5:
             break
         reason = h.get("reason", "")
-        matched = next((theme for theme in final_priority if theme in reason), None)
-        if not matched:
-            # 20cm/涨停股即使题材不在既有 priority，也应使用 reason 首标签入榜，
-            # 避免 AI智能体、DeepSeek 等新题材被硬编码列表漏掉。
-            matched = next((tag.strip() for tag in reason.split("+")
-                            if tag.strip() and tag.strip() != "ST板块"), None)
+        # ⚠️ 2026-10-21: 标签解析统一走 resolve_theme_label（子串命中时回退到
+        # 标的自身的更具体标签，如"人形机器人"而非"机器人"）
+        matched = resolve_theme_label(reason, final_priority)
         if not matched:
             continue
         # 先按 20cm 优先排序后的股票流逐个选；同一题材只取一只，保证题材多样性。
@@ -406,10 +453,26 @@ def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
     name_map = {"sh000001": "上证指数", "sz399001": "深证成指",
                 "sz399006": "创业板指", "sz399005": "中小100",
                 "sz399300": "沪深300", "sh000688": "科创50"}
+    # ⚠️ 2026-10-21 修复: 盘中/尾盘报告的指数行标签并不统一 ——
+    # 实测 `2026-10-21-尾盘选股.md` 写的是 "| 创业板 |" 而非 "| 创业板指 |"，
+    # 旧 name_map 只匹配全称 → 创业板被静默跳过，警示表只剩 3/6 指数。
+    # 这里为每个指数配置别名，任一别名命中即算抓到。
+    name_aliases = {
+        "sh000001": ["上证指数", "上证"],
+        "sz399001": ["深证成指", "深证"],
+        "sz399006": ["创业板指", "创业板"],
+        "sz399005": ["中小100", "中小板100"],
+        "sz399300": ["沪深300", "沪深 300"],
+        "sh000688": ["科创50", "科创 50"],
+    }
     rows, has_alert = [], False
     for k, name in name_map.items():
         # ⚠️ v1.5 修复: regex 必须跨管道 .*?（不是 [^|]*?）
-        m = re.search(rf"\|\s*{name}\s*\|.*?([+-]?\d+\.\d+)\s*%", tail_content)
+        m = None
+        for alias in name_aliases.get(k, [name]):
+            m = re.search(rf"\|\s*{re.escape(alias)}\s*\|.*?([+-]?\d+\.\d+)\s*%", tail_content)
+            if m:
+                break
         if not m:
             # ⚠️ v1.13 修复: 跳过缺失指数（如盘中报告无沪深300/中小100）
             continue
@@ -454,12 +517,15 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         top_text = " / ".join(
             f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["top"][:5]
         )
+        # ⚠️ 2026-10-21 修复: bottom 现在是"最差在前"（ds 端已排好），
+        # 旧代码用 [-5:] 会取到跌幅榜里最不差的几条 → 跌幅榜标签与内容相反。
         bottom_text = " / ".join(
-            f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["bottom"][-5:]
+            f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["bottom"][:5]
         )
         md += f"📈 **东财行业涨幅 Top5：** {top_text}\n"
         md += f"📉 **东财行业跌幅 Bottom5：** {bottom_text}\n"
-        md += f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('total', 0)} 个行业板块。\n"
+        md += (f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('universe', 0)} "
+               f"个行业板块（m:90+t:2 全量）。\n")
         if "push2delay" in industry.get("source", ""):
             md += "> 数据源降级：东财 push2 主域断连，已切换官方 push2delay 域。\n\n"
     else:
@@ -518,7 +584,9 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
     if hit_rows:
         baseline_avg = sum(r[2] for r in hit_rows) / len(hit_rows)
         continuation_negative = sum(1 for r in hit_rows if r[4] < 0)
-        md += f"\n📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/len(hit_rows)*100:.1f}%\n"
+        # ⚠️ v1.19/v1.24: 样本量不足时命中率必须带 ⚠️ 前缀，不得以正常数字呈现
+        hit_prefix = "⚠️ " if len(hit_rows) < 7 else ""
+        md += f"\n{hit_prefix}📊 **命中率：** {len(positives)}/{len(hit_rows)} = {len(positives)/len(hit_rows)*100:.1f}%\n"
         md += f"- 整体均值：{avg:+.2f}% | 正：{avg_pos:+.2f}% | 负：{avg_neg:+.2f}%\n"
         md += f"- baseline均值：{baseline_avg:+.2f}% | {continuation_negative}/{len(hit_rows)} 负延续 | Δ均值：{avg - baseline_avg:+.2f}pp\n"
         md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}pp**\n"
@@ -560,6 +628,21 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"1️⃣ **大盘性质：** ⚠️ 假突破后尾盘跳水型！最深时点差 {min_delta:+.2f}pp，盘中建议已被收盘推翻\n"
         md += "2️⃣ **回避：** 追高强势股与高Beta小盘股，先看次日开盘量能\n"
         md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头能否扛住杀跌\n"
+    elif any((r[1] < 0 < r[2]) or (r[2] < 0 < r[1]) for r in (gap_rows or [])) and max_delta >= 2.0:
+        # ⚠️ 2026-10-21 新增（v1.28）: 单点 V 型反转 → 盘中读数被收盘推翻
+        flip = next((r for r in (gap_rows or [])
+                     if ((r[1] < 0 < r[2]) or (r[2] < 0 < r[1])) and abs(r[3]) >= 2.0),
+                    None) or ("某指数", 0.0, 0.0, max_delta)
+        flip_name = flip[0]
+        md += (f"1️⃣ **大盘性质：** 🔄 单点V型反转！{flip_name} 14:45 {flip[1]:+.2f}% → 收盘 {flip[2]:+.2f}%"
+               f"（Δ={flip[3]:+.2f}pp），四大核心指数均值 {market_avg:+.2f}% —— 盘中\"冰点\"读数已被收盘推翻，"
+               f"明日{flip_name}能否延续是首要验证点\n")
+        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 龙头若高开不回落且成交不萎缩50%则结构延续；"
+               f"若{flip_name}再度翻绿则今日翻红属尾盘脉冲而非趋势反转\n")
+        md += (f"3️⃣ **候选池修正：** 上游仅 {len(hit_rows)} 只样本"
+               f"{'（⚠️ 完整度不足，命中率不可外推）' if len(hit_rows) < 7 else ''}，"
+               f"整体均值 {avg:+.2f}% vs 上证 {sh_pct:+.2f}%，"
+               f"{'暂不据此调仓' if len(hit_rows) < 7 else '关注延续性'}\n")
     elif sh_pct < -1.5 and kc50_pct < -5:
         md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！创业板/科创50收盘 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%\n"
         md += "2️⃣ **回避：** 追高强势股 + 小盘题材投机\n"
