@@ -3806,56 +3806,264 @@
       "reason": "AAna v2.4 尾盘评分 63",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "601963",
+      "name": "重庆银行",
+      "action": "sell",
+      "price": 11.07,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -5.0,
+      "pnl_pct": -0.45
+    },
+    {
+      "date": "2026-10-21",
+      "code": "600011",
+      "name": "华能国际",
+      "action": "sell",
+      "price": 7.48,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 2.0,
+      "pnl_pct": 0.27
+    },
+    {
+      "date": "2026-10-21",
+      "code": "603533",
+      "name": "掌阅科技",
+      "action": "sell",
+      "price": 28.71,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -7.0,
+      "pnl_pct": -0.24
+    },
+    {
+      "date": "2026-10-21",
+      "code": "000848",
+      "name": "承德露露",
+      "action": "sell",
+      "price": 8.52,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -3.0,
+      "pnl_pct": -0.35
+    },
+    {
+      "date": "2026-10-21",
+      "code": "000423",
+      "name": "东阿阿胶",
+      "action": "sell",
+      "price": 48.63,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 9.0,
+      "pnl_pct": 0.19
+    },
+    {
+      "date": "2026-10-21",
+      "code": "002956",
+      "name": "西麦食品",
+      "action": "sell",
+      "price": 18.99,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -7.0,
+      "pnl_pct": -0.37
+    },
+    {
+      "date": "2026-10-21",
+      "code": "603976",
+      "name": "正川股份",
+      "action": "buy",
+      "price": 32.98,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "603355",
+      "name": "莱克电气",
+      "action": "buy",
+      "price": 33.91,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "000815",
+      "name": "美利云",
+      "action": "buy",
+      "price": 15.45,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "002549",
+      "name": "凯美特气",
+      "action": "buy",
+      "price": 13.38,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "002995",
+      "name": "天地在线",
+      "action": "buy",
+      "price": 18.16,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "002587",
+      "name": "奥拓电子",
+      "action": "buy",
+      "price": 5.51,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "002178",
+      "name": "延华智能",
+      "action": "buy",
+      "price": 5.09,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "001266",
+      "name": "宏英智能",
+      "action": "buy",
+      "price": 41.47,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "003021",
+      "name": "兆威机电",
+      "action": "buy",
+      "price": 75.62,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-21",
+      "code": "600843",
+      "name": "上工申贝",
+      "action": "buy",
+      "price": 8.83,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
   "positions": {
-    "601963": {
-      "date": "2026-10-20",
-      "name": "重庆银行",
+    "603976": {
+      "date": "2026-10-21",
+      "name": "正川股份",
       "shares": 100,
-      "entry_price": 11.12,
-      "highest_price": 11.12,
-      "entry_date": "2026-10-20"
+      "entry_price": 32.98,
+      "highest_price": 32.98,
+      "entry_date": "2026-10-21"
     },
-    "600011": {
-      "date": "2026-10-20",
-      "name": "华能国际",
+    "603355": {
+      "date": "2026-10-21",
+      "name": "莱克电气",
       "shares": 100,
-      "entry_price": 7.46,
-      "highest_price": 7.46,
-      "entry_date": "2026-10-20"
+      "entry_price": 33.91,
+      "highest_price": 33.91,
+      "entry_date": "2026-10-21"
     },
-    "603533": {
-      "date": "2026-10-20",
-      "name": "掌阅科技",
+    "000815": {
+      "date": "2026-10-21",
+      "name": "美利云",
       "shares": 100,
-      "entry_price": 28.78,
-      "highest_price": 28.78,
-      "entry_date": "2026-10-20"
+      "entry_price": 15.45,
+      "highest_price": 15.45,
+      "entry_date": "2026-10-21"
     },
-    "000848": {
-      "date": "2026-10-20",
-      "name": "承德露露",
+    "002549": {
+      "date": "2026-10-21",
+      "name": "凯美特气",
       "shares": 100,
-      "entry_price": 8.55,
-      "highest_price": 8.55,
-      "entry_date": "2026-10-20"
+      "entry_price": 13.38,
+      "highest_price": 13.38,
+      "entry_date": "2026-10-21"
     },
-    "000423": {
-      "date": "2026-10-20",
-      "name": "东阿阿胶",
+    "002995": {
+      "date": "2026-10-21",
+      "name": "天地在线",
       "shares": 100,
-      "entry_price": 48.54,
-      "highest_price": 48.54,
-      "entry_date": "2026-10-20"
+      "entry_price": 18.16,
+      "highest_price": 18.16,
+      "entry_date": "2026-10-21"
     },
-    "002956": {
-      "date": "2026-10-20",
-      "name": "西麦食品",
+    "002587": {
+      "date": "2026-10-21",
+      "name": "奥拓电子",
       "shares": 100,
-      "entry_price": 19.06,
-      "highest_price": 19.06,
-      "entry_date": "2026-10-20"
+      "entry_price": 5.51,
+      "highest_price": 5.51,
+      "entry_date": "2026-10-21"
+    },
+    "002178": {
+      "date": "2026-10-21",
+      "name": "延华智能",
+      "shares": 100,
+      "entry_price": 5.09,
+      "highest_price": 5.09,
+      "entry_date": "2026-10-21"
+    },
+    "001266": {
+      "date": "2026-10-21",
+      "name": "宏英智能",
+      "shares": 100,
+      "entry_price": 41.47,
+      "highest_price": 41.47,
+      "entry_date": "2026-10-21"
+    },
+    "003021": {
+      "date": "2026-10-21",
+      "name": "兆威机电",
+      "shares": 100,
+      "entry_price": 75.62,
+      "highest_price": 75.62,
+      "entry_date": "2026-10-21"
+    },
+    "600843": {
+      "date": "2026-10-21",
+      "name": "上工申贝",
+      "shares": 100,
+      "entry_price": 8.83,
+      "highest_price": 8.83,
+      "entry_date": "2026-10-21"
     }
   },
   "daily_snapshots": []
