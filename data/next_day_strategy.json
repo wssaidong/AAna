@@ -1,13 +1,8 @@
 {
-  "date_for": "2026-10-21",
+  "date_for": "2026-10-22",
   "score_threshold": 63,
   "hold_days": 1,
   "weak_sectors": [
-    "ai_app",
-    "chem",
-    "elec",
-    "mach",
-    "robot",
     "semi",
     "印制电路板"
   ],
@@ -15,12 +10,16 @@
   "position_base": 50,
   "watchlist": [],
   "cold_sectors": [
-    "银行",
-    "火电",
-    "移动互联网服务",
-    "软饮料",
-    "中药",
-    "食品综合"
+    "医疗器械",
+    "小家电",
+    "造纸",
+    "其他化学制品",
+    "营销服务",
+    "LED",
+    "其他专业工程",
+    "仪器仪表",
+    "电机",
+    "纺织服装设备"
   ],
   "tuning_log": [
     {
@@ -29,13 +28,8 @@
       "threshold": 60,
       "hold_days": 1,
       "weak_sectors": [
-        "ai_app",
-        "chem",
-        "mach",
-        "elec",
         "semi",
-        "印制电路板",
-        "robot"
+        "印制电路板"
       ]
     },
     {
@@ -46,19 +40,23 @@
       "weak_sectors_added": [],
       "watchlist": [],
       "cold_sectors": [
-        "银行",
-        "火电",
-        "移动互联网服务",
-        "软饮料",
-        "中药",
-        "食品综合"
+        "医疗器械",
+        "小家电",
+        "造纸",
+        "其他化学制品",
+        "营销服务",
+        "LED",
+        "其他专业工程",
+        "仪器仪表",
+        "电机",
+        "纺织服装设备"
       ],
       "reasons": [
-        "E. 冷启动盲区: 6 只来自 6 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['银行', '火电', '移动互联网服务', '软饮料', '中药']"
+        "E. 冷启动盲区: 10 只来自 10 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['医疗器械', '小家电', '造纸', '其他化学制品', '营销服务']"
       ]
     }
   ],
-  "generated_at": "2026-10-20T16:10:32",
+  "generated_at": "2026-10-21T16:10:28",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"

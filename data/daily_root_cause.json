@@ -1,9 +1,9 @@
 {
-  "date": "2026-10-20",
-  "total_recs": 6,
+  "date": "2026-10-21",
+  "total_recs": 10,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 6,
+  "no_data": 10,
   "win_rate": 0,
   "baseline": null,
   "causes": {
@@ -31,70 +31,110 @@
       "hit": true,
       "items": [
         {
-          "code": "601963",
-          "name": "重庆银行",
-          "sector_cn": "银行",
-          "sector_enum": "bank",
+          "code": "603976",
+          "name": "正川股份",
+          "sector_cn": "医疗器械",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 医疗器械 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "603355",
+          "name": "莱克电气",
+          "sector_cn": "小家电",
+          "sector_enum": "home_appliance",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "600011",
-          "name": "华能国际",
-          "sector_cn": "火电",
+          "code": "000815",
+          "name": "美利云",
+          "sector_cn": "造纸",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "603533",
-          "name": "掌阅科技",
-          "sector_cn": "移动互联网服务",
-          "sector_enum": "internet",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "000848",
-          "name": "承德露露",
-          "sector_cn": "软饮料",
+          "code": "002549",
+          "name": "凯美特气",
+          "sector_cn": "其他化学制品",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "000423",
-          "name": "东阿阿胶",
-          "sector_cn": "中药",
-          "sector_enum": "pharma",
+          "code": "002995",
+          "name": "天地在线",
+          "sector_cn": "营销服务",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 营销服务 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "002587",
+          "name": "奥拓电子",
+          "sector_cn": "",
+          "sector_enum": "LED",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
         },
         {
-          "code": "002956",
-          "name": "西麦食品",
-          "sector_cn": "食品综合",
-          "sector_enum": "food",
+          "code": "002178",
+          "name": "延华智能",
+          "sector_cn": "其他专业工程",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 其他专业工程 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "001266",
+          "name": "宏英智能",
+          "sector_cn": "仪器仪表",
+          "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
           "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "003021",
+          "name": "兆威机电",
+          "sector_cn": "电机",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600843",
+          "name": "上工申贝",
+          "sector_cn": "纺织服装设备",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 纺织服装设备 (enum=unknown) 未在 sec_stats 里, cold sector risk"
         }
       ],
       "watchlist": [],
       "cold_sectors": [
-        "银行",
-        "火电",
-        "移动互联网服务",
-        "软饮料",
-        "中药",
-        "食品综合"
+        "医疗器械",
+        "小家电",
+        "造纸",
+        "其他化学制品",
+        "营销服务",
+        "LED",
+        "其他专业工程",
+        "仪器仪表",
+        "电机",
+        "纺织服装设备"
       ],
-      "summary": "6 只命中冷启动板块 (6 个不同板块), 单次冷板块: ['银行', '火电', '移动互联网服务', '软饮料', '中药']"
+      "summary": "10 只命中冷启动板块 (10 个不同板块), 单次冷板块: ['医疗器械', '小家电', '造纸', '其他化学制品', '营销服务']"
     }
   },
   "hit_causes": [
@@ -108,15 +148,19 @@
     "watchlist": [],
     "position_delta": -5,
     "reasons": [
-      "E. 冷启动盲区: 6 只来自 6 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['银行', '火电', '移动互联网服务', '软饮料', '中药']"
+      "E. 冷启动盲区: 10 只来自 10 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['医疗器械', '小家电', '造纸', '其他化学制品', '营销服务']"
     ],
     "cold_sectors": [
-      "银行",
-      "火电",
-      "移动互联网服务",
-      "软饮料",
-      "中药",
-      "食品综合"
+      "医疗器械",
+      "小家电",
+      "造纸",
+      "其他化学制品",
+      "营销服务",
+      "LED",
+      "其他专业工程",
+      "仪器仪表",
+      "电机",
+      "纺织服装设备"
     ]
   }
 }
