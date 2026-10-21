@@ -2,101 +2,96 @@
   "recommended_score_threshold": 60,
   "recommended_hold_days": 1,
   "weak_sectors": [
-    "ai_app",
-    "chem",
-    "mach",
-    "elec",
     "semi",
-    "印制电路板",
-    "robot"
+    "印制电路板"
   ],
-  "total_records": 1014,
-  "overall_win_rate": 32.544378698224854,
+  "total_records": 285,
+  "overall_win_rate": 39.64912280701755,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-10-20T20:00:31.148708",
+  "generated_at": "2026-10-21T15:49:21.834619",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
       "count": 47,
-      "win_count": 37,
-      "win_rate": 78.72340425531915,
-      "avg_change": 2.0985106382978724,
+      "win_count": 38,
+      "win_rate": 80.85106382978722,
+      "avg_change": 2.0991489361702125,
       "avg_hold_days": 1.0
     },
     "70+": {
       "band": "70+",
       "count": 94,
-      "win_count": 36,
-      "win_rate": 38.297872340425535,
-      "avg_change": -0.4069148936170214,
+      "win_count": 37,
+      "win_rate": 39.361702127659576,
+      "avg_change": -0.4789361702127661,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 1014,
-      "win_count": 330,
-      "win_rate": 32.544378698224854,
-      "avg_change": -0.6189447731755399
+      "count": 285,
+      "win_count": 113,
+      "win_rate": 39.64912280701755,
+      "avg_change": -0.8746666666666657
     }
   },
   "sector_stats": {
     "energy": {
       "sector": "energy",
       "sector_name": "储能/绿电",
-      "count": 22,
-      "win_count": 22,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 8.537727272727274
+      "avg_change": 8.55
     },
     "robot": {
       "sector": "robot",
       "sector_name": "人形机器人",
-      "count": 33,
-      "win_count": 12,
-      "win_rate": 36.36363636363637,
-      "avg_change": 1.4590909090909092
+      "count": 3,
+      "win_count": 2,
+      "win_rate": 66.66666666666666,
+      "avg_change": 2.706666666666667
     },
     "ai_app": {
       "sector": "ai_app",
       "sector_name": "AI应用",
-      "count": 11,
+      "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -9.723636363636365
+      "avg_change": -9.65
     },
     "semi": {
       "sector": "semi",
       "sector_name": "半导体设备",
-      "count": 33,
+      "count": 3,
       "win_count": 1,
-      "win_rate": 3.0303030303030303,
-      "avg_change": -5.9442424242424226
+      "win_rate": 33.33333333333333,
+      "avg_change": -2.6833333333333322
     },
     "chem": {
       "sector": "chem",
       "sector_name": "化工",
-      "count": 22,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -9.358181818181817
+      "avg_change": -11.01
     },
     "mach": {
       "sector": "mach",
       "sector_name": "机械",
-      "count": 22,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -2.1568181818181817
+      "avg_change": -12.725
     },
     "elec": {
       "sector": "elec",
       "sector_name": "电子",
-      "count": 11,
+      "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -14.60181818181818
+      "avg_change": -14.6
     },
     "被动元件": {
       "sector": "被动元件",
@@ -158,9 +153,9 @@
       "sector": "食品综合",
       "sector_name": "",
       "count": 2,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -0.785
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 0.31999999999999995
     },
     "纺织服装": {
       "sector": "纺织服装",
@@ -216,7 +211,7 @@
       "count": 4,
       "win_count": 3,
       "win_rate": 75.0,
-      "avg_change": 1.675
+      "avg_change": 1.3125
     },
     "造纸": {
       "sector": "造纸",
@@ -360,7 +355,7 @@
       "count": 3,
       "win_count": 2,
       "win_rate": 66.66666666666666,
-      "avg_change": 0.8300000000000001
+      "avg_change": 0.56
     },
     "制冷空调设备": {
       "sector": "制冷空调设备",
@@ -472,7 +467,7 @@
       "count": 4,
       "win_count": 2,
       "win_rate": 50.0,
-      "avg_change": 1.2850000000000001
+      "avg_change": 0.19499999999999995
     },
     "热电": {
       "sector": "热电",
@@ -542,9 +537,9 @@
       "sector": "移动互联网服务",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.14
     },
     "软饮料": {
       "sector": "软饮料",
@@ -552,7 +547,7 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -2.47
     }
   }
 }

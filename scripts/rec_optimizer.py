@@ -119,6 +119,44 @@ class TuningConfig:
 
 # ── 数据加载 ────────────────────────────────────────────────────────────────
 
+def _dedup_rows(rows: List[dict]) -> List[dict]:
+    """按 (code, rec_date) 去重 — 同一推荐只保留一条样本。
+
+    v2026-10-21 修复 (P0 数据完整性):
+    rec_feedback.csv 的历史行被 record_recommendation 重复追加 (5-6 月实测
+    最高 9.6x, 2026-09 起已无新增重复), 而 rec_optimizer.load_feedback_data()
+    逐行读取 → 同一条推荐被当成多个独立样本, 灌水 sector_stats.count 并
+    稀释胜率。实测 1024 行 → 唯一键 295 个, 虚增 247%。
+
+    保留规则与 feedback_loop._valid_rows() 一致:
+      1) 优先保留 ret_* 填得最全的行 (信息最完整)
+      2) 完整度相同时保留文件靠后的一行 (最新一次追加)
+
+    v1 格式 (无 rec_date 列) 退化为按 (code, date) 去重。
+    """
+    best: Dict[Any, dict] = {}
+    for row in rows:
+        code = str(row.get("code", "") or "").strip()
+        rec_date = str(row.get("rec_date", "") or "").strip()
+        if not rec_date:
+            rec_date = str(row.get("date", "") or "").strip()
+        key: Any = (code, rec_date)
+        if not code and not rec_date:
+            key = (id(row), "")  # 无键行不合并, 原样保留
+        prev = best.get(key)
+        if prev is None:
+            best[key] = row
+            continue
+        filled = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                     if str(row.get(c, "") or "").strip())
+        prev_filled = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                          if str(prev.get(c, "") or "").strip())
+        # 完整度更高 → 换; 完整度相同 → 保留靠后的一行
+        if filled >= prev_filled:
+            best[key] = row
+    return list(best.values())
+
+
 def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
     """
     加载 rec_feedback.csv，转换为 FeedbackRecord 列表。
@@ -141,75 +179,97 @@ def load_feedback_data(csv_path: str = None) -> List[FeedbackRecord]:
         print(f"[RecOptimizer] 数据文件不存在且无法重建: {csv_path}")
         return []
 
-    records = []
+    # v2026-10-21 修复 (P0 数据完整性): 读取后按 (code, rec_date) 去重。
+    #
+    # 背景: rec_feedback.csv 的历史行被 record_recommendation 重复追加 (5-6 月
+    # 最高 9.6x), 而本函数逐行读取 → 同一条推荐被当成多个独立样本重复计数。
+    # 实测: 1024 行 → 唯一 (code, rec_date) 仅 295 个, 虚增 247%;
+    # 且重复行的 ret_1d 互相冲突 (同一推荐算出 5 个不同收益率), 胜率被稀释。
+    # 直接后果: sector_stats 的 count 被灌水 (ai_app 11→真实 1), 导致
+    # strategy_policy 的 MIN_SECTOR_SAMPLES=10 门槛误判 + weak_sectors 错挂。
+    #
+    # 去重口径与 feedback_loop._valid_rows() 保持一致: 保留 ret_* 填得最全的行,
+    # 完整度相同时取文件靠后的一行 (最新一次追加)。
     with open(csv_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames or []
         is_new_format = "ret_1d" in fieldnames and "actual_change" not in fieldnames
+        raw_rows = list(reader)
 
-        for row in reader:
-            try:
-                if is_new_format:
-                    # v2 格式：通过 ret_1d 反推 actual_change/score/hold_days
-                    ret_1d_raw = row.get("ret_1d", "")
-                    actual_change = float(ret_1d_raw) if ret_1d_raw else 0.0
-                    # v2026-08-23 (防循环论证): 真实 score 优先; 只有 CSV 里 score 为空
-                    # 才反推估算。真实 score 是推荐时刻写入的,估算 score 是从收益
-                    # 反推的 — 拿后者算 "score 越高胜率越高" 是循环论证 (8/23 复盘发现
-                    # 97% 记录是估算值,把 60-70 带算成 100% 胜率假象)。
-                    score_raw = str(row.get("score", "")).strip()
-                    if score_raw and score_raw not in ("0", "0.0"):
-                        score = int(float(score_raw))
-                        score_is_estimated = False
-                    else:
-                        score = _estimate_score_from_ret(actual_change)
-                        score_is_estimated = True
-                    hold_days = 1  # v2 默认持有 1 天（T+1）
+    rows = _dedup_rows(raw_rows)
 
-                    # 尝试从 rec_date + recommendations.csv 获取 sector/name
-                    rec_date = row.get("rec_date", "")
-                    code = row.get("code", "")
-                    sector, sector_name = _lookup_sector(code, rec_date)
-
-                    records.append(FeedbackRecord(
-                        date=row.get("date", ""),
-                        code=code,
-                        name=row.get("name", ""),
-                        sector=sector,
-                        sector_name=sector_name,
-                        score=score,
-                        hold_days=hold_days,
-                        actual_change=actual_change,
-                        is_win=actual_change > 0,
-                        expected_high=0.0,
-                        expected_low=0.0,
-                        hit=actual_change > 0,
-                        created_at="",
-                        score_is_estimated=score_is_estimated,
-                    ))
+    records = []
+    for row in rows:
+        try:
+            if is_new_format:
+                # v2 格式：通过 ret_1d 反推 actual_change/score/hold_days
+                ret_1d_raw = row.get("ret_1d", "")
+                # v2026-10-21 修复 (P0 数据完整性): ret_1d 为空 = 该推荐尚未结算
+                # (T+1 还没走完 / K 线取不到), 不是"收益 0%"。原实现把它当
+                # actual_change=0.0 → is_win=False → 计入分母当亏损, 凭空拉低胜率
+                # 并让板块因"虚假亏损"被误判为弱势 (实测 造纸 n=3 里 1 条是未结算,
+                # 被算成 0% 亏损后 wr=0% → 错进 weak_sectors)。
+                # 正确做法: 未结算的记录不参与任何胜率/板块统计。
+                if not str(ret_1d_raw or "").strip():
+                    continue
+                actual_change = float(ret_1d_raw)
+                # v2026-08-23 (防循环论证): 真实 score 优先; 只有 CSV 里 score 为空
+                # 才反推估算。真实 score 是推荐时刻写入的,估算 score 是从收益
+                # 反推的 — 拿后者算 "score 越高胜率越高" 是循环论证 (8/23 复盘发现
+                # 97% 记录是估算值,把 60-70 带算成 100% 胜率假象)。
+                score_raw = str(row.get("score", "")).strip()
+                if score_raw and score_raw not in ("0", "0.0"):
+                    score = int(float(score_raw))
+                    score_is_estimated = False
                 else:
-                    # v1 格式（原有逻辑）
-                    score = int(float(row.get("score", 0)))
-                    hold_days = int(float(row.get("hold_days", 0)))
-                    actual_change = float(row.get("actual_change", 0))
-                    is_win = bool(row.get("is_win", str(actual_change > 0)).lower() == "true")
-                    records.append(FeedbackRecord(
-                        date=row.get("date", ""),
-                        code=row.get("code", ""),
-                        name=row.get("name", ""),
-                        sector=row.get("sector", ""),
-                        sector_name=row.get("sector_name", ""),
-                        score=score,
-                        hold_days=hold_days,
-                        actual_change=actual_change,
-                        is_win=is_win,
-                        expected_high=float(row.get("expected_high", 0)),
-                        expected_low=float(row.get("expected_low", 0)),
-                        hit=row.get("hit", "") == "True",
-                        created_at=row.get("created_at", ""),
-                    ))
-            except (ValueError, KeyError) as e:
-                continue
+                    score = _estimate_score_from_ret(actual_change)
+                    score_is_estimated = True
+                hold_days = 1  # v2 默认持有 1 天（T+1）
+
+                # 尝试从 rec_date + recommendations.csv 获取 sector/name
+                rec_date = row.get("rec_date", "")
+                code = row.get("code", "")
+                sector, sector_name = _lookup_sector(code, rec_date)
+
+                records.append(FeedbackRecord(
+                    date=row.get("date", ""),
+                    code=code,
+                    name=row.get("name", ""),
+                    sector=sector,
+                    sector_name=sector_name,
+                    score=score,
+                    hold_days=hold_days,
+                    actual_change=actual_change,
+                    is_win=actual_change > 0,
+                    expected_high=0.0,
+                    expected_low=0.0,
+                    hit=actual_change > 0,
+                    created_at="",
+                    score_is_estimated=score_is_estimated,
+                ))
+            else:
+                # v1 格式（原有逻辑）
+                score = int(float(row.get("score", 0)))
+                hold_days = int(float(row.get("hold_days", 0)))
+                actual_change = float(row.get("actual_change", 0))
+                is_win = bool(row.get("is_win", str(actual_change > 0)).lower() == "true")
+                records.append(FeedbackRecord(
+                    date=row.get("date", ""),
+                    code=row.get("code", ""),
+                    name=row.get("name", ""),
+                    sector=row.get("sector", ""),
+                    sector_name=row.get("sector_name", ""),
+                    score=score,
+                    hold_days=hold_days,
+                    actual_change=actual_change,
+                    is_win=is_win,
+                    expected_high=float(row.get("expected_high", 0)),
+                    expected_low=float(row.get("expected_low", 0)),
+                    hit=row.get("hit", "") == "True",
+                    created_at=row.get("created_at", ""),
+                ))
+        except (ValueError, KeyError) as e:
+            continue
     return records
 
 
