@@ -1,26 +1,26 @@
 {
-  "date": "2026-10-21",
-  "total_recs": 10,
+  "date": "2026-10-22",
+  "total_recs": 0,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 10,
+  "no_data": 0,
   "win_rate": 0,
   "baseline": null,
   "causes": {
     "A_板块错配": {
       "hit": false,
       "items": [],
-      "summary": "无弱板块命中"
+      "summary": "无 weak_sectors 或无当日推荐"
     },
     "B_题材错配": {
       "hit": false,
       "items": [],
-      "summary": "无"
+      "summary": "无当日推荐"
     },
     "C_技术面虚高": {
       "hit": false,
       "items": [],
-      "summary": "无"
+      "summary": "无当日推荐"
     },
     "D_大盘错配": {
       "hit": false,
@@ -28,139 +28,19 @@
       "summary": "无大盘数据"
     },
     "E_冷启动盲区": {
-      "hit": true,
-      "items": [
-        {
-          "code": "603976",
-          "name": "正川股份",
-          "sector_cn": "医疗器械",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块 医疗器械 (enum=unknown) 未在 sec_stats 里, cold sector risk"
-        },
-        {
-          "code": "603355",
-          "name": "莱克电气",
-          "sector_cn": "小家电",
-          "sector_enum": "home_appliance",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "000815",
-          "name": "美利云",
-          "sector_cn": "造纸",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002549",
-          "name": "凯美特气",
-          "sector_cn": "其他化学制品",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002995",
-          "name": "天地在线",
-          "sector_cn": "营销服务",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块 营销服务 (enum=unknown) 未在 sec_stats 里, cold sector risk"
-        },
-        {
-          "code": "002587",
-          "name": "奥拓电子",
-          "sector_cn": "",
-          "sector_enum": "LED",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "002178",
-          "name": "延华智能",
-          "sector_cn": "其他专业工程",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块 其他专业工程 (enum=unknown) 未在 sec_stats 里, cold sector risk"
-        },
-        {
-          "code": "001266",
-          "name": "宏英智能",
-          "sector_cn": "仪器仪表",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "003021",
-          "name": "兆威机电",
-          "sector_cn": "电机",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块样本 0 < 3"
-        },
-        {
-          "code": "600843",
-          "name": "上工申贝",
-          "sector_cn": "纺织服装设备",
-          "sector_enum": "unknown",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块 纺织服装设备 (enum=unknown) 未在 sec_stats 里, cold sector risk"
-        }
-      ],
-      "watchlist": [],
-      "cold_sectors": [
-        "医疗器械",
-        "小家电",
-        "造纸",
-        "其他化学制品",
-        "营销服务",
-        "LED",
-        "其他专业工程",
-        "仪器仪表",
-        "电机",
-        "纺织服装设备"
-      ],
-      "summary": "10 只命中冷启动板块 (10 个不同板块), 单次冷板块: ['医疗器械', '小家电', '造纸', '其他化学制品', '营销服务']"
+      "hit": false,
+      "items": [],
+      "summary": "无冷启动命中"
     }
   },
-  "hit_causes": [
-    "E_冷启动盲区"
-  ],
+  "hit_causes": [],
   "tuning_suggestion": {
-    "score_threshold_delta": 3,
+    "score_threshold_delta": 0,
     "hold_days_delta": 0,
     "weak_sectors_add": [],
     "weak_sectors_remove": [],
     "watchlist": [],
-    "position_delta": -5,
-    "reasons": [
-      "E. 冷启动盲区: 10 只来自 10 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['医疗器械', '小家电', '造纸', '其他化学制品', '营销服务']"
-    ],
-    "cold_sectors": [
-      "医疗器械",
-      "小家电",
-      "造纸",
-      "其他化学制品",
-      "营销服务",
-      "LED",
-      "其他专业工程",
-      "仪器仪表",
-      "电机",
-      "纺织服装设备"
-    ]
+    "position_delta": 0,
+    "reasons": []
   }
 }
