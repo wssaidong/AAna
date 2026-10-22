@@ -3982,89 +3982,118 @@
       "reason": "AAna v2.4 尾盘评分 83",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-22",
+      "code": "603976",
+      "name": "正川股份",
+      "action": "sell",
+      "price": 32.87,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -11.0,
+      "pnl_pct": -0.33
+    },
+    {
+      "date": "2026-10-22",
+      "code": "603355",
+      "name": "莱克电气",
+      "action": "sell",
+      "price": 34.01,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 10.0,
+      "pnl_pct": 0.29
+    },
+    {
+      "date": "2026-10-22",
+      "code": "000815",
+      "name": "美利云",
+      "action": "sell",
+      "price": 15.01,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -44.0,
+      "pnl_pct": -2.85
+    },
+    {
+      "date": "2026-10-22",
+      "code": "002549",
+      "name": "凯美特气",
+      "action": "sell",
+      "price": 13.16,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -22.0,
+      "pnl_pct": -1.64
+    },
+    {
+      "date": "2026-10-22",
+      "code": "002995",
+      "name": "天地在线",
+      "action": "sell",
+      "price": 18.14,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -2.0,
+      "pnl_pct": -0.11
+    },
+    {
+      "date": "2026-10-22",
+      "code": "002587",
+      "name": "奥拓电子",
+      "action": "sell",
+      "price": 5.53,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 2.0,
+      "pnl_pct": 0.36
+    },
+    {
+      "date": "2026-10-22",
+      "code": "002178",
+      "name": "延华智能",
+      "action": "sell",
+      "price": 5.08,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -1.0,
+      "pnl_pct": -0.2
+    },
+    {
+      "date": "2026-10-22",
+      "code": "001266",
+      "name": "宏英智能",
+      "action": "sell",
+      "price": 41.56,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 9.0,
+      "pnl_pct": 0.22
+    },
+    {
+      "date": "2026-10-22",
+      "code": "003021",
+      "name": "兆威机电",
+      "action": "sell",
+      "price": 80.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 438.0,
+      "pnl_pct": 5.79
+    },
+    {
+      "date": "2026-10-22",
+      "code": "600843",
+      "name": "上工申贝",
+      "action": "sell",
+      "price": 8.7,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -13.0,
+      "pnl_pct": -1.47
     }
   ],
-  "positions": {
-    "603976": {
-      "date": "2026-10-21",
-      "name": "正川股份",
-      "shares": 100,
-      "entry_price": 32.98,
-      "highest_price": 32.98,
-      "entry_date": "2026-10-21"
-    },
-    "603355": {
-      "date": "2026-10-21",
-      "name": "莱克电气",
-      "shares": 100,
-      "entry_price": 33.91,
-      "highest_price": 33.91,
-      "entry_date": "2026-10-21"
-    },
-    "000815": {
-      "date": "2026-10-21",
-      "name": "美利云",
-      "shares": 100,
-      "entry_price": 15.45,
-      "highest_price": 15.45,
-      "entry_date": "2026-10-21"
-    },
-    "002549": {
-      "date": "2026-10-21",
-      "name": "凯美特气",
-      "shares": 100,
-      "entry_price": 13.38,
-      "highest_price": 13.38,
-      "entry_date": "2026-10-21"
-    },
-    "002995": {
-      "date": "2026-10-21",
-      "name": "天地在线",
-      "shares": 100,
-      "entry_price": 18.16,
-      "highest_price": 18.16,
-      "entry_date": "2026-10-21"
-    },
-    "002587": {
-      "date": "2026-10-21",
-      "name": "奥拓电子",
-      "shares": 100,
-      "entry_price": 5.51,
-      "highest_price": 5.51,
-      "entry_date": "2026-10-21"
-    },
-    "002178": {
-      "date": "2026-10-21",
-      "name": "延华智能",
-      "shares": 100,
-      "entry_price": 5.09,
-      "highest_price": 5.09,
-      "entry_date": "2026-10-21"
-    },
-    "001266": {
-      "date": "2026-10-21",
-      "name": "宏英智能",
-      "shares": 100,
-      "entry_price": 41.47,
-      "highest_price": 41.47,
-      "entry_date": "2026-10-21"
-    },
-    "003021": {
-      "date": "2026-10-21",
-      "name": "兆威机电",
-      "shares": 100,
-      "entry_price": 75.62,
-      "highest_price": 75.62,
-      "entry_date": "2026-10-21"
-    },
-    "600843": {
-      "date": "2026-10-21",
-      "name": "上工申贝",
-      "shares": 100,
-      "entry_price": 8.83,
-      "highest_price": 8.83,
-      "entry_date": "2026-10-21"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }

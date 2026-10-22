@@ -69,6 +69,24 @@ try:
 except ImportError:
     AFTER_NEW = False
 
+
+def _safe_position_ratio(sentiment_score: int) -> float:
+    """情绪分 → 建议仓位 (risk_rules 不可用时的兜底, 阈值与 risk_rules 一致)"""
+    try:
+        return get_position_ratio(sentiment_score)
+    except NameError:
+        if sentiment_score >= 75:
+            return 0.85
+        elif sentiment_score >= 60:
+            return 0.70
+        elif sentiment_score >= 45:
+            return 0.50
+        elif sentiment_score >= 35:
+            return 0.20
+        elif sentiment_score >= 20:
+            return 0.10
+        return 0.0
+
 # ============================================
 # 数据获取
 # ============================================
@@ -1353,6 +1371,82 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
 # 主流程
 # ============================================
 
+def check_ice_point_guard(sent=None):
+    """冰点/极低仓位守卫 — 尾盘选股的**唯一**短路入口 (v2026-10-22 P0 修复)
+
+    背景 (P0, 连续 3 日复发 10/17 + 10/21 + 10/22):
+      冰点守卫原先只写在 main() 内部，而 daily_v24_recommend.py (launchd 14:45)
+      直接调用 screen_afternoon_stocks() —— 绕过了 main() 里的守卫，
+      并且硬编码 sentiment_score=50 / position_ratio=0.5 (假装中性)，
+      于是在冰点日逆势建了 10 只纸面仓 + 写 10 行 rec_feedback/recommendations，
+      污染 rec_tuning 胜率统计。
+
+    修复 (单一真源):
+      把守卫抽成本函数, main() 与 daily_v24_recommend.py 共用同一个判定。
+      任何调用 screen_afternoon_stocks() 的入口都必须先过这道门。
+
+    返回 dict:
+      is_ice_point: bool      — True 表示应短路 (不选股/不建仓/不写推荐池)
+      sentiment_label: str
+      sentiment_score: int
+      position_ratio: float
+      data_source_fallback: bool
+      reason: str             — 短路原因 (写日志用)
+
+    参数 sent: 可选。传入已取好的情绪 dict 则复用 (避免重复拉取 + 便于测试);
+                传 None 则自行调用 get_market_sentiment()。
+    """
+    sentiment_label = '乐观'
+    sentiment_score = 50
+    position_ratio = 0.5
+
+    if sent is None and AFTER_NEW:
+        try:
+            sent = get_market_sentiment()
+        except Exception as e:
+            print(f"[情绪] ⚠️ 获取失败 ({e}), 保守按非冰点处理")
+            sent = None
+
+    if sent is not None:
+        sentiment_label = sent.get('label', '乐观')
+        sentiment_score = sent.get('score', 50)
+        position_ratio = _safe_position_ratio(sentiment_score)
+        print("[情绪] {} | 涨停{} 跌停{} | 建议仓位{:.0f}%".format(
+            sentiment_label,
+            sent.get('zt_count', 0),
+            sent.get('dt_count', 0),
+            position_ratio * 100
+        ))
+
+    # v2.5.1 修复（2026-06-12）：冰点短路必须配合"数据源=fallback"判断
+    # 涨跌停接口 fallback 时返回 (-1,-1)，单看 label='冰点' 会误判 → 不强制空仓
+    data_source_fallback = (sent is not None) and (
+        sent.get('zt_count', 0) == -1 or sent.get('dt_count', 0) == -1
+    )
+    if data_source_fallback and position_ratio < 0.3:
+        print(f"[情绪] ⚠️ 涨跌停数据 fallback，仓位从 {position_ratio*100:.0f}% 提升到 30%（避免单点脏数据误判冰点）")
+        position_ratio = 0.3
+
+    # P0-B: 冰点日 / 仓位 < 10% 时直接短路, 不跑选股
+    # 阈值 < 0.1: 仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
+    is_ice_point = (
+        sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
+    ) and not data_source_fallback
+
+    reason = ""
+    if is_ice_point:
+        reason = f"情绪={sentiment_label}/仓位={position_ratio*100:.0f}%"
+
+    return {
+        'is_ice_point': is_ice_point,
+        'sentiment_label': sentiment_label,
+        'sentiment_score': sentiment_score,
+        'position_ratio': position_ratio,
+        'data_source_fallback': data_source_fallback,
+        'reason': reason,
+    }
+
+
 def main():
     # ── 🆕 假期守卫 (2026-10-06): 非交易日直接短路, 禁止写推荐/反馈 ──
     # 教训: 10/02 (国庆假期) cron 仍执行, 用 9/30 陈旧数据+fallback_empty
@@ -1363,33 +1457,13 @@ def main():
         print(f"[AAna 尾盘] 📅 今日非交易日 ({non_trade_reason}), 跳过选股, 不写任何推荐/反馈")
         return []
 
-    # ── 市场情绪（v2.5）─────────────────────────────────────
-    sentiment_label = '乐观'
-    sentiment_score = 50
-    position_ratio = 0.5
-    sent = None
-    if AFTER_NEW:
-        sent = get_market_sentiment()
-        sentiment_label = sent.get('label', '乐观')
-        sentiment_score = sent.get('score', 50)
-        position_ratio = get_position_ratio(sentiment_score)
-        print("[情绪] {} | 涨停{} 跌停{} | 建议仓位{:.0f}%".format(
-            sentiment_label,
-            sent.get('zt_count', 0), sent.get('dt_count', 0),
-            position_ratio * 100
-        ))
-
-    # v2.5.1 修复（2026-06-12）：冰点短路必须配合"数据源=fallback"判断
-    # 原因：6/12 实战发现东财涨跌停接口 fallback 时返回 (-1,-1)，
-    # 冰点短路单独看 label='冰点' 会误判 → 强制空仓
-    # 修复：data_source=fallback 时把 position_ratio 抬高到 0.3（轻仓），
-    #        label='冰点' 仍短路（避免硬逆势），但不会因为单点数据脏就全空仓。
-    data_source_fallback = (sent is not None) and (
-        sent.get('zt_count', 0) == -1 or sent.get('dt_count', 0) == -1
-    )
-    if data_source_fallback and position_ratio < 0.3:
-        print(f"[情绪] ⚠️ 涨跌停数据 fallback，仓位从 {position_ratio*100:.0f}% 提升到 30%（避免单点脏数据误判冰点）")
-        position_ratio = 0.3
+    # ── 市场情绪 + 冰点守卫 (v2026-10-22 P0: 抽成 check_ice_point_guard 单一真源) ──
+    # 守卫判定与 daily_v24_recommend.py 共用同一个函数，避免两个入口阈值分裂。
+    guard = check_ice_point_guard()
+    sentiment_label = guard['sentiment_label']
+    sentiment_score = guard['sentiment_score']
+    position_ratio = guard['position_ratio']
+    data_source_fallback = guard['data_source_fallback']
 
     # 获取大盘指数
     index_codes = ['000001', '399001', '399006', '000688']
@@ -1411,12 +1485,9 @@ def main():
     # 之前 bug：报告顶部写"建议仓位 0%"，但仍推 8 只（自相矛盾）
     # 阈值 < 0.1：仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
     #
-    # v2.5.1 修复（2026-06-12）：is_ice_point 增加"数据源正常"前提——
-    # 冰点短路必须**在情绪数据有效**的前提下触发。如果数据全 fallback，
-    # 不要直接冰点短路（position_ratio 已经被 P0 修复抬到 0.3）。
-    is_ice_point = (
-        sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
-    ) and not data_source_fallback
+    # v2026-10-22 P0 修复：判定已抽到 check_ice_point_guard()，与
+    # daily_v24_recommend.py 共用同一真源（连续 3 日复发 10/17+10/21+10/22 的根因）。
+    is_ice_point = guard['is_ice_point']
     if is_ice_point:
         print(f"[AAna 尾盘] ❄️ 情绪={sentiment_label}/仓位={position_ratio*100:.0f}%，跳过尾盘选股（冰点日策略不推任何票）")
         # 仍然生成报告，但内容是"暂停推荐"

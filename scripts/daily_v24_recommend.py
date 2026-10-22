@@ -70,12 +70,44 @@ def main(dry_run=False):
     log("=" * 60)
     log(f"AAna v2.4 尾盘推荐启动 (dry_run={dry_run})")
 
+    # ── P0 守卫 (v2026-10-22 修复) ──────────────────────────────
+    # 根因: 本脚本直接调 screen_afternoon_stocks()，绕过了 aana_afternoon_screen.main()
+    #       里的冰点守卫，并且硬编码 sentiment_score=50/position_ratio=0.5 (假装中性)。
+    #       → 冰点日逆势建 10 只纸面仓 + 写 10 行 rec_feedback/recommendations，
+    #         污染 rec_tuning 胜率统计。连续 3 日复发 (10/17 + 10/21 + 10/22)。
+    # 修复: 调 check_ice_point_guard() —— 与 main() 共用同一真源，冰点日短路:
+    #       不选股 / 不建仓 / 不写推荐池 / 不同步东财。
+    try:
+        from aana_afternoon_screen import check_ice_point_guard
+        guard = check_ice_point_guard()
+    except Exception as e:
+        log(f"❌ 守卫检查失败: {e} — 保守跳过 (不建仓)")
+        push_feishu(
+            "**AAna 尾盘推荐** · " + datetime.now().strftime("%Y-%m-%d %H:%M") +
+            "\n\n⚠️ 情绪守卫检查失败，今日跳过尾盘建仓 (不建仓/不写推荐池)"
+        )
+        return True
+
+    if guard['is_ice_point']:
+        log(f"❄️ 冰点守卫触发 ({guard['reason']})，跳过尾盘选股 (不建仓/不写推荐池)")
+        push_feishu(
+            "**AAna 尾盘推荐** · " + datetime.now().strftime("%Y-%m-%d %H:%M") +
+            f"\n\n❄️ 今日冰点 ({guard['reason']})，按策略不推任何票 —— 不建仓、不写推荐池"
+        )
+        return True
+
+    log(f"✅ 守卫通过: 情绪={guard['sentiment_label']}/仓位={guard['position_ratio']*100:.0f}%")
+
     # 1. 跑评分
     log("[1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...")
     try:
         from aana_afternoon_screen import screen_afternoon_stocks
-        _ret = screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5,
-                                        record_feedback=True)
+        # v2026-10-22 P0 修复: 传真实情绪分/仓位 (原先硬编码 50/0.5 = 假装中性)
+        _ret = screen_afternoon_stocks(
+            sentiment_score=guard['sentiment_score'],
+            position_ratio=guard['position_ratio'],
+            record_feedback=True,
+        )
         # v2026-10-08: screen_afternoon_stocks 现在返回 (top_n, confidence_note) tuple
         # (数据源健康度修复 #12)，兼容旧 list 返回
         if isinstance(_ret, tuple):
