@@ -1629,6 +1629,7 @@ if __name__ == "__main__":
 
 
 
+
 # === REC_OPTIMIZER_TUNING_START ===
 # 由 RecOptimizer 自动生成，勿手动修改
 REC_TUNING = {
@@ -1637,6 +1638,6 @@ REC_TUNING = {
     "weak_sectors": ['造纸', 'semi', '印制电路板'],
     "overall_win_rate": 39.9,
     "total_records": 293,
-    "generated_at": "2026-10-22T20:00:26.869724",
+    "generated_at": "2026-10-23T20:00:32.072134",
 }
 # === REC_OPTIMIZER_TUNING_END ===
