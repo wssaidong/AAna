@@ -191,12 +191,22 @@ def get_stock_history(code, lookback_days=30):
     return {"recommendations": rec_rows[-lookback_days:],
              "tracking": track_rows[-lookback_days:]}
 
-def get_win_rate(code=None, sector=None, days=30):
-    """计算个股或板块胜率"""
+def get_win_rate(code=None, sector=None, days=30, codes=None):
+    """计算个股或板块胜率
+
+    v2026-10-16 (XWI-50): 向后兼容新增 codes: list[str] 参数。
+    - codes 不为空时,优先用 codes 列表 (union),忽略单 code。
+    - codes 为 None / [] 时,沿用原 code/sector 行为。
+    - 旧的 code=None, sector=None 调用 (返回全场胜率) 仍工作。
+    """
     today_str = _today()
     rows = _read_csv(DATA / "tracking.csv")
     rows = [r for r in rows if r["date"] <= today_str]
-    if code:
+    # XWI-50: codes 列表优先
+    if codes:
+        codes_set = {str(c) for c in codes}
+        rows = [r for r in rows if r["code"] in codes_set]
+    elif code:
         rows = [r for r in rows if r["code"] == code]
     elif sector:
         rows = [r for r in rows if r["sector"] == sector]
@@ -209,7 +219,9 @@ def get_win_rate(code=None, sector=None, days=30):
         return None
     hits = sum(1 for r in rows if r.get("hit") == "True")
     return {"total": len(rows), "hits": hits,
-            "win_rate": round(hits/len(rows)*100, 1) if rows else None}
+            "win_rate": round(hits/len(rows)*100, 1) if rows else None,
+            # XWI-50: 标记是 codes 聚合结果 (供 Skill 上层区分)
+            "scope": "codes" if codes else ("code" if code else ("sector" if sector else "all"))}
 
 # ── 数据迁移工具 ────────────────────────────────────────────
 def migrate_from_state():

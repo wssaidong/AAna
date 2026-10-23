@@ -69,6 +69,24 @@ try:
 except ImportError:
     AFTER_NEW = False
 
+
+def _safe_position_ratio(sentiment_score: int) -> float:
+    """情绪分 → 建议仓位 (risk_rules 不可用时的兜底, 阈值与 risk_rules 一致)"""
+    try:
+        return get_position_ratio(sentiment_score)
+    except NameError:
+        if sentiment_score >= 75:
+            return 0.85
+        elif sentiment_score >= 60:
+            return 0.70
+        elif sentiment_score >= 45:
+            return 0.50
+        elif sentiment_score >= 35:
+            return 0.20
+        elif sentiment_score >= 20:
+            return 0.10
+        return 0.0
+
 # ============================================
 # 数据获取
 # ============================================
@@ -785,7 +803,14 @@ def record_recommendation(code, name, score, sentiment_score=50,
         print(f"  [记录失败] {code}: {e}")
 
 
-def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedback=True):
+def screen_afternoon_stocks(
+    sentiment_score=50,
+    position_ratio=0.5,
+    record_feedback=True,
+    weights=None,
+    codes=None,
+    dual_export=True,
+):
     """
     尾盘选股主流程
     1. 从全市场涨幅榜 / 候选池取粗筛股票
@@ -797,7 +822,42 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     v2026-08-23 (数据驱动策略): 评分阈值 + 板块黑名单从 strategy_policy 读取
     (rec_tuning.json ← rec_optimizer 复盘胜率,闭环自动化)。
     policy 失败时回落 v2.4 硬编码 (65 / 无黑名单),不影响主流程。
+
+    v2026-10-16 (XWI-50): 向后兼容新增 Skill 调用所需的 3 个参数
+    - weights: dict[str, int|float] | None
+        评分权重透传 (Skill 调用者意图),会写入 rec_feedback.csv
+        每行的 weights 字段供下游分析。**不修改评分逻辑本身**
+        (避免影响现有 rec_optimizer 闭环),只作为 side-channel。
+    - codes: list[str] | None
+        指定候选股票代码列表;为 None 时走默认池 (top10 + 新浪全市场)。
+        Skill 模式下传 [codes] 时收敛到只评这些票。
+    - dual_export: bool
+        默认 True: 沿用历史行为,既写 rec_feedback.csv 也写配套的
+        rec_feedback_weights_YYYYMMDD.jsonl (Skill 调用的 weights 痕迹)。
+        Skill 模式下设 False 可只写主表,避免污染 JSONL 衍生数据。
     """
+    # ── XWI-50: 透传参数校验 ──
+    if weights is not None and not isinstance(weights, dict):
+        print(f"  [screen_afternoon_stocks] weights 不是 dict,忽略: {type(weights).__name__}")
+        weights = None
+    if codes is not None:
+        if not isinstance(codes, (list, tuple)):
+            print(f"  [screen_afternoon_stocks] codes 不是 list/tuple,忽略: {type(codes).__name__}")
+            codes = None
+        else:
+            codes = [str(c).strip() for c in codes if str(c).strip()]
+            if not codes:
+                codes = None
+    import json as _wjson
+    _today = datetime.now().strftime("%Y%m%d")
+    _weights_jsonl = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "data", f"rec_feedback_weights_{_today}.jsonl",
+    )
+    if weights is not None:
+        print(f"  [screen_afternoon_stocks] 收到 weights: {weights} (作为侧-channel 写入 JSONL)")
+    if codes is not None:
+        print(f"  [screen_afternoon_stocks] 收到 codes={len(codes)} 只, 收敛候选池")
     # ── 策略参数 (数据驱动) ──
     try:
         from strategy_policy import get_today_policy, policy_banner
@@ -902,6 +962,16 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
     if not candidate_codes:
         print("[AAna 尾盘] 候选股票池为空，跳过尾盘选股")
         return []
+
+    # ── XWI-50: Skill 模式下调用方指定 codes 时,过滤候选池 ──
+    if codes is not None:
+        codes_set = set(codes)
+        before = len(candidate_codes)
+        candidate_codes = [c for c in candidate_codes if c in codes_set]
+        print(f"  [XWI-50 codes 过滤] {before} → {len(candidate_codes)} 只 (仅 Skill 指定)")
+        if not candidate_codes:
+            print("[AAna 尾盘] Skill 指定 codes 在默认池中无匹配, 跳过")
+            return []
 
     print(f"[AAna 尾盘] 候选股票总数: {len(candidate_codes)} 只")
 
@@ -1053,6 +1123,25 @@ def screen_afternoon_stocks(sentiment_score=50, position_ratio=0.5, record_feedb
                 sector=s.get('sector', '') or '',
             )
         print(f"[AAna 尾盘] 已记录 {len(top_n)} 条推荐到 rec_feedback.csv (优化 #3)")
+
+    # ── XWI-50: dual_export — Skill 模式下可关闭,避免污染 JSONL 衍生数据 ──
+    if dual_export and weights is not None and top_n:
+        try:
+            os.makedirs(os.path.dirname(_weights_jsonl), exist_ok=True)
+            with open(_weights_jsonl, "a", encoding="utf-8") as _fj:
+                for s in top_n:
+                    _fj.write(_wjson.dumps({
+                        "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "code": s.get("code", ""),
+                        "name": s.get("name", ""),
+                        "score": s.get("score", 0),
+                        "sentiment_score": sentiment_score,
+                        "weights": weights,
+                        "source": "skill",
+                    }, ensure_ascii=False) + "\n")
+            print(f"[AAna 尾盘] dual_export 已记录 {len(top_n)} 条 weights 到 {_weights_jsonl}")
+        except Exception as _de_err:
+            print(f"[AAna 尾盘] dual_export 写入失败: {_de_err}")
 
     print(f"[AAna 尾盘] 筛选后候选: {len(results)} 只 (板块黑名单拦截 {filtered_by_sector} 只)")
     return top_n, f"K线失败率 {fail_rate_kline:.0%} (置信度:{confidence})" if fail_rate_kline > 0.5 else None
@@ -1282,6 +1371,82 @@ def generate_report(stocks, index_data=None, sentiment_label='中性', position_
 # 主流程
 # ============================================
 
+def check_ice_point_guard(sent=None):
+    """冰点/极低仓位守卫 — 尾盘选股的**唯一**短路入口 (v2026-10-22 P0 修复)
+
+    背景 (P0, 连续 3 日复发 10/17 + 10/21 + 10/22):
+      冰点守卫原先只写在 main() 内部，而 daily_v24_recommend.py (launchd 14:45)
+      直接调用 screen_afternoon_stocks() —— 绕过了 main() 里的守卫，
+      并且硬编码 sentiment_score=50 / position_ratio=0.5 (假装中性)，
+      于是在冰点日逆势建了 10 只纸面仓 + 写 10 行 rec_feedback/recommendations，
+      污染 rec_tuning 胜率统计。
+
+    修复 (单一真源):
+      把守卫抽成本函数, main() 与 daily_v24_recommend.py 共用同一个判定。
+      任何调用 screen_afternoon_stocks() 的入口都必须先过这道门。
+
+    返回 dict:
+      is_ice_point: bool      — True 表示应短路 (不选股/不建仓/不写推荐池)
+      sentiment_label: str
+      sentiment_score: int
+      position_ratio: float
+      data_source_fallback: bool
+      reason: str             — 短路原因 (写日志用)
+
+    参数 sent: 可选。传入已取好的情绪 dict 则复用 (避免重复拉取 + 便于测试);
+                传 None 则自行调用 get_market_sentiment()。
+    """
+    sentiment_label = '乐观'
+    sentiment_score = 50
+    position_ratio = 0.5
+
+    if sent is None and AFTER_NEW:
+        try:
+            sent = get_market_sentiment()
+        except Exception as e:
+            print(f"[情绪] ⚠️ 获取失败 ({e}), 保守按非冰点处理")
+            sent = None
+
+    if sent is not None:
+        sentiment_label = sent.get('label', '乐观')
+        sentiment_score = sent.get('score', 50)
+        position_ratio = _safe_position_ratio(sentiment_score)
+        print("[情绪] {} | 涨停{} 跌停{} | 建议仓位{:.0f}%".format(
+            sentiment_label,
+            sent.get('zt_count', 0),
+            sent.get('dt_count', 0),
+            position_ratio * 100
+        ))
+
+    # v2.5.1 修复（2026-06-12）：冰点短路必须配合"数据源=fallback"判断
+    # 涨跌停接口 fallback 时返回 (-1,-1)，单看 label='冰点' 会误判 → 不强制空仓
+    data_source_fallback = (sent is not None) and (
+        sent.get('zt_count', 0) == -1 or sent.get('dt_count', 0) == -1
+    )
+    if data_source_fallback and position_ratio < 0.3:
+        print(f"[情绪] ⚠️ 涨跌停数据 fallback，仓位从 {position_ratio*100:.0f}% 提升到 30%（避免单点脏数据误判冰点）")
+        position_ratio = 0.3
+
+    # P0-B: 冰点日 / 仓位 < 10% 时直接短路, 不跑选股
+    # 阈值 < 0.1: 仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
+    is_ice_point = (
+        sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
+    ) and not data_source_fallback
+
+    reason = ""
+    if is_ice_point:
+        reason = f"情绪={sentiment_label}/仓位={position_ratio*100:.0f}%"
+
+    return {
+        'is_ice_point': is_ice_point,
+        'sentiment_label': sentiment_label,
+        'sentiment_score': sentiment_score,
+        'position_ratio': position_ratio,
+        'data_source_fallback': data_source_fallback,
+        'reason': reason,
+    }
+
+
 def main():
     # ── 🆕 假期守卫 (2026-10-06): 非交易日直接短路, 禁止写推荐/反馈 ──
     # 教训: 10/02 (国庆假期) cron 仍执行, 用 9/30 陈旧数据+fallback_empty
@@ -1292,33 +1457,13 @@ def main():
         print(f"[AAna 尾盘] 📅 今日非交易日 ({non_trade_reason}), 跳过选股, 不写任何推荐/反馈")
         return []
 
-    # ── 市场情绪（v2.5）─────────────────────────────────────
-    sentiment_label = '乐观'
-    sentiment_score = 50
-    position_ratio = 0.5
-    sent = None
-    if AFTER_NEW:
-        sent = get_market_sentiment()
-        sentiment_label = sent.get('label', '乐观')
-        sentiment_score = sent.get('score', 50)
-        position_ratio = get_position_ratio(sentiment_score)
-        print("[情绪] {} | 涨停{} 跌停{} | 建议仓位{:.0f}%".format(
-            sentiment_label,
-            sent.get('zt_count', 0), sent.get('dt_count', 0),
-            position_ratio * 100
-        ))
-
-    # v2.5.1 修复（2026-06-12）：冰点短路必须配合"数据源=fallback"判断
-    # 原因：6/12 实战发现东财涨跌停接口 fallback 时返回 (-1,-1)，
-    # 冰点短路单独看 label='冰点' 会误判 → 强制空仓
-    # 修复：data_source=fallback 时把 position_ratio 抬高到 0.3（轻仓），
-    #        label='冰点' 仍短路（避免硬逆势），但不会因为单点数据脏就全空仓。
-    data_source_fallback = (sent is not None) and (
-        sent.get('zt_count', 0) == -1 or sent.get('dt_count', 0) == -1
-    )
-    if data_source_fallback and position_ratio < 0.3:
-        print(f"[情绪] ⚠️ 涨跌停数据 fallback，仓位从 {position_ratio*100:.0f}% 提升到 30%（避免单点脏数据误判冰点）")
-        position_ratio = 0.3
+    # ── 市场情绪 + 冰点守卫 (v2026-10-22 P0: 抽成 check_ice_point_guard 单一真源) ──
+    # 守卫判定与 daily_v24_recommend.py 共用同一个函数，避免两个入口阈值分裂。
+    guard = check_ice_point_guard()
+    sentiment_label = guard['sentiment_label']
+    sentiment_score = guard['sentiment_score']
+    position_ratio = guard['position_ratio']
+    data_source_fallback = guard['data_source_fallback']
 
     # 获取大盘指数
     index_codes = ['000001', '399001', '399006', '000688']
@@ -1340,12 +1485,9 @@ def main():
     # 之前 bug：报告顶部写"建议仓位 0%"，但仍推 8 只（自相矛盾）
     # 阈值 < 0.1：仓位低于 10% 视为"几乎空仓"，尾盘选股无意义
     #
-    # v2.5.1 修复（2026-06-12）：is_ice_point 增加"数据源正常"前提——
-    # 冰点短路必须**在情绪数据有效**的前提下触发。如果数据全 fallback，
-    # 不要直接冰点短路（position_ratio 已经被 P0 修复抬到 0.3）。
-    is_ice_point = (
-        sentiment_label in ('冰点', '极冷', '恐慌') or position_ratio < 0.1
-    ) and not data_source_fallback
+    # v2026-10-22 P0 修复：判定已抽到 check_ice_point_guard()，与
+    # daily_v24_recommend.py 共用同一真源（连续 3 日复发 10/17+10/21+10/22 的根因）。
+    is_ice_point = guard['is_ice_point']
     if is_ice_point:
         print(f"[AAna 尾盘] ❄️ 情绪={sentiment_label}/仓位={position_ratio*100:.0f}%，跳过尾盘选股（冰点日策略不推任何票）")
         # 仍然生成报告，但内容是"暂停推荐"

@@ -7,7 +7,6 @@ v2026-08-23 Phase 1C: 移除脚本末尾的"再调一次 sync_portfolio_to_eastm
   cleanup 现在由 `scripts/eastmoney_cleanup.py` 独立脚本负责(待补)。
 """
 import os
-import re
 import sys
 from datetime import datetime
 
@@ -16,16 +15,23 @@ SCRIPTS_DIR = os.path.expanduser('~/code/AAna/scripts')
 
 
 def extract_top10(report_path):
+    """
+    从选股报告解析 Top10 代码。
+
+    v2026-10-21 修复 (P0 静默空跑):
+      旧正则 `## 三、精选个股.*?(?=^---)` 在 2026-08-07 commit fd7b691 插入
+      "### ⏱ 持仓策略" + `---` 分隔线后被提前截断 → 永远返回 []。
+      后果: 本脚本自 8/7 起静默空跑, generate_report.py 内部的自动东财同步
+            同时完全失效, 且没有任何报错 (exit 0 + "no codes" 早退)。
+      现在统一走 eastmoney_portfolio.parse_top10_from_report (单一权威解析器)。
+    """
     if not os.path.exists(report_path):
         return []
-    with open(report_path, encoding='utf-8') as f:
+    with open(report_path, encoding="utf-8") as f:
         content = f.read()
-    section = re.search(r'## 三、精选个股.*?(?=^---)', content, re.DOTALL | re.MULTILINE)
-    if section:
-        rows = re.findall(r'\|\s*(\d+)\s*\|\s*[^|]*\|\s*(\d{6})\s*\|', section.group(0))
-        return [code for _, code in rows[:10]]
-    rows = re.findall(r'\|\s*\d+\s*\|\s*[^|]*\|\s*(\d{6})\s*\|', content)
-    return rows[:10]
+    sys.path.insert(0, SCRIPTS_DIR)
+    from eastmoney_portfolio import parse_top10_from_report
+    return parse_top10_from_report(content)
 
 
 def main():

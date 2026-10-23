@@ -1,0 +1,190 @@
+{
+ "date": "2026-10-22",
+ "base_date": "2026-10-21",
+ "base_report": "/Users/cai/code/AAna/reports/2026-10-21-选股报告.md",
+ "generated": "08:32:49",
+ "overall_win_rate": 39.64912280701755,
+ "total_records": 285,
+ "results": [
+  {
+   "code": "603992",
+   "name": "松霖科技",
+   "price": 23.29,
+   "pe_ttm": 38.64,
+   "pb": 2.97,
+   "mcap_yi": 103.18,
+   "float_mcap_yi": 103.18,
+   "turnover_pct": 3.24,
+   "vol_ratio": 1.01,
+   "v24_score": 65,
+   "src": "当日报告Top10#2+活跃股榜",
+   "tech_score": 44,
+   "fund_score": 22,
+   "val_score": 12,
+   "total": 78.0,
+   "rating": "买入",
+   "target": 25.88,
+   "stop": 22.59,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=64 健康",
+    "20日区间位置 65% 中上",
+    "60日涨幅 +2% 健康",
+    "量能比 1.01 正常"
+   ],
+   "fund_notes": [
+    "ROE 4.6% 一般",
+    "净利增速 +66%",
+    "营收增速 +44%"
+   ],
+   "val_notes": [
+    "PE 39 偏高",
+    "PB 2.97 合理"
+   ],
+   "tech_stat": {
+    "rsi": 64.5,
+    "pos20": 65.0,
+    "chg60": 2.1,
+    "vol_ratio_5d": 1.01,
+    "ma5": 23.42,
+    "ma20": 21.06,
+    "ma60": 21.41,
+    "hi20": 25.88,
+    "lo20": 18.4,
+    "chg_1d": 1.79,
+    "last_date": "2026-10-21",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 4.57,
+    "ni_growth": 66.176772,
+    "rev_growth": 43.955318
+   },
+   "chg_pct": 1.79,
+   "chg_date": "2026-10-21",
+   "industry": "轻工-厨卫家居",
+   "sector_stat_key": "其他家用轻工",
+   "sector_win_rate": "0% (0/1)"
+  },
+  {
+   "code": "000028",
+   "name": "国药一致",
+   "price": 20.53,
+   "pe_ttm": 11.11,
+   "pb": 0.65,
+   "mcap_yi": 107.96,
+   "float_mcap_yi": 125.69,
+   "turnover_pct": 1.03,
+   "vol_ratio": 1.69,
+   "v24_score": 64,
+   "src": "当日报告Top10#3+活跃股榜",
+   "tech_score": 49,
+   "fund_score": 0,
+   "val_score": 15,
+   "total": 64.5,
+   "rating": "中性",
+   "target": 21.56,
+   "stop": 19.91,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=62 健康",
+    "20日区间位置 74% 中上",
+    "60日涨幅 -1% 回调",
+    "量能比 1.69 正常"
+   ],
+   "fund_notes": [
+    "ROE 3.2% 弱",
+    "净利增速 -9% 负增长",
+    "营收增速 -1%"
+   ],
+   "val_notes": [
+    "PE 11 合理",
+    "PB 0.65 合理"
+   ],
+   "tech_stat": {
+    "rsi": 61.8,
+    "pos20": 74.0,
+    "chg60": -0.8,
+    "vol_ratio_5d": 1.69,
+    "ma5": 20.26,
+    "ma20": 19.95,
+    "ma60": 20.15,
+    "hi20": 20.96,
+    "lo20": 19.32,
+    "chg_1d": 1.99,
+    "last_date": "2026-10-21",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 3.21,
+    "ni_growth": -8.965776,
+    "rev_growth": -1.441009
+   },
+   "chg_pct": 1.99,
+   "chg_date": "2026-10-21",
+   "industry": "医药-医药商业流通",
+   "sector_stat_key": "医药商业",
+   "sector_win_rate": "100% (2/2)"
+  },
+  {
+   "code": "603466",
+   "name": "风语筑",
+   "price": 14.47,
+   "pe_ttm": -3146.22,
+   "pb": 4.11,
+   "mcap_yi": 86.07,
+   "float_mcap_yi": 86.07,
+   "turnover_pct": 19.94,
+   "vol_ratio": 1.03,
+   "v24_score": 65,
+   "src": "当日报告Top10#1+强势股榜",
+   "tech_score": 55,
+   "fund_score": 8,
+   "val_score": 4,
+   "total": 63.3,
+   "rating": "中性",
+   "target": 15.19,
+   "stop": 14.04,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=63 健康",
+    "20日区间位置 84% 突破区",
+    "60日涨幅 +22% 健康",
+    "量能比 1.03 正常"
+   ],
+   "fund_notes": [
+    "ROE 3.2% 弱",
+    "净利增速 +30%",
+    "营收增速 -24%"
+   ],
+   "val_notes": [
+    "PE -3146 过高/异常",
+    "PB 4.11 中等"
+   ],
+   "tech_stat": {
+    "rsi": 63.2,
+    "pos20": 84.0,
+    "chg60": 22.4,
+    "vol_ratio_5d": 1.03,
+    "ma5": 13.49,
+    "ma20": 12.73,
+    "ma60": 11.9,
+    "hi20": 15.14,
+    "lo20": 10.88,
+    "chg_1d": 1.69,
+    "last_date": "2026-10-21",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 3.24,
+    "ni_growth": 29.675446,
+    "rev_growth": -23.500838
+   },
+   "chg_pct": 1.69,
+   "chg_date": "2026-10-21",
+   "industry": "建筑装饰-数字展示",
+   "sector_stat_key": "装修装饰",
+   "sector_win_rate": "100% (1/1)"
+  }
+ ]
+}

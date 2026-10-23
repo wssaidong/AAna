@@ -1,0 +1,580 @@
+{
+ "date": "2026-10-20",
+ "base_date": "2026-10-19",
+ "base_report": "/Users/cai/code/AAna/reports/2026-10-19-选股报告.md",
+ "generated": "08:34:28",
+ "overall_win_rate": 31.448412698412696,
+ "total_records": 1008,
+ "results": [
+  {
+   "code": "002332",
+   "name": "仙琚制药",
+   "price": 8.82,
+   "pe_ttm": 22.61,
+   "pb": 1.49,
+   "mcap_yi": 86.94,
+   "v24_score": 64,
+   "src": "当日报告Top10#8+活跃股",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 80.0,
+   "rating": "买入",
+   "target": 9.26,
+   "stop": 8.56,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=59 健康",
+    "20日区间位置 91% 突破区",
+    "60日涨幅 +4% 健康",
+    "量能比 1.69 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 23 合理",
+    "PB 1.49 合理"
+   ],
+   "tech_stat": {
+    "rsi": 58.9,
+    "pos20": 91.0,
+    "chg60": 4.0,
+    "vol_ratio_5d": 1.69,
+    "ma5": 8.71,
+    "ma20": 8.65,
+    "ma60": 8.53,
+    "hi20": 8.86,
+    "lo20": 8.422,
+    "chg_1d": 1.97,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.97,
+   "chg_date": "2026-10-19",
+   "industry": "医药-甾体激素",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "000848",
+   "name": "承德露露",
+   "price": 8.59,
+   "pe_ttm": 13.14,
+   "pb": 2.72,
+   "mcap_yi": 86.81,
+   "v24_score": 64,
+   "src": "当日报告Top10#9+潜力股",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 80.0,
+   "rating": "买入",
+   "target": 9.02,
+   "stop": 8.33,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=64 健康",
+    "20日区间位置 85% 突破区",
+    "60日涨幅 +3% 健康",
+    "量能比 1.18 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 13 合理",
+    "PB 2.72 合理"
+   ],
+   "tech_stat": {
+    "rsi": 63.8,
+    "pos20": 85.0,
+    "chg60": 2.8,
+    "vol_ratio_5d": 1.18,
+    "ma5": 8.44,
+    "ma20": 8.23,
+    "ma60": 8.42,
+    "hi20": 8.71,
+    "lo20": 7.92,
+    "chg_1d": 1.9,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.9,
+   "chg_date": "2026-10-19",
+   "industry": "食品饮料-植物蛋白",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "600546",
+   "name": "山煤国际",
+   "price": 13.5,
+   "pe_ttm": 17.6,
+   "pb": 1.61,
+   "mcap_yi": 267.63,
+   "v24_score": 65,
+   "src": "当日报告Top10#2",
+   "tech_score": 51,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 76.4,
+   "rating": "买入",
+   "target": 14.18,
+   "stop": 13.09,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=48 健康",
+    "20日区间位置 60% 中上",
+    "60日涨幅 +14% 健康",
+    "量能比 0.73 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 18 合理",
+    "PB 1.61 合理"
+   ],
+   "tech_stat": {
+    "rsi": 48.4,
+    "pos20": 60.0,
+    "chg60": 14.3,
+    "vol_ratio_5d": 0.73,
+    "ma5": 13.46,
+    "ma20": 13.38,
+    "ma60": 13.17,
+    "hi20": 14.07,
+    "lo20": 12.66,
+    "chg_1d": 1.96,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.96,
+   "chg_date": "2026-10-19",
+   "industry": "煤炭开采",
+   "sector_stat_key": "煤炭开采",
+   "sector_win_rate": "40% (2/5)"
+  },
+  {
+   "code": "601963",
+   "name": "重庆银行",
+   "price": 11.25,
+   "pe_ttm": 6.82,
+   "pb": 0.69,
+   "mcap_yi": 228.83,
+   "v24_score": 65,
+   "src": "当日报告Top10#3+活跃股",
+   "tech_score": 51,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 76.4,
+   "rating": "买入",
+   "target": 11.81,
+   "stop": 10.91,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=58 健康",
+    "20日区间位置 61% 中上",
+    "60日涨幅 +7% 健康",
+    "量能比 0.74 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 7 合理",
+    "PB 0.69 合理"
+   ],
+   "tech_stat": {
+    "rsi": 57.6,
+    "pos20": 61.0,
+    "chg60": 6.7,
+    "vol_ratio_5d": 0.74,
+    "ma5": 11.15,
+    "ma20": 11.09,
+    "ma60": 11.1,
+    "hi20": 11.54,
+    "lo20": 10.79,
+    "chg_1d": 1.9,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.9,
+   "chg_date": "2026-10-19",
+   "industry": "银行-城商行",
+   "sector_stat_key": "银行",
+   "sector_win_rate": "100% (3/3)"
+  },
+  {
+   "code": "002956",
+   "name": "西麦食品",
+   "price": 18.32,
+   "pe_ttm": 24.01,
+   "pb": 3.48,
+   "mcap_yi": 57.25,
+   "v24_score": 64,
+   "src": "当日报告Top10#7",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 12,
+   "total": 76.0,
+   "rating": "买入",
+   "target": 19.24,
+   "stop": 17.77,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=50 健康",
+    "20日区间位置 91% 突破区",
+    "60日涨幅 +8% 健康",
+    "量能比 1.00 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 24 合理",
+    "PB 3.48 中等"
+   ],
+   "tech_stat": {
+    "rsi": 50.2,
+    "pos20": 91.0,
+    "chg60": 7.8,
+    "vol_ratio_5d": 1.0,
+    "ma5": 17.86,
+    "ma20": 17.45,
+    "ma60": 17.28,
+    "hi20": 18.65,
+    "lo20": 15.06,
+    "chg_1d": 1.95,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.95,
+   "chg_date": "2026-10-19",
+   "industry": "食品-燕麦谷物",
+   "sector_stat_key": "食品综合",
+   "sector_win_rate": "0% (0/1)"
+  },
+  {
+   "code": "600938",
+   "name": "中国海油",
+   "price": 35.4,
+   "pe_ttm": 12.16,
+   "pb": 2.06,
+   "mcap_yi": 1058.46,
+   "v24_score": 65,
+   "src": "当日报告Top10#1",
+   "tech_score": 48,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 73.6,
+   "rating": "增持",
+   "target": 37.17,
+   "stop": 34.34,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=67 偏热",
+    "20日区间位置 86% 突破区",
+    "60日涨幅 +26% 健康",
+    "量能比 1.12 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 12 合理",
+    "PB 2.06 合理"
+   ],
+   "tech_stat": {
+    "rsi": 66.5,
+    "pos20": 86.0,
+    "chg60": 25.7,
+    "vol_ratio_5d": 1.12,
+    "ma5": 34.5,
+    "ma20": 32.98,
+    "ma60": 32.37,
+    "hi20": 36.09,
+    "lo20": 31.027,
+    "chg_1d": 1.9,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 1.9,
+   "chg_date": "2026-10-19",
+   "industry": "石油天然气-开采",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "600764",
+   "name": "中国海防",
+   "price": 20.56,
+   "pe_ttm": 179.64,
+   "pb": 1.77,
+   "mcap_yi": 146.11,
+   "v24_score": 65,
+   "src": "当日报告Top10#5+潜力股",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 7,
+   "total": 69.3,
+   "rating": "增持",
+   "target": 21.59,
+   "stop": 19.94,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=64 健康",
+    "20日区间位置 98% 突破区",
+    "60日涨幅 +20% 健康",
+    "量能比 1.81 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 180 过高/异常",
+    "PB 1.77 合理"
+   ],
+   "tech_stat": {
+    "rsi": 64.1,
+    "pos20": 98.0,
+    "chg60": 19.9,
+    "vol_ratio_5d": 1.81,
+    "ma5": 19.38,
+    "ma20": 18.72,
+    "ma60": 18.4,
+    "hi20": 20.63,
+    "lo20": 17.71,
+    "chg_1d": 4.9,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.9,
+   "chg_date": "2026-10-19",
+   "industry": "军工-船舶信息化",
+   "sector_stat_key": "船舶制造",
+   "sector_win_rate": "100% (1/1)"
+  },
+  {
+   "code": "600011",
+   "name": "华能国际",
+   "price": 7.66,
+   "pe_ttm": 10.25,
+   "pb": 1.86,
+   "mcap_yi": 842.42,
+   "v24_score": 65,
+   "src": "当日报告Top10#4+潜力股",
+   "tech_score": 40,
+   "fund_score": 10,
+   "val_score": 15,
+   "total": 66.4,
+   "rating": "增持",
+   "target": 8.04,
+   "stop": 7.43,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=84 超买",
+    "20日区间位置 93% 突破区",
+    "60日涨幅 +11% 健康",
+    "量能比 0.76 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 10 合理",
+    "PB 1.86 合理"
+   ],
+   "tech_stat": {
+    "rsi": 83.7,
+    "pos20": 93.0,
+    "chg60": 10.7,
+    "vol_ratio_5d": 0.76,
+    "ma5": 7.51,
+    "ma20": 7.09,
+    "ma60": 7.01,
+    "hi20": 7.73,
+    "lo20": 6.72,
+    "chg_1d": 2.0,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 2.0,
+   "chg_date": "2026-10-19",
+   "industry": "电力-火电",
+   "sector_stat_key": "火电",
+   "sector_win_rate": "100% (2/2)"
+  },
+  {
+   "code": "000423",
+   "name": "东阿阿胶",
+   "price": 49.81,
+   "pe_ttm": 17.86,
+   "pb": 3.43,
+   "mcap_yi": 318.14,
+   "v24_score": 64,
+   "src": "当日报告Top10#10+潜力股",
+   "tech_score": 40,
+   "fund_score": 10,
+   "val_score": 12,
+   "total": 62.4,
+   "rating": "中性",
+   "target": 52.3,
+   "stop": 48.32,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=80 超买",
+    "20日区间位置 97% 突破区",
+    "60日涨幅 +2% 健康",
+    "量能比 1.93 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 18 合理",
+    "PB 3.43 中等"
+   ],
+   "tech_stat": {
+    "rsi": 80.5,
+    "pos20": 97.0,
+    "chg60": 2.1,
+    "vol_ratio_5d": 1.93,
+    "ma5": 48.06,
+    "ma20": 46.44,
+    "ma60": 48.63,
+    "hi20": 49.95,
+    "lo20": 44.99,
+    "chg_1d": 4.84,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.84,
+   "chg_date": "2026-10-19",
+   "industry": "中药-滋补",
+   "sector_stat_key": "中药",
+   "sector_win_rate": "0% (0/3)"
+  },
+  {
+   "code": "603533",
+   "name": "掌阅科技",
+   "price": 28.85,
+   "pe_ttm": -190.54,
+   "pb": 5.56,
+   "mcap_yi": 126.62,
+   "v24_score": 65,
+   "src": "当日报告Top10#6+潜力股",
+   "tech_score": 36,
+   "fund_score": 10,
+   "val_score": 1,
+   "total": 44.1,
+   "rating": "减持",
+   "target": 30.29,
+   "stop": 27.98,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=65 偏热",
+    "20日区间位置 64% 中上",
+    "60日涨幅 +61% 严重透支",
+    "量能比 1.05 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE -191 过高/异常",
+    "PB 5.56 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 65.4,
+    "pos20": 64.0,
+    "chg60": 61.2,
+    "vol_ratio_5d": 1.05,
+    "ma5": 28.52,
+    "ma20": 24.91,
+    "ma60": 22.89,
+    "hi20": 32.91,
+    "lo20": 21.49,
+    "chg_1d": 4.42,
+    "last_date": "2026-10-19"
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.42,
+   "chg_date": "2026-10-19",
+   "industry": "数字阅读-互联网传媒",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  }
+ ]
+}

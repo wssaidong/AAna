@@ -106,6 +106,77 @@ class TestLoadRecentRecommendations:
         assert result[0]["code"] == "600000"
 
 
+class TestCalculateReturnsPositionGuard:
+    """v2026-10-16: 旧仓位劫持基线回归锁定
+
+    不变量: position_map 的 buy 只有 entry_date >= rec_date 才能作为推荐收益基准。
+    老仓位（已平仓, buy < rec_date）不得劫持新推荐的 base_date,
+    否则当日推荐会立刻"算出"全套历史收益（实证 001229 被其 7/13 仓位劫持）。
+    """
+
+    def _make_rec(self, code, rec_date):
+        return {"date": rec_date, "code": code, "name": "测试股"}
+
+    def test_old_position_does_not_hijack(self, monkeypatch):
+        """buy 在 rec_date 之前（已平仓老仓位）→ 不得劫持基线"""
+        rec_date = "2026-10-16"
+        trades = [{
+            "date": "2026-07-13", "code": "001229", "action": "buy",
+            "price": 46.51, "shares": 100,
+        }]
+        # K 线: 推荐日 close=39.91, 推荐日之后没有未来 bar (T+1 未发生)
+        klines = [{"date": "2026-10-15", "close": 39.05}, {"date": rec_date, "close": 39.91}]
+
+        import feedback_loop as fl
+        monkeypatch.setattr(fl, "_get_kline_close",
+                            lambda c, d: (39.91, rec_date) if d[:10] == rec_date else (None, None))
+        monkeypatch.setattr(fl, "_get_kline_for_trend", lambda c, d: None)
+        monkeypatch.setattr(fl, "_future_close", lambda c, b, n: (None, None))
+
+        rows = fl.calculate_returns([self._make_rec("001229", rec_date)], trades)
+        assert len(rows) == 1
+        r = rows[0]
+        # 基线必须留在推荐日本身 (rec_close=39.91), ret_* 全空 (未来未发生)
+        assert all(str(r[f"ret_{n}d"] or "").strip() == "" for n in (1, 3, 5, 15)), \
+            f"老仓位劫持基线: {r}"
+
+    def test_same_day_position_still_applies(self, monkeypatch):
+        """推荐日当天建仓 → 仍用持仓日做基准（原有意设计保留）"""
+        rec_date = "2026-10-16"
+        trades = [{
+            "date": rec_date, "code": "600000", "action": "buy",
+            "price": 10.0, "shares": 100,
+        }]
+        klines = [{"date": "2026-10-14", "close": 9.8}, {"date": rec_date, "close": 10.0}]
+
+        import feedback_loop as fl
+        monkeypatch.setattr(fl, "_get_kline_close",
+                            lambda c, d: (10.0, rec_date))
+        monkeypatch.setattr(fl, "_get_kline_for_trend", lambda c, d: None)
+        monkeypatch.setattr(fl, "_future_close",
+                            lambda c, b, n: (10.5, "2026-10-19") if n <= 3 else (None, None))
+
+        rows = fl.calculate_returns([self._make_rec("600000", rec_date)], trades)
+        r = rows[0]
+        # 当天建仓合法 → ret_1d 用实际持仓基准计算 = (10.5/10.0-1)
+        assert str(r["ret_1d"]).strip() != ""
+        assert abs(float(r["ret_1d"]) - 5.0) < 0.01
+
+    def test_no_position_uses_rec_close(self, monkeypatch):
+        """无持仓记录 → 用推荐日 close 做基准（默认路径不变）"""
+        rec_date = "2026-10-16"
+        import feedback_loop as fl
+        monkeypatch.setattr(fl, "_get_kline_close",
+                            lambda c, d: (39.91, rec_date) if d[:10] == rec_date else (None, None))
+        monkeypatch.setattr(fl, "_get_kline_for_trend", lambda c, d: None)
+        monkeypatch.setattr(fl, "_future_close",
+                            lambda c, b, n: (41.0, "2026-10-19") if n == 1 else (None, None))
+
+        rows = fl.calculate_returns([self._make_rec("600000", rec_date)], [])
+        r = rows[0]
+        assert abs(float(r["ret_1d"]) - (41.0 / 39.91 - 1) * 100) < 0.01
+
+
 class TestMainExitCode:
     """Phase 1A: rec_rows 空时 main() exit 2"""
 

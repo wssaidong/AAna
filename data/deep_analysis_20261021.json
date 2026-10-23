@@ -1,0 +1,190 @@
+{
+ "date": "2026-10-21",
+ "base_date": "2026-10-20",
+ "base_report": "/Users/cai/code/AAna/reports/2026-10-20-选股报告.md",
+ "generated": "08:33:54",
+ "overall_win_rate": 32.544378698224854,
+ "total_records": 1014,
+ "results": [
+  {
+   "code": "002956",
+   "name": "西麦食品",
+   "price": 19.15,
+   "pe_ttm": 25.1,
+   "pb": 3.64,
+   "mcap_yi": 59.85,
+   "float_mcap_yi": 59.85,
+   "turnover_pct": 3.35,
+   "vol_ratio": 1.67,
+   "v24_score": 64,
+   "src": "当日报告Top10#2+活跃股榜",
+   "tech_score": 55,
+   "fund_score": 26,
+   "val_score": 12,
+   "total": 92.0,
+   "rating": "买入",
+   "target": 20.11,
+   "stop": 18.58,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=63 健康",
+    "20日区间位置 99% 突破区",
+    "60日涨幅 +13% 健康",
+    "量能比 1.67 正常"
+   ],
+   "fund_notes": [
+    "ROE 8.8% 良好",
+    "净利增速 +82%",
+    "营收增速 +22%"
+   ],
+   "val_notes": [
+    "PE 25 合理",
+    "PB 3.64 中等"
+   ],
+   "tech_stat": {
+    "rsi": 63.2,
+    "pos20": 99.0,
+    "chg60": 13.1,
+    "vol_ratio_5d": 1.67,
+    "ma5": 18.17,
+    "ma20": 17.64,
+    "ma60": 17.32,
+    "hi20": 19.18,
+    "lo20": 15.06,
+    "chg_1d": 4.53,
+    "last_date": "2026-10-20",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 8.8,
+    "ni_growth": 81.882498,
+    "rev_growth": 22.032042
+   },
+   "chg_pct": 4.53,
+   "chg_date": "2026-10-20",
+   "industry": "食品-燕麦谷物",
+   "sector_stat_key": "食品综合",
+   "sector_win_rate": "0% (0/2)"
+  },
+  {
+   "code": "002917",
+   "name": "金奥博",
+   "price": 12.47,
+   "pe_ttm": 24.59,
+   "pb": 2.48,
+   "mcap_yi": 32.49,
+   "float_mcap_yi": 43.35,
+   "turnover_pct": 18.72,
+   "vol_ratio": 1.59,
+   "v24_score": 64,
+   "src": "当日报告Top10#1+强势股榜",
+   "tech_score": 44,
+   "fund_score": 8,
+   "val_score": 15,
+   "total": 68.0,
+   "rating": "增持",
+   "target": 13.18,
+   "stop": 12.1,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=69 偏热",
+    "20日区间位置 79% 中上",
+    "60日涨幅 +29% 健康",
+    "量能比 1.59 正常"
+   ],
+   "fund_notes": [
+    "ROE 5.0% 一般",
+    "净利增速 +2%",
+    "营收增速 -4%"
+   ],
+   "val_notes": [
+    "PE 25 合理",
+    "PB 2.48 合理"
+   ],
+   "tech_stat": {
+    "rsi": 68.9,
+    "pos20": 79.0,
+    "chg60": 29.2,
+    "vol_ratio_5d": 1.59,
+    "ma5": 11.88,
+    "ma20": 10.6,
+    "ma60": 10.41,
+    "hi20": 13.18,
+    "lo20": 9.77,
+    "chg_1d": 4.09,
+    "last_date": "2026-10-20",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 5.04,
+    "ni_growth": 1.946609,
+    "rev_growth": -4.398764
+   },
+   "chg_pct": 4.09,
+   "chg_date": "2026-10-20",
+   "industry": "化工-民爆器材",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  },
+  {
+   "code": "001233",
+   "name": "海安集团",
+   "price": 53.64,
+   "pe_ttm": 24.78,
+   "pb": 2.06,
+   "mcap_yi": 20.23,
+   "float_mcap_yi": 99.76,
+   "turnover_pct": 19.64,
+   "vol_ratio": 1.7,
+   "v24_score": 64,
+   "src": "当日报告Top10#3+潜力股榜",
+   "tech_score": 44,
+   "fund_score": 3,
+   "val_score": 15,
+   "total": 63.0,
+   "rating": "中性",
+   "target": 56.32,
+   "stop": 52.03,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=72 偏热",
+    "20日区间位置 91% 突破区",
+    "60日涨幅 +30% 偏热",
+    "量能比 1.70 正常"
+   ],
+   "fund_notes": [
+    "ROE 3.9% 弱",
+    "净利增速 -46% 负增长",
+    "营收增速 +3%"
+   ],
+   "val_notes": [
+    "PE 25 合理",
+    "PB 2.06 合理"
+   ],
+   "tech_stat": {
+    "rsi": 71.7,
+    "pos20": 91.0,
+    "chg60": 30.4,
+    "vol_ratio_5d": 1.7,
+    "ma5": 49.1,
+    "ma20": 45.51,
+    "ma60": 44.71,
+    "hi20": 54.94,
+    "lo20": 41.01,
+    "chg_1d": 4.09,
+    "last_date": "2026-10-20",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 3.86,
+    "ni_growth": -46.08975,
+    "rev_growth": 3.465713
+   },
+   "chg_pct": 4.09,
+   "chg_date": "2026-10-20",
+   "industry": "汽车-轮胎",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)"
+  }
+ ]
+}

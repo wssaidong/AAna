@@ -1,102 +1,98 @@
 {
-  "recommended_score_threshold": 70,
+  "recommended_score_threshold": 60,
   "recommended_hold_days": 1,
   "weak_sectors": [
-    "ai_app",
-    "chem",
-    "mach",
-    "elec",
-    "银行",
+    "造纸",
     "semi",
-    "robot"
+    "印制电路板"
   ],
-  "total_records": 940,
-  "overall_win_rate": 28.723404255319153,
+  "total_records": 293,
+  "overall_win_rate": 39.93174061433447,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-10-12T16:00:25.146813",
+  "generated_at": "2026-10-22T20:00:26.869724",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
-      "count": 8,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0,
+      "count": 47,
+      "win_count": 38,
+      "win_rate": 80.85106382978722,
+      "avg_change": 2.0991489361702125,
       "avg_hold_days": 1.0
     },
     "70+": {
       "band": "70+",
-      "count": 59,
-      "win_count": 13,
-      "win_rate": 22.033898305084744,
-      "avg_change": -1.4861016949152541,
+      "count": 102,
+      "win_count": 41,
+      "win_rate": 40.19607843137255,
+      "avg_change": -0.4299019607843138,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 940,
-      "win_count": 270,
-      "win_rate": 28.723404255319153,
-      "avg_change": -0.8557446808510604
+      "count": 293,
+      "win_count": 117,
+      "win_rate": 39.93174061433447,
+      "avg_change": -0.8467918088737193
     }
   },
   "sector_stats": {
     "energy": {
       "sector": "energy",
       "sector_name": "储能/绿电",
-      "count": 22,
-      "win_count": 22,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 8.537727272727274
+      "avg_change": 8.55
     },
     "robot": {
       "sector": "robot",
       "sector_name": "人形机器人",
-      "count": 33,
-      "win_count": 12,
-      "win_rate": 36.36363636363637,
-      "avg_change": 1.4590909090909092
+      "count": 3,
+      "win_count": 2,
+      "win_rate": 66.66666666666666,
+      "avg_change": 2.706666666666667
     },
     "ai_app": {
       "sector": "ai_app",
       "sector_name": "AI应用",
-      "count": 11,
+      "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -9.723636363636365
+      "avg_change": -9.65
     },
     "semi": {
       "sector": "semi",
       "sector_name": "半导体设备",
-      "count": 33,
+      "count": 3,
       "win_count": 1,
-      "win_rate": 3.0303030303030303,
-      "avg_change": -5.9442424242424226
+      "win_rate": 33.33333333333333,
+      "avg_change": -2.6833333333333322
     },
     "chem": {
       "sector": "chem",
       "sector_name": "化工",
-      "count": 22,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -9.358181818181817
+      "avg_change": -11.01
     },
     "mach": {
       "sector": "mach",
       "sector_name": "机械",
-      "count": 22,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -2.1568181818181817
+      "avg_change": -12.725
     },
     "elec": {
       "sector": "elec",
       "sector_name": "电子",
-      "count": 11,
+      "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -14.60181818181818
+      "avg_change": -14.6
     },
     "被动元件": {
       "sector": "被动元件",
@@ -125,42 +121,42 @@
     "印制电路板": {
       "sector": "印制电路板",
       "sector_name": "",
-      "count": 2,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -0.595
+      "count": 3,
+      "win_count": 1,
+      "win_rate": 33.33333333333333,
+      "avg_change": 3.1833333333333336
     },
     "汽车零部件": {
       "sector": "汽车零部件",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -1.52
+      "count": 11,
+      "win_count": 10,
+      "win_rate": 90.9090909090909,
+      "avg_change": 1.8072727272727276
     },
     "煤炭开采": {
       "sector": "煤炭开采",
       "sector_name": "",
-      "count": 2,
-      "win_count": 1,
-      "win_rate": 50.0,
-      "avg_change": 0.905
+      "count": 5,
+      "win_count": 3,
+      "win_rate": 60.0,
+      "avg_change": 0.8
     },
     "男装": {
       "sector": "男装",
       "sector_name": "",
-      "count": 1,
+      "count": 2,
       "win_count": 1,
-      "win_rate": 100.0,
-      "avg_change": 1.46
+      "win_rate": 50.0,
+      "avg_change": 0.46499999999999997
     },
     "食品综合": {
       "sector": "食品综合",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -1.57
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 0.31999999999999995
     },
     "纺织服装": {
       "sector": "纺织服装",
@@ -206,41 +202,41 @@
       "sector": "钢结构",
       "sector_name": "",
       "count": 2,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -1.61
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 0.2549999999999999
     },
     "银行": {
       "sector": "银行",
       "sector_name": "",
-      "count": 3,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "count": 4,
+      "win_count": 3,
+      "win_rate": 75.0,
+      "avg_change": 1.3125
     },
     "造纸": {
       "sector": "造纸",
       "sector_name": "",
-      "count": 1,
+      "count": 3,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -2.533333333333333
     },
     "其他化学制品": {
       "sector": "其他化学制品",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": -2.79
     },
     "冰箱": {
       "sector": "冰箱",
       "sector_name": "",
       "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": 0.0
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.52
     },
     "公用事业": {
       "sector": "公用事业",
@@ -248,15 +244,335 @@
       "count": 1,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -2.26
     },
     "其他采掘": {
       "sector": "其他采掘",
       "sector_name": "",
       "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 4.11
+    },
+    "航运": {
+      "sector": "航运",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 2.24
+    },
+    "光学元件": {
+      "sector": "光学元件",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 9.39
+    },
+    "计算机设备": {
+      "sector": "计算机设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 8.08
+    },
+    "调味发酵品": {
+      "sector": "调味发酵品",
+      "sector_name": "",
+      "count": 3,
+      "win_count": 3,
+      "win_rate": 100.0,
+      "avg_change": 2.69
+    },
+    "船舶制造": {
+      "sector": "船舶制造",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.52
+    },
+    "医药商业": {
+      "sector": "医药商业",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 1.105
+    },
+    "线缆部件及其他": {
+      "sector": "线缆部件及其他",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 4.125
+    },
+    "水电": {
+      "sector": "水电",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.88
+    },
+    "航空装备": {
+      "sector": "航空装备",
+      "sector_name": "",
+      "count": 4,
+      "win_count": 2,
+      "win_rate": 50.0,
+      "avg_change": 0.3074999999999998
+    },
+    "水泥制造": {
+      "sector": "水泥制造",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.55
+    },
+    "房地产开发": {
+      "sector": "房地产开发",
+      "sector_name": "",
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": 0.0
+      "avg_change": -1.0699999999999998
+    },
+    "有线电视网络": {
+      "sector": "有线电视网络",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.71
+    },
+    "火电": {
+      "sector": "火电",
+      "sector_name": "",
+      "count": 3,
+      "win_count": 2,
+      "win_rate": 66.66666666666666,
+      "avg_change": 0.56
+    },
+    "制冷空调设备": {
+      "sector": "制冷空调设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -3.52
+    },
+    "辅料": {
+      "sector": "辅料",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 4.56
+    },
+    "超市": {
+      "sector": "超市",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -5.44
+    },
+    "百货": {
+      "sector": "百货",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.79
+    },
+    "农林牧渔": {
+      "sector": "农林牧渔",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.62
+    },
+    "其他家用轻工": {
+      "sector": "其他家用轻工",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -4.57
+    },
+    "林业": {
+      "sector": "林业",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.44
+    },
+    "软件开发": {
+      "sector": "软件开发",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.28
+    },
+    "高低压设备": {
+      "sector": "高低压设备",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 1.69
+    },
+    "备注：此为申万行业分类": {
+      "sector": "备注：此为申万行业分类",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 3.37
+    },
+    "通信配套服务": {
+      "sector": "通信配套服务",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 11.17
+    },
+    "白酒": {
+      "sector": "白酒",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 0.67
+    },
+    "影视动漫": {
+      "sector": "影视动漫",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -3.78
+    },
+    "中药": {
+      "sector": "中药",
+      "sector_name": "",
+      "count": 4,
+      "win_count": 2,
+      "win_rate": 50.0,
+      "avg_change": 0.19499999999999995
+    },
+    "热电": {
+      "sector": "热电",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.92
+    },
+    "装修装饰": {
+      "sector": "装修装饰",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 13.27
+    },
+    "电机": {
+      "sector": "电机",
+      "sector_name": "",
+      "count": 3,
+      "win_count": 3,
+      "win_rate": 100.0,
+      "avg_change": 6.63
+    },
+    "小家电": {
+      "sector": "小家电",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 2.75
+    },
+    "综合": {
+      "sector": "综合",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 4.26
+    },
+    "物流": {
+      "sector": "物流",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.87
+    },
+    "地面兵装": {
+      "sector": "地面兵装",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.07
+    },
+    "仪器仪表": {
+      "sector": "仪器仪表",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 2,
+      "win_rate": 100.0,
+      "avg_change": 4.24
+    },
+    "移动互联网服务": {
+      "sector": "移动互联网服务",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 0.14
+    },
+    "软饮料": {
+      "sector": "软饮料",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -2.47
+    },
+    "医疗器械": {
+      "sector": "医疗器械",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -4.27
+    },
+    "LED": {
+      "sector": "LED",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.4
+    },
+    "纺织服装设备": {
+      "sector": "纺织服装设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -5.09
     }
   }
 }

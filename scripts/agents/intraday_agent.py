@@ -36,12 +36,25 @@ def log(msg):
     with open(LOG_FILE, 'a', encoding='utf-8') as f:
         f.write(line + '\n')
 
-def real_time_monitor():
-    """实时监控（09:30-15:00定时检查）"""
+def real_time_monitor(codes=None):
+    """实时监控（09:30-15:00定时检查）
+
+    v2026-10-16 (XWI-50): 向后兼容新增 codes: list[str] | None 参数。
+    - codes 为 None (默认): 沿用原行为,扫描 STOCK_POOL 全量 + INDEX_CODES。
+    - codes 不为空: 只扫描 INDEX_CODES + 给定 codes (用作 Skill 指定监控)。
+    - 不修改 STOCK_POOL 常量, 只在本次调用内替换遍历范围。
+    """
     log("="*50)
     log("👁️ 盘中实时监控")
 
-    all_codes = get_all_codes()
+    # XWI-50: codes 透传 — Skill 指定监控列表时,收敛到 INDEX + codes
+    from scripts.agents.config import INDEX_CODES as _IDX
+    if codes:
+        codes_list = list(dict.fromkeys([str(c).strip() for c in codes if str(c).strip()]))
+        all_codes = list(dict.fromkeys(list(_IDX.keys()) + codes_list))
+        log(f"  [XWI-50 codes] 仅监控 {len(all_codes)} 只 (INDEX + Skill 指定)")
+    else:
+        all_codes = get_all_codes()
 
     # 优先用增强行情（腾讯，含PE/PB/涨跌停）
     prices_enh = get_enhanced_quotes(all_codes)
@@ -95,8 +108,14 @@ def real_time_monitor():
         avg_change = 0
 
     # 个股异动检测（含涨跌停检测）
+    # XWI-50: codes 透传时,用 codes 集合当遍历范围,category 标 "custom"
+    if codes:
+        _custom_codes_set = set(all_codes) - set(_IDX.keys())
+        scan_iter = [("custom", {"name": "Skill指定", "codes": list(_custom_codes_set)})]
+    else:
+        scan_iter = list(STOCK_POOL.items())
     alerts = []
-    for cat_id, cat in STOCK_POOL.items():
+    for cat_id, cat in scan_iter:
         for code in cat['codes']:
             info = prices.get(code, {})
             if info.get('price', 0) > 0:

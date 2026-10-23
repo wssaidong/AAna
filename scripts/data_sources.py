@@ -43,6 +43,8 @@ EM_DATACENTER = "https://datacenter-web.eastmoney.com/api/data/v1/get"
 EM_PUSH2 = "https://push2.eastmoney.com/api/qt/stock/get"
 EM_PUSH2HIS = "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
 EM_PUSH2IND = "https://push2.eastmoney.com/api/qt/clist/get"
+# 2026-10-21 新增: push2 主域断连时的官方备用域（v1.27 行业分页修复要求）
+EM_PUSH2IND_DELAY = "https://push2delay.eastmoney.com/api/qt/clist/get"
 EM_REPORT = "https://reportapi.eastmoney.com/report/list"
 CURL_PAPER = "https://quotes.sina.cn/cn/api/openapi.php/CompanyFinanceService.getFinanceReport2022"
 CNINFO_URL = "https://www.cninfo.com.cn/new/hisAnnouncement/query"
@@ -379,34 +381,78 @@ def ths_hot_reason(date_str: str = None) -> dict:
 
 def industry_comparison(top_n: int = 20) -> dict:
     """
-    全行业涨跌幅排名（东财行业板块，~100个行业）。
-    返回: {top: [...], bottom: [...], total: int}
+    全行业涨跌幅排名（东财行业板块，m:90+t:2 共 496 个）。
+
+    返回: {top: [...], bottom: [...], total: int, fetched: int, source: str}
+
+    ⚠️ 2026-10-21 修复两个生产 bug（详见 skill a-stock-afterhours v1.28 pitfall）:
+      1. **缺 fid=f3 导致涨跌幅榜完全错位**: 不带 fid 时 push2 按板块代码序
+         (BK0420/BK0421/...) 返回，"涨幅 Top" 实际是代码序前 20 个、"跌幅 Bottom"
+         是代码序后 20 个 — 榜单标签与内容相反。修复: 加 fid=f3 按涨跌幅排序 +
+         Python 侧显式排序，不依赖服务端顺序。
+      2. **只拉第 1 页 (100/496)**: 每页上限 100，必须按 total 分页拉全，
+         否则"跌幅榜"只是第一页尾部 20 个，不是全市场真实跌幅榜。
+
+    契约（调用方依赖）:
+      - top:    按 change_pct **降序**（涨幅榜），最多 top_n 条
+      - bottom: 按 change_pct **升序**（跌幅榜，最差在前），最多 top_n 条
+      - 调用方取跌幅榜请用 bottom[:N]（不是 [-N:]）
     """
+    import math
     import requests
 
-    url = EM_PUSH2IND
-    params = {
-        "pn": "1", "pz": "100", "po": "1", "np": "1",
-        "fltt": "2", "invt": "2",
-        "fs": "m:90+t:2",
-        "fields": "f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141,f207",
-    }
-    try:
+    fields = "f2,f3,f4,f12,f13,f14,f104,f105,f128,f136,f140,f141,f207"
+    page_size = 100
+
+    def _fetch(url: str, pn: int):
+        params = {
+            "pn": str(pn), "pz": str(page_size), "po": "1", "np": "1",
+            "fltt": "2", "invt": "2",
+            "fs": "m:90+t:2",
+            "fid": "f3",  # ← 关键: 按涨跌幅排序，否则榜单顺序与内容错位
+            "fields": fields,
+        }
         r = requests.get(url, params=params, headers={"User-Agent": UA}, timeout=15)
         d = r.json()
-        items = d.get("data", {}).get("diff", [])
+        data = d.get("data") or {}
+        items = data.get("diff") or []
+        if isinstance(items, dict):  # np=1 时部分返回是 dict
+            items = list(items.values())
+        return int(data.get("total") or 0), items
+
+    source = "push2"
+    try:
+        universe, items = _fetch(EM_PUSH2IND, 1)
     except Exception as e:
-        return {"top": [], "bottom": [], "total": 0, "error": str(e)}
+        # push2 主域断连 → 切官方 push2delay 备用域
+        try:
+            universe, items = _fetch(EM_PUSH2IND_DELAY, 1)
+            source = "push2delay"
+        except Exception as e2:
+            return {"top": [], "bottom": [], "total": 0, "fetched": 0,
+                    "source": "none", "error": f"push2:{e} | push2delay:{e2}"}
 
     if not items:
-        return {"top": [], "bottom": [], "total": 0}
+        return {"top": [], "bottom": [], "total": 0, "fetched": 0, "source": source}
+
+    all_items = list(items)
+    if universe and universe > page_size:
+        pages = math.ceil(universe / page_size)
+        for pn in range(2, pages + 1):
+            try:
+                _, more = _fetch(EM_PUSH2IND if source == "push2" else EM_PUSH2IND_DELAY, pn)
+            except Exception:
+                break  # 单页失败不丢弃已取到的数据
+            if not more:
+                break
+            all_items.extend(more)
 
     rows = []
-    for i, item in enumerate(items):
+    for item in all_items:
+        pct = item.get("f3")
         rows.append({
-            "rank": i + 1,
             "name": item.get("f14", ""),
-            "change_pct": item.get("f3", 0),
+            "change_pct": pct if isinstance(pct, (int, float)) else 0,
             "code": item.get("f12", ""),
             "up_count": item.get("f104", 0),
             "down_count": item.get("f105", 0),
@@ -414,10 +460,18 @@ def industry_comparison(top_n: int = 20) -> dict:
             "leader_change": item.get("f136", 0),
         })
 
+    # 服务端已按 f3 降序，这里再显式排一次，杜绝分页拼接导致的顺序漂移
+    rows.sort(key=lambda x: x["change_pct"], reverse=True)
+    for i, row in enumerate(rows):
+        row["rank"] = i + 1
+
     return {
         "top": rows[:top_n],
-        "bottom": rows[-top_n:],
+        "bottom": list(reversed(rows[-top_n:])) if rows else [],
         "total": len(rows),
+        "fetched": len(rows),
+        "universe": universe or len(rows),
+        "source": source,
     }
 
 
