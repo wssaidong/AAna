@@ -3,13 +3,31 @@
     "ok": true,
     "rows": [
       {
+        "weekday": "Monday",
+        "dow": "1",
+        "n": 25,
+        "wins": 21,
+        "win_rate": 84.0,
+        "avg_ret": 3.0,
+        "weekday_zh": "周一"
+      },
+      {
         "weekday": "Tuesday",
         "dow": "2",
-        "n": 2,
-        "wins": 0,
-        "win_rate": 0.0,
-        "avg_ret": -1.36,
+        "n": 16,
+        "wins": 12,
+        "win_rate": 75.0,
+        "avg_ret": 2.6,
         "weekday_zh": "周二"
+      },
+      {
+        "weekday": "Wednesday",
+        "dow": "3",
+        "n": 18,
+        "wins": 9,
+        "win_rate": 50.0,
+        "avg_ret": 0.29,
+        "weekday_zh": "周三"
       },
       {
         "weekday": "Thursday",
@@ -19,9 +37,36 @@
         "win_rate": 50.0,
         "avg_ret": 0.36,
         "weekday_zh": "周四"
+      },
+      {
+        "weekday": "Friday",
+        "dow": "5",
+        "n": 13,
+        "wins": 7,
+        "win_rate": 53.8,
+        "avg_ret": -0.13,
+        "weekday_zh": "周五"
+      },
+      {
+        "weekday": "Saturday",
+        "dow": "6",
+        "n": 10,
+        "wins": 8,
+        "win_rate": 80.0,
+        "avg_ret": 1.59,
+        "weekday_zh": "周六"
+      },
+      {
+        "weekday": "Sunday",
+        "dow": "7",
+        "n": 10,
+        "wins": 8,
+        "win_rate": 80.0,
+        "avg_ret": 1.59,
+        "weekday_zh": "周日"
       }
     ],
-    "n": 2
+    "n": 7
   },
   "hold": {
     "ok": true,
@@ -29,54 +74,183 @@
       {
         "hold_days": 1,
         "label": "T+1 (次日)",
-        "n": 12,
-        "wins": 5,
-        "win_rate": 41.7,
-        "avg_ret": 0.07
+        "n": 102,
+        "wins": 70,
+        "win_rate": 68.6,
+        "avg_ret": 1.53
       },
       {
         "hold_days": 3,
         "label": "T+3",
-        "n": 2,
-        "wins": 2,
-        "win_rate": 100.0,
-        "avg_ret": 4.5
+        "n": 93,
+        "wins": 53,
+        "win_rate": 57.0,
+        "avg_ret": 1.91
       },
       {
         "hold_days": 5,
         "label": "T+5",
-        "n": 2,
-        "wins": 2,
-        "win_rate": 100.0,
-        "avg_ret": 8.4
+        "n": 70,
+        "wins": 30,
+        "win_rate": 42.9,
+        "avg_ret": -0.5
       }
     ],
     "n": 3
   },
   "sector": {
     "ok": true,
-    "rows": [],
-    "n": 0
+    "rows": [
+      {
+        "sector": "影视动漫",
+        "sector_name": "影视动漫",
+        "n": 4,
+        "wins": 0,
+        "win_rate": 0.0,
+        "avg_ret": -3.78
+      },
+      {
+        "sector": "造纸",
+        "sector_name": "造纸",
+        "n": 3,
+        "wins": 0,
+        "win_rate": 0.0,
+        "avg_ret": -2.53
+      },
+      {
+        "sector": "航空装备",
+        "sector_name": "航空装备",
+        "n": 6,
+        "wins": 2,
+        "win_rate": 33.3,
+        "avg_ret": -0.93
+      },
+      {
+        "sector": "中药",
+        "sector_name": "中药",
+        "n": 6,
+        "wins": 2,
+        "win_rate": 33.3,
+        "avg_ret": -0.6
+      },
+      {
+        "sector": "印制电路板",
+        "sector_name": "印制电路板",
+        "n": 3,
+        "wins": 1,
+        "win_rate": 33.3,
+        "avg_ret": 3.46
+      },
+      {
+        "sector": "煤炭开采",
+        "sector_name": "煤炭开采",
+        "n": 7,
+        "wins": 3,
+        "win_rate": 42.9,
+        "avg_ret": 0.31
+      },
+      {
+        "sector": "其他化学制品",
+        "sector_name": "其他化学制品",
+        "n": 4,
+        "wins": 2,
+        "win_rate": 50.0,
+        "avg_ret": -2.79
+      },
+      {
+        "sector": "火电",
+        "sector_name": "火电",
+        "n": 5,
+        "wins": 3,
+        "win_rate": 60.0,
+        "avg_ret": 0.48
+      },
+      {
+        "sector": "食品综合",
+        "sector_name": "食品综合",
+        "n": 3,
+        "wins": 2,
+        "win_rate": 66.7,
+        "avg_ret": 0.95
+      },
+      {
+        "sector": "银行",
+        "sector_name": "银行",
+        "n": 6,
+        "wins": 4,
+        "win_rate": 66.7,
+        "avg_ret": 1.08
+      },
+      {
+        "sector": "调味发酵品",
+        "sector_name": "调味发酵品",
+        "n": 5,
+        "wins": 5,
+        "win_rate": 100.0,
+        "avg_ret": 1.99
+      },
+      {
+        "sector": "电机",
+        "sector_name": "电机",
+        "n": 3,
+        "wins": 3,
+        "win_rate": 100.0,
+        "avg_ret": 6.63
+      },
+      {
+        "sector": "仪器仪表",
+        "sector_name": "仪器仪表",
+        "n": 4,
+        "wins": 4,
+        "win_rate": 100.0,
+        "avg_ret": 4.24
+      },
+      {
+        "sector": "汽车零部件",
+        "sector_name": "汽车零部件",
+        "n": 16,
+        "wins": 16,
+        "win_rate": 100.0,
+        "avg_ret": 2.0
+      },
+      {
+        "sector": "备注：此为申万行业分类",
+        "sector_name": "备注：此为申万行业分类",
+        "n": 4,
+        "wins": 4,
+        "win_rate": 100.0,
+        "avg_ret": 3.37
+      },
+      {
+        "sector": "通信配套服务",
+        "sector_name": "通信配套服务",
+        "n": 4,
+        "wins": 4,
+        "win_rate": 100.0,
+        "avg_ret": 11.17
+      },
+      {
+        "sector": "白酒",
+        "sector_name": "白酒",
+        "n": 4,
+        "wins": 4,
+        "win_rate": 100.0,
+        "avg_ret": 0.67
+      },
+      {
+        "sector": "高低压设备",
+        "sector_name": "高低压设备",
+        "n": 4,
+        "wins": 4,
+        "win_rate": 100.0,
+        "avg_ret": 1.69
+      }
+    ],
+    "n": 18
   },
   "trend": {
     "ok": true,
     "rows": [
-      {
-        "iso_week": "2026-W34",
-        "week_start": "2026-08-18",
-        "n": 11,
-        "wins": 1,
-        "win_rate": 9.1,
-        "avg_ret": -3.53
-      },
-      {
-        "iso_week": "2026-W35",
-        "week_start": "2026-08-24",
-        "n": 1,
-        "wins": 0,
-        "win_rate": 0.0,
-        "avg_ret": -1.8
-      },
       {
         "iso_week": "2026-W36",
         "week_start": "2026-08-31",
@@ -89,9 +263,9 @@
         "iso_week": "2026-W37",
         "week_start": "2026-09-08",
         "n": 5,
-        "wins": 1,
-        "win_rate": 20.0,
-        "avg_ret": -2.74
+        "wins": 2,
+        "win_rate": 40.0,
+        "avg_ret": -1.43
       },
       {
         "iso_week": "2026-W38",
@@ -108,10 +282,26 @@
         "wins": 5,
         "win_rate": 50.0,
         "avg_ret": 0.36
+      },
+      {
+        "iso_week": "2026-W42",
+        "week_start": "2026-10-12",
+        "n": 63,
+        "wins": 46,
+        "win_rate": 73.0,
+        "avg_ret": 1.72
+      },
+      {
+        "iso_week": "2026-W43",
+        "week_start": "2026-10-19",
+        "n": 29,
+        "wins": 19,
+        "win_rate": 65.5,
+        "avg_ret": 1.51
       }
     ],
     "n": 6
   },
   "weeks": 4,
-  "generated_at": "2026-10-10T09:00:28"
+  "generated_at": "2026-10-24T09:00:27"
 }
