@@ -4092,8 +4092,199 @@
       "reason": "止损/止盈/到期",
       "pnl": -13.0,
       "pnl_pct": -1.47
+    },
+    {
+      "date": "2026-10-24",
+      "code": "603767",
+      "name": "中马传动",
+      "action": "buy",
+      "price": 16.03,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "002347",
+      "name": "泰尔股份",
+      "action": "buy",
+      "price": 6.85,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "002403",
+      "name": "爱仕达",
+      "action": "buy",
+      "price": 11.26,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "603955",
+      "name": "大千生态",
+      "action": "buy",
+      "price": 24.59,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "603669",
+      "name": "灵康药业",
+      "action": "buy",
+      "price": 6.74,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "603919",
+      "name": "金徽酒",
+      "action": "buy",
+      "price": 16.65,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "002956",
+      "name": "西麦食品",
+      "action": "buy",
+      "price": 18.81,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "002184",
+      "name": "海得控制",
+      "action": "buy",
+      "price": 10.95,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "600801",
+      "name": "华新建材",
+      "action": "buy",
+      "price": 22.85,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-24",
+      "code": "603662",
+      "name": "柯力传感",
+      "action": "buy",
+      "price": 51.29,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "603767": {
+      "date": "2026-10-24",
+      "name": "中马传动",
+      "shares": 100,
+      "entry_price": 16.03,
+      "highest_price": 16.03,
+      "entry_date": "2026-10-24"
+    },
+    "002347": {
+      "date": "2026-10-24",
+      "name": "泰尔股份",
+      "shares": 100,
+      "entry_price": 6.85,
+      "highest_price": 6.85,
+      "entry_date": "2026-10-24"
+    },
+    "002403": {
+      "date": "2026-10-24",
+      "name": "爱仕达",
+      "shares": 100,
+      "entry_price": 11.26,
+      "highest_price": 11.26,
+      "entry_date": "2026-10-24"
+    },
+    "603955": {
+      "date": "2026-10-24",
+      "name": "大千生态",
+      "shares": 100,
+      "entry_price": 24.59,
+      "highest_price": 24.59,
+      "entry_date": "2026-10-24"
+    },
+    "603669": {
+      "date": "2026-10-24",
+      "name": "灵康药业",
+      "shares": 100,
+      "entry_price": 6.74,
+      "highest_price": 6.74,
+      "entry_date": "2026-10-24"
+    },
+    "603919": {
+      "date": "2026-10-24",
+      "name": "金徽酒",
+      "shares": 100,
+      "entry_price": 16.65,
+      "highest_price": 16.65,
+      "entry_date": "2026-10-24"
+    },
+    "002956": {
+      "date": "2026-10-24",
+      "name": "西麦食品",
+      "shares": 100,
+      "entry_price": 18.81,
+      "highest_price": 18.81,
+      "entry_date": "2026-10-24"
+    },
+    "002184": {
+      "date": "2026-10-24",
+      "name": "海得控制",
+      "shares": 100,
+      "entry_price": 10.95,
+      "highest_price": 10.95,
+      "entry_date": "2026-10-24"
+    },
+    "600801": {
+      "date": "2026-10-24",
+      "name": "华新建材",
+      "shares": 100,
+      "entry_price": 22.85,
+      "highest_price": 22.85,
+      "entry_date": "2026-10-24"
+    },
+    "603662": {
+      "date": "2026-10-24",
+      "name": "柯力传感",
+      "shares": 100,
+      "entry_price": 51.29,
+      "highest_price": 51.29,
+      "entry_date": "2026-10-24"
+    }
+  },
   "daily_snapshots": []
 }
