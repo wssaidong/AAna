@@ -1,0 +1,276 @@
+{
+ "date": "2026-10-26",
+ "generated": "14:51:24",
+ "results": [
+  {
+   "code": "603037",
+   "name": "凯众股份",
+   "price": 10.79,
+   "pe_ttm": 43.32,
+   "pb": 2.99,
+   "mcap_yi": 28.72,
+   "v24_score": 100,
+   "tech_score": 51,
+   "fund_score": 3,
+   "val_score": 12,
+   "total": 65.4,
+   "rating": "增持",
+   "target": 11.33,
+   "stop": 9.99,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=54 健康",
+    "20日区间位置 79% 中上",
+    "60日涨幅 +20% 健康",
+    "量能比 1.00 正常"
+   ],
+   "fund_notes": [
+    "ROE 2.9% 弱/亏损",
+    "净利增速 -19% 负增长",
+    "营收增速 +11%"
+   ],
+   "val_notes": [
+    "PE 43 偏高",
+    "PB 2.99 合理"
+   ],
+   "tech_stat": {
+    "rsi": 54.5,
+    "pos20": 79.0,
+    "chg60": 20.3,
+    "vol_ratio_5d": 1.0,
+    "ma5": 10.54,
+    "ma20": 10.2,
+    "ma60": 10.15,
+    "hi20": 11.19,
+    "lo20": 9.32,
+    "last_kline_date": "2026-10-26"
+   },
+   "fund_stat": {
+    "roe": 2.92,
+    "ni_growth": -19.037887,
+    "rev_growth": 10.866707,
+    "report_date": "20260630"
+   },
+   "chg_pct": 2.78,
+   "live_chg_pct": 3.25,
+   "industry": "汽车零部件-制动系统精密件",
+   "sector_key": "汽车零部件"
+  },
+  {
+   "code": "603882",
+   "name": "金域医学",
+   "price": 31.82,
+   "pe_ttm": 144.86,
+   "pb": 2.33,
+   "mcap_yi": 145.75,
+   "v24_score": 100,
+   "tech_score": 48,
+   "fund_score": 12,
+   "val_score": 7,
+   "total": 65.0,
+   "rating": "增持",
+   "target": 33.41,
+   "stop": 29.59,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=66 偏热",
+    "20日区间位置 86% 突破区",
+    "60日涨幅 +23% 健康",
+    "量能比 1.15 正常"
+   ],
+   "fund_notes": [
+    "ROE 2.9% 弱/亏损",
+    "净利增速 +324%",
+    "营收增速 -4%"
+   ],
+   "val_notes": [
+    "PE 145 过高/异常",
+    "PB 2.33 合理"
+   ],
+   "tech_stat": {
+    "rsi": 66.4,
+    "pos20": 86.0,
+    "chg60": 22.5,
+    "vol_ratio_5d": 1.15,
+    "ma5": 31.02,
+    "ma20": 29.49,
+    "ma60": 28.53,
+    "hi20": 32.55,
+    "lo20": 27.36,
+    "last_kline_date": "2026-10-26"
+   },
+   "fund_stat": {
+    "roe": 2.92,
+    "ni_growth": 324.265927,
+    "rev_growth": -3.758637,
+    "report_date": "20260630"
+   },
+   "chg_pct": 3.99,
+   "live_chg_pct": 3.99,
+   "industry": "医疗服务-第三方医学检验(ICL)",
+   "sector_key": null
+  },
+  {
+   "code": "603355",
+   "name": "莱克电气",
+   "price": 33.87,
+   "pe_ttm": 32.18,
+   "pb": 3.31,
+   "mcap_yi": 194.21,
+   "v24_score": 100,
+   "tech_score": 44,
+   "fund_score": 0,
+   "val_score": 9,
+   "total": 52.0,
+   "rating": "中性",
+   "target": 35.56,
+   "stop": 31.39,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=67 偏热",
+    "20日区间位置 89% 突破区",
+    "60日涨幅 +35% 偏热",
+    "量能比 1.05 正常"
+   ],
+   "fund_notes": [
+    "ROE 4.0% 弱/亏损",
+    "净利增速 -46% 负增长",
+    "营收增速 -3%"
+   ],
+   "val_notes": [
+    "PE 32 偏高",
+    "PB 3.31 中等"
+   ],
+   "tech_stat": {
+    "rsi": 67.1,
+    "pos20": 89.0,
+    "chg60": 35.0,
+    "vol_ratio_5d": 1.05,
+    "ma5": 33.32,
+    "ma20": 32.02,
+    "ma60": 29.51,
+    "hi20": 34.5,
+    "lo20": 29.01,
+    "last_kline_date": "2026-10-26"
+   },
+   "fund_stat": {
+    "roe": 3.97,
+    "ni_growth": -45.804325,
+    "rev_growth": -2.595916,
+    "report_date": "20260630"
+   },
+   "chg_pct": 3.18,
+   "live_chg_pct": 3.55,
+   "industry": "小家电-电机/锂电工具/空气压缩机",
+   "sector_key": "小家电"
+  },
+  {
+   "code": "001239",
+   "name": "永达股份",
+   "price": 12.68,
+   "pe_ttm": -91.8,
+   "pb": 2.26,
+   "mcap_yi": 14.46,
+   "v24_score": 100,
+   "tech_score": 39,
+   "fund_score": 3,
+   "val_score": 7,
+   "total": 47.8,
+   "rating": "减持",
+   "target": 13.98,
+   "stop": 11.82,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=53 健康",
+    "20日区间位置 32% 偏低",
+    "60日涨幅 +17% 健康",
+    "量能比 0.93 正常"
+   ],
+   "fund_notes": [
+    "ROE -0.7% 弱/亏损",
+    "净利增速 -112% 负增长",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE -91.8 亏损(估值面 0 分)",
+    "PB 2.26 合理"
+   ],
+   "tech_stat": {
+    "rsi": 53.1,
+    "pos20": 32.0,
+    "chg60": 16.7,
+    "vol_ratio_5d": 0.93,
+    "ma5": 13.31,
+    "ma20": 12.51,
+    "ma60": 12.08,
+    "hi20": 14.74,
+    "lo20": 11.7,
+    "last_kline_date": "2026-10-26"
+   },
+   "fund_stat": {
+    "roe": -0.65,
+    "ni_growth": -112.138258,
+    "rev_growth": 1.689933,
+    "report_date": "20260930"
+   },
+   "chg_pct": 2.17,
+   "live_chg_pct": 1.93,
+   "industry": "汽车服务-汽车经销与维修",
+   "sector_key": null
+  },
+  {
+   "code": "603348",
+   "name": "文灿股份",
+   "price": 14.99,
+   "pe_ttm": -8.17,
+   "pb": 1.23,
+   "mcap_yi": 47.14,
+   "v24_score": 100,
+   "tech_score": 39,
+   "fund_score": 0,
+   "val_score": 7,
+   "total": 44.8,
+   "rating": "减持",
+   "target": 16.47,
+   "stop": 13.92,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=54 健康",
+    "20日区间位置 47% 偏低",
+    "60日涨幅 +17% 健康",
+    "量能比 0.63 正常"
+   ],
+   "fund_notes": [
+    "ROE -5.5% 弱/亏损",
+    "净利增速 -1747% 负增长",
+    "营收增速 -0%"
+   ],
+   "val_notes": [
+    "PE -8.2 亏损(估值面 0 分)",
+    "PB 1.23 合理"
+   ],
+   "tech_stat": {
+    "rsi": 53.7,
+    "pos20": 47.0,
+    "chg60": 17.3,
+    "vol_ratio_5d": 0.63,
+    "ma5": 15.23,
+    "ma20": 14.79,
+    "ma60": 14.48,
+    "hi20": 16.84,
+    "lo20": 13.38,
+    "last_kline_date": "2026-10-26"
+   },
+   "fund_stat": {
+    "roe": -5.53,
+    "ni_growth": -1746.843535,
+    "rev_growth": -0.107871,
+    "report_date": "20260630"
+   },
+   "chg_pct": 1.91,
+   "live_chg_pct": 2.04,
+   "industry": "汽车零部件-铝合金压铸/一体化压铸",
+   "sector_key": "汽车零部件"
+  }
+ ]
+}
