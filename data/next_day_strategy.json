@@ -1,10 +1,13 @@
 {
-  "date_for": "2026-10-23",
+  "date_for": "2026-10-28",
   "score_threshold": 60,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
+    "其他家用轻工",
     "印制电路板",
+    "影视动漫",
+    "房地产开发",
     "造纸"
   ],
   "position_final": 50,
@@ -20,7 +23,10 @@
       "weak_sectors": [
         "造纸",
         "semi",
-        "印制电路板"
+        "印制电路板",
+        "房地产开发",
+        "其他家用轻工",
+        "影视动漫"
       ]
     },
     {
@@ -34,7 +40,7 @@
       "reasons": []
     }
   ],
-  "generated_at": "2026-10-22T16:10:40",
+  "generated_at": "2026-10-27T16:10:28",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
