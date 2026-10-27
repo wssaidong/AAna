@@ -106,16 +106,24 @@ class QuoteService:
         return result
 
     def kline(self, code: str, period: str = "daily",
-              count: int = 30, adjust: str = "qfq") -> List[Dict[str, Any]]:
+              count: int = 30, adjust: str = "qfq",
+              allow_sina_fallback: bool = True) -> List[Dict[str, Any]]:
         """
         获取历史K线（腾讯 → 新浪 fallback）
         period: daily / weekly / monthly
         count: 获取K线根数
         adjust: qfq / hfq / ""（前复权/后复权/不复权）
         返回: [{date, open, high, low, close, vol}, ...]
+
+        ⚠️ v2026-10-26 新增 allow_sina_fallback（默认 True = 保持原行为）:
+        新浪 fallback 只提供**不复权**日线，腾讯 fqkline 提供**前复权**。
+        两者混用会在除权日产生假跌幅（实测 002178: 腾讯 qfq 10-21→10-22 = 0.00%，
+        新浪 raw = -3.73%，差 0.19 元 = 纯分红除权缺口）。
+        计算**收益率**的场景必须传 allow_sina_fallback=False，拿不到前复权序列时
+        宁可留空也不要用不复权价凑出脏收益率（见 feedback_loop._kline_cached）。
         """
         kl = self._tencent_kline(code, period, count, adjust)
-        if not kl:
+        if not kl and allow_sina_fallback:
             kl = self._sina_kline_fallback(code, count)
         return kl
 

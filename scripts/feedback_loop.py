@@ -113,12 +113,20 @@ _KLINE_CACHE = {}
 
 
 def _kline_cached(code: str, count: int = 260):
-    """按 code 缓存日线，避免同一只股票被反复拉取（原版每只股票要拉 5+ 次）。"""
+    """
+    按 code 缓存日线，避免同一只股票被反复拉取（原版每只股票要拉 5+ 次）。
+
+    ⚠️ v2026-10-26: 传 allow_sina_fallback=False —— 新浪 fallback 是**不复权**价，
+    腾讯是前复权，两者混用会在除权日算出假跌幅（实测 002178 10-21 rec 差 3.73pp，
+    纯分红除权缺口被计成亏损）。本函数用于 ret_1d 等收益率计算，宁可拉不到
+    （返回 []，该条 ret_1d 留空待下次补）也不用不复权价凑数。
+    """
     if code in _KLINE_CACHE:
         return _KLINE_CACHE[code]
     try:
         qs = QuoteService()
-        kl = qs.kline(code, period="daily", count=count, adjust="qfq") or []
+        kl = qs.kline(code, period="daily", count=count, adjust="qfq",
+                      allow_sina_fallback=False) or []
     except Exception:
         kl = []
     # 统一按日期升序（旧 → 新）；QuoteService 已是升序，这里做一次防御性排序
