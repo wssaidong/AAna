@@ -47,20 +47,14 @@ def log(msg):
 
 def push_feishu(markdown: str, title: str = "AAna 尾盘推荐"):
     """推送到飞书"""
-    cmd = [
-        "lark-cli", "im", "+messages-send",
-        "--user-id", FEISHU_USER_ID,
-        "--markdown", markdown,
-    ]
     try:
-        import subprocess
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
-        if r.returncode == 0:
+        from lark_push import push_markdown
+        ok, detail = push_markdown(markdown, user_id=FEISHU_USER_ID)
+        if ok:
             log(f"✅ 飞书推送成功")
             return True
-        else:
-            log(f"❌ 飞书推送失败: {r.stderr[:200]}")
-            return False
+        log(f"❌ 飞书推送失败: {detail}")
+        return False
     except Exception as e:
         log(f"❌ 飞书推送异常: {e}")
         return False

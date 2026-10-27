@@ -68,23 +68,40 @@ def get_indices():
 
 
 def ths_hot(date_str):
-    """同花顺强势股;ds.ths_hot_reason 返回 dict {stocks, total, tag_freq, date},本函数取 stocks 转 list 保持兼容
+    """同花顺强势股（直连接口，保留行级 date 字段用于非交易日过滤）
 
-    原 ths_hot 返回 list[{code, name, reason, date, market}]
-    ds.ths_hot_reason 返回 dict{stocks, total, tag_freq, date}
+    ⚠️ 2026-10-26 修复（两层）:
+    1. 同花顺 /date/{非交易日}/ 端点**不返回空**，而是回落到"最近一个有数据的
+       交易日"（实测 2026-10-24/25 两个非交易日都返回了 2026-10-26 当天的记录）。
+       旧代码直接取用 → 题材环比变成"今天 vs 今天"，所有 diff 恒为 0。
+       修复: 按行内 `date` 字段过滤，只保留 date == 请求日期的记录。
+    2. ds.ths_hot_reason() 的返回结构**丢弃了行级 date 字段**（只回顶层
+       'date' 回显），导致按行过滤无从下手 → 本函数改为直连接口解析。
+    请求日无数据时返回 [] → previous_nonempty_hot_day 会继续向前回溯。
     """
-    raw = ds.ths_hot_reason(date_str)
-    stocks = raw.get("stocks", []) if isinstance(raw, dict) else []
-    return [
-        {
-            "code": row.get("code", ""),
+    import requests as _rq
+    url = (f"http://zx.10jqka.com.cn/event/api/getharden/date/{date_str}"
+           f"/orderby/date/orderway/desc/charset/GBK/")
+    try:
+        r = _rq.get(url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.0.0 Safari/537.36"}, timeout=10)
+        data = r.json()
+    except Exception:
+        return []
+    rows = data.get("data") or []
+    out = []
+    for row in rows:
+        # 端点在无数据日会回落成"最近交易日"的数据 → 必须按行级 date 过滤
+        row_date = str(row.get("date") or "")[:10]
+        if row_date != date_str:
+            continue
+        out.append({
+            "code": str(row.get("code", "")).zfill(6),
             "name": row.get("name", ""),
             "reason": row.get("reason", ""),
-            "date": row.get("date", ""),
+            "date": row_date,
             "market": row.get("market"),
-        }
-        for row in stocks
-    ]
+        })
+    return out
 
 
 def enrich_with_quote(hot_list):
@@ -122,6 +139,53 @@ def theme_counter(hot_list):
     return c
 
 
+def _industry_ranking_ths(top_n=10):
+    """同花顺行业板块 fallback — 东财 push2 全断时使用。
+
+    ⚠️ 2026-10-26 实战: 东财 push2 **主域 + push2delay 双双 RemoteDisconnected**
+    (已连续多日不可用), 行业全貌整段降级为"无数据" → 战报丢失最重要的
+    "行业今日全貌"章节。同花顺行业接口 (akshare stock_board_industry_summary_ths)
+    实测可用, 返回 90 个行业板块的涨跌幅/净流入/涨跌家数。
+
+    返回契约与东财一致: {top, bottom, total, fetched, universe, source}
+      - top:    涨幅榜（降序）
+      - bottom: 跌幅榜（升序，最差在前）
+    """
+    try:
+        import akshare as ak
+        df = ak.stock_board_industry_summary_ths()
+    except Exception as e:
+        return {"top": [], "bottom": [], "total": 0, "fetched": 0,
+                "universe": 0, "source": "ths", "error": f"ths 行业接口失败: {e}"}
+    if df is None or len(df) == 0:
+        return {"top": [], "bottom": [], "total": 0, "fetched": 0,
+                "universe": 0, "source": "ths", "error": "ths 行业接口返回空"}
+    rows = []
+    for _, r in df.iterrows():
+        try:
+            pct = float(r.get("涨跌幅"))
+        except (TypeError, ValueError):
+            continue
+        rows.append({
+            "name": str(r.get("板块", "")).strip(),
+            "change_pct": pct,
+            "code": "",
+            "up_count": r.get("上涨家数", 0),
+            "down_count": r.get("下跌家数", 0),
+            "leader": str(r.get("领涨股", "")).strip(),
+            "leader_change": r.get("领涨股-涨跌幅", 0),
+        })
+    rows.sort(key=lambda x: -x["change_pct"])
+    return {
+        "top": rows[:top_n],
+        "bottom": list(reversed(rows[-top_n:])) if rows else [],
+        "total": len(rows),
+        "fetched": len(rows),
+        "universe": len(rows),
+        "source": "ths",
+    }
+
+
 def get_industry_ranking(top_n=10):
     """东财行业涨跌 — 用 ds.industry_comparison（已内置 fid=f3 排序 + 全量分页）
 
@@ -131,20 +195,46 @@ def get_industry_ranking(top_n=10):
       - bottom: 跌幅榜，按 change_pct 升序（**最差在前**）
     ⚠️ 旧代码用 `bottom[-top_n:]` 取跌幅榜，在 bottom 已按升序排列后会拿到
     "跌幅榜里最不差的那几条"，反而丢掉真正的跌幅榜 → 榜单标签与内容相反。
+
+    ⚠️ 2026-10-26 新增: 东财 push2 双域断连时降级到同花顺行业板块
+    (见 _industry_ranking_ths), 保住"行业今日全貌"章节。
     """
     raw = ds.industry_comparison(top_n=top_n)  # ds 已同时给出 top/bottom 各 top_n 条
     if not isinstance(raw, dict):
-        return {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
+        raw = {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
     top = raw.get("top", []) or []
     bottom = raw.get("bottom", []) or []
+    source = raw.get("source", "scripts.data_sources.industry_comparison")
+    error = raw.get("error", "")
+
+    if not top:
+        # 东财不可用 → 同花顺行业板块兜底
+        ths = _industry_ranking_ths(top_n)
+        if ths.get("top"):
+            ths["error"] = error  # 保留东财失败原因用于展示
+            return {
+                "top": ths["top"],
+                "bottom": ths["bottom"],
+                "total": ths["total"],
+                "returned": ths["fetched"],
+                "universe": ths["universe"],
+                "source": "ths",
+                "error": error,
+            }
+        return {
+            "top": [], "bottom": [], "total": 0, "returned": 0, "universe": 0,
+            "source": "none",
+            "error": f"{error} | 同花顺行业兜底也失败: {ths.get('error', '无数据')}",
+        }
+
     return {
         "top": top[:top_n],
         "bottom": bottom[:top_n],  # bottom 已是"最差在前"，直接取头部
         "total": raw.get("total", len(top) + len(bottom)),
         "returned": raw.get("fetched", len(top) + len(bottom)),
         "universe": raw.get("universe", raw.get("total", 0)),
-        "source": raw.get("source", "scripts.data_sources.industry_comparison"),
-        "error": raw.get("error", ""),
+        "source": source,
+        "error": error,
     }
 
 
@@ -186,13 +276,16 @@ def previous_nonempty_hot_day(date_str, max_lookback=10):
 
 
 def parse_top10_with_baseline(date_str):
-    path = f"{REPORT_DIR}/{date_str}-选股报告.md"
-    try:
-        with open(path) as f:
-            content = f.read()
-    except FileNotFoundError:
-        print(f"❌ 选股报告不存在: {path}")
-        return []
+    """向后兼容包装: 只返回 rows。候选池来源回捞逻辑见 resolve_candidate_pool()。"""
+    rows, _, _ = resolve_candidate_pool(date_str)
+    return rows
+
+
+def parse_top10_content(content):
+    """从选股报告正文解析 Top10 section → [(code, name, baseline_pct)]。
+
+    纯函数（不含 IO），供 on-disk / git HEAD 两种来源复用。
+    """
     rows = []
     in_section = False
     seen = set()
@@ -207,6 +300,7 @@ def parse_top10_with_baseline(date_str):
             if "排名" in line or "代码" in line:
                 continue
             parts = [p.strip() for p in line.split("|")]
+            # 列顺序: ['', '排名', '股票', '代码', '价格', '涨跌幅', '技术分', '综合评分', '信号', '风险', '趋势', '']
             code, name, pct = None, None, None
             for i, p in enumerate(parts):
                 if re.match(r"^\d{6}$", p):
@@ -224,6 +318,122 @@ def parse_top10_with_baseline(date_str):
             if len(rows) >= 10:
                 break
     return rows
+
+
+def _parse_top10_from_deep_analysis(date_str):
+    """从 {date}-深度分析.md 的"候选池"表格回捞候选池。
+
+    ⚠️ 2026-10-26 实战: 选股报告的 Top10 section 会被**盘中重跑覆盖**成空
+    (09:37 重跑用盘中实时情绪把"停止交易"状态写回同一个文件, 把 08:02 盘前
+    版的 10 只候选池清空)。深度分析报告 08:34 生成时读的还是盘前版,
+    其"二、候选池"表格保留了完整的 10 只 + 基准日涨跌幅 → 作为回捞来源。
+
+    表格形如:
+      | 深度排名 | 股票 | 代码 | 10-23 涨跌 | ... |
+      | 1 | 🥇**西麦食品** | **002956** | **+4.73%** | ... |
+    """
+    path = f"{REPORT_DIR}/{date_str}-深度分析.md"
+    try:
+        with open(path) as f:
+            content = f.read()
+    except FileNotFoundError:
+        return []
+    lines = content.split("\n")
+    start = None
+    for i, line in enumerate(lines):
+        if "候选池" in line and line.startswith("##"):
+            start = i
+            break
+    if start is None:
+        return []
+    rows = []
+    seen = set()
+    for line in lines[start + 1:]:
+        if re.match(r"^#{1,3}\s+", line):
+            break
+        if not line.startswith("|"):
+            continue
+        if "代码" in line:
+            continue
+        cells = [c.strip().replace("**", "").replace("🥇", "").replace("🥈", "")
+                 .replace("🥉", "").replace("🆕", "") for c in line.split("|")]
+        code = next((c for c in cells if re.match(r"^\d{6}$", c)), None)
+        if not code or code in seen:
+            continue
+        ci = cells.index(code)
+        name = cells[ci - 1] if ci > 0 else code
+        pct = None
+        for c in cells[ci + 1:]:
+            m = re.search(r"([+-]?\d+\.\d+)%", c)
+            if m:
+                pct = float(m.group(1))
+                break
+        if pct is None:
+            continue
+        rows.append((code, name or code, pct))
+        seen.add(code)
+        if len(rows) >= 10:
+            break
+    return rows
+
+
+def _git_head_top10(date_str):
+    """从 git HEAD 读取 {date}-选股报告.md 并解析 Top10。
+
+    选股报告每天都会被 autopilot 提交, 因此 HEAD 版本通常就是**盘前版**
+    (08:02 生成的 Top10), 即使工作区文件已被盘中重跑覆盖。
+    """
+    import subprocess
+    rel = f"reports/{date_str}-选股报告.md"
+    repo = os.path.dirname(REPORT_DIR.rstrip("/"))
+    try:
+        out = subprocess.run(
+            ["git", "-C", repo, "show", f"HEAD:{rel}"],
+            capture_output=True, text=True, timeout=20,
+        )
+    except Exception:
+        return []
+    if out.returncode != 0 or not out.stdout.strip():
+        return []
+    return parse_top10_content(out.stdout)
+
+
+def resolve_candidate_pool(date_str):
+    """解析候选池, 返回 (rows, source_label, note)。
+
+    来源优先级 (on-disk → git HEAD → 深度分析回捞):
+      1. 工作区 {date}-选股报告.md 的 "重点关注 Top 10" section
+      2. git HEAD 的同名文件 (盘前版, 盘中重跑覆盖工作区时的兜底)
+      3. {date}-深度分析.md 的 "二、候选池" 表格 (上游 bug 的最后兜底)
+
+    ⚠️ 2026-10-26 实战: 工作区文件 09:39 被重跑覆盖成 Top10 空表
+    (情绪 25 冰点/停止交易), 直接读会把**真实存在并已同步东财**的
+    10 只候选池误判为"上游报告缺失"。三源回捞后命中率评估恢复正常。
+    """
+    path = f"{REPORT_DIR}/{date_str}-选股报告.md"
+    try:
+        with open(path) as f:
+            rows = parse_top10_content(f.read())
+        if rows:
+            return rows, "选股报告(工作区)", ""
+    except FileNotFoundError:
+        pass
+
+    rows = _git_head_top10(date_str)
+    if rows:
+        return rows, "选股报告(git HEAD 盘前版)", (
+            "⚠️ 工作区选股报告的 Top10 section 为空（盘中重跑覆盖），"
+            "已回捞 git HEAD 盘前版候选池"
+        )
+
+    rows = _parse_top10_from_deep_analysis(date_str)
+    if rows:
+        return rows, "深度分析报告候选池表", (
+            "⚠️ 工作区与 git HEAD 的选股报告 Top10 均为空，"
+            "已从深度分析报告的候选池表格回捞"
+        )
+
+    return [], "无", "⚠️ 三源均无候选池（选股报告/深度分析报告）"
 
 
 def resolve_theme_label(reason, final_priority):
@@ -275,6 +485,11 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
                 return f"🔄 单点V型反转型（{name} 尾盘{direction} {delta:+.2f}pp，其余指数普跌）"
     if sh_pct < -1.5 and kc50_pct < -5:
         return "📉 平稳转急跌型（模式⑦）"
+    # ⚠️ 2026-10-26 新增（v1.29）: 上证红盘/微跌 + 成长方向（创业板/科创50）杀跌
+    # 主板相对平稳时属"结构性分化"，写"震荡"会掩盖成长方向的系统性杀跌风险。
+    # 阈值按 2026-10-26 实战校准（科创50 -2.23 / 创业板 -1.71 / 上证 +0.19）。
+    if kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
+        return "📊 主板稳态 + 成长方向杀跌型（结构性分化）"
     if other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
         return "📊 主板稳态 + 科创50单点跳水型"
     if sh_pct > 1.5:
@@ -309,8 +524,10 @@ def generate_full_report(date_str):
     hot = enrich_with_quote(hot)
 
     print(f"[3/5] 拉候选池…")
-    top10 = parse_top10_with_baseline(date_str)
-    print(f"      Top10 {len(top10)} 只")
+    top10, pool_source, pool_note = resolve_candidate_pool(date_str)
+    print(f"      Top10 {len(top10)} 只（来源: {pool_source}）")
+    if pool_note:
+        print(f"      {pool_note}")
 
     print(f"[4/5] 计算题材热度对比…")
     comparison_date, hot_yest = previous_nonempty_hot_day(date_str)
@@ -414,7 +631,8 @@ def generate_full_report(date_str):
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                               positives, negatives, avg, avg_pos, avg_neg,
                               sh_pct, cyb_pct, kc50_pct, selected, len(hot),
-                              gap_md, gap_rows, comparison_date, industry, dragon)
+                              gap_md, gap_rows, comparison_date, industry, dragon,
+                              pool_note=pool_note)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
@@ -506,7 +724,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    positives, negatives, avg, avg_pos, avg_neg,
                    sh_pct, cyb_pct, kc50_pct, selected, hot_count,
                    gap_md="", gap_rows=None, comparison_date=None,
-                   industry=None, dragon=None):
+                   industry=None, dragon=None, pool_note=""):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     md = (f"📊 **盘后战报｜生成时间 {now} CST｜"
           f"目标交易日 {date_str} 15:00 收盘**\n\n")
@@ -562,6 +780,8 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
 
     md += "\n━━━ **候选池命中率** ━━━\n\n"
     md += "> 注：报告 08:03 生成，'baseline' 实为昨日(昨-1)收盘涨跌幅\n\n"
+    if pool_note:
+        md += f"> {pool_note}\n\n"
     md += "| 代码 | 名称 | baseline | 今日实际 | Δ | 评估 |\n"
     md += "|:----:|:----:|:------:|:------:|:----:|:----:|\n"
     if not hit_rows:
@@ -647,6 +867,15 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！创业板/科创50收盘 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%\n"
         md += "2️⃣ **回避：** 追高强势股 + 小盘题材投机\n"
         md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头股是否扛住杀跌\n"
+    elif other_5_avg is not None and kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
+        # ⚠️ 2026-10-26 新增（v1.29）: 主板稳态 + 成长方向杀跌（结构性分化）
+        # 明日观察要点要指出"成长杀跌但候选池跑赢"的仓位含义：结构市不追成长回撤。
+        md += (f"1️⃣ **大盘性质：** 📊 主板稳态（上证 {sh_pct:+.2f}%）+ 成长方向杀跌"
+               f"（创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%），结构性分化——"
+               f"明日看点是成长杀跌是否向主板扩散（上证跌破 -0.5% 即确认）\n")
+        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 今日热度回落（对比 {comparison_date or '上期'}），"
+               f"延续条件：龙头不跌停、成交不萎缩50%；杀跌中的半导体/元件等成长板块先看企稳再接\n")
+        md += "3️⃣ **防御/仓位：** 候选池今日 +1.01pp 超额但 9/10 负延续，追高资金退潮期优先低位补涨方向，不追昨日+4%强势股\n"
     else:
         md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
@@ -863,17 +1092,16 @@ def send_feishu(md, dry=False):
         print("=== DRY RUN: 飞书Markdown ===")
         print(md)
         return
-    import subprocess
-    result = subprocess.run(
-        ["lark-cli", "im", "+messages-send",
-         "--user-id", FEISHU_USER, "--as", "bot", "--markdown", md],
-        capture_output=True, text=True, timeout=30
-    )
-    if result.returncode == 0:
-        print(f"✅ 飞书推送成功")
-        print(result.stdout[:200])
-    else:
-        print(f"❌ 飞书推送失败: {result.stderr}")
+    try:
+        from lark_push import push_markdown
+        ok, detail = push_markdown(md, user_id=FEISHU_USER)
+        if ok:
+            print(f"✅ 飞书推送成功")
+            print(detail[:200])
+        else:
+            print(f"❌ 飞书推送失败: {detail}")
+    except Exception as e:
+        print(f"❌ 飞书推送失败: {type(e).__name__}: {e}")
 
 
 def main():
