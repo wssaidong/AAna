@@ -593,6 +593,51 @@ def compute_trend_stats(rows, top_n=20):
     return trend_stats
 
 
+def compute_calibers(feedback_rows):
+    """三口径胜率 — 口径透明化 (对齐 live_business_perf.py Phase 5A)。
+
+    v2026-10-28 修复: 反馈报告标题只给「最近 20 只」的胜率
+    (2026-10-28 实测 95.0% / n=20), 但全历史去重样本 (n=354) 只有 48.9%,
+    30 日窗口 (n=163) 是 77.3%。单一口径 → 用户看到 95% 会误判策略水平。
+    这与 SKILL.md 记录的「v2.4 实盘 vs 回测背离 37+ 天 P0」同源
+    (口径不一致被当成策略 bug), 故此处三口径并列出。
+
+    返回 [(口径名, 样本数, 胜率%), ...]
+    """
+    def _wr(values):
+        if not values:
+            return 0, 0.0
+        wins = sum(1 for v in values if v > 0)
+        return len(values), 100.0 * wins / len(values)
+
+    # 全量去重后的 ret_1d (与 rec_optimizer 的 (code, rec_date) 去重口径一致)
+    all_valid = [r for r in _valid_rows(feedback_rows, 10 ** 9)]
+    all_rets = [_sf(r.get('ret_1d')) for r in all_valid]
+    all_rets = [v for v in all_rets if v is not None]
+
+    calibers = []
+
+    # 口径 (a): 最近 20 只 — 报告标题口径
+    n20 = [_sf(r.get('ret_1d')) for r in _valid_rows(feedback_rows, 20)]
+    n20 = [v for v in n20 if v is not None]
+    n, wr = _wr(n20)
+    calibers.append(("最近 20 只（标题口径）", n, wr))
+
+    # 口径 (b): 近 30 日 — 与 DuckDB Phase 8C 同窗口
+    cutoff = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    r30 = [_sf(r.get('ret_1d')) for r in all_valid
+           if (r.get('rec_date') or '')[:10] >= cutoff]
+    r30 = [v for v in r30 if v is not None]
+    n, wr = _wr(r30)
+    calibers.append((f"近 30 日（与 DuckDB 同口径）", n, wr))
+
+    # 口径 (c): 全历史去重 — 策略真实水平
+    n, wr = _wr(all_rets)
+    calibers.append(("全历史去重（策略真实水平）", n, wr))
+
+    return calibers
+
+
 def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
     """构建 Markdown 报告"""
     win_n, total, winrate, avg_win, avg_loss, profit_ratio = stats
@@ -614,6 +659,32 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
         f"| 盈亏比 | {profit_ratio:.2f} |" if profit_ratio else f"| 盈亏比 | N/A |",
         "",
     ]
+
+    # 三口径对照 (v2026-10-28) — 标题的 n=20 胜率只是最近窗口, 必须并列全历史口径,
+    # 否则用户会把 95% 当成策略水平 (真实 48.9%)。
+    try:
+        calibers = compute_calibers(feedback_rows)
+        if calibers:
+            lines.extend([
+                "### 📐 三口径胜率对照（勿只看标题口径）",
+                "",
+                "| 口径 | 样本 | 胜率 |",
+                "|:-----|-----:|-----:|",
+            ])
+            for label, n_c, wr_c in calibers:
+                lines.append(f"| {label} | {n_c} | {wr_c:.1f}% |")
+            lines.append("")
+            head_n, head_wr = calibers[0][1], calibers[0][2]
+            full_n, full_wr = calibers[-1][1], calibers[-1][2]
+            if full_n >= 100 and abs(head_wr - full_wr) >= 15:
+                lines.append(
+                    f"> ⚠️ 标题口径（最近 {head_n} 只）胜率 {head_wr:.1f}%, "
+                    f"但全历史去重（{full_n} 笔）只有 {full_wr:.1f}% — "
+                    f"**策略真实水平以全历史口径为准**, 小窗口胜率受近期行情影响大, 不可单独引用。"
+                )
+                lines.append("")
+    except Exception as _cal_err:
+        print(f"   [口径对照] 计算跳过: {type(_cal_err).__name__}: {_cal_err}", file=sys.stderr)
 
     # 趋势胜率统计（新增）
     if trend_stats:

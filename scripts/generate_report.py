@@ -898,10 +898,22 @@ def generate_report():
 
             # ── REC_TUNING 过滤（评分阈值 + 弱势板块）──────────
             # v2.6 改用函数顶部 _tuning 局部变量(来自 data/rec_tuning.json)
-            sector = info.get('category', '') or info.get('sector', '')
+            # v2026-10-28 P0 修复: 旧代码取 info['category'] —— 那是**选股池分组 id**
+            # (high_rise/active/potential), 与 rec_tuning 的板块名(中文行业名)
+            # 永不相等 → 弱势板块过滤 100% 失效。改为用真实行业名反查后比对。
+            sector = info.get('category', '') or ''
+            if weak_sectors:
+                _cn = ''
+                try:
+                    from data_sources import industry_for_code, normalize_code
+                    _cn = industry_for_code(normalize_code(code)) or ''
+                except Exception:
+                    _cn = ''
+                if _cn:
+                    sector = _cn
             if 综合评分 < score_thresh:
                 continue  # 评分低于阈值，跳过
-            if sector in weak_sectors:
+            if sector and sector in weak_sectors:
                 continue  # 板块为弱势板块，跳过
 
             price = info.get('price', 0)

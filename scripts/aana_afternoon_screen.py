@@ -448,6 +448,31 @@ def _cn_sector_to_enum(sector_cn: str) -> str:
     return "unknown"  # 有中文行业但未映射到 enum → 'unknown' (让 blacklist 拦截条件失败 → 放过)
 
 
+def _sector_blacklisted(sector_raw: str, sector_enum: str, blacklist) -> bool:
+    """板块黑名单判定 — 中文行业名 OR 英文 enum 双路匹配。
+
+    v2026-10-28 P0 修复 (黑名单 100% 失效根因):
+      rec_tuning.sector_stats 的 key = rec_feedback.csv `sector` 列原值 =
+      industry_for_code() 返回的中文行业名 (如 '房地产开发' / '印制电路板'),
+      而旧代码只拿 enum 去比 → '房地产开发' vs enum 'realestate' 永不相等,
+      中文名黑名单 100% 匹配不上。实际只有 2026-05 那 7 个英文 enum 历史 key
+      能命中 (energy/robot/ai_app/semi/chem/mach/elec), 而它们 n 全部 < 10
+      → strategy_policy 门槛又拦一道 → 实测 blacklist 恒为空,
+      日志 10-13 至今全是 `blacklist=[无]`。
+
+      修法: raw 中文名 OR enum 双路匹配, 同时兼容历史 enum key。
+      注: 不改 rec_optimizer 的分桶口径 (合并 '半导体'/'semi' 会改变胜率 →
+      改变 weak_sectors → 改变实盘推荐, 属策略调整需先回测, 不在本次范围)。
+    """
+    if not blacklist:
+        return False
+    if sector_raw and sector_raw in blacklist:
+        return True
+    if sector_enum and sector_enum in blacklist:
+        return True
+    return False
+
+
 # ============================================
 # 尾盘评分系统
 # ============================================
@@ -1059,7 +1084,9 @@ def screen_afternoon_stocks(
                 stock_sector_raw = 'unknown'
         # 映射中文行业名 → rec_tuning 英文 enum
         stock_sector_enum = _cn_sector_to_enum(stock_sector_raw)
-        if sector_blacklist and stock_sector_enum and stock_sector_enum in sector_blacklist:
+        # v2026-10-28 P0 修复: 双路匹配 (中文原名 OR enum) — 旧代码只比 enum,
+        # 而 blacklist 里存的是 rec_feedback.sector 列的中文原值 → 恒不匹配。
+        if _sector_blacklisted(stock_sector_raw, stock_sector_enum, sector_blacklist):
             filtered_by_sector += 1
             continue
         # v2026-09-09 (Phase 12): next_day_strategy.json 的 cold_sectors 拦截
