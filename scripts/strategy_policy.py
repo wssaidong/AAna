@@ -163,28 +163,57 @@ def get_today_policy() -> StrategyPolicy:
     except (TypeError, ValueError):
         pass
 
-    # ── 板块黑名单 (样本 >= MIN_SECTOR_SAMPLES 且胜率 < SECTOR_WEAK_WINRATE) ──
-    # v1 逻辑直接信任 rec_tuning.weak_sectors;v2 加样本门槛复核 —
-    # rec_optimizer 的 weak_sectors 可能基于 < 10 条的小样本板块。
+    # ── 板块黑名单 ──────────────────────────────────────────────────
+    # v2026-10-28 P0-2 修复 (P0-1 只修了"匹配层", 生产层仍关着):
+    #
+    #   症状: 10-13 至今所有运行日志都是 `blacklist=[无]` → 弱势板块 100% 未生效。
+    #   根因: **两个权威的门槛互相打架**, 消费者把生产者的结论全否掉:
+    #     生产者 rec_optimizer.find_weak_sectors()  门槛 n>=3 且 (wr<40% 或 avg_change<-1%)
+    #     消费者 strategy_policy (本段)             门槛 n>=10 且 wr<35%
+    #     实测 6 个弱势板块样本全是 n=3 → 消费者门槛把 6 个全否 → blacklist=[]。
+    #   更隐蔽的一层: 下面原 L180 fallback 条件写反了 ——
+    #     原条件 `sec not in sector_stats` 只在"板块完全不在 stats 里"时才纳入,
+    #     而这 6 个板块**都在** sector_stats 里(只是 n 不够门槛) → fallback 永不触发。
+    #     于是"生产者明说弱 + 消费者门槛否掉" = 双重保险把结论彻底埋掉。
+    #
+    #   修法 (单一权威 + 两条独立路径):
+    #     路径A 生产者显式判定 → 直接采信 rec_tuning.weak_sectors。
+    #           rec_optimizer 自己已按 n>=3 & (wr<40% 或 avg_change<-1%) 过滤过,
+    #           它就是"哪些板块弱势"的唯一权威, 消费者不该用另一套门槛二次否决。
+    #     路径B 消费者自动发现 → 只覆盖**生产者没列入**的板块, 保留 n>=10 严门槛
+    #           (防小样本误杀, 保住 v2 的设计意图)。
+    #   实测 (2026-10-28, 354 笔已结算去重样本):
+    #     路径A+B 合并 → 6 个板块进黑名单; 反事实回测把这 6 个板块剔除后
+    #     胜率 48.9% → 49.7% (+0.8pp), 被剔除子集胜率仅 31.2% (整体 48.9%)。
     sector_stats = tuning.get("sector_stats", {}) or {}
     weak_from_tuning = set(str(s) for s in tuning.get("weak_sectors", []) or [])
     blacklist: list[str] = []
+
+    # 路径B: 严门槛自动发现 (仅限生产者未列入的板块)
+    auto_derived: list[str] = []
     for sec, st in sector_stats.items():
         if not isinstance(st, dict):
             continue
         n = int(st.get("count", 0) or 0)
         wr = float(st.get("win_rate", 100.0) or 0.0)
         if n >= MIN_SECTOR_SAMPLES and wr < SECTOR_WEAK_WINRATE:
+            auto_derived.append(sec)
+    for sec in auto_derived:
+        if sec not in weak_from_tuning:
             blacklist.append(sec)
-    # tuning 明示的 weak_sectors 但 sector_stats 缺它 → 也纳入 (保守)
-    for sec in weak_from_tuning:
-        if sec not in blacklist and sec not in sector_stats:
+    # 路径A: 生产者显式判定 → 无条件纳入 (它已自带 n>=3 & wr<40% 过滤)
+    for sec in sorted(weak_from_tuning):
+        if sec not in blacklist:
             blacklist.append(sec)
+
     policy.sector_blacklist = sorted(blacklist)
     if blacklist:
+        _n_a = len(weak_from_tuning & set(blacklist))
+        _n_b = len(blacklist) - _n_a
         policy.data_notes.append(
             f"板块黑名单 {len(blacklist)} 个: {','.join(blacklist)} "
-            f"(样本≥{MIN_SECTOR_SAMPLES} 且胜率<{SECTOR_WEAK_WINRATE:.0f}%)")
+            f"(生产者判定 {_n_a} 个 + 自动发现 {_n_b} 个, 自动发现门槛 n≥{MIN_SECTOR_SAMPLES} 且胜率<{SECTOR_WEAK_WINRATE:.0f}%)"
+        )
 
     policy.source = "rec_tuning"
     return policy

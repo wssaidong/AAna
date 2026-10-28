@@ -163,6 +163,28 @@ def detect_冷启动盲区(day_recs: list[dict], tuning: dict, sector_resolver=N
     """
     sec_stats = tuning.get('sector_stats', {})
 
+    def _stat_for(cn: str, enum: str) -> dict:
+        """按正确的 key 取板块统计 — **中文名优先, enum 兜底**。
+
+        v2026-10-28 P0-4 修复:
+          rec_tuning.sector_stats 的 key = rec_feedback.csv `sector` 列原值 =
+          **中文行业名** (如 '汽车零部件' / '水泥制造' / '机械基础件'),
+          而本函数原来只用 enum 查 (L178 / L182) → 中文名板块永远查不到 →
+          count 恒为 0 → 一律判成"冷启动" → 进 cold_sectors → 尾盘一票否决。
+
+          实测误伤 3 个**已验证充分**的强势板块 (2026-10-28):
+            汽车零部件  n=21  win_rate=95.2%
+            水泥制造    n=4   win_rate=100%
+            机械基础件  n=3   win_rate=100%
+          这 3 个板块的 28 笔历史样本胜率 96.4% (整体 48.9%) ——
+          把最好的板块当成"没验证过的新板块"一票否决, 是 P0 级的自伤。
+        """
+        if cn and cn in sec_stats:
+            return sec_stats[cn]
+        if enum and enum in sec_stats:
+            return sec_stats[enum]
+        return {}
+
     items = []
     for r in day_recs:
         info = _sector_info(r, sector_resolver)
@@ -174,24 +196,25 @@ def detect_冷启动盲区(day_recs: list[dict], tuning: dict, sector_resolver=N
         if not enum and not cn:
             continue
 
+        stat = _stat_for(cn, enum)
+        n_known = int(stat.get('count', 0) or 0)
+
         # 已知板块且样本 >= 3 -> 不是冷启动
-        if enum and sec_stats.get(enum, {}).get('count', 0) >= 3:
+        if n_known >= 3:
             continue
 
-        # 冷启动: cn 不在 sec_stats 里 (枚举或中文都查不到), 或 enum 在但 n<3
-        is_cold = (cn and cn not in sec_stats) or (enum and sec_stats.get(enum, {}).get('count', 0) < 3)
-        if is_cold:
-            sec_stat = sec_stats.get(enum or cn, {})
-            note = (f"板块 {cn} (enum={enum or '未映射'}) 未在 sec_stats 里, cold sector risk"
-                    if enum and cn and cn not in sec_stats and enum not in sec_stats
-                    else f"板块样本 {sec_stat.get('count', 0)} < 3")
-            items.append({
-                "code": r['code'], "name": r['name'],
-                "sector_cn": cn, "sector_enum": enum,
-                "n": sec_stat.get('count', 0),
-                "ret_1d": ret_1d,
-                "note": note,
-            })
+        # 冷启动: 板块完全没在 sec_stats 里 (n=0), 或已知但 n < 3
+        sec_stat = stat
+        note = (f"板块 {cn} (enum={enum or '未映射'}) 未在 sec_stats 里, cold sector risk"
+                if enum and cn and cn not in sec_stats and enum not in sec_stats
+                else f"板块样本 {sec_stat.get('count', 0)} < 3")
+        items.append({
+            "code": r['code'], "name": r['name'],
+            "sector_cn": cn, "sector_enum": enum,
+            "n": sec_stat.get('count', 0),
+            "ret_1d": ret_1d,
+            "note": note,
+        })
     if not items:
         return {"hit": False, "items": [], "summary": "无冷启动命中"}
 

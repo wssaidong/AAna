@@ -14,11 +14,8 @@
   "position_base": 50,
   "watchlist": [],
   "cold_sectors": [
-    "水泥制造",
-    "汽车零部件",
     "通信传输设备",
     "其它通用机械",
-    "机械基础件",
     "改性塑料",
     "显示器件",
     "传媒",
@@ -49,11 +46,8 @@
       "weak_sectors_added": [],
       "watchlist": [],
       "cold_sectors": [
-        "水泥制造",
-        "汽车零部件",
         "通信传输设备",
         "其它通用机械",
-        "机械基础件",
         "改性塑料",
         "显示器件",
         "传媒",
@@ -62,11 +56,11 @@
         "化学制剂"
       ],
       "reasons": [
-        "E. 冷启动盲区: 13 只来自 11 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['水泥制造', '汽车零部件', '通信传输设备', '其它通用机械', '机械基础件']"
+        "E. 冷启动盲区: 8 只来自 8 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['通信传输设备', '其它通用机械', '改性塑料', '显示器件', '传媒']"
       ]
     }
   ],
-  "generated_at": "2026-10-28T16:10:33",
+  "generated_at": "2026-10-28T20:16:31",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"

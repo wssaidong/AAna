@@ -99,6 +99,68 @@ def get_market_sina(code):
         return f'sh{code}'
     return f'sz{code}'
 
+
+# v2026-10-23 P0 修复: 指数代码的交易所前缀**不能**套用个股规则。
+#   000001 作为个股是 sz(平安银行), 作为指数是 sh(上证指数);
+#   000688 作为个股是 sz(国城矿业), 作为指数是 sh(科创50)。
+# 原实现用 get_market_sina() 拉指数 → 报告"大盘环境"表把平安银行/国城矿业
+#   当成上证指数/科创50 显示 (10/23 实证: 报告写"上证 -0.88%", 真实 +0.89%)。
+_INDEX_SINA_PREFIX = {
+    '000001': 'sh',  # 上证指数
+    '000016': 'sh',  # 上证50
+    '000300': 'sh',  # 沪深300
+    '000688': 'sh',  # 科创50
+    '000905': 'sh',  # 中证500
+    '399001': 'sz',  # 深证成指
+    '399005': 'sz',  # 中小板指
+    '399006': 'sz',  # 创业板指
+}
+
+
+def get_index_data_sina(codes):
+    """指数行情 (sina)。与个股分开取数, 因为指数代码的交易所前缀与个股不同。
+    字段布局与个股一致: [0]=名称 [2]=昨收 [3]=当前 [4]=最高 [5]=最低。"""
+    import requests
+    results = {}
+    try:
+        formatted = [f"{_INDEX_SINA_PREFIX.get(c, 'sh')}{c}" for c in codes]
+        url = f'https://hq.sinajs.cn/list={",".join(formatted)}'
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+            'Referer': 'https://finance.sina.com.cn'
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.encoding = 'gbk'
+        lines = resp.text.strip().split('\n')
+        for i, line in enumerate(lines):
+            if '=' not in line:
+                continue
+            code = codes[i] if i < len(codes) else ''
+            parts = line.split('=')[1].strip('";\n ').split(',')
+            if len(parts) < 10:
+                continue
+            yesterday_close = float(parts[2]) if parts[2] else 0
+            price = float(parts[3]) if parts[3] else 0
+            high = float(parts[4]) if parts[4] else 0
+            low = float(parts[5]) if parts[5] else 0
+            change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
+            results[code] = {
+                'code': code,
+                'name': parts[0],
+                'price': price,
+                'yesterday_close': yesterday_close,
+                'high': high,
+                'low': low,
+                'change_pct': change_pct,
+            }
+    except Exception as e:
+        print(f"[Sina Index] Error: {e}")
+
+    for code in codes:
+        if code not in results:
+            results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0}
+    return results
+
 def get_stock_data_sina(codes):
     """使用新浪财经API获取实时行情"""
     import requests
@@ -157,69 +219,114 @@ def get_tencent_kline(code, count=30):
     获取历史K线（前复权）
     v2.5.1 修复（2026-06-12）：原 web.ifzq.gtimg.cn 返回 501（接口废弃），
     改用东财 push2his K线（已知稳定，30 根 < 100ms）。
+    v2026-10-23 修复：改为三档独立兜底，每档自带 try/except（任一档抛错不再
+    阻断后续档位）—— 旧写法把三档串在一个 try 里，腾讯档 json.loads 抛异常会
+    直接跳到函数末尾的 except，后面兜底永远执行不到。
     """
     import requests
-    try:
-        # 1) 首选：东财 push2his K线（沪深都稳定）
-        mkt = 1 if code.startswith(('6', '9')) else 0
-        url = f"https://push2his.eastmoney.com/api/qt/stock/kline/get"
-        params = {
-            "secid": f"{mkt}.{code}",
-            "fields1": "f1,f2,f3,f4,f5,f6",
-            "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
-            "klt": "101", "fqt": "1",
-            "end": "20500101", "lmt": str(count),
-        }
-        resp = requests.get(url, params=params,
-                            headers={"User-Agent": "Mozilla/5.0",
-                                     "Referer": "https://quote.eastmoney.com/"},
-                            timeout=8)
-        klines = resp.json().get('data', {}).get('klines', [])
-        if klines:
-            result = []
-            for line in klines:
-                parts = line.split(",")
-                if len(parts) >= 6:
-                    try:
-                        result.append({
-                            'date': parts[0],
-                            'open': float(parts[1]),
-                            'high': float(parts[3]),
-                            'low': float(parts[4]),
-                            'close': float(parts[2]),
-                            'vol': float(parts[5]),
-                        })
-                    except (ValueError, IndexError):
-                        continue
-            if result:
-                return result
+    mkt_str = 'sh' if code.startswith(('6', '9')) else 'sz'
 
-        # 2) 备用：原腾讯 K线（web.ifzq.gtimg.cn，已知 501 不可用，但留口子）
-        mkt_str = 'sh' if code.startswith(('6', '9')) else 'sz'
-        url2 = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param={mkt_str}{code},day,,,{count},qfq"
-        resp2 = requests.get(url2, timeout=8)
+    # ── 档 1: 东财 push2his（沪深都稳定，首选）──────────────────────
+    try:
+        mkt = 1 if code.startswith(('6', '9')) else 0
+        resp = requests.get(
+            "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+            params={
+                "secid": f"{mkt}.{code}",
+                "fields1": "f1,f2,f3,f4,f5,f6",
+                "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+                "klt": "101", "fqt": "1",
+                "end": "20500101", "lmt": str(count),
+            },
+            headers={"User-Agent": "Mozilla/5.0", "Referer": "https://quote.eastmoney.com/"},
+            timeout=8)
+        klines = (resp.json().get('data') or {}).get('klines') or []
+        result = []
+        for line in klines:
+            parts = line.split(",")
+            if len(parts) >= 6:
+                try:
+                    result.append({
+                        'date': parts[0],
+                        'open': float(parts[1]),
+                        'high': float(parts[3]),
+                        'low': float(parts[4]),
+                        'close': float(parts[2]),
+                        'vol': float(parts[5]),
+                    })
+                except (ValueError, IndexError):
+                    continue
+        if result:
+            return result
+    except Exception as e:
+        print(f"[K线] {code} 东财push2his失败: {e}")
+
+    # ── 档 2: 腾讯 ifzq（fqkline）────────────────────────────────
+    try:
+        url2 = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayqfq&param={mkt_str}{code},day,,,{count},qfq"
+        resp2 = requests.get(url2, timeout=8,
+                              headers={'User-Agent': 'Mozilla/5.0',
+                                       'Referer': 'https://gu.qq.com/'})
         text = resp2.text.strip()
         if '=' in text:
             text = text.split('=', 1)[1]
         data = json.loads(text)
-        day_data = data.get('data', {}).get(f'{mkt_str}{code}', {}).get('qfqday', [])
-        if not day_data:
-            day_data = data.get('data', {}).get(f'{mkt_str}{code}', {}).get('day', [])
+        node = (data.get('data') or {}).get(f'{mkt_str}{code}') or {}
+        day_data = node.get('qfqday') or node.get('day') or []
         result = []
         for item in day_data:
             if len(item) >= 6:
-                result.append({
-                    'date': item[0],
-                    'open': float(item[1]),
-                    'high': float(item[2]),
-                    'low': float(item[3]),
-                    'close': float(item[4]),
-                    'vol': float(item[5]),
-                })
-        return result
+                try:
+                    result.append({
+                        'date': item[0],
+                        'open': float(item[1]),
+                        'high': float(item[2]),
+                        'low': float(item[3]),
+                        'close': float(item[4]),
+                        'vol': float(item[5]),
+                    })
+                except (ValueError, IndexError):
+                    continue
+        if result:
+            return result
     except Exception as e:
-        print(f"[K线] {code}: {e}")
-        return []
+        print(f"[K线] {code} 腾讯ifzq失败: {e}")
+
+    # ── 档 3: 新浪 K线（兜底）────────────────────────────────────
+    # v2026-10-23 P0 修复: 东财 push2his 连续 RemoteDisconnected + 腾讯 ifzq
+    # 返回 HTML 反爬页时, K线 100% 失败 → 评分退化成 fallback(RSI=N/A, 量比=N/A),
+    # 所有票同分 ~67.4, Top10 完全失去区分度 (15:12 实测: 报告第一版被覆盖成
+    # 无意义的推荐列表)。新浪这条链路实测可用, 补上第三档兜底。
+    try:
+        resp3 = requests.get(
+            "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData",
+            params={'symbol': mkt_str + code, 'scale': '240', 'ma': 'no',
+                    'datalen': str(count)},
+            headers={'User-Agent': 'Mozilla/5.0',
+                     'Referer': 'https://finance.sina.com.cn'},
+            timeout=8)
+        rows3 = resp3.json() or []
+        out3 = []
+        for r3 in rows3:
+            try:
+                out3.append({
+                    'date': r3['day'],
+                    'open': float(r3['open']),
+                    'high': float(r3['high']),
+                    'low': float(r3['low']),
+                    'close': float(r3['close']),
+                    'vol': float(r3['volume']),
+                })
+            except (KeyError, ValueError, TypeError):
+                continue
+        if out3:
+            print(f"[K线] {code}: 新浪兜底 OK ({len(out3)} 根)")
+            return out3
+    except Exception as e:
+        print(f"[K线] {code} 新浪兜底失败: {e}")
+
+    print(f"[K线] {code}: 全部数据源失败")
+    return []
 
 
 # ============================================
@@ -918,6 +1025,19 @@ def screen_afternoon_stocks(
                       + (f" (+{len(_cold)-5} more)" if len(_cold) > 5 else ""))
             else:
                 cn_blacklist = set()
+            # v2026-10-28 P0-3 修复: next_day_strategy.weak_sectors 之前只被
+            #   run_afterhours.py 拿去**显示** "板块黑名单: ..." (盘后战报),
+            #   尾盘选股本身**从来没把它当过滤器用** → 战报承诺的黑名单没执行。
+            #   auto_tune_next_day.py 的 SAFE_WEAK_SECTOR_MIN_SAMPLES=3 与
+            #   rec_optimizer 的 n>=3 门槛一致, 说明这份列表已是"权威口径",
+            #   直接并入 sector_blacklist 即可 (中文名 OR enum 双路匹配已就绪)。
+            _nd_weak = _nd.get("weak_sectors") or []
+            if _nd_weak:
+                _added = [s for s in _nd_weak if s not in sector_blacklist]
+                sector_blacklist.update(_nd_weak)
+                print(f"  [next_day_strategy] 加载 weak_sectors: {_nd_weak[:5]}"
+                      + (f" (+{len(_nd_weak)-5} more)" if len(_nd_weak) > 5 else "")
+                      + (f" → 新增 {len(_added)} 个到黑名单" if _added else ""))
         else:
             cn_blacklist = set()
     except Exception as _nd_err:
@@ -955,38 +1075,40 @@ def screen_afternoon_stocks(
             candidate_codes.extend(yest_top10)
             print(f"  [源2] 昨日 Top10: {len(yest_top10)} 只")
 
-    # 源 3 (修复 #5): 新浪全市场涨幅榜，扩大候选
+    # 源 3 (修复 #5): 全市场涨幅榜，扩大候选
     # 抓涨幅 -3% ~ +5% 区间 + 成交活跃股，这是尾盘选股的真正范围
+    #
+    # v2026-10-23 P0 修复 (根因): 原实现内联硬编码"5 页 × 80 只 + 涨幅 -3%~+5% 窗口"。
+    # 强普涨日 (2026-10-23: 上证 -2.66% → +0.85%, 深证 +3.00%, 创业板 +4.46%, 涨停 81)
+    # 涨幅榜前 400 只**全部** >+5% (实测最小 +6.94%), 硬编码窗口筛出 0 只 →
+    # 候选池空 → 0 推荐 (假空仓)。**窗口是"涨跌幅绝对值", 普涨日天然失效。**
+    # 修复: 统一走 dynamic_stocks 的真源 (get_top_gainers_with_fallback 800 只 +
+    # filter_stocks 用集中常量 CHANGE_MIN/MAX=-3/+7 + 主板/价格/ST 过滤)。
+    # 这同时消除了"多脚本多阈值"分裂 (同源取数, 见 china-stock-analysis v2026.5 教训)。
     try:
-        import requests
-        url = "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
-        all_codes = []
-        for page in range(5):  # 5 页 × 80 = 400 只候选
-            params = {
-                "page": str(page), "num": "80",
-                "sort": "changepercent", "asc": "0",  # 涨幅降序
-                "node": "hs_a", "type": "stock",
-            }
-            r = requests.get(url, params=params, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-            data = r.json() or []
-            for item in data:
-                code = item.get("code", "")
-                change = item.get("changepercent", 0)
-                # 只保留 -3% ~ +5% 区间（尾盘选股范围）
-                if -3 <= change <= 5:
-                    all_codes.append(code)
-        # 加进去重
-        before = len(candidate_codes)
-        for c in all_codes:
-            if c not in candidate_codes:
-                candidate_codes.append(c)
-        print(f"  [源3] 全市场涨幅榜: 新增 {len(candidate_codes) - before} 只")
+        from dynamic_stocks import get_top_gainers_with_fallback, filter_stocks
+        raw_stocks, src = get_top_gainers_with_fallback(800)
+        if raw_stocks:
+            pool = filter_stocks(raw_stocks)
+            before = len(candidate_codes)
+            for item in pool:
+                c = item.get('code', '')
+                if c and c not in candidate_codes:
+                    candidate_codes.append(c)
+            print(f"  [源3] 全市场涨幅榜 ({src}, 原始{len(raw_stocks)}→过滤{len(pool)}): 新增 {len(candidate_codes) - before} 只")
+        else:
+            print("  [源3] 全市场涨幅榜失败: 所有数据源返回空")
     except Exception as e:
         print(f"  [源3] 全市场涨幅榜失败: {e}")
 
     if not candidate_codes:
         print("[AAna 尾盘] 候选股票池为空，跳过尾盘选股")
-        return []
+        # v2026-10-23 P0 修复: 必须返回 (top_n, confidence_note) 二元组。
+        # 根因: 这里原来 `return []` (单值), 而 main() 写的是
+        #   `stocks, confidence_note = screen_afternoon_stocks(...)` → 候选池为空时
+        #   ValueError: not enough values to unpack (expected 2, got 0) → 整个尾盘流程崩,
+        #   报告都没生成, 上层误判为"0 推荐"。
+        return [], None
 
     # ── XWI-50: Skill 模式下调用方指定 codes 时,过滤候选池 ──
     if codes is not None:
@@ -996,7 +1118,7 @@ def screen_afternoon_stocks(
         print(f"  [XWI-50 codes 过滤] {before} → {len(candidate_codes)} 只 (仅 Skill 指定)")
         if not candidate_codes:
             print("[AAna 尾盘] Skill 指定 codes 在默认池中无匹配, 跳过")
-            return []
+            return [], None  # v2026-10-23 P0 修复: 同上, 保持二元组返回契约
 
     print(f"[AAna 尾盘] 候选股票总数: {len(candidate_codes)} 只")
 
@@ -1493,9 +1615,11 @@ def main():
     data_source_fallback = guard['data_source_fallback']
 
     # 获取大盘指数
+    # v2026-10-23 P0 修复: 指数走 get_index_data_sina() (专用 sh/sz 前缀表),
+    # 不能用个股的 get_market_sina() —— 否则 000001→平安银行 / 000688→国城矿业。
     index_codes = ['000001', '399001', '399006', '000688']
     index_names = {'000001': '上证指数', '399001': '深证成指', '399006': '创业板', '000688': '科创50'}
-    prices = get_stock_data_sina(index_codes)
+    prices = get_index_data_sina(index_codes)
     index_data = []
     for code, name in index_names.items():
         info = prices.get(code, {})

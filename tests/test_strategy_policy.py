@@ -170,6 +170,41 @@ class TestSectorBlacklist:
         p = strategy_policy.get_today_policy()
         assert "robot" in p.sector_blacklist
 
+    def test_producer_verdict_honored_despite_small_n(self, tmp_path, monkeypatch):
+        """生产者 (rec_optimizer) 判弱的板块, 即使 n<10 也必须进黑名单。
+
+        v2026-10-28 P0-2 回归测试:
+          生产者门槛 n>=3 & wr<40% → 消费门槛 n>=10 & wr<35% → 双重保险把
+          所有 n=3 的弱势板块全部否掉 → blacklist 恒为空 → 10-13 起日志全是
+          `blacklist=[无]`。生产者才是"哪些板块弱势"的唯一权威。
+        """
+        self._write_tuning(tmp_path, monkeypatch, {
+            "造纸": {"count": 3, "win_rate": 0.0},
+            "半导体设备": {"count": 3, "win_rate": 33.3},
+        }, weak=["造纸", "半导体设备"])
+        import strategy_policy
+        p = strategy_policy.get_today_policy()
+        assert "造纸" in p.sector_blacklist
+        assert "半导体设备" in p.sector_blacklist
+
+    def test_small_n_not_in_producer_list_still_excluded(self, tmp_path, monkeypatch):
+        """生产者没列入 + n<10 的板块 → 仍不拉黑 (保留 v2 防小样本意图)"""
+        self._write_tuning(tmp_path, monkeypatch, {
+            "杂毛板块": {"count": 3, "win_rate": 0.0},
+        }, weak=[])
+        import strategy_policy
+        p = strategy_policy.get_today_policy()
+        assert "杂毛板块" not in p.sector_blacklist
+
+    def test_producer_list_not_duplicated_by_auto_discovery(self, tmp_path, monkeypatch):
+        """同时满足生产者列表和自动发现门槛的板块 → 只出现一次"""
+        self._write_tuning(tmp_path, monkeypatch, {
+            "造纸": {"count": 30, "win_rate": 0.0},
+        }, weak=["造纸"])
+        import strategy_policy
+        p = strategy_policy.get_today_policy()
+        assert p.sector_blacklist.count("造纸") == 1
+
 
 class TestRealTuning:
     def test_real_tuning_file_loads(self):
