@@ -190,16 +190,48 @@ def add_stocks(gid, codes):
 
 
 def find_group_gid(target_name):
-    """通过遍历 gid 范围找到指定名称的组合"""
+    """通过遍历 gid 范围找到指定名称的组合
+
+    2026-10-28 P0 修复: 原实现扫描 range(100, 250) (gid 早已到 1796),
+      且循环体内的 if 分支**没有 return** → 函数永远走到底部 return None,
+      等于完全失效。探测"某天组合是否存在"必须用本函数, 失效会直接导致
+      重复创建同名组合 (App 端孤儿组合)。
+
+    匹配方式: gstkinfos 不返回组合名, 只能用 stkinfolist[0].updatetime 的
+      前 8 位日期与名称前 8 位比对。PP/ZZ 后缀组合与当日早盘组合同日期,
+      存在歧义, 返回首个命中 (调用方需 gstkinfos 复核)。
+    """
     _silenced = _safe_silenced()  # v2026-08-23 Phase 3-2
-    for test_gid in range(100, 250):
+    name_date = target_name[:8] if target_name[:8].isdigit() else target_name
+
+    # 动态扫描范围: 以 groups.json 历史 max_gid 为中心 ±60 (与 get_or_create_group 2b 一致)
+    scan_lo, scan_hi = 136, 400
+    groups_file = os.path.expanduser(
+        '~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json')
+    if os.path.exists(groups_file):
+        try:
+            with open(groups_file) as f:
+                _hist = json.load(f)
+            _gids = [int(v['gid']) for v in _hist.values() if v.get('gid')]
+            if _gids:
+                scan_lo = max(136, max(_gids) - 60)
+                scan_hi = max(_gids) + 60
+        except Exception as _e:
+            _silenced(f"find_group_gid:load_history", _e)
+
+    for test_gid in range(scan_lo, scan_hi):
         url = mkurl('gstkinfos', g=test_gid)
         try:
-            result, _ = api_call(url)
+            result, _ = api_call(url, max_retries=0)
             if result.get('state') == 0:
                 stocks = result.get('data', {}).get('stkinfolist', [])
-                # 如果这个 gid 有股票，认为是有效组合
-                # 但我们无法直接知道组合名称，除非尝试用ag接口查询
+                if not stocks:
+                    continue
+                updatetime_str = str(stocks[0].get('updatetime', ''))
+                if len(updatetime_str) >= 8 and updatetime_str[:8] == name_date:
+                    print(f"[Eastmoney] find_group_gid({target_name}) -> gid={test_gid} "
+                          f"(updatetime={updatetime_str})")
+                    return test_gid
         except Exception as _e:  # v2026-08-23 Phase 3-2: bare except → Exception + log
             _silenced(f"find_group_gid:test_gid={test_gid}", _e)
     return None
@@ -283,25 +315,50 @@ def get_or_create_group(group_name):
             print(f"[Eastmoney] 从 -131 响应中获取 gid={gid_from_response}")
             return gid_from_response
         
-        # 2b. 扫描全部 gid 范围找同名组合
+        # 2b. 扫描 gid 范围找同名组合
+        # 2026-10-28 P0 修复: 原写死 range(136, 400), 但 gid 已涨到 1796 →
+        #   两条兜底路径都扫不到真 gid, 会把股票加到错误/不存在的 gid。
+        #   改为动态范围: 以 groups.json 历史 max_gid 为中心 ±SCAN_WINDOW,
+        #   同时保留一个下限 (136) 防止历史缓存为空时扫不到早期组合。
+        SCAN_WINDOW = 60
+        scan_center = 0
         _silenced = _safe_silenced()
-        for test_gid in range(136, 400):
+        if os.path.exists(groups_file):
+            try:
+                with open(groups_file) as f:
+                    _hist = json.load(f)
+                _gids = [int(v['gid']) for v in _hist.values() if v.get('gid')]
+                if _gids:
+                    scan_center = max(_gids)
+            except Exception as _e:
+                _silenced(f"get_or_create_group 2b:load_history gid={scan_center}", _e)
+        if scan_center:
+            scan_lo = max(136, scan_center - SCAN_WINDOW)
+            scan_hi = scan_center + SCAN_WINDOW
+        else:
+            scan_lo, scan_hi = 136, 400
+        print(f"[Eastmoney] 扫描 gid 范围 {scan_lo}..{scan_hi} 找 {group_name}")
+        for test_gid in range(scan_lo, scan_hi):
             url_check = mkurl('gstkinfos', g=test_gid)
             try:
-                r, _ = api_call(url_check)
+                r, _ = api_call(url_check, max_retries=0)
                 if r.get('state') == 0 and r.get('data', {}).get('stkinfolist'):
                     stocks = r['data']['stkinfolist']
                     updatetime = stocks[0].get('updatetime', 0)
                     updatetime_str = str(updatetime)
                     if len(updatetime_str) >= 8:
                         date_part = updatetime_str[:8]
-                        if date_part == group_name:
+                        # group_name 可能是 8 位日期, 也可能带 PP/ZZ 后缀
+                        name_date = group_name[:8] if group_name[:8].isdigit() else group_name
+                        if date_part == name_date:
                             print(f"[Eastmoney] 扫描找到 {group_name} 对应 gid={test_gid}")
                             return test_gid
             except Exception as _e:  # v2026-08-23 Phase 3-2: log instead of bare pass
                 _silenced(f"get_or_create_group 2b:test_gid={test_gid}", _e)
         
         # 2c. 扫描也找不到，用 groups.json 历史最大值 + 步进作为兜底
+        # 2026-10-28 P0 修复: 推断值必须 gstkinfos 验证后才返回
+        #   (8/7 沉淀: 推断 gid 不能直接 add_stocks, 否则 state=-119 刷屏掩盖真错误)
         if os.path.exists(groups_file):
             with open(groups_file) as f:
                 history = json.load(f)
@@ -309,8 +366,17 @@ def get_or_create_group(group_name):
             if gids:
                 max_gid = max(gids)
                 inferred_gid = max_gid + 10
-                print(f"[Eastmoney] 扫描未找到，从历史 gid 最大值推断 gid={inferred_gid}")
-                return inferred_gid
+                # 验证推断值是否真实存在且有股票
+                try:
+                    r, _ = api_call(mkurl('gstkinfos', g=inferred_gid), max_retries=0)
+                    stks = r.get('data', {}).get('stkinfolist', [])
+                    if r.get('state') == 0 and stks:
+                        print(f"[Eastmoney] 推断 gid={inferred_gid} 已验证存在 ({len(stks)} 只)")
+                        return inferred_gid
+                    print(f"[Eastmoney] 推断 gid={inferred_gid} 验证失败 "
+                          f"(state={r.get('state')}), 不返回")
+                except Exception as _e:
+                    _silenced(f"get_or_create_group 2c:verify gid={inferred_gid}", _e)
         
         print(f"[Eastmoney] 未找到 {group_name}，也无法推断 gid")
         return None
@@ -474,8 +540,17 @@ def sync_portfolio_to_eastmoney(stock_codes, group_name=None):
         }
 
     # 找出要删除的旧组合
+    # ⚠️ 2026-10-28 修复: date 字段历史上有两种格式 —— "2026-10-26"(带横线, 由
+    # sync_YYYYMMDD_zz.py / 早盘流程写入) 与 "20261026"(纯数字, 由本函数写入)。
+    # 两者直接字符串比较时 "2026-10-26" < "20261025" 恒为 True (因为 '-' < '1'),
+    # 会把**所有**带横线的条目(含当天/最近几天)判定为过期 → 批量 dg 掉服务端组合。
+    # 统一归一化成 8 位纯数字后再比较。
+    def _norm_date(d):
+        return str(d or "").replace("-", "")[:8]
+
     to_delete = {name: info for name, info in groups_history.items()
-                 if info.get('date', '') < cutoff and name != group_name}
+                 if _norm_date(info.get('date')) and _norm_date(info.get('date')) < cutoff
+                 and name != group_name}
 
     for name, info in to_delete.items():
         print(f"[Eastmoney] 清理旧组合 {name} (gid={info.get('gid')})")
