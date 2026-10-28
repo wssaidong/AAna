@@ -1,0 +1,112 @@
+{
+ "date": "2026-10-28",
+ "base_date": "2026-10-27",
+ "report": "/Users/cai/code/AAna/reports/2026-10-28-选股报告.md",
+ "report_size": 5468,
+ "report_mtime": "2026-10-28T08:03:37",
+ "generated": "08:37:31",
+ "sentiment_snap": {
+  "score": 20,
+  "label": "冰点",
+  "zt_count": 42,
+  "dt_count": 4,
+  "position": 0.1
+ },
+ "mk_avg": -2.14,
+ "pool_size": 0,
+ "guard_ice": true,
+ "guard_reason": "情绪=冰点/仓位=10%",
+ "overall_win_rate": 48.87005649717514,
+ "total_records": 354,
+ "sector_count": 83,
+ "yesterday_review": {
+  "base": "2026-10-26",
+  "verified_on": "2026-10-27",
+  "n_beat_mkt": 4,
+  "n_positive": 1,
+  "results": [
+   {
+    "code": "603883",
+    "name": "老百姓",
+    "total": 75.4,
+    "rating": "买入",
+    "close": 14.87,
+    "chg_pct": 1.99,
+    "quote_ts": "20261027161447",
+    "beat_mkt": true
+   },
+   {
+    "code": "002233",
+    "name": "塔牌集团",
+    "total": 63.6,
+    "rating": "中性",
+    "close": 7.68,
+    "chg_pct": -0.26,
+    "quote_ts": "20261027161406",
+    "beat_mkt": true
+   },
+   {
+    "code": "600085",
+    "name": "同仁堂",
+    "total": 60.0,
+    "rating": "中性",
+    "close": 24.9,
+    "chg_pct": -0.88,
+    "quote_ts": "20261027161459",
+    "beat_mkt": true
+   },
+   {
+    "code": "601857",
+    "name": "中国石油",
+    "total": 71.4,
+    "rating": "增持",
+    "close": 13.2,
+    "chg_pct": -1.35,
+    "quote_ts": "20261027161447",
+    "beat_mkt": true
+   },
+   {
+    "code": "603707",
+    "name": "健友股份",
+    "total": 70.0,
+    "rating": "增持",
+    "close": 8.12,
+    "chg_pct": -2.29,
+    "quote_ts": "20261027161458",
+    "beat_mkt": false
+   },
+   {
+    "code": "603882",
+    "name": "金域医学",
+    "total": 65.0,
+    "rating": "增持",
+    "close": 30.8,
+    "chg_pct": -3.51,
+    "quote_ts": "20261027161444",
+    "beat_mkt": false
+   },
+   {
+    "code": "002362",
+    "name": "汉王科技",
+    "total": 48.3,
+    "rating": "减持",
+    "close": 16.65,
+    "chg_pct": -4.15,
+    "quote_ts": "20261027161439",
+    "beat_mkt": false
+   },
+   {
+    "code": "002265",
+    "name": "建设工业",
+    "total": 68.4,
+    "rating": "增持",
+    "close": 19.02,
+    "chg_pct": -6.12,
+    "quote_ts": "20261027161445",
+    "beat_mkt": false
+   }
+  ]
+ },
+ "recommend": null,
+ "eastmoney": "skipped: 0 推荐 (冰点守卫短路, 不创建 20261028ZZ)"
+}
