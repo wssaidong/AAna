@@ -1,26 +1,26 @@
 {
-  "date": "2026-10-27",
-  "total_recs": 0,
+  "date": "2026-10-28",
+  "total_recs": 13,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 0,
+  "no_data": 13,
   "win_rate": 0,
   "baseline": null,
   "causes": {
     "A_板块错配": {
       "hit": false,
       "items": [],
-      "summary": "无 weak_sectors 或无当日推荐"
+      "summary": "无弱板块命中"
     },
     "B_题材错配": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "C_技术面虚高": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "D_大盘错配": {
       "hit": false,
@@ -28,19 +28,168 @@
       "summary": "无大盘数据"
     },
     "E_冷启动盲区": {
-      "hit": false,
-      "items": [],
-      "summary": "无冷启动命中"
+      "hit": true,
+      "items": [
+        {
+          "code": "600802",
+          "name": "福建水泥",
+          "sector_cn": "水泥制造",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "601689",
+          "name": "拓普集团",
+          "sector_cn": "汽车零部件",
+          "sector_enum": "auto",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "002792",
+          "name": "通宇通讯",
+          "sector_cn": "通信传输设备",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 通信传输设备 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "603325",
+          "name": "博隆技术",
+          "sector_cn": "其它通用机械",
+          "sector_enum": "mach",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "002046",
+          "name": "国机精工",
+          "sector_cn": "机械基础件",
+          "sector_enum": "mach",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "603051",
+          "name": "鹿山新材",
+          "sector_cn": "改性塑料",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 改性塑料 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "002289",
+          "name": "宇顺电子",
+          "sector_cn": "显示器件",
+          "sector_enum": "elec",
+          "n": 1,
+          "ret_1d": null,
+          "note": "板块样本 1 < 3"
+        },
+        {
+          "code": "603721",
+          "name": "中广天择",
+          "sector_cn": "传媒",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 传媒 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "605118",
+          "name": "力鼎光电",
+          "sector_cn": "光学元件",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600592",
+          "name": "龙溪股份",
+          "sector_cn": "机械基础件",
+          "sector_enum": "mach",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "603025",
+          "name": "大豪科技",
+          "sector_cn": "工控自动化",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        },
+        {
+          "code": "600276",
+          "name": "恒瑞医药",
+          "sector_cn": "化学制剂",
+          "sector_enum": "chem",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "003033",
+          "name": "征和工业",
+          "sector_cn": "汽车零部件",
+          "sector_enum": "auto",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块样本 0 < 3"
+        }
+      ],
+      "watchlist": [],
+      "cold_sectors": [
+        "水泥制造",
+        "汽车零部件",
+        "通信传输设备",
+        "其它通用机械",
+        "机械基础件",
+        "改性塑料",
+        "显示器件",
+        "传媒",
+        "光学元件",
+        "工控自动化",
+        "化学制剂"
+      ],
+      "summary": "13 只命中冷启动板块 (11 个不同板块), 单次冷板块: ['水泥制造', '汽车零部件', '通信传输设备', '其它通用机械', '机械基础件']"
     }
   },
-  "hit_causes": [],
+  "hit_causes": [
+    "E_冷启动盲区"
+  ],
   "tuning_suggestion": {
-    "score_threshold_delta": 0,
+    "score_threshold_delta": 3,
     "hold_days_delta": 0,
     "weak_sectors_add": [],
     "weak_sectors_remove": [],
     "watchlist": [],
-    "position_delta": 0,
-    "reasons": []
+    "position_delta": -5,
+    "reasons": [
+      "E. 冷启动盲区: 13 只来自 11 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['水泥制造', '汽车零部件', '通信传输设备', '其它通用机械', '机械基础件']"
+    ],
+    "cold_sectors": [
+      "水泥制造",
+      "汽车零部件",
+      "通信传输设备",
+      "其它通用机械",
+      "机械基础件",
+      "改性塑料",
+      "显示器件",
+      "传媒",
+      "光学元件",
+      "工控自动化",
+      "化学制剂"
+    ]
   }
 }

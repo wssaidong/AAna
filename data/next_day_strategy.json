@@ -1,6 +1,6 @@
 {
-  "date_for": "2026-10-28",
-  "score_threshold": 60,
+  "date_for": "2026-10-29",
+  "score_threshold": 63,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
@@ -10,10 +10,22 @@
     "房地产开发",
     "造纸"
   ],
-  "position_final": 50,
+  "position_final": 45,
   "position_base": 50,
   "watchlist": [],
-  "cold_sectors": [],
+  "cold_sectors": [
+    "水泥制造",
+    "汽车零部件",
+    "通信传输设备",
+    "其它通用机械",
+    "机械基础件",
+    "改性塑料",
+    "显示器件",
+    "传媒",
+    "光学元件",
+    "工控自动化",
+    "化学制剂"
+  ],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -32,15 +44,29 @@
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 0,
-      "position_delta": 0,
+      "threshold_delta": 3,
+      "position_delta": -5,
       "weak_sectors_added": [],
       "watchlist": [],
-      "cold_sectors": [],
-      "reasons": []
+      "cold_sectors": [
+        "水泥制造",
+        "汽车零部件",
+        "通信传输设备",
+        "其它通用机械",
+        "机械基础件",
+        "改性塑料",
+        "显示器件",
+        "传媒",
+        "光学元件",
+        "工控自动化",
+        "化学制剂"
+      ],
+      "reasons": [
+        "E. 冷启动盲区: 13 只来自 11 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['水泥制造', '汽车零部件', '通信传输设备', '其它通用机械', '机械基础件']"
+      ]
     }
   ],
-  "generated_at": "2026-10-27T16:10:28",
+  "generated_at": "2026-10-28T16:10:33",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
