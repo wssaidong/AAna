@@ -4862,89 +4862,118 @@
       "reason": "AAna v2.4 尾盘评分 93",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-10-29",
+      "code": "603025",
+      "name": "大豪科技",
+      "action": "sell",
+      "price": 13.8,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -2.0,
+      "pnl_pct": -0.14
+    },
+    {
+      "date": "2026-10-29",
+      "code": "600802",
+      "name": "福建水泥",
+      "action": "sell",
+      "price": 7.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -19.0,
+      "pnl_pct": -2.64
+    },
+    {
+      "date": "2026-10-29",
+      "code": "002792",
+      "name": "通宇通讯",
+      "action": "sell",
+      "price": 28.36,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -51.0,
+      "pnl_pct": -1.77
+    },
+    {
+      "date": "2026-10-29",
+      "code": "600276",
+      "name": "恒瑞医药",
+      "action": "sell",
+      "price": 48.77,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 39.0,
+      "pnl_pct": 0.81
+    },
+    {
+      "date": "2026-10-29",
+      "code": "002046",
+      "name": "国机精工",
+      "action": "sell",
+      "price": 57.68,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 202.0,
+      "pnl_pct": 3.63
+    },
+    {
+      "date": "2026-10-29",
+      "code": "603051",
+      "name": "鹿山新材",
+      "action": "sell",
+      "price": 23.86,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -31.0,
+      "pnl_pct": -1.28
+    },
+    {
+      "date": "2026-10-29",
+      "code": "002289",
+      "name": "宇顺电子",
+      "action": "sell",
+      "price": 33.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -16.0,
+      "pnl_pct": -0.48
+    },
+    {
+      "date": "2026-10-29",
+      "code": "603721",
+      "name": "中广天择",
+      "action": "sell",
+      "price": 20.57,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -64.0,
+      "pnl_pct": -3.02
+    },
+    {
+      "date": "2026-10-29",
+      "code": "600592",
+      "name": "龙溪股份",
+      "action": "sell",
+      "price": 16.62,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 82.0,
+      "pnl_pct": 5.19
+    },
+    {
+      "date": "2026-10-29",
+      "code": "003033",
+      "name": "征和工业",
+      "action": "sell",
+      "price": 78.28,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -360.0,
+      "pnl_pct": -4.4
     }
   ],
-  "positions": {
-    "603025": {
-      "date": "2026-10-28",
-      "name": "大豪科技",
-      "shares": 100,
-      "entry_price": 13.82,
-      "highest_price": 13.82,
-      "entry_date": "2026-10-28"
-    },
-    "600802": {
-      "date": "2026-10-28",
-      "name": "福建水泥",
-      "shares": 100,
-      "entry_price": 7.19,
-      "highest_price": 7.19,
-      "entry_date": "2026-10-28"
-    },
-    "002792": {
-      "date": "2026-10-28",
-      "name": "通宇通讯",
-      "shares": 100,
-      "entry_price": 28.87,
-      "highest_price": 28.87,
-      "entry_date": "2026-10-28"
-    },
-    "600276": {
-      "date": "2026-10-28",
-      "name": "恒瑞医药",
-      "shares": 100,
-      "entry_price": 48.38,
-      "highest_price": 48.38,
-      "entry_date": "2026-10-28"
-    },
-    "002046": {
-      "date": "2026-10-28",
-      "name": "国机精工",
-      "shares": 100,
-      "entry_price": 55.66,
-      "highest_price": 55.66,
-      "entry_date": "2026-10-28"
-    },
-    "603051": {
-      "date": "2026-10-28",
-      "name": "鹿山新材",
-      "shares": 100,
-      "entry_price": 24.17,
-      "highest_price": 24.17,
-      "entry_date": "2026-10-28"
-    },
-    "002289": {
-      "date": "2026-10-28",
-      "name": "宇顺电子",
-      "shares": 100,
-      "entry_price": 33.16,
-      "highest_price": 33.16,
-      "entry_date": "2026-10-28"
-    },
-    "603721": {
-      "date": "2026-10-28",
-      "name": "中广天择",
-      "shares": 100,
-      "entry_price": 21.21,
-      "highest_price": 21.21,
-      "entry_date": "2026-10-28"
-    },
-    "600592": {
-      "date": "2026-10-28",
-      "name": "龙溪股份",
-      "shares": 100,
-      "entry_price": 15.8,
-      "highest_price": 15.8,
-      "entry_date": "2026-10-28"
-    },
-    "003033": {
-      "date": "2026-10-28",
-      "name": "征和工业",
-      "shares": 100,
-      "entry_price": 81.88,
-      "highest_price": 81.88,
-      "entry_date": "2026-10-28"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }
