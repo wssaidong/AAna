@@ -957,17 +957,16 @@ REC_TUNING = {{
         content = f.read()
 
     # 移除旧标记块
-    if marker in content:
-        import re
-        content = re.sub(r"# === REC_OPTIMIZER_TUNING_START ===\n.*?# === REC_OPTIMIZER_TUNING_END ===\n",
-                         "", content, flags=re.DOTALL)
+    # v2026-10-29 修复 (幂等性): 原正则只吃掉块本身, 块前后的空行原样保留 ——
+    # 每次 --integrate 都在 generate_report.py 末尾多留一行空行 (实测 20:00 这次
+    # 累积到 107 行空行, 且每次 commit 都带一条无意义 diff)。
+    # 现在连同块前后的换行一起吃掉, 再按固定 2 空行分隔写回 → 重复跑结果完全一致。
+    import re
+    content = re.sub(r"\n*# === REC_OPTIMIZER_TUNING_START ===\n.*?# === REC_OPTIMIZER_TUNING_END ===\n*",
+                     "\n", content, flags=re.DOTALL)
 
-    # 追加到文件末尾（marker 之前）
-    insert_pos = content.rfind(marker)
-    if insert_pos >= 0:
-        new_content = content[:insert_pos] + block + "\n" + content[insert_pos:]
-    else:
-        new_content = content + "\n" + block
+    # 追加到文件末尾（固定 2 空行分隔, 幂等）
+    new_content = content.rstrip() + "\n\n\n" + block
 
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(new_content)
