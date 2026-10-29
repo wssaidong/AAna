@@ -272,3 +272,233 @@ def test_new_mover_theme_label_uses_specific_stock_tag():
         "ST板块+重组", priority) == "重组"
     # 无标签 → None
     assert run_afterhours.resolve_theme_label("", priority) is None
+
+
+# ── 2026-10-28 v1.31 回归测试（冰点守卫空池 + 成长领涨型）────────────────
+
+def test_empty_premarket_pool_is_not_replaced_by_intraday_rerun(monkeypatch, tmp_path):
+    """盘前版存在但 Top10 为空（冰点守卫 0 推荐）时，**必须返回空池**。
+
+    2026-10-28 生产 bug：git 历史里 08:02 盘前版存在但 Top10 为空
+    （冰点守卫短路，属设计行为）。旧实现 `if rows:` 把空表版本静默跳过，
+    最终回落到 09:37 开盘后重跑版的 7 只池并标注"盘前口径"，
+    战报输出虚假的"命中率 7/7 = 100.0% / vs 上证超额 +4.29pp"。
+    """
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    # 工作区 = 开盘后重跑版（有 7 行，intraday 口径）
+    (tmp_path / "2026-10-28-选股报告.md").write_text(
+        "### 🏆 重点关注 Top 10\n"
+        "| 排名 | 股票 | 代码 | 涨跌幅 |\n"
+        "| 1 | 📊甲 | 600001 | +2.79% |\n"
+        "| 2 | 📊乙 | 000002 | +1.92% |\n",
+        encoding="utf-8",
+    )
+    # git 历史：盘前版存在但 Top10 为空 → found_prev_close=True, rows=[]
+    monkeypatch.setattr(
+        run_afterhours, "_git_history_premarket_top10",
+        lambda d: ([], "abc1234", True),
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_git_head_top10_with_semantics", lambda d: ([], "unknown")
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_parse_top10_from_deep_analysis", lambda d: []
+    )
+
+    rows, source, note, sem = run_afterhours.resolve_candidate_pool("2026-10-28")
+
+    assert rows == [], f"空盘前池不应回落到开盘后重跑版: {rows}"
+    assert "空表" in source, source
+    assert "Top10 为空" in note, note
+    assert sem == "prev_close"
+
+
+def test_empty_premarket_pool_reports_design_not_fault():
+    """空池（冰点守卫）应标注"设计行为"，不能写成"上游报告缺失"。"""
+    note = ("⚠️ 上游盘前版选股报告（git commit abc1234）**Top10 为空** —— "
+            "冰点守卫短路（情绪冰点/仓位 10%/停止交易）时**有意**输出 0 推荐，"
+            "属**设计行为**而非数据故障。")
+    md = run_afterhours.format_feishu(
+        "2026-10-28", _minimal_indices(), [], {}, {}, [], [], [],
+        0, 0, 0, 0.91, 3.40, 2.45, [], 73,
+        pool_note=note,
+    )
+    assert "上游冰点守卫短路（0 推荐·设计行为）" in md
+    assert "上游报告缺失" not in md
+    assert "无候选池命中率评估" in md
+
+
+def test_growth_leading_market_feature_detected():
+    """主板滞涨 + 成长集体走强，应判"成长领涨型"而非"震荡"。
+
+    2026-10-28 实战：上证 +0.91% / 创业板 +3.40% / 科创50 +2.45%。
+    旧代码只在 sh_pct > 1.5 时给"强势行情"，主板滞涨日一律回落成"震荡"，
+    并给出方向完全相反的"央企/红利对冲"建议。
+    """
+    feature = run_afterhours.classify_market_feature(
+        2.20, 0.91, 3.40, 2.45, [], other_5_avg=1.77
+    )
+    assert "成长领涨" in feature, feature
+    assert "震荡" not in feature, feature
+
+    # 普涨日（上证也 > 1.5%）仍走"强势行情"，不能被成长领涨层抢走
+    broad = run_afterhours.classify_market_feature(
+        2.50, 2.20, 3.40, 2.45, [], other_5_avg=2.50
+    )
+    assert broad == "📈 强势行情", broad
+
+
+def test_growth_leading_day_defense_advice_not_red_hedge():
+    """成长领涨日的防御建议不能是"央企/红利对冲"（当日红利全线下跌）。"""
+    md = run_afterhours.format_feishu(
+        "2026-10-28", _minimal_indices(), ["半导体"], {"半导体": 3}, {},
+        [], [], [], 0, 0, 0, 0.91, 3.40, 2.45, [], 73,
+    )
+    assert "成长领涨型" in md
+    assert "红利仅作低位观察而非对冲盘" in md
+    assert "央企/红利股作为底仓对冲" not in md
+
+
+def test_t1_closed_loop_section_rendered_when_pool_empty():
+    """当日池为空时必须补 T+1 闭环段（否则战报失去与盘前情报的闭环）。"""
+    t1 = {
+        "rows": [("600085", "同仁堂", 1.95, 2.10, 0.15),
+                 ("603883", "老百姓", 1.89, -0.50, -2.39)],
+        "hits": 1, "n": 2, "hit_rate": 50.0, "avg": 0.80, "alpha_sh": -0.11,
+        "avg_baseline": 1.92, "neg_continuation": 1,
+        "best": ("600085", "同仁堂", 1.95, 2.10, 0.15),
+        "worst": ("603883", "老百姓", 1.89, -0.50, -2.39),
+        "prev_date": "2026-10-27",
+    }
+    md = run_afterhours.format_feishu(
+        "2026-10-28", _minimal_indices(), [], {}, {}, [], [], [],
+        0, 0, 0, 0.91, 3.40, 2.45, [], 73, t1=t1,
+    )
+    assert "T+1 闭环复核（2026-10-27 盘前池 → 2026-10-28 收盘）" in md
+    assert "📊 **T+1 命中率：** 1/2 = 50.0%" in md
+    assert "不代表今日新推荐" in md
+    # 当日池为空时不应出现虚假的当日命中率
+    assert "📊 **命中率：**" not in md
+
+
+def test_t1_pool_evaluation_uses_today_close(monkeypatch):
+    """T+1 评估必须用今日收盘涨跌与 baseline 做差（真实 T+1，不是自指）。"""
+    monkeypatch.setattr(
+        run_afterhours, "tencent_quote",
+        lambda codes: {"sh600085": {"change_pct": 2.10},
+                       "sh603883": {"change_pct": -0.50}},
+    )
+    rows = [("600085", "同仁堂", 1.95), ("603883", "老百姓", 1.89)]
+    res = run_afterhours.evaluate_t1_pool(rows, "2026-10-27", _minimal_indices())
+
+    assert res["n"] == 2
+    assert res["hits"] == 1
+    assert abs(res["avg"] - 0.80) < 0.01
+    # baseline 与今日收盘比较 → delta 分别为 +0.15 / -2.39
+    deltas = sorted(r[4] for r in res["rows"])
+    assert abs(deltas[0] - (-2.39)) < 0.01
+    assert abs(deltas[1] - 0.15) < 0.01
+    assert res["prev_date"] == "2026-10-27"
+
+
+def test_send_feishu_skipped_in_cron_auto_delivery(monkeypatch, capsys):
+    """cron 自动投递环境下必须跳过手动 lark-cli 推送（避免重复消息）。
+
+    2026-10-26 实战：本 cron 的回复由 Hermes 自动投递到 origin chat，
+    脚本再手动推一遍 → 两条内容相同的战报。
+    """
+    import sys as _sys
+    sent = []
+    fake_lark = type("M", (), {
+        "push_markdown": staticmethod(lambda md, user_id=None, **kw:
+                                       sent.append(md) or (True, "ok")),
+    })()
+    monkeypatch.setitem(_sys.modules, "lark_push", fake_lark)
+    monkeypatch.setenv("HERMES_CRON_AUTO_DELIVERY", "1")
+
+    run_afterhours.send_feishu("body")
+
+    assert sent == [], "cron 自动投递环境不应手动推送"
+    assert "跳过飞书手动推送" in capsys.readouterr().out
+
+    # AANA_FORCE_FEISHU=1 时强制推送
+    monkeypatch.setenv("AANA_FORCE_FEISHU", "1")
+    run_afterhours.send_feishu("body")
+    assert sent == ["body"], "强制推送未生效"
+
+
+def test_growth_collective_dump_layer7_detected():
+    """v1.27 第七层「主板稳态 + 成长方向集体杀跌」必须有检测层。
+
+    changelog v1.27 只写了检测条件（kc50/cyb 双破 -3%，主板未破），
+    代码此前从未实现。2026-10-29 实战（创业板 -4.45% / 科创50 -4.27%、
+    其余 4 指数未破 -3%）落在这个盲区。
+    """
+    # 成长双破 -3%，主板 4 指数全部 > -3% → 第七层
+    feature = run_afterhours.classify_market_feature(
+        -1.85, -0.85, -4.45, -4.27, [],
+        other_idx_pcts=[-0.85, -1.10, -0.60, -0.90],
+    )
+    assert "成长方向集体杀跌" in feature, feature
+
+    # 主板也破 -3%（普跌）→ 不能叫"主板稳态"
+    broad = run_afterhours.classify_market_feature(
+        -3.20, -3.10, -4.45, -4.27, [],
+        other_idx_pcts=[-3.10, -3.50, -2.80, -3.00],
+    )
+    assert "主板稳态" not in broad, broad
+
+    # 与模式⑤双层嵌套：4 核心均值破 -3% 由成长拖累造成（主板 4 指数未破 -3%）
+    # → 模式⑤（外层）+ 第七层（内层结构）两个标签都要有
+    nested = run_afterhours.classify_market_feature(
+        -3.68, -1.00, -6.50, -6.00, [],
+        other_idx_pcts=[-1.00, -1.20, -1.00, -1.10],
+    )
+    assert "模式⑤" in nested and "成长方向集体杀跌" in nested, nested
+
+
+def test_pool_attribution_rendered_in_feishu():
+    """候选池偏差归因必须出现在战报里（skill 交付物 #2）。"""
+    hit_rows = [("603683", "海兴电力", 4.99, -6.20, -11.19),
+                ("002242", "九阳股份", 4.62, -1.20, -5.82),
+                ("000810", "创新维", 4.88, -7.30, -12.18),
+                ("001233", "华兰生物", 4.74, 9.95, 5.21)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    md = run_afterhours.format_feishu(
+        "2026-10-29", _minimal_indices(), ["医药"], {"医药": 3}, {},
+        hit_rows, positives, negatives,
+        avg, 9.95, -4.90, -0.85, -4.45, -4.27, [], 73,
+        pool_mode="⑩-h", pool_label="模式⑩-h 极端情绪日 + 昨日+5%追高 + 全天单边杀跌",
+        pool_attr="候选池 1/4 命中、整体均值 -4.04%（破 -3%）",
+        pool_industries={"603683": "电网设备", "002242": "家电行业"},
+    )
+    assert "偏差归因" in md
+    assert "⑩-h" in md
+    assert "电网设备" in md  # 行业暴露行
+
+
+def test_pool_failure_mode_10h_classified():
+    """2026-10-29 实战形态: 25%命中 + 均值破 -3% + baseline +5% → 必须判 ⑩-h。"""
+    hit_rows = [("603683", "海兴电力", 4.99, -9.90, -14.89),
+                ("002242", "九阳股份", 4.62, -6.20, -10.82),
+                ("000810", "创新维", 4.88, -8.30, -13.18),
+                ("001233", "华兰生物", 4.74, 9.95, 5.21)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    # 注意 gap = |avg_pos| + |avg_neg| —— ⑧ 分支要求 gap < 10（高Beta特征），
+    # ⑩-h 是"破 -3% + 追高"，要避免正负差距大到落进 ⑧。
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 9.95, -8.13,
+        sh_pct=-0.85, market_avg=-3.20,
+        tail_dive=False, in_hot_count=1, hot_count=73,
+    )
+    assert mode == "⑩-h", (mode, label)
+    assert "全天单边杀跌" in label or "追高" in label, label
+    assert "无 ≥3.5pp 尾盘跳水" in attr, attr
+    # 极端情绪日 → 归因必须带大盘层
+    assert "模式⑤" in attr, attr
+    # 样本 N=4 < 5 → 必须降级标注
+    assert "置信度低" in attr, attr

@@ -277,7 +277,7 @@ def previous_nonempty_hot_day(date_str, max_lookback=10):
 
 def parse_top10_with_baseline(date_str):
     """向后兼容包装: 只返回 rows。候选池来源回捞逻辑见 resolve_candidate_pool()。"""
-    rows, _, _ = resolve_candidate_pool(date_str)
+    rows, _, _, _ = resolve_candidate_pool(date_str)
     return rows
 
 
@@ -398,42 +398,311 @@ def _git_head_top10(date_str):
     return parse_top10_content(out.stdout)
 
 
-def resolve_candidate_pool(date_str):
-    """解析候选池, 返回 (rows, source_label, note)。
+def detect_baseline_semantics(content, date_str=None):
+    """判定选股报告 "涨跌幅" 列的口径。
 
-    来源优先级 (on-disk → git HEAD → 深度分析回捞):
-      1. 工作区 {date}-选股报告.md 的 "重点关注 Top 10" section
-      2. git HEAD 的同名文件 (盘前版, 盘中重跑覆盖工作区时的兜底)
-      3. {date}-深度分析.md 的 "二、候选池" 表格 (上游 bug 的最后兜底)
+    返回:
+      "prev_close" — 昨收涨跌幅（盘前生成, 市场未开盘）→ **可作延续性 baseline**
+      "intraday"   — 当日盘中/盘后实时涨跌幅 → 与当日收盘涨跌自指, **不可作 baseline**
+      "unknown"    — 无生成时间且无盘前标记（保守按 prev_close 使用, 但需标注不确定）
+
+    ⚠️ 2026-10-27 实战（v1.30）: 同一份 {date}-选股报告.md 可能存在**两个版本**——
+    08:0x 盘前版（"涨跌幅"=昨收）与 09:3x 开盘后重跑版（"涨跌幅"=当日盘中实时）。
+    后者若被当作 baseline, Δ 变成"当日盘中 vs 当日收盘"的自指比较,
+    会得出完全虚假的命中率/超额结论（实战: 误用得 40% 命中 +1.98pp 超额,
+    真实盘前池为 12.5% 命中 -0.74pp 超额）。
+    """
+    if not content:
+        return "unknown"
+    m = re.search(r"\*\*生成时间：\*\*\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2})", content)
+    if m:
+        gen_date, hh, mm = m.group(1), int(m.group(2)), int(m.group(3))
+        if date_str and gen_date != date_str:
+            return "unknown"
+        # 09:30 开盘后重跑版 → 当日盘中口径
+        if (hh, mm) >= (9, 30):
+            return "intraday"
+        return "prev_close"
+    # 无生成时间: 盘前版带 "涨跌幅"=**昨收涨跌幅** 副标题
+    if "昨收涨跌幅" in content:
+        return "prev_close"
+    return "unknown"
+
+
+def _git_head_content(date_str):
+    """取 git HEAD 的 {date}-选股报告.md 原文（取不到返回 ""）。"""
+    import subprocess
+    rel = f"reports/{date_str}-选股报告.md"
+    repo = os.path.dirname(REPORT_DIR.rstrip("/"))
+    try:
+        out = subprocess.run(
+            ["git", "-C", repo, "show", f"HEAD:{rel}"],
+            capture_output=True, text=True, timeout=20,
+        )
+    except Exception:
+        return ""
+    if out.returncode != 0 or not out.stdout.strip():
+        return ""
+    return out.stdout
+
+
+def _git_history_premarket_top10(date_str, max_commits=12):
+    """从 git 历史回捞**盘前口径**版本的 Top10。
+
+    返回 (rows, sha, found_prev_close):
+      - rows: 解析出的候选池（可能为空 list）
+      - sha: 命中的盘前口径版本 commit 短 hash（可能 None）
+      - found_prev_close: 历史中**确实存在**盘前口径版本（哪怕其 Top10 表为空）
+
+    ⚠️ 2026-10-27 实战（v1.30）: 工作区**和 git HEAD** 的 {date}-选股报告.md
+    都可能已被开盘后重跑覆盖（09:38 开盘后版）, 盘前版只存在于 git 历史里。
+    必须按提交顺序（新→旧）回捞第一个 prev_close 口径的版本。
+
+    ⚠️ 2026-10-28 实战（v1.31）: 盘前口径版本**可能存在但 Top10 表为空** ——
+    上游冰点守卫短路时**有意**输出 0 推荐（"情绪=冰点/仓位=10%/停止交易"）,
+    属**设计行为**而非数据故障。旧实现把"空表"和"版本不存在"混为一谈
+    (`if rows:` 才返回), 导致空池被静默跳过、最终回落到开盘后重跑版,
+    战报给出虚假的"命中率 7/7 = 100%"。故新增 found_prev_close 标志。
+    """
+    import subprocess
+    rel = f"reports/{date_str}-选股报告.md"
+    repo = os.path.dirname(REPORT_DIR.rstrip("/"))
+    try:
+        out = subprocess.run(
+            ["git", "-C", repo, "log", "--format=%H", "--", rel],
+            capture_output=True, text=True, timeout=20,
+        )
+    except Exception:
+        return [], None, False
+    if out.returncode != 0 or not out.stdout.strip():
+        return [], None, False
+    found_sha = None
+    for sha in out.stdout.split()[:max_commits]:
+        try:
+            show = subprocess.run(
+                ["git", "-C", repo, "show", f"{sha}:{rel}"],
+                capture_output=True, text=True, timeout=20,
+            )
+        except Exception:
+            continue
+        if show.returncode != 0 or not show.stdout.strip():
+            continue
+        content = show.stdout
+        if detect_baseline_semantics(content, date_str) != "prev_close":
+            continue
+        if found_sha is None:
+            found_sha = sha[:7]
+        rows = parse_top10_content(content)
+        if rows:
+            return rows, sha[:7], True
+    # 盘前口径版本存在但 Top10 为空 → found_prev_close=True, rows=[]
+    return [], found_sha, found_sha is not None
+
+
+def _git_head_top10_with_semantics(date_str):
+    """git HEAD 版选股报告 Top10 + 口径判定。HEAD 缺失/解析空 → ([], "unknown")。"""
+    import subprocess
+    rel = f"reports/{date_str}-选股报告.md"
+    repo = os.path.dirname(REPORT_DIR.rstrip("/"))
+    try:
+        out = subprocess.run(
+            ["git", "-C", repo, "show", f"HEAD:{rel}"],
+            capture_output=True, text=True, timeout=20,
+        )
+    except Exception:
+        return [], "unknown"
+    if out.returncode != 0 or not out.stdout.strip():
+        return [], "unknown"
+    content = out.stdout
+    sem = detect_baseline_semantics(content, date_str)
+    return parse_top10_content(content), sem
+
+
+def resolve_candidate_pool(date_str):
+    """解析候选池, 返回 (rows, source_label, note, semantics)。
+
+    来源优先级（全部要求 **昨收口径**, 否则 baseline 与当日收盘自指）:
+      1. 工作区 {date}-选股报告.md（若为盘前口径）
+      2. git HEAD 的同名文件（若为盘前口径）
+      3. git 历史中最新的盘前口径版本（HEAD 已被开盘后重跑覆盖时）
+      4. {date}-深度分析.md 的"二、候选池"表格（列名即基准日涨跌）
+    兜底: 任意版本 + 明确的口径警示
 
     ⚠️ 2026-10-26 实战: 工作区文件 09:39 被重跑覆盖成 Top10 空表
     (情绪 25 冰点/停止交易), 直接读会把**真实存在并已同步东财**的
     10 只候选池误判为"上游报告缺失"。三源回捞后命中率评估恢复正常。
+
+    ⚠️ 2026-10-27 实战（v1.30）: 工作区被 09:38 **开盘后重跑**覆盖成
+    另一只 5 只池, 且 "涨跌幅" 列已变成**当日盘中实时涨跌**。若直接当
+    baseline 用, Δ = 当日收盘涨跌 − 当日 09:38 盘中涨跌 = 自指比较,
+    会得出"40% 命中 / +1.98pp 超额"的虚假结论; 真实盘前池（8 只, 已同步
+    东财 20261027ZZ）为 **12.5% 命中 / −0.74pp 超额**（vs 上证）。
+    故新增 git 历史盘前版回捞 + 口径判定。
+
+    ⚠️ 2026-10-28 实战（v1.31）: **盘前口径版本存在但 Top10 表为空** ——
+    上游冰点守卫短路（情绪 20 冰点 / 仓位 10% / "停止交易"）时**有意**
+    输出 0 推荐，属**设计行为**而非数据故障。
+    旧实现（v1.30）把"盘前版空表"与"盘前版不存在"混为一谈:
+      `rows, sha = _git_history_premarket_top10(...)` 只在 `if rows:` 时返回,
+    空表版本被**静默跳过** → 继续回落到深度分析(空) → 最后落到工作区
+    **开盘后重跑版**的 7 只池, 并标注成"盘前口径"。
+    后果: 战报输出虚假的 **"命中率 7/7 = 100.0% / vs 上证超额 +4.29pp"**
+    （实测该 7 只的实际命中率 5/7=71.4%, 且该池是开盘后选出来的,
+    用盘中涨跌当 baseline 与收盘自指 → Δ 完全失效）。
+    修复: 新增 found_prev_close 标志, 盘前版存在但空表时**明确返回空池**
+    并标注"上游冰点守卫短路, 0 推荐属设计行为", 绝不回落到开盘后重跑版。
     """
-    path = f"{REPORT_DIR}/{date_str}-选股报告.md"
+    notes = []
+
+    # 1) 工作区
     try:
-        with open(path) as f:
-            rows = parse_top10_content(f.read())
-        if rows:
-            return rows, "选股报告(工作区)", ""
+        with open(f"{REPORT_DIR}/{date_str}-选股报告.md") as f:
+            content = f.read()
+        rows = parse_top10_content(content)
+        sem = detect_baseline_semantics(content, date_str)
+        if rows and sem == "prev_close":
+            return rows, "选股报告(工作区·盘前口径)", "", sem
+        if rows and sem == "intraday":
+            notes.append(
+                "⚠️ 工作区选股报告为**开盘后重跑版**（'涨跌幅'列为当日盘中实时口径，"
+                "与当日收盘自指，不能作延续性 baseline），已回捞盘前口径候选池。"
+            )
+        elif rows and sem == "unknown":
+            # ⚠️ v1.31: 口径未确认 ≠ 盘前口径。旧代码用 `sem != "intraday"` 判定，
+            # 导致 unknown 口径（无生成时间、无盘前标记）被直接标注成"盘前口径"。
+            # 未确认口径必须继续往下走，优先用 git HEAD/历史的**已确认**盘前版；
+            # 只有全部源都不可用时才由末尾兜底返回，并标注"口径未确认"。
+            notes.append(
+                "⚠️ 工作区选股报告口径未确认（无生成时间/盘前标记），"
+                "已继续回捞已确认的盘前口径版本。"
+            )
     except FileNotFoundError:
         pass
 
-    rows = _git_head_top10(date_str)
-    if rows:
-        return rows, "选股报告(git HEAD 盘前版)", (
-            "⚠️ 工作区选股报告的 Top10 section 为空（盘中重跑覆盖），"
-            "已回捞 git HEAD 盘前版候选池"
+    # 2) git HEAD（**必须是**盘前口径）
+    #    ⚠️ v1.31: 旧代码只看 `if rows:` 就返回，但 HEAD 可能同样是开盘后重跑版
+    #    （当日只提交过一次 intraday 版），返回后被标注成"git HEAD·盘前口径"
+    #    而实际口径是 intraday —— 战报出现"来源=盘前口径，口径=intraday"的
+    #    自相矛盾标注，且 baseline 与收盘自指。必须按口径过滤。
+    rows, sem = _git_head_top10_with_semantics(date_str)
+    if rows and sem == "prev_close":
+        return rows, "选股报告(git HEAD·盘前口径)", "".join(notes), sem
+    if rows and sem == "intraday":
+        notes.append(
+            "⚠️ git HEAD 版选股报告亦为**开盘后重跑版**（盘中实时口径），"
+            "已继续回捞已确认的盘前口径版本。"
         )
 
+    # 3) git 历史中最新盘前口径版本
+    #    ⚠️ v1.31: rows 可能为空但 found_prev_close=True —— 盘前版**存在**，
+    #    只是上游冰点守卫有意输出 0 推荐。此时**必须返回空池**，
+    #    不得继续回落到开盘后重跑版（那会产出虚假命中率）。
+    rows, sha, found_prev_close = _git_history_premarket_top10(date_str)
+    if rows:
+        notes.append(
+            f"已回捞 git 历史盘前口径候选池（commit {sha}）"
+        )
+        return rows, f"选股报告(git 历史盘前版·{sha})", "".join(notes), "prev_close"
+    if found_prev_close:
+        notes.append(
+            f"⚠️ 上游盘前版选股报告（git commit {sha}）**Top10 为空** —— "
+            f"冰点守卫短路（情绪冰点/仓位 10%/停止交易）时**有意**输出 0 推荐，"
+            f"属**设计行为**而非数据故障。今日盘前无候选池，"
+            f"故**不做候选池命中率评估**（已跳过 09:37 开盘后重跑版，"
+            f"其涨跌幅为盘中实时口径、与收盘自指，评估无效）"
+        )
+        return [], f"选股报告(git 历史盘前版·{sha}·Top10 空表)", "".join(notes), "prev_close"
+
+    # 4) 深度分析报告候选池表（列名即基准日涨跌，天然昨收口径）
     rows = _parse_top10_from_deep_analysis(date_str)
     if rows:
-        return rows, "深度分析报告候选池表", (
-            "⚠️ 工作区与 git HEAD 的选股报告 Top10 均为空，"
-            "已从深度分析报告的候选池表格回捞"
-        )
+        notes.append("已从深度分析报告的候选池表格回捞")
+        return rows, "深度分析报告候选池表", "".join(notes), "prev_close"
 
-    return [], "无", "⚠️ 三源均无候选池（选股报告/深度分析报告）"
+    # 兜底: 工作区任意版本（口径异常时显式警示）
+    try:
+        with open(f"{REPORT_DIR}/{date_str}-选股报告.md") as f:
+            content = f.read()
+        rows = parse_top10_content(content)
+        if rows:
+            notes.append("⚠️ 未能回捞到盘前口径版本，'涨跌幅'列口径未确认")
+            return rows, "选股报告(工作区·口径未确认)", "".join(notes), "unknown"
+    except FileNotFoundError:
+        pass
+
+    return [], "无", "⚠️ 三源均无候选池（选股报告/深度分析报告）", "unknown"
+
+
+def resolve_previous_pool(date_str, max_lookback=6):
+    """回捞**上一个交易日**的盘前候选池（昨收口径），用于 T+1 闭环复核。
+
+    ⚠️ 2026-10-28 新增（v1.31）: 当日盘前池为空（冰点守卫短路）时，
+    "候选池命中率"整段退化成 N/A，战报就**失去了与盘前情报的闭环** ——
+    而闭环正是本 skill 的核心目的（"与盘前情报联动形成闭环"）。
+    此时唯一有意义的评估对象是**上一交易日的盘前池在今日收盘的表现**
+    （T+1 真实收益），它直接回答"选股策略昨天选的东西今天表现如何"。
+
+    返回 (rows, prev_date, source_label)：
+      - rows: [(code, name, baseline_pct)]，baseline = 上一交易日报告里的昨收涨跌
+      - prev_date: 该池的报告日期（找不到返回 None）
+      - source_label: 来源说明
+
+    ⚠️ 口径纪律: 只接受**已确认的昨收口径**版本（prev_close），
+    否则 baseline 与收盘自指，T+1 收益完全失真。
+    """
+    cursor = datetime.strptime(date_str, "%Y-%m-%d")
+    for offset in range(1, max_lookback + 1):
+        day = (cursor - timedelta(days=offset)).strftime("%Y-%m-%d")
+        # 先看该日是否真的是有行情的交易日（同花顺强势股非空）
+        if not ths_hot(day):
+            continue
+        try:
+            rows, source, _note, sem = resolve_candidate_pool(day)
+        except Exception:
+            continue
+        if rows and sem == "prev_close":
+            return rows, day, source
+    return [], None, "无"
+
+
+def evaluate_t1_pool(prev_rows, prev_date, indices):
+    """用**今日收盘价**评估上一交易日盘前池的 T+1 表现。
+
+    返回 dict: {rows, hits, n, avg, alpha_sh, avg_baseline, deltas, best, worst}
+      - rows: [(code, name, baseline, today_pct, delta)]，delta = 今日涨跌 - baseline
+      - alpha_sh: 池内均值 - 今日上证涨跌（真实超额，非自指）
+    """
+    if not prev_rows:
+        return {}
+    codes = [c for c, _, _ in prev_rows]
+    q = tencent_quote([f"{'sh' if c.startswith('6') else 'sz'}{c}" for c in codes])
+    rows = []
+    for code, name, baseline in prev_rows:
+        key = f"{'sh' if code.startswith('6') else 'sz'}{code}"
+        entry = q.get(key) or q.get(code) or {}
+        pct = entry.get("change_pct")
+        if pct is None:
+            continue
+        rows.append((code, name, baseline, pct, pct - baseline))
+    if not rows:
+        return {}
+    hits = [r for r in rows if r[3] > 0]
+    avg = sum(r[3] for r in rows) / len(rows)
+    sh_pct = indices.get("sh000001", {}).get("change_pct", 0)
+    sorted_rows = sorted(rows, key=lambda x: x[4], reverse=True)
+    return {
+        "rows": rows,
+        "hits": len(hits),
+        "n": len(rows),
+        "hit_rate": len(hits) / len(rows) * 100,
+        "avg": avg,
+        "alpha_sh": avg - sh_pct,
+        "avg_baseline": sum(r[2] for r in rows) / len(rows),
+        "neg_continuation": sum(1 for r in rows if r[4] < 0),
+        "best": sorted_rows[0],
+        "worst": sorted_rows[-1],
+        "prev_date": prev_date,
+    }
 
 
 def resolve_theme_label(reason, final_priority):
@@ -459,44 +728,196 @@ def resolve_theme_label(reason, final_priority):
 
 
 def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
-                            other_5_avg=None):
-    """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。"""
+                            other_5_avg=None, other_idx_pcts=None):
+    """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。
+
+    ⚠️ 2026-10-29 新增（v1.32）: **v1.27 第七层**「主板稳态 + 成长方向集体杀跌型」
+    此前只在 changelog 里写了检测条件（`kc50_pct < -3.0 and cy_pct < -3.0`），
+    **代码从未实现** —— 2026-10-29 实战（创业板 -4.45% / 科创50 -4.27% 双双破 -3%，
+    其余 4 指数全部未破 -3%）正好落在这个盲区里，只被判成"极端情绪日（模式⑤）"，
+    丢掉了"主板未破 -3%、杀跌集中在成长方向"这个结构性信息。
+    按 v1.19「双重满足须双层嵌套」原则，与模式⑤ 同时命中时输出双层标签。
+
+    `other_idx_pcts`: 非成长指数的涨跌幅列表（上证/深证/中小100/沪深300）。
+    用于校验"主板稳态"语义 —— 只有其余指数都未破 -3% 才算主板稳态，
+    否则是全市场普跌（此时不该叫"主板稳态"）。
+    """
     deltas = [row[3] for row in gap_rows]
     max_delta = max(deltas, default=0.0)
     min_delta = min(deltas, default=0.0)
+    # v1.27 第七层: 成长双指数集体破 -3%，而主板指数未破 -3%
+    growth_collective_dump = (
+        kc50_pct < -3.0 and cyb_pct < -3.0
+        and (other_idx_pcts is None or all(p >= -3.0 for p in other_idx_pcts))
+    )
     if market_avg < -3.0 and min_delta <= -3.5:
-        return "💥 极端情绪日（模式⑤）+ 假突破后尾盘跳水（v1.22第四层）"
-    if market_avg < -3.0:
-        return "💥 极端情绪日（模式⑤）"
-    if max_delta >= 3.5:
-        return "📈 假平稳真急涨型（v1.22第五层）"
-    if min_delta <= -3.5:
-        return "📉 假突破后尾盘跳水型（v1.22第四层）"
-    # ⚠️ 2026-10-21 新增（v1.28）: 单点 V 型反转层
-    # 触发条件: 某个指数 14:45→15:00 **跨越零点**（正负号翻转）且 |Δ| >= 2pp，
-    # 同时大盘整体为负（其余指数在跌）→ 该指数是当日唯一逆势方向。
-    # 与 v1.24 第六层（科创50 单点跳水）是**镜像场景**: 那次是 kc50 独跌，
-    # 这次是 kc50 独涨/翻红，v1.14/v1.22/v1.24 六层检测全部落空 →
-    # 战报会写"震荡"，掩盖"盘中冰点读数被收盘推翻"的关键信息。
-    for name, v1445, v1500, delta in (gap_rows or []):
-        if (v1445 < 0 < v1500) or (v1500 < 0 < v1445):
-            if abs(delta) >= 2.0 and market_avg < 0:
-                direction = "翻红" if v1500 > 0 else "翻绿"
-                return f"🔄 单点V型反转型（{name} 尾盘{direction} {delta:+.2f}pp，其余指数普跌）"
-    if sh_pct < -1.5 and kc50_pct < -5:
-        return "📉 平稳转急跌型（模式⑦）"
-    # ⚠️ 2026-10-26 新增（v1.29）: 上证红盘/微跌 + 成长方向（创业板/科创50）杀跌
-    # 主板相对平稳时属"结构性分化"，写"震荡"会掩盖成长方向的系统性杀跌风险。
-    # 阈值按 2026-10-26 实战校准（科创50 -2.23 / 创业板 -1.71 / 上证 +0.19）。
-    if kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
-        return "📊 主板稳态 + 成长方向杀跌型（结构性分化）"
-    if other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
-        return "📊 主板稳态 + 科创50单点跳水型"
-    if sh_pct > 1.5:
-        return "📈 强势行情"
-    if sh_pct < -1.0:
-        return "📉 震荡偏弱"
-    return "➡️ 震荡"
+        base = "💥 极端情绪日（模式⑤）+ 假突破后尾盘跳水（v1.22第四层）"
+    elif market_avg < -3.0:
+        base = "💥 极端情绪日（模式⑤）"
+    elif max_delta >= 3.5:
+        base = "📈 假平稳真急涨型（v1.22第五层）"
+    elif min_delta <= -3.5:
+        base = "📉 假突破后尾盘跳水型（v1.22第四层）"
+    elif growth_collective_dump:
+        # v1.27 第七层放在急涨/急跌之后、V型之前：它描述的是**结构**（杀跌集中在
+        # 成长方向），不是**时点**（尾盘反转），两者正交。
+        base = "📊 主板稳态 + 成长方向集体杀跌型（v1.27第七层）"
+    else:
+        # ⚠️ 2026-10-21 新增（v1.28）: 单点 V 型反转层
+        # 触发条件: 某个指数 14:45→15:00 **跨越零点**（正负号翻转）且 |Δ| >= 2pp，
+        # 同时大盘整体为负（其余指数在跌）→ 该指数是当日唯一逆势方向。
+        # 与 v1.24 第六层（科创50 单点跳水）是**镜像场景**: 那次是 kc50 独跌，
+        # 这次是 kc50 独涨/翻红，v1.14/v1.22/v1.24 六层检测全部落空 →
+        # 战报会写"震荡"，掩盖"盘中冰点读数被收盘推翻"的关键信息。
+        v_flip = None
+        for name, v1445, v1500, delta in (gap_rows or []):
+            if (v1445 < 0 < v1500) or (v1500 < 0 < v1445):
+                if abs(delta) >= 2.0 and market_avg < 0:
+                    v_flip = (name, v1445, v1500, delta)
+                    break
+        if v_flip:
+            direction = "翻红" if v_flip[2] > 0 else "翻绿"
+            return (f"🔄 单点V型反转型（{v_flip[0]} 尾盘{direction} {v_flip[3]:+.2f}pp，"
+                    f"其余指数普跌）")
+        if sh_pct < -1.5 and kc50_pct < -5:
+            base = "📉 平稳转急跌型（模式⑦）"
+        elif kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
+            base = "📊 主板稳态 + 成长方向杀跌型（结构性分化）"
+        elif other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
+            base = "📊 主板稳态 + 科创50单点跳水型"
+        elif cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0:
+            base = "📈 成长领涨型（主板滞涨，结构性走强）"
+        elif sh_pct > 1.5:
+            base = "📈 强势行情"
+        elif sh_pct < -1.0:
+            base = "📉 震荡偏弱"
+        else:
+            base = "➡️ 震荡"
+    if growth_collective_dump and "成长方向集体杀跌" not in base:
+        # 双层嵌套：模式⑤（外层大盘）+ 第七层（内层结构）
+        base += " + 主板稳态·成长方向集体杀跌（v1.27第七层）"
+    return base
+
+
+def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg_neg,
+                               sh_pct, market_avg, market_feature="",
+                               tail_dive=False, in_hot_count=0, hot_count=0):
+    """候选池失败模式判定 —— 八态速查表 + ⑩ 系列（v1.32 新增）。
+
+    返回 (mode_key, label, attribution_text) 或 (None, None, None)。
+
+    判定依据（references/candidate-pool-failure-modes.md 八态速查表 +
+    ⑩-a..⑩-g 子类）：
+
+      命中率 ≤ 20%  → 均值 < -3% ? (baseline > +4% → ② 追高杀跌 / < +2% → ⑤ 系统性崩盘)
+      命中率 20-40% → 均值 -2%~-3% + baseline +5~+7% → ⑦
+                    → 均值 -1%~-2% + baseline +4~+5% + 正负差距 ≥10pp → ⑧
+                    → 均值 < -3% + baseline > +4% → ⑩-h（v1.32 新增）
+      命中率 40-60% → Alpha ≈ 0 → ①/⑥ ; Alpha 显著负 → ⑥
+      命中率 ≥ 60%  → Alpha > 0.5pp → ④-a ; 0~0.5pp → ④-b
+
+    ⚠️ 2026-10-29 实战新增 **模式 ⑩-h**：「极端情绪日 + 昨日+5%追高 +
+    全天单边杀跌（无尾盘跳水）」。原八态速查表的 20-40% 命中率分支只覆盖
+    均值 -2%~-3%（模式⑦）与 -1%~-2%（模式⑧），**没有覆盖均值破 -3% 的情形**；
+    而 ⑩-f/⑩-g 两条新模式又都是 **0% 命中**，也覆盖不到 1/4 命中。
+    2026-10-29 实战正好落在这个空档：命中率 25%（1/4）+ 均值 -4.03%（破 -3%）
+    + baseline 全部 +4.62%~+4.99%（昨日+5% 追高）+ 大盘极端情绪日，
+    且 **14:45→15:00 最大时点差仅 0.20pp**（杀跌全天发生、盘中已同步杀跌，
+    与模式⑦/⑩-c/⑩-f 的"尾盘跳水"机制完全不同）。
+
+    `in_hot_count`: 候选池中进入今日同花顺强势股/涨停池的只数（题材主线命中数）。
+    `tail_dive`: 14:45→15:00 是否发生 ≥3.5pp 的尾盘跳水。
+    """
+    n = len(hit_rows)
+    if not n:
+        return None, None, None
+    hit_rate = len(positives) / n
+    alpha = avg - sh_pct
+    baseline_avg = sum(r[2] for r in hit_rows) / n
+    neg_cont = sum(1 for r in hit_rows if r[4] < 0)
+    gap = abs(avg_pos) + abs(avg_neg)          # 正负差距
+    extreme = market_avg < -3.0                # 大盘极端情绪日（模式⑤）
+    small_sample = n < 5                       # v1.19: N<5 置信度低，须降级措辞
+    miss_rate = (n - in_hot_count) / n if n else 1.0
+
+    if hit_rate <= 0.20:
+        if avg < -3.0:
+            if baseline_avg > 4.0:
+                mode, label = "②", "模式② 追高杀跌（系统性追高风险）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（破 -3%），"
+                        f"baseline 均值 {baseline_avg:+.2f}%（昨日强势股追高）—— "
+                        f"在大盘杀跌中被系统性绞杀")
+            else:
+                mode, label = "⑤", "模式⑤ 系统性崩盘（大盘系统性风险 + 题材错配）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%，"
+                        f"baseline 均值 {baseline_avg:+.2f}%（未达追高门槛）—— "
+                        f"主因是大盘系统性风险，非追高")
+        else:
+            mode, label = "①", "模式① 风格切换 / 边缘归因"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                    f"Alpha {alpha:+.2f}pp（中性区间）—— 主因偏题材错配")
+    elif hit_rate <= 0.40:
+        if avg < -3.0 and baseline_avg > 4.0:
+            # ★ v1.32 新模式 ⑩-h
+            mode, label = "⑩-h", "模式⑩-h 极端情绪日 + 昨日+5%追高 + 全天单边杀跌"
+            mech = ("杀跌全天发生、盘中已同步（14:45→15:00 无 ≥3.5pp 尾盘跳水）"
+                    if not tail_dive else "尾盘再度跳水")
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（破 -3%），"
+                    f"baseline 全部为昨日 +4% 以上强势股（均值 {baseline_avg:+.2f}%），"
+                    f"{neg_cont}/{n} 负延续、Δ 均值 {avg - baseline_avg:+.2f}pp；"
+                    f"{mech} —— 主因是**昨日强势股追高**在大盘极端情绪日被反向兑现")
+        elif -3.0 < avg <= -2.0 and baseline_avg >= 5.0:
+            mode, label = "⑦", "模式⑦ 昨日+6%追高 + 大盘平稳转急跌"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%，"
+                    f"baseline 均值 {baseline_avg:+.2f}%（昨日+5~+7% 强势股）—— "
+                    f"追高 + 大盘急跌双层绞杀")
+        elif -2.0 <= avg <= -1.0 and baseline_avg >= 4.0 and gap >= 10.0:
+            mode, label = "⑧", "模式⑧ 昨日+5%追高 + 高Beta个股分化 + 题材错配"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                    f"正负差距 {gap:.2f}pp（高Beta分化）、baseline 均值 {baseline_avg:+.2f}%"
+                    f"（昨日+5% 强势股）—— 内部分化 + 追高延续性失败")
+        else:
+            mode, label = "①/⑥", "模式①/⑥ 风格切换或高Beta+题材错配混合"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                    f"Alpha {alpha:+.2f}pp、正负差距 {gap:.2f}pp")
+    elif hit_rate <= 0.60:
+        if alpha <= -1.0:
+            mode, label = "⑥", "模式⑥ 高Beta个股分化 + 题材错配混合"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                    f"Alpha {alpha:+.2f}pp（显著负）、正负差距 {gap:.2f}pp —— "
+                    f"高Beta分化 + 题材错配双层")
+        else:
+            mode, label = "①", "模式① 风格切换（题材错配）"
+            attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp（中性）—— "
+                    f"主因是题材错配")
+    else:
+        if alpha > 0.5:
+            mode, label = "④-a", "模式④-a 健康中等命中（跑赢大盘）"
+            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                    f"Alpha {alpha:+.2f}pp —— 策略有效，个别标的题材错配")
+        elif alpha >= 0.0:
+            mode, label = "④-b", "模式④-b 边缘中等命中（大盘托底但延续性差）"
+            attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp（边缘），"
+                    f"{neg_cont}/{n} 负延续 —— 表面命中实为大盘托底")
+        else:
+            mode, label = "③", "模式③ 高Beta个股分化（个股选择问题）"
+            attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp、"
+                    f"正负差距 {gap:.2f}pp —— 主因是个股选择而非系统性")
+
+    # 题材错配度（候选池命中今日强势股/涨停池的只数）
+    if in_hot_count == 0 and n:
+        attr += ("；**题材完全错配** —— 候选池无一只进入今日强势股/涨停池"
+                 f"（{hot_count} 只），所选标的未参与当日主线")
+    elif n:
+        attr += (f"；候选池 {in_hot_count}/{n} 只进入今日强势股/涨停池"
+                 f"（主线命中率 {in_hot_count / n * 100:.0f}%）")
+
+    if extreme:
+        attr += f"。**大盘层**：模式⑤ 极端情绪日（四大核心均值 {market_avg:+.2f}%）"
+    if small_sample:
+        attr += (f"。⚠️ **样本仅 {n} 只（<5），本次命中率评估置信度低，"
+                 f"结论按近似模式处理**")
+    return mode, label, attr
 
 
 def eval_index(pct):
@@ -524,10 +945,15 @@ def generate_full_report(date_str):
     hot = enrich_with_quote(hot)
 
     print(f"[3/5] 拉候选池…")
-    top10, pool_source, pool_note = resolve_candidate_pool(date_str)
-    print(f"      Top10 {len(top10)} 只（来源: {pool_source}）")
+    top10, pool_source, pool_note, pool_semantics = resolve_candidate_pool(date_str)
+    print(f"      Top10 {len(top10)} 只（来源: {pool_source}；口径: {pool_semantics}）")
     if pool_note:
         print(f"      {pool_note}")
+    if pool_semantics != "prev_close" and top10:
+        pool_note = (pool_note + " " if pool_note else "") + (
+            "⚠️ 候选池 '涨跌幅' 列口径未确认为昨收口径，"
+            "延续性 Δ 仅供参考"
+        )
 
     print(f"[4/5] 计算题材热度对比…")
     comparison_date, hot_yest = previous_nonempty_hot_day(date_str)
@@ -564,11 +990,38 @@ def generate_full_report(date_str):
         delta = actual - baseline
         hit_rows.append((code, name, baseline, actual, delta))
 
+    # ⚠️ v1.31: 当日盘前池为空（冰点守卫短路）时，退化为 T+1 闭环复核 ——
+    # 用**上一交易日**的盘前池在**今日收盘**的真实表现评估策略有效性。
+    # 否则"候选池命中率"整段 N/A，战报失去与盘前情报的闭环。
+    t1 = {}
+    if not hit_rows:
+        prev_rows, prev_date, prev_source = resolve_previous_pool(date_str)
+        if prev_rows:
+            t1 = evaluate_t1_pool(prev_rows, prev_date, indices)
+            print(f"      T+1 闭环: {prev_date} 盘前池 {len(prev_rows)} 只 → 今日收盘 "
+                  f"命中 {t1.get('hits', 0)}/{t1.get('n', 0)}，"
+                  f"均值 {t1.get('avg', 0):+.2f}% vs 上证超额 {t1.get('alpha_sh', 0):+.2f}pp")
+        else:
+            print("      ⚠️ 无上一交易日盘前池，T+1 闭环复核不可用")
+
     positives = [r for r in hit_rows if r[3] > 0]
     negatives = [r for r in hit_rows if r[3] <= 0]
     avg = sum(r[3] for r in hit_rows) / max(len(hit_rows), 1)
     avg_pos = sum(r[3] for r in positives) / max(len(positives), 1) if positives else 0
     avg_neg = sum(r[3] for r in negatives) / max(len(negatives), 1) if negatives else 0
+
+    # ⚠️ 2026-10-29（v1.32）候选池**偏差归因**输入: 候选池与今日主线（同花顺
+    # 强势股/涨停池）的重合度。此前战报只有数字（命中率/均值/超额），没有
+    # "为什么"——skill 交付物 #2 明确要求"命中率 vs 预期 + **偏差归因**"。
+    hot_code_set = {h.get("code", "") for h in hot}
+    in_hot_count = sum(1 for c in top10_codes if c in hot_code_set)
+    # 候选池行业暴露（偏差归因用，东财 f127；失败时静默降级为空 dict）
+    pool_industries = {}
+    try:
+        from data_sources import industry_for_codes as _ifc
+        pool_industries = _ifc(top10_codes) or {}
+    except Exception:
+        pool_industries = {}
 
     sh_pct = indices.get("sh000001", {}).get("change_pct", 0)
     cyb_pct = indices.get("sz399006", {}).get("change_pct", 0)
@@ -627,12 +1080,28 @@ def generate_full_report(date_str):
     ]
     gap_md, has_gap, gap_rows, gap_source = realtime_gap_alert(indices, candidate_paths)
 
+    # ⚠️ v1.32 候选池偏差归因（需 gap_rows 判断是否有尾盘跳水）
+    tail_dive = bool(gap_rows) and min(r[3] for r in gap_rows) <= -3.5
+    core_pcts = [indices.get(k, {}).get("change_pct", 0)
+                 for k in ("sh000001", "sz399001", "sz399006", "sh000688")]
+    market_avg = sum(core_pcts) / len(core_pcts)
+    pool_mode, pool_label, pool_attr = classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, avg_pos, avg_neg,
+        sh_pct, market_avg,
+        tail_dive=tail_dive, in_hot_count=in_hot_count, hot_count=len(hot),
+    )
+    if pool_mode:
+        print(f"      候选池归因: {pool_mode} {pool_label}")
+        print(f"      主线重合: {in_hot_count}/{len(hit_rows)} 进入今日强势股池")
+
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                               positives, negatives, avg, avg_pos, avg_neg,
                               sh_pct, cyb_pct, kc50_pct, selected, len(hot),
                               gap_md, gap_rows, comparison_date, industry, dragon,
-                              pool_note=pool_note)
+                              pool_note=pool_note, gap_source=gap_source, t1=t1,
+                              pool_mode=pool_mode, pool_label=pool_label,
+                              pool_attr=pool_attr, pool_industries=pool_industries)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
@@ -724,7 +1193,9 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    positives, negatives, avg, avg_pos, avg_neg,
                    sh_pct, cyb_pct, kc50_pct, selected, hot_count,
                    gap_md="", gap_rows=None, comparison_date=None,
-                   industry=None, dragon=None, pool_note=""):
+                   industry=None, dragon=None, pool_note="",
+                   gap_source=None, t1=None, pool_mode=None, pool_label=None,
+                   pool_attr=None, pool_industries=None):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     md = (f"📊 **盘后战报｜生成时间 {now} CST｜"
           f"目标交易日 {date_str} 15:00 收盘**\n\n")
@@ -740,12 +1211,28 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         bottom_text = " / ".join(
             f"{row['name']} {row['change_pct']:+.2f}%" for row in industry["bottom"][:5]
         )
-        md += f"📈 **东财行业涨幅 Top5：** {top_text}\n"
-        md += f"📉 **东财行业跌幅 Bottom5：** {bottom_text}\n"
-        md += (f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('universe', 0)} "
-               f"个行业板块（m:90+t:2 全量）。\n")
-        if "push2delay" in industry.get("source", ""):
+        # ⚠️ 2026-10-27 修复（来源标注缺陷）: 东财双域断连时降级到同花顺行业板块，
+        # 旧代码硬编码"东财行业"标签 → 数据来自 THS 却标"东财"，来源标注失实。
+        ind_source = industry.get("source", "")
+        if ind_source == "ths":
+            ind_label = "同花顺行业"
+        elif "push2" in ind_source:
+            ind_label = "东财行业"
+        else:
+            ind_label = "行业"
+        md += f"📈 **{ind_label}涨幅 Top5：** {top_text}\n"
+        md += f"📉 **{ind_label}跌幅 Bottom5：** {bottom_text}\n"
+        if ind_source == "ths":
+            md += (f"> 口径：东财行业板块不可用（{industry.get('error', '原因未知')}），"
+                   f"已降级同花顺行业板块（{industry.get('returned', 0)}/"
+                   f"{industry.get('universe', 0)} 个）。\n")
+        else:
+            md += (f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('universe', 0)} "
+                   f"个行业板块（m:90+t:2 全量）。\n")
+        if "push2delay" in ind_source:
             md += "> 数据源降级：东财 push2 主域断连，已切换官方 push2delay 域。\n\n"
+        else:
+            md += "\n"
     else:
         md += f"> ⚠️ 东财行业板块不可用：{industry.get('error', '无数据')}；以下用同花顺强势股题材聚合作为 fallback。\n\n"
     md += "🔥 **今日最强题材（热度排行 Top10）：**\n"
@@ -764,7 +1251,9 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                for k in ("sh000001", "sz399001", "sz399006", "sz399005", "sz399300")]
     other_5_avg = sum(other_5) / len(other_5)
     market_feature = classify_market_feature(
-        market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows or [], other_5_avg
+        market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows or [], other_5_avg,
+        other_idx_pcts=[indices.get(k, {}).get("change_pct", 0)
+                        for k in ("sh000001", "sz399001", "sz399005", "sz399300")],
     )
     md += f"\n⚠️ **市场特征：** {market_feature}（根据 {hot_count} 只强势股判断）\n"
     md += f"- 四大核心指数平均 {market_avg:+.2f}%｜上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
@@ -779,13 +1268,21 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"- {name_map[k]} {cur:.2f} ({v.get('change_pct', 0):+.2f}%)\n"
 
     md += "\n━━━ **候选池命中率** ━━━\n\n"
-    md += "> 注：报告 08:03 生成，'baseline' 实为昨日(昨-1)收盘涨跌幅\n\n"
+    if hit_rows:
+        md += "> 注：报告 08:03 生成，'baseline' 实为昨日(昨-1)收盘涨跌幅\n\n"
     if pool_note:
         md += f"> {pool_note}\n\n"
     md += "| 代码 | 名称 | baseline | 今日实际 | Δ | 评估 |\n"
     md += "|:----:|:----:|:------:|:------:|:----:|:----:|\n"
     if not hit_rows:
-        md += "| ⚠️ | 上游报告缺失 | N/A | N/A | N/A | 无候选池评估 |\n"
+        # ⚠️ v1.31: 区分「上游冰点守卫主动 0 推荐（设计行为）」与「上游报告缺失（故障）」。
+        # 两者对用户的含义完全不同：前者是策略主动空仓（不是系统坏了），
+        # 后者才是链路故障。旧代码一律写"上游报告缺失"，会把"策略正确地空仓"
+        # 误报成"数据丢了"，误导用户排查。
+        if pool_note and ("Top10 为空" in pool_note or "空表" in pool_note):
+            md += "| ⚠️ | 上游冰点守卫短路（0 推荐·设计行为） | N/A | N/A | N/A | 无候选池评估 |\n"
+        else:
+            md += "| ⚠️ | 上游报告缺失 | N/A | N/A | N/A | 无候选池评估 |\n"
     for code, name, baseline, actual, delta in hit_rows:
         if delta >= 3:
             ev = "✅ 强势延续"
@@ -811,9 +1308,58 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"- baseline均值：{baseline_avg:+.2f}% | {continuation_negative}/{len(hit_rows)} 负延续 | Δ均值：{avg - baseline_avg:+.2f}pp\n"
         md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{avg - sh_pct:+.2f}pp**\n"
         md += f"- vs 四大核心指数均值 {market_avg:+.2f}% 超额：**{avg - market_avg:+.2f}pp**\n"
+        # ⚠️ v1.32 候选池偏差归因（skill 交付物 #2: 命中率 vs 预期 + 偏差归因）
+        if pool_mode:
+            md += f"\n🔍 **偏差归因：{pool_mode} {pool_label}**\n"
+            if pool_attr:
+                md += f"- {pool_attr}\n"
+            if pool_industries:
+                ind_summary = " / ".join(
+                    f"{code}·{pool_industries[code]}" for code in
+                    [r[0] for r in hit_rows if r[0] in pool_industries][:6]
+                )
+                if ind_summary:
+                    md += f"- 行业暴露：{ind_summary}\n"
     else:
         md += "\n⚠️ **候选池评估：** 上游选股报告 Top10 为空，本次无候选池命中率评估\n"
         md += f"- 大盘参考：上证 {sh_pct:+.2f}%；候选池超额：**N/A**\n"
+        # ⚠️ v1.31: 当日池为空时用 T+1 闭环补上"策略到底行不行"的答案。
+        # 没有这一段，战报只剩"没数据"，用户拿不到任何策略有效性信息。
+        if t1 and t1.get("rows"):
+            prev_date = t1.get("prev_date")
+            md += (f"\n📈 **T+1 闭环复核（{prev_date} 盘前池 → {date_str} 收盘）：**\n\n")
+            md += "> 口径：上一交易日盘前候选池（昨收口径 baseline）在**今日收盘**的真实表现，\n"
+            md += f"> 非当日自指比较；今日上证 {sh_pct:+.2f}%\n\n"
+            md += "| 代码 | 名称 | baseline(昨收) | 今日实际 | Δ | 评估 |\n"
+            md += "|:----:|:----:|:------:|:------:|:----:|:----:|\n"
+            for code, name, baseline, actual, delta in t1["rows"]:
+                if delta >= 3:
+                    ev = "✅ 强势延续"
+                elif delta >= 0:
+                    ev = "✅ 延续"
+                elif delta >= -3:
+                    ev = "⚠️ 高位震荡"
+                else:
+                    ev = "❌ 高位回吐"
+                md += f"| {code} | {name} | {baseline:+.2f}% | {actual:+.2f}% | {delta:+.2f}% | {ev} |\n"
+            hit_prefix = "⚠️ " if t1["n"] < 7 else ""
+            md += (f"\n{hit_prefix}📊 **T+1 命中率：** {t1['hits']}/{t1['n']} = "
+                   f"{t1['hit_rate']:.1f}%\n")
+            md += (f"- 今日实际均值：{t1['avg']:+.2f}% | "
+                   f"baseline均值：{t1['avg_baseline']:+.2f}% | "
+                   f"{t1['neg_continuation']}/{t1['n']} 负延续\n")
+            md += f"- vs 上证 {sh_pct:+.2f}% 超额：**{t1['alpha_sh']:+.2f}pp**\n"
+            best, worst = t1.get("best"), t1.get("worst")
+            if best and worst:
+                # ⚠️ best/worst 按 **Δ**（延续性）排序，不是按绝对涨跌。
+                # 旧写法只打印今日涨跌幅，会出现"最大回吐：+0.45%"这种自相矛盾
+                # 的标签（实际是最差 Δ 但当日仍上涨）。两个数都要给。
+                md += (f"- 最强延续：{best[1]}({best[0]}) 今日 {best[3]:+.2f}%"
+                       f"（Δ {best[4]:+.2f}pp）；"
+                       f"最弱延续：{worst[1]}({worst[0]}) 今日 {worst[3]:+.2f}%"
+                       f"（Δ {worst[4]:+.2f}pp）\n")
+            md += (f"> ⚠️ 样本为**上一交易日**盘前池（{prev_date}），"
+                   f"用于回答「策略选股 T+1 是否有效」，**不代表今日新推荐**。\n")
 
     md += "\n━━━ **新晋异动 Top5** ━━━\n\n"
     dragon = dragon or {}
@@ -876,6 +1422,20 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 今日热度回落（对比 {comparison_date or '上期'}），"
                f"延续条件：龙头不跌停、成交不萎缩50%；杀跌中的半导体/元件等成长板块先看企稳再接\n")
         md += "3️⃣ **防御/仓位：** 候选池今日 +1.01pp 超额但 9/10 负延续，追高资金退潮期优先低位补涨方向，不追昨日+4%强势股\n"
+    elif cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0:
+        # ⚠️ 2026-10-28 新增（v1.31）: 成长领涨型（主板滞涨 + 成长集体走强）
+        # 建议方向必须与"成长强、主板弱"的资金流向一致 —— 旧的"央企/红利对冲"
+        # 在这种日子里恰好买在今日最弱的板块（当日白酒/证券/银行/保险全跌）。
+        md += (f"1️⃣ **大盘性质：** 📈 成长领涨型（结构性走强）—— 创业板 {cyb_pct:+.2f}% / "
+               f"科创50 {kc50_pct:+.2f}% 明显强于上证 {sh_pct:+.2f}%，"
+               f"四大核心指数均值 {market_avg:+.2f}%；属成长主导的**结构性**上涨，"
+               f"非普涨，明日看点是成长能否延续、主板能否补涨\n")
+        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、"
+               f"成交不萎缩50%；今日涨幅榜集中在半导体/自动化设备/电子化学品等成长方向，"
+               f"明日若成长高开回落而主板补涨，说明是单日资金切换而非趋势\n")
+        md += ("3️⃣ **防御方向：** ⚠️ 今日白酒/证券/银行/保险等红利防御板块**全线下跌**，"
+               "「央企/红利对冲」在成长领涨日恰好买在弱势侧 —— 明日防御应转向"
+               "**跟随主线的高景气分支**（半导体/设备/材料），红利仅作低位观察而非对冲盘\n")
     else:
         md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
@@ -884,6 +1444,20 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         # 外发正文只保留数据源文件名，不泄露本机绝对路径。
         gap_md = re.sub(r"(?<=数据源：)(?:/[^\s（]+/)+", "", gap_md)
         md += gap_md
+    elif gap_rows:
+        # ⚠️ 2026-10-27 修复（时点差静默缺失缺陷）: 未触发也必须显式披露
+        # （skill v1.13/v1.19 规范），否则"盘中报告缺失的静默降级"与
+        # "稳态日"在战报里不可区分。
+        src_name = (gap_source or "").rsplit("/", 1)[-1]
+        max_abs = max((abs(r[3]) for r in gap_rows), default=0.0)
+        src_warn = ("⚠️ 该源（尾盘选股.md）历史已连续确认失真，"
+                    "优先级应低于盘中报告，此处为兜底；"
+                    if src_name.endswith("尾盘选股.md") else "")
+        md += (f"\n> 时点差：数据源 {src_name}（{len(gap_rows)}/6 指数）{src_warn}"
+               f"最大 |Δ| {max_abs:.2f}pp < 2.0pp 阈值未触发，盘中信号与收盘方向一致。\n")
+    else:
+        md += ("\n> 时点差：⚠️ 无 14:45 盘中报告且尾盘选股.md 不可用，"
+               "无法对比盘中→收盘；以下全部按 15:00 收盘数据复盘。\n")
 
     # v2026-09-09 (Phase 12): 根因分析 + 次日调参摘要
     # 读 data/daily_root_cause.json + data/next_day_strategy.json, 拼成飞书卡片
@@ -1088,9 +1662,29 @@ def format_full_report(date_str, indices, themes, ct, cy, hit_rows,
 
 
 def send_feishu(md, dry=False):
+    """推送飞书。
+
+    ⚠️ 2026-10-28 新增（v1.31）: **cron 自动投递场景下默认跳过手动推送**。
+    本 cron 的最终回复会由 Hermes 自动投递到 origin chat
+    (oc_936c9bc353220399455da6c1a919eb62) —— 再手动 lark-cli 推一遍会造成
+    **重复消息**（2026-10-26 实际发生：手动 om_x100b62dbe4b... + cron
+    om_x100b62dbe20... 两条内容相同的战报）。
+
+    跳过条件（任一命中即跳过，不推送）：
+      - 环境变量 HERMES_CRON_AUTO_DELIVERY=1（cron 环境由 Hermes 注入时推荐设置）
+      - 环境变量 AANA_SKIP_FEISHU=1
+    手动/交互场景（直接跑脚本、不在 cron 里）仍会正常推送。
+    用 --force-feishu 可强制推送（即使在自动投递环境）。
+    """
     if dry:
         print("=== DRY RUN: 飞书Markdown ===")
         print(md)
+        return
+    if os.environ.get("AANA_FORCE_FEISHU") == "1":
+        pass
+    elif (os.environ.get("HERMES_CRON_AUTO_DELIVERY") == "1"
+          or os.environ.get("AANA_SKIP_FEISHU") == "1"):
+        print("ℹ️ 跳过飞书手动推送（cron 自动投递环境，避免重复消息）")
         return
     try:
         from lark_push import push_markdown
@@ -1109,6 +1703,8 @@ def main():
     parser.add_argument("date", nargs="?", default=datetime.now().strftime("%Y-%m-%d"))
     parser.add_argument("--dry", action="store_true", help="只输出不推送")
     parser.add_argument("--no-feishu", action="store_true", help="不推送飞书")
+    parser.add_argument("--force-feishu", action="store_true",
+                        help="强制推送飞书（即使在 cron 自动投递环境）")
     args = parser.parse_args()
 
     print(f"=== A股盘后战报 {args.date} ===")
@@ -1124,6 +1720,8 @@ def main():
         f.write(full_md)
     print(f"✅ 报告已保存: {report_path}")
 
+    if args.force_feishu:
+        os.environ["AANA_FORCE_FEISHU"] = "1"
     if not args.no_feishu:
         send_feishu(feishu_md, dry=False)
 
