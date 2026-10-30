@@ -1,0 +1,98 @@
+{
+ "date": "2026-10-30",
+ "base_date": "2026-10-29",
+ "report": "/Users/cai/code/AAna/reports/2026-10-30-选股报告.md",
+ "report_size": 5460,
+ "report_mtime": "2026-10-30T08:03:25",
+ "generated": "08:35:11",
+ "sentiment_snap": {
+  "score": 20,
+  "label": "冰点",
+  "zt_count": 39,
+  "dt_count": 4,
+  "position": 0.1
+ },
+ "mk_avg": -2.3,
+ "pool_size": 0,
+ "guard_ice": true,
+ "guard_reason": "情绪=冰点/仓位=10%",
+ "guard_live": {
+  "score": 20,
+  "label": "冰点",
+  "is_ice_point": true
+ },
+ "overall_win_rate": 49.863760217983646,
+ "total_records": 367,
+ "sector_count": 88,
+ "yesterday_review": {
+  "base": "2026-10-28",
+  "verified_on": "2026-10-29",
+  "n_beat_mkt": 1,
+  "n_positive": 1,
+  "pool_avg_chg": -4.03,
+  "results": [
+   {
+    "code": "002242",
+    "name": "九阳股份",
+    "total": 30.4,
+    "rating": "减持",
+    "stop": 21.71,
+    "industry": "家电-小家电(厨房小家电双品牌)",
+    "sector_stat_key": "小家电",
+    "sector_win_rate": "100% (6/6)",
+    "close": 23.0,
+    "chg_pct": 2.77,
+    "quote_ts": "20261029161421",
+    "beat_mkt": true,
+    "stop_broken": false
+   },
+   {
+    "code": "000810",
+    "name": "创维数字",
+    "total": 70.4,
+    "rating": "增持",
+    "stop": 10.71,
+    "industry": "家电-其它视听器材(机顶盒/宽带终端/VR)",
+    "sector_stat_key": null,
+    "sector_win_rate": "无记录(冷启动)",
+    "close": 10.58,
+    "chg_pct": -4.17,
+    "quote_ts": "20261029161439",
+    "beat_mkt": false,
+    "stop_broken": true
+   },
+   {
+    "code": "603683",
+    "name": "晶华新材",
+    "total": 65.6,
+    "rating": "增持",
+    "stop": 17.56,
+    "industry": "化学-其他化学制品(功能性胶粘材料/电子胶带)",
+    "sector_stat_key": "其他化学制品",
+    "sector_win_rate": "50% (1/2)",
+    "close": 16.85,
+    "chg_pct": -6.91,
+    "quote_ts": "20261029161451",
+    "beat_mkt": false,
+    "stop_broken": true
+   },
+   {
+    "code": "001233",
+    "name": "海安集团",
+    "total": 59.7,
+    "rating": "中性",
+    "stop": 59.15,
+    "industry": "汽车-轮胎",
+    "sector_stat_key": null,
+    "sector_win_rate": "无记录(冷启动)",
+    "close": 56.22,
+    "chg_pct": -7.81,
+    "quote_ts": "20261029161500",
+    "beat_mkt": false,
+    "stop_broken": true
+   }
+  ]
+ },
+ "recommend": null,
+ "eastmoney": "skipped: 0 推荐 (冰点守卫短路, 不创建 20261030ZZ; 20261029ZZ gid=1811 保留)"
+}
