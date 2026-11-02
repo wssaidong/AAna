@@ -742,7 +742,21 @@ def _sina_industry_concept(code: str) -> tuple:
         if not tds:
             continue
         if tds[0] == "所属行业板块" and industry is None:
-            industry = tds[1] if len(tds) > 1 else None
+            # v2026-11-02 修复 (P1): sina 行业名单元格为空时, 表尾那句
+            # "备注：此为申万行业分类" 会被顶到 tds[1]。
+            #   根因: 正则 <td[^>]*>([^<]+)</td> 要求 1+ 个非 '<' 字符,
+            #   所以空的 <td class="ct" align="center"></td> 被整格跳过 →
+            #   tds = ['所属行业板块', '备注：此为申万行业分类'] → industry 取到备注。
+            #   实测 16 只股票受影响 (state/industry_cache.json 已污染)。
+            # 影响: 该值写进 rec_feedback.csv / recommendations.csv 的 sector 列 →
+            #   rec_tuning.sector_stats 里凭空多一个垃圾板块 key (count=4) →
+            #   _cn_sector_to_enum 匹配不到 → 该股逃过所有板块黑名单。
+            # 修法: 行业名只取第一个非空且非 "备注" 开头的单元格; 取不到 → None,
+            #   继续走 4 级降级链 (akshare 兜底)。与下面的 concept 分支同一套过滤规则。
+            for cand in tds[1:]:
+                if cand and not cand.startswith("备注"):
+                    industry = cand
+                    break
         elif tds[0] == "所属概念板块":
             for c in tds[1:]:
                 if c and c != "点击查看" and not c.startswith("备注"):
