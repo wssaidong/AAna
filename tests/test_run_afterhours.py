@@ -502,3 +502,231 @@ def test_pool_failure_mode_10h_classified():
     assert "模式⑤" in attr, attr
     # 样本 N=4 < 5 → 必须降级标注
     assert "置信度低" in attr, attr
+
+
+# ── v1.33（2026-11-02 实战）: 盘前池空表未被 git 提交 → 虚假 100% 命中率 ──────
+
+_EMPTY_DEEP_ANALYSIS = """# 深度分析 — 2026-11-02 (周一交易日盘前 · 冰点快照延续 · 0 推荐 · 空仓观望)
+
+## 一、报告确认
+
+| 项 | 值 |
+|---|---|
+| 采用报告 | **reports/2026-11-02-选股报告.md** (5464 字节, 2026-11-02T08:03:31 盘前版) |
+| 采用报告 Top10 表 | ⛔ **0 只 (空表)** — 解析器正确排除 |
+| 候选池 | **空 (0 只)** — 无标的可评分 |
+| 链路状态 | is_ice_point=True 短路, 情绪 20 冰点 / 仓位 10% / 停止交易 |
+
+## 二、候选池: 0 只 — 盘前报告空表 + 冰点守卫延续 (单一真源判定)
+
+- P0 冰点守卫 (`check_ice_point_guard`): 情绪 20(冰点) · 仓位 10% · **is_ice_point=True**,
+  短路原因 "情绪=冰点/仓位=10%"。
+- 11-02 盘前报告 Top10 空表 = 冰点守卫短路设计行为。
+
+## 三、逐股基本面
+
+N/A — 候选池 0 只。
+"""
+
+_POPULATED_DEEP_ANALYSIS = """# 深度分析 — 2026-10-29 (周四交易日盘前 · 候选池 4 只)
+
+## 一、报告确认
+
+| 项 | 值 |
+|---|---|
+| 候选池 | **4 只** — 晶华新材 603683 / 九阳股份 002242 / 创维数字 000810 / 海安集团 001233 |
+
+## 二、市场环境与守卫
+
+盘前情绪偏暖, 冰点守卫未触发。
+"""
+
+
+def test_empty_pool_detected_from_deep_analysis_when_premarket_never_committed(
+    monkeypatch, tmp_path
+):
+    """盘前版**从未入库 git**时，深度分析的空池声明是真源。
+
+    2026-11-02 生产 bug：08:03 盘前版选股报告从未被 git 提交（git log 只有
+    09:38 开盘后重跑版那条），于是 v1.31 的三源回捞全部落空：
+      工作区=intraday 口径拒绝 / git HEAD=intraday 口径拒绝 /
+      git 历史无 prev_close 版本 / 深度分析候选池**表**是空表解析 0 行
+    结果回落到兜底分支，把 09:38 的 6 只当"盘前池"评估，战报输出虚假的
+    「命中率 6/6 = 100.0% / vs 上证超额 +4.08pp」。
+    """
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    # 工作区 = 09:38 开盘后重跑版（intraday 口径，6 只）
+    (tmp_path / "2026-11-02-选股报告.md").write_text(
+        "# A股选股报告 — 2026-11-02 v2.5\n\n"
+        "> **生成时间：** 2026-11-02 09:38:23\n\n"
+        "### 🏆 重点关注 Top 10\n\n"
+        "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 |\n"
+        "|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|\n"
+        "| 1 | 📊襄阳轴承 | 000678 | ¥18.48 | 🔴 +2.21% | 78 | **64** |\n"
+        "| 2 | 📊润建股份 | 002929 | ¥50.77 | 🔴 +2.40% | 78 | **64** |\n"
+        "| 3 | 📊云南白药 | 000538 | ¥54.44 | 🔴 +1.36% | 78 | **64** |\n"
+        "| 4 | 📊完美世界 | 002624 | ¥10.04 | 🔴 +1.31% | 78 | **64** |\n"
+        "| 5 | 📊三一重工 | 600031 | ¥17.95 | 🔴 +1.07% | 68 | **60** |\n"
+        "| 6 | 📊中创智领 | 601717 | ¥14.77 | 🔴 +1.86% | 68 | **60** |\n",
+        encoding="utf-8",
+    )
+    # 深度分析（盘前时段生成）声明空池
+    (tmp_path / "2026-11-02-深度分析.md").write_text(
+        _EMPTY_DEEP_ANALYSIS, encoding="utf-8"
+    )
+    # git 历史无盘前版本（盘前版从未入库）
+    monkeypatch.setattr(
+        run_afterhours, "_git_history_premarket_top10", lambda d: ([], None, False)
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_git_head_top10_with_semantics",
+        lambda d: ([("000678", "襄阳轴承", 2.21)], "intraday"),
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_parse_top10_from_deep_analysis", lambda d: []
+    )
+
+    rows, source, note, sem = run_afterhours.resolve_candidate_pool("2026-11-02")
+
+    assert rows == [], f"空盘前池不应回落到开盘后重跑版: {rows}"
+    assert "空池" in source, source
+    assert "设计行为" in note, note
+    assert "冰点守卫" in note, note
+    assert sem == "prev_close"
+
+
+def test_populated_deep_analysis_is_not_mistaken_for_empty_pool(monkeypatch, tmp_path):
+    """有池的日子（10-29，4 只）不能被误判为空池。"""
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    (tmp_path / "2026-10-29-深度分析.md").write_text(
+        _POPULATED_DEEP_ANALYSIS, encoding="utf-8"
+    )
+    is_empty, evidence = run_afterhours.detect_empty_premarket_pool_from_deep_analysis(
+        "2026-10-29"
+    )
+    assert is_empty is False, evidence
+
+
+def test_empty_pool_renders_design_behavior_not_fault():
+    """空池标注必须是"冰点守卫·设计行为"，不能写成"上游报告缺失"。"""
+    md = run_afterhours.format_feishu(
+        "2026-11-02", _minimal_indices(), [], {}, {}, [], [], [],
+        0, 0, 0, 1.08, 1.87, 3.11, [], 131,
+        pool_note=(
+            "⚠️ 深度分析报告（盘前时段生成）确认 2026-11-02 盘前候选池为空"
+            "（冰点守卫短路，**设计行为而非数据故障**）"
+        ),
+    )
+    assert "上游冰点守卫短路（0 推荐·设计行为）" in md
+    assert "上游报告缺失" not in md
+    assert "无候选池命中率评估" in md
+    # 关键: 不得出现虚假的高命中率
+    assert "100.0%" not in md
+
+
+# ── v1.33: 成长领涨价差口径（v1.31 窄口径漏判） ──────────────────────────
+
+def test_growth_lead_detected_by_spread_not_only_absolute_thresholds():
+    """2026-11-02 实战: 科创50 +3.11% 领先上证 +1.08% 达 2.03pp。
+
+    v1.31 窄口径 (cyb>=2.0 and kc50>=1.5 and sh<1.0) 不命中
+    （创业板 +1.87% < 2.0，上证 +1.08% ≥ 1.0），战报误标"震荡"并给出
+    "央企/红利股对冲"建议，而当日红利防御全线下跌 —— 方向完全相反。
+    """
+    feature = run_afterhours.classify_market_feature(
+        1.92, 1.08, 1.87, 3.11, [], other_5_avg=1.33
+    )
+    assert "成长领涨型" in feature, feature
+
+
+def test_growth_lead_spread_does_not_fire_on_broad_rally():
+    """普涨日（科创50 与上证同步涨）不应被误判为成长领涨。"""
+    feature = run_afterhours.classify_market_feature(
+        2.00, 2.10, 2.30, 2.00, [], other_5_avg=2.00
+    )
+    assert "成长领涨型" not in feature, feature
+
+
+def test_growth_lead_spread_does_not_fire_on_weak_market():
+    """全市场下跌中的科创50相对抗跌，不是"结构性走强"。"""
+    feature = run_afterhours.classify_market_feature(
+        -1.50, -0.20, -1.00, 0.30, [], other_5_avg=-0.80
+    )
+    assert "成长领涨型" not in feature, feature
+
+
+def test_growth_lead_advice_uses_real_industry_data_not_hardcoded_sectors():
+    """成长领涨日的建议必须引用**当日真实**板块，不得写死其他日期的板块名。"""
+    industry = {
+        "top": [
+            {"name": "影视院线", "change_pct": 9.36},
+            {"name": "游戏", "change_pct": 8.91},
+            {"name": "文化传媒", "change_pct": 8.31},
+        ],
+        "bottom": [
+            {"name": "贵金属", "change_pct": -1.45},
+            {"name": "银行", "change_pct": -0.83},
+            {"name": "煤炭开采加工", "change_pct": -0.35},
+        ],
+    }
+    md = run_afterhours.format_feishu(
+        "2026-11-02", _minimal_indices(), ["三季报增长"], {"三季报增长": 22}, {},
+        [], [], [], 0, 0, 0, 1.08, 1.87, 3.11, [], 131,
+        industry=industry,
+    )
+    assert "影视院线" in md, md
+    assert "贵金属" in md, md
+    # 旧代码写死的 10-28 板块名不应出现在 11-02 的战报里
+    assert "电子化学品" not in md, md
+
+
+def test_gap_source_warning_trusts_same_day_intraday_snapshot(tmp_path):
+    """同日 14:4x 生成的尾盘报告是可信盘中快照，不该挂"历史失真"警示。
+
+    2026-11-02 实战: 旧代码按**文件名**一刀切警告"该源历史已连续确认失真"，
+    但当日文件生成于 14:46:55（真实盘中快照，Δ 仅 0.19pp），误伤可信数据源。
+    """
+    src = tmp_path / "2026-11-02-尾盘选股.md"
+    src.write_text(
+        "# A股尾盘选股建议 — 2026-11-02 14:46\n\n"
+        "> **生成时间：** 2026-11-02 14:46:55\n\n"
+        "| 上证指数 | 🔴 +0.89% | 上涨 |\n",
+        encoding="utf-8",
+    )
+    warn = run_afterhours._gap_source_warning(str(src), "2026-11-02")
+    assert "历史已连续确认失真" not in warn, warn
+    assert "真实盘中快照" in warn, warn
+
+
+def test_gap_source_warning_flags_stale_or_undated_source(tmp_path):
+    """非目标交易日 / 无生成时间字段的源必须保留失真警示。"""
+    stale = tmp_path / "stale-尾盘选股.md"
+    stale.write_text(
+        "> **生成时间：** 2026-07-02 08:03:10\n\n| 上证指数 | 🔴 +1.18% | 上涨 |\n",
+        encoding="utf-8",
+    )
+    warn = run_afterhours._gap_source_warning(str(stale), "2026-11-02")
+    assert "疑为陈旧快照" in warn, warn
+
+    undated = tmp_path / "undated-尾盘选股.md"
+    undated.write_text("| 上证指数 | 🔴 +1.18% | 上涨 |\n", encoding="utf-8")
+    warn2 = run_afterhours._gap_source_warning(str(undated), "2026-11-02")
+    assert "历史已连续确认失真" in warn2, warn2
+
+
+def test_dragon_tiger_note_distinguishes_trading_day_from_non_trading(monkeypatch):
+    """交易日但龙虎榜未发布，不能写成"非交易日"（事实性错误）。"""
+    monkeypatch.setattr(run_afterhours, "ths_hot", lambda d: [{"code": "000001"}])
+
+    def _fake_ds(trade_date=None, **kw):
+        return {"date": trade_date, "total_records": 0, "stocks": [],
+                "note": "无数据（非交易日或盘后未更新）"}
+
+    monkeypatch.setattr(run_afterhours.ds, "daily_dragon_tiger", _fake_ds)
+    res = run_afterhours.get_daily_dragon_tiger("2026-11-02")
+    assert "非交易日" not in res["note"], res["note"]
+    assert "尚未发布" in res["note"], res["note"]
+
+    monkeypatch.setattr(run_afterhours, "ths_hot", lambda d: [])
+    res2 = run_afterhours.get_daily_dragon_tiger("2026-11-02")
+    assert "非交易日" in res2["note"], res2["note"]

@@ -243,6 +243,14 @@ def get_daily_dragon_tiger(date_str):
 
     ds.daily_dragon_tiger 返回 {date, total_records, stocks, [note]}
     本函数适配为 {rows, source} 接口约定,以便下游消费方拿到统一格式。
+
+    ⚠️ 2026-11-02 实战（v1.33）: ds 层在拿不到数据时统一返回
+    "无数据（非交易日或盘后未更新）" —— 但**今日是交易日**，真实原因是
+    东财龙虎榜在**收盘后尚未发布**（通常盘后 17:00 前后才出当日榜）。
+    战报若照抄这句话，用户会以为"今天不是交易日"，是**事实性错误**。
+    故本层用同花顺强势股数据判定当日是否交易日，据实区分:
+      - 非交易日 → "当日非交易日（无龙虎榜）"
+      - 交易日但无榜 → "东财龙虎榜当日尚未发布（通常盘后 17:00 前后更新）"
     """
     raw = ds.daily_dragon_tiger(trade_date=date_str)
     if isinstance(raw, dict):
@@ -250,14 +258,31 @@ def get_daily_dragon_tiger(date_str):
         if "rows" in raw:
             return raw
         if "stocks" in raw:
+            stocks = raw.get("stocks", [])
+            note = raw.get("note", "")
+            if not stocks:
+                note = _dragon_tiger_absence_note(date_str, note)
             return {
-                "rows": raw.get("stocks", []),
+                "rows": stocks,
                 "date": raw.get("date", date_str),
                 "total_records": raw.get("total_records", 0),
                 "source": "scripts.data_sources.daily_dragon_tiger",
-                "note": raw.get("note", ""),
+                "note": note,
             }
     return {"rows": [], "note": "scripts.data_sources.daily_dragon_tiger 未返回 rows", "date": date_str}
+
+
+def _dragon_tiger_absence_note(date_str, fallback_note=""):
+    """龙虎榜缺失原因 —— 区分"非交易日"与"交易日但尚未发布"。"""
+    try:
+        is_trading = bool(ths_hot(date_str))
+    except Exception:
+        is_trading = None
+    if is_trading is True:
+        return "东财龙虎榜当日尚未发布（通常盘后 17:00 前后更新），已降级同花顺涨停股池"
+    if is_trading is False:
+        return "当日非交易日（无龙虎榜），已降级同花顺涨停股池"
+    return fallback_note or "龙虎榜无数据，已降级同花顺涨停股池"
 
 
 def _yesterday(date_str):
@@ -619,6 +644,26 @@ def resolve_candidate_pool(date_str):
         notes.append("已从深度分析报告的候选池表格回捞")
         return rows, "深度分析报告候选池表", "".join(notes), "prev_close"
 
+    # 4.5) ⚠️ 2026-11-02 实战（v1.33 新增）: 深度分析报告是**盘前候选池是否为空
+    #      （冰点守卫·设计行为）**的单一真源。当日 08:03 盘前版选股报告**从未
+    #      被 git 提交**（只有 09:38 开盘后重跑版入库），于是 v1.31 的三源回捞
+    #      全部落空:
+    #        1) 工作区 = 09:38 重跑版（intraday 口径）→ 口径不符，拒绝
+    #        2) git HEAD = 同一份 09:38 重跑版（intraday 口径）→ 口径不符，拒绝
+    #        3) git 历史 = 只有 intraday 那一次提交 → found_prev_close=False
+    #        4) 深度分析候选池**表** = 空表（只有文字说明，无表格行）→ 解析 0 行
+    #      结果回落到兜底分支，把 09:38 的 6 只当"盘前池"评估 → 战报输出
+    #      **虚假的「命中率 6/6 = 100.0% / vs 上证超额 +4.08pp」**。
+    #      而 08:34 提交的深度分析报告明确记载: 盘前 Top10 空表 + 冰点守卫短路，
+    #      候选池 0 只（**设计行为，非故障**）。
+    #      故新增第 4 个真源: 深度分析报告（盘前时段生成并入库）里的空池声明。
+    #      ⚠️ 顺序纪律: 本检查**排在 git 历史盘前版(有行)之后** —— 真实
+    #      prev_close 数据优先于空池声明，两者冲突时以有行的盘前版为准。
+    empty_flag, empty_evidence = detect_empty_premarket_pool_from_deep_analysis(date_str)
+    if empty_flag:
+        notes.append(empty_evidence)
+        return [], f"深度分析报告确认空池（{date_str}·冰点守卫）", "".join(notes), "prev_close"
+
     # 兜底: 工作区任意版本（口径异常时显式警示）
     try:
         with open(f"{REPORT_DIR}/{date_str}-选股报告.md") as f:
@@ -631,6 +676,75 @@ def resolve_candidate_pool(date_str):
         pass
 
     return [], "无", "⚠️ 三源均无候选池（选股报告/深度分析报告）", "unknown"
+
+
+def detect_empty_premarket_pool_from_deep_analysis(date_str):
+    """深度分析报告是**盘前候选池是否为空（冰点守卫·设计行为）**的单一真源。
+
+    返回 (is_empty: bool, evidence: str)。
+
+    ⚠️ 2026-11-02 实战（v1.33 新增）: 当日 08:03 盘前版选股报告**从未被 git
+    提交** —— 只有 09:38 开盘后重跑版入库（git log 只有 1 条 commit）。于是
+    v1.31 的三源回捞全部落空:
+      1) 工作区 = 09:38 重跑版（'涨跌幅'为当日盘中实时口径）→ 口径不符，拒绝
+      2) git HEAD = 同一份 09:38 重跑版（盘中口径）→ 口径不符，拒绝
+      3) git 历史 = 只有 intraday 那一次提交 → found_prev_close=False
+      4) 深度分析"候选池"**表格** = 空表（只有文字说明，无表格行）→ 解析 0 行
+    结果回落到兜底分支，把 09:38 的 6 只当"盘前池"评估 → 战报输出**虚假的**
+    「命中率 6/6 = 100.0% / vs 上证超额 +4.08pp」。而 08:34 提交的深度分析
+    报告明确记载: 盘前 Top10 空表 + 冰点守卫短路，候选池 0 只（**设计行为，
+    非故障**）—— 这才是当日盘前池的真值。
+
+    深度分析报告（08:3x 生成、盘前时段入库）记录了三项可判定信号：
+      - "候选池 | **空 (0 只)**"                → 池确实为空
+      - "采用报告 Top10 表 | ⛔ **0 只 (空表)**" → 盘前报告 Top10 是空表
+      - 标题 "## 二、候选池: 0 只"             → 池为空的独立声明
+    任一命中即判定为空池。
+
+    ⚠️ 必须与"有池"的日子区分: 10-29 深度分析写的是
+    "| 候选池 | **4 只** — 晶华新材 603683 / ...", 标题为
+    "## 二、市场环境与守卫"（无"候选池: 0 只"）→ 不应被判为空。
+    """
+    path = f"{REPORT_DIR}/{date_str}-深度分析.md"
+    try:
+        with open(path) as f:
+            content = f.read()
+    except (FileNotFoundError, OSError):
+        return False, ""
+
+    # 信号 1: 表格行 "| 候选池 | **空 (0 只)** ..."（要求出现"空"或"0 只"）
+    m_pool = re.search(r"\|\s*候选池\s*\|([^\n]*)", content)
+    if not m_pool:
+        return False, ""
+    pool_cell = m_pool.group(1)
+    if not re.search(r"空\s*\(0\s*只\)|0\s*只", pool_cell):
+        # 有池的日子（如 10-29 "| 候选池 | **4 只** — ..."）→ 不是空池
+        return False, ""
+
+    # 信号 2: "采用报告 Top10 表 | ⛔ **0 只 (空表)**"
+    m_top10 = re.search(r"\|\s*采用报告\s*Top10\s*表\s*\|([^\n]*)", content)
+    top10_cell = m_top10.group(1) if m_top10 else ""
+    empty_top10 = bool(re.search(r"0\s*只\s*\(空表\)|空表", top10_cell))
+
+    # 信号 3: 二级标题 "## 二、候选池: 0 只 ..."（独立声明）
+    m_head = re.search(r"^##+\s*二、候选池[:：]\s*0\s*只", content, re.M)
+    empty_heading = bool(m_head)
+
+    if not (empty_top10 or empty_heading):
+        return False, ""
+
+    # 证据文本: 说明这是"冰点守卫·设计行为"而非数据故障
+    ice = bool(re.search(r"冰点守卫|is_ice_point", content))
+    reason = "冰点守卫短路" if ice else "上游无推荐"
+    evidence = (
+        f"⚠️ 深度分析报告（盘前时段生成）确认 {date_str} 盘前候选池为空"
+        f"（{reason}，**设计行为而非数据故障**）—— "
+        f"「采用报告 Top10 表 = 0 只(空表)」+「候选池 = 空 (0 只)」双重声明。"
+        f"当日 08:03 盘前版选股报告**未入库 git**（只有 09:38 开盘后重跑版入库，"
+        f"其'涨跌幅'为当日盘中实时口径、与当日收盘自指，不能作延续性 baseline），"
+        f"故**不做候选池命中率评估**（已跳过开盘后重跑版，避免虚假命中率）"
+    )
+    return True, evidence
 
 
 def resolve_previous_pool(date_str, max_lookback=6):
@@ -727,6 +841,107 @@ def resolve_theme_label(reason, final_priority):
     return tags[0] if tags else None
 
 
+def _gap_source_warning(gap_source, date_str):
+    """时点差数据源的可靠性提示 —— **按文件自身口径判定**，不按文件名一刀切。
+
+    ⚠️ 2026-11-02 实战（v1.33 新增）: 旧代码只要数据源文件名是
+    「尾盘选股.md」就无条件挂上"历史已连续确认失真"警示。但**失真不是文件名
+    属性，而是文件内容属性**：
+      - 失真案例（2026-06-16/23、07-02、07-13）: 该文件写的是**早盘/更早
+        快照**的指数值（如 07-02 写上证 +1.18% 而 15:00 收盘实为 -2.03%），
+        与目标交易日不匹配。
+      - 2026-11-02: 该文件生成时间 14:46:55，指数值为 **14:46 真实盘中快照**
+        （上证 +0.89% vs 收盘 +1.08%，Δ 仅 0.19pp），**完全可信**。
+    继续无条件挂警示会**误伤可信数据源**，让用户对正确的时点差也产生怀疑。
+
+    判定方法（读文件自身"生成时间"）:
+      - 生成日期 == 目标交易日 且 生成时间在 14:00-15:00 之间 → 可信盘中快照，
+        不加警示，只标注生成时刻。
+      - 否则（生成日期不符 / 时间不在尾盘窗口 / 读不到生成时间）→ 保留原警示。
+    """
+    if not gap_source:
+        return ""
+    try:
+        with open(gap_source) as f:
+            content = f.read()
+    except (FileNotFoundError, OSError):
+        return "⚠️ 该源生成时间不可读，可能为陈旧快照；"
+    m = re.search(r"\*\*生成时间：\*\*\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2})", content)
+    if not m:
+        # 2026-06-16/23、07-02、07-13 这批失真文件**根本没有**生成时间字段
+        return ("⚠️ 该源（尾盘选股.md）无生成时间字段，历史已连续确认失真，"
+                "优先级应低于盘中报告，此处为兜底；")
+    gen_date, hh, mm = m.group(1), int(m.group(2)), int(m.group(3))
+    if gen_date == date_str and (14, 0) <= (hh, mm) <= (15, 5):
+        return f"（{gen_date} {hh:02d}:{mm:02d} 真实盘中快照）"
+    return (f"⚠️ 该源生成时间为 {gen_date} {hh:02d}:{mm:02d}，"
+            f"与目标交易日 {date_str} 的尾盘窗口不符，疑为陈旧快照；")
+
+
+def _growth_top_industries(industry):
+    """成长领涨日：涨幅榜前几名的真实行业名（数据驱动，不写死板块）。
+
+    ⚠️ v1.31 旧代码在建议里写死"今日涨幅榜集中在半导体/自动化设备/电子化学品"
+    —— 那是 2026-10-28 当天的真实板块名，写死在代码里会在别的日子**说错**。
+    改为从当次 industry 数据里取涨幅榜前 3 名。
+    """
+    ind = industry or {}
+    top = ind.get("top") or []
+    if not top:
+        return "今日涨幅榜领涨方向未知"
+    names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in top[:3])
+    return f"今日涨幅榜领涨方向为 {names}"
+
+
+def _defensive_weak_industries(industry):
+    """成长领涨日：真实走弱的防御/红利板块（数据驱动，不写死板块）。
+
+    ⚠️ v1.31 旧代码写死"白酒/证券/银行/保险等红利防御板块全线下跌"，
+    同样是 10-28 当天的快照。改为从跌幅榜里筛出红利/防御相关关键词，
+    命中则列出真实板块名与涨跌幅；没命中则如实说明"跌幅榜未见红利防御居前"。
+    """
+    ind = industry or {}
+    bottom = ind.get("bottom") or []
+    defense_kw = ("银行", "保险", "证券", "白酒", "贵金属", "煤炭", "石油", "石油开采",
+                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口")
+    hits = [r for r in bottom if any(k in str(r.get("name", "")) for k in defense_kw)]
+    if hits:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in hits[:4])
+        return f"红利防御板块走弱（{names}）"
+    if bottom:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in bottom[:3])
+        return f"跌幅榜以 {names} 为主，红利防御未见系统性杀跌但同样缺乏资金关注"
+    return "红利防御板块今日涨跌幅数据缺失，无法确认防御方向强弱"
+
+
+def _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
+    """成长领涨的**价差口径**判定（v1.33 新增，v1.31 窄口径的补充）。
+
+    ⚠️ 2026-11-02 实战: v1.31 的成长领涨检测用**绝对阈值**
+    (`cyb>=2.0 and kc50>=1.5 and sh<1.0`)，当日实测
+    上证 +1.08% / 创业板 +1.87% / 科创50 **+3.11%**：
+      - 创业板 +1.87% < 2.0 → 窄口径不命中
+      - 上证 +1.08% ≥ 1.0 → 窄口径不命中
+    结果战报把一个"科创50 单点暴涨 3.11%、四大核心均值 +1.92%"的日子
+    标成"➡️ 震荡"，并给出"央企/红利股作为底仓对冲"的建议 ——
+    而当日贵金属 -1.45% / 银行 -0.83% / 煤炭 -0.35%，**红利防御全线下跌**，
+    建议方向与当日实际资金流向完全相反（与 v1.31 记录的 10-28 同型失败）。
+
+    价差口径（不看绝对值，看**相对强弱**）:
+      1. 科创50 与创业板**同时**上涨（成长方向整体走强）
+      2. 科创50 相对上证领先 ≥ 1.5pp（主板明显滞涨）
+      3. 四大核心整体不弱（上证 ≥ 0.5%）—— 排除"全市场下跌中的相对抗跌"
+
+    与窄口径并存：窄口径命中时（创业板 ≥2.0 且上证 <1.0）仍按原逻辑走，
+    两者取或集，扩大召回但不改变原有已验证场景的判定。
+    """
+    if cyb_pct <= 0 or kc50_pct <= 0:
+        return False
+    if sh_pct < 0.5:                      # 全市场偏弱 → 不是"结构性走强"
+        return False
+    return (kc50_pct - sh_pct) >= 1.5     # 科创50 相对主板明显领先
+
+
 def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
                             other_5_avg=None, other_idx_pcts=None):
     """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。
@@ -785,7 +1000,7 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
             base = "📊 主板稳态 + 成长方向杀跌型（结构性分化）"
         elif other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
             base = "📊 主板稳态 + 科创50单点跳水型"
-        elif cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0:
+        elif (cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0) or _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
             base = "📈 成长领涨型（主板滞涨，结构性走强）"
         elif sh_pct > 1.5:
             base = "📈 强势行情"
@@ -1279,7 +1494,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         # 两者对用户的含义完全不同：前者是策略主动空仓（不是系统坏了），
         # 后者才是链路故障。旧代码一律写"上游报告缺失"，会把"策略正确地空仓"
         # 误报成"数据丢了"，误导用户排查。
-        if pool_note and ("Top10 为空" in pool_note or "空表" in pool_note):
+        if pool_note and any(k in pool_note for k in ("Top10 为空", "空表", "候选池为空", "空池")):
             md += "| ⚠️ | 上游冰点守卫短路（0 推荐·设计行为） | N/A | N/A | N/A | 无候选池评估 |\n"
         else:
             md += "| ⚠️ | 上游报告缺失 | N/A | N/A | N/A | 无候选池评估 |\n"
@@ -1422,7 +1637,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 今日热度回落（对比 {comparison_date or '上期'}），"
                f"延续条件：龙头不跌停、成交不萎缩50%；杀跌中的半导体/元件等成长板块先看企稳再接\n")
         md += "3️⃣ **防御/仓位：** 候选池今日 +1.01pp 超额但 9/10 负延续，追高资金退潮期优先低位补涨方向，不追昨日+4%强势股\n"
-    elif cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0:
+    elif (cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0) or _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
         # ⚠️ 2026-10-28 新增（v1.31）: 成长领涨型（主板滞涨 + 成长集体走强）
         # 建议方向必须与"成长强、主板弱"的资金流向一致 —— 旧的"央企/红利对冲"
         # 在这种日子里恰好买在今日最弱的板块（当日白酒/证券/银行/保险全跌）。
@@ -1431,9 +1646,9 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                f"四大核心指数均值 {market_avg:+.2f}%；属成长主导的**结构性**上涨，"
                f"非普涨，明日看点是成长能否延续、主板能否补涨\n")
         md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、"
-               f"成交不萎缩50%；今日涨幅榜集中在半导体/自动化设备/电子化学品等成长方向，"
+               f"成交不萎缩50%；{_growth_top_industries(industry)}，"
                f"明日若成长高开回落而主板补涨，说明是单日资金切换而非趋势\n")
-        md += ("3️⃣ **防御方向：** ⚠️ 今日白酒/证券/银行/保险等红利防御板块**全线下跌**，"
+        md += (f"3️⃣ **防御方向：** ⚠️ 今日{_defensive_weak_industries(industry)}，"
                "「央企/红利对冲」在成长领涨日恰好买在弱势侧 —— 明日防御应转向"
                "**跟随主线的高景气分支**（半导体/设备/材料），红利仅作低位观察而非对冲盘\n")
     else:
@@ -1450,9 +1665,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         # "稳态日"在战报里不可区分。
         src_name = (gap_source or "").rsplit("/", 1)[-1]
         max_abs = max((abs(r[3]) for r in gap_rows), default=0.0)
-        src_warn = ("⚠️ 该源（尾盘选股.md）历史已连续确认失真，"
-                    "优先级应低于盘中报告，此处为兜底；"
-                    if src_name.endswith("尾盘选股.md") else "")
+        src_warn = _gap_source_warning(gap_source, date_str)
         md += (f"\n> 时点差：数据源 {src_name}（{len(gap_rows)}/6 指数）{src_warn}"
                f"最大 |Δ| {max_abs:.2f}pp < 2.0pp 阈值未触发，盘中信号与收盘方向一致。\n")
     else:
