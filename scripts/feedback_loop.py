@@ -33,6 +33,14 @@ FEEDBACK_CSV = DATA_DIR / "rec_feedback.csv"
 N_DAYS = [1, 3, 5, 15]
 WINRATE_THRESHOLD = 0.50
 
+# 🔴 2026-11-03 修复：趋势结论的最小样本门槛
+# 旧实现 compute_trend_stats(top_n=20) → 20 只拆成 上升/震荡/下降 三组后
+# 单组只剩 n=4~5，报告却照样输出「下降趋势胜率(60.0%)高于上升趋势(25.0%)」
+# 这种**方向性结论**（2026-11-03 实测 n=4 vs n=5）。
+# 而 60 只窗口下结论完全相反（上升 85.7% vs 下降 71.4%）→ 说明 n=4 的结论是噪声。
+# 门槛取 10：与 strategy_policy 消费层「n≥10 且胜率<35%」口径一致（SKILL.md 10-28）。
+MIN_TREND_SAMPLES = 10
+
 # ── 内部工具 ────────────────────────────────────────────────────────────────
 
 def _today():
@@ -556,6 +564,12 @@ def compute_trend_stats(rows, top_n=20):
     按趋势分类统计RSI超卖策略的胜率差异
     区分：上升趋势中RSI超卖 vs 下降趋势中RSI超卖
     返回趋势统计数据字典
+
+    🔴 2026-11-03 修复: 趋势统计窗口从 20 只放大到 60 只。
+    旧实现 top_n=20 → 拆成三组后单组仅 n=4~5，样本太小导致结论方向随窗口翻转
+    (20 只窗口: 下降 60.0% > 上升 25.0%; 60 只窗口: 上升 85.7% > 下降 71.4%)。
+    放大到 60 只后每组 n=7~32，结论稳定且与全历史口径 (上升 37.4% / 下降 74.1%)
+    的量级一致。样本不足时由 build_markdown_report 的 MIN_TREND_SAMPLES 门槛拦截。
     """
     valid = _valid_rows(rows, top_n)
 
@@ -706,10 +720,20 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
                 )
         lines.append("")
         # 添加趋势分析结论
+        # 🔴 2026-11-03 修复: 样本门槛 — 单组 n < MIN_TREND_SAMPLES 时不出方向性结论。
+        # 旧实现无条件输出「A 胜率高于 B」，n=4 vs n=5 也能出结论 → 噪声被当结论。
         if "上升" in trend_stats and "下降" in trend_stats:
-            up_wr = trend_stats["上升"]["winrate"]
-            down_wr = trend_stats["下降"]["winrate"]
-            if up_wr > down_wr:
+            up = trend_stats["上升"]
+            down = trend_stats["下降"]
+            up_n, down_n = up["count"], down["count"]
+            up_wr, down_wr = up["winrate"], down["winrate"]
+            if up_n < MIN_TREND_SAMPLES or down_n < MIN_TREND_SAMPLES:
+                lines.append(
+                    f"> ⚠️ **样本不足，不下趋势结论：** 上升趋势 n={up_n}、下降趋势 n={down_n}，"
+                    f"其中至少一组 < {MIN_TREND_SAMPLES} 只 —— 小样本胜率差异在窗口变动下会翻转，"
+                    f"仅供参考（上升 {up_wr:.1f}% / 下降 {down_wr:.1f}%）。"
+                )
+            elif up_wr > down_wr:
                 lines.append(f"> 📊 **结论：** 上升趋势中RSI超卖策略胜率({up_wr:.1f}%)高于下降趋势({down_wr:.1f}%)，顺势策略更有效。")
             elif down_wr > up_wr:
                 lines.append(f"> 📊 **结论：** 下降趋势中RSI超卖策略胜率({down_wr:.1f}%)高于上升趋势({up_wr:.1f}%)，或存在抄底机会但需谨慎。")
@@ -814,7 +838,9 @@ def main():
     print(f"   统计样本: {stats[1]} 只, 胜率: {stats[2]*100:.1f}%, 盈亏比: {stats[5]}", file=sys.stderr)
 
     # 5b. 趋势胜率统计
-    trend_stats = compute_trend_stats(all_feedback, top_n=20)
+    # 🔴 2026-11-03 修复: 窗口 20 → 60 只。20 只拆三组后单组仅 n=4~5，
+    # 结论方向随窗口翻转（噪声）。详见 compute_trend_stats docstring。
+    trend_stats = compute_trend_stats(all_feedback, top_n=60)
     if trend_stats:
         print(f"   趋势分布: " + ", ".join(f"{k}({v['count']}只,{v['winrate']}%)" for k, v in trend_stats.items()), file=sys.stderr)
 

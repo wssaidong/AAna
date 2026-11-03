@@ -155,16 +155,34 @@ def get_morning_snapshot_filename():
     return f"{REPORT_DIR}/.snapshot_{today}_09_00.json"
 
 def save_morning_snapshot(prices):
-    """保存早盘快照（9:00AM），用于收盘后复盘对比"""
+    """保存早盘快照（9:00AM），用于收盘后复盘对比
+
+    🔴 2026-11-03 修复 (P1 断链 + P0 连带):
+    1) 调用点在 2026-05-23 的 v2.5 重构 (93f7ad8) 中被删掉 → 快照永不生成
+       → generate_review_report() 每次都在"快照不存在"处 return
+       → 复盘评分报告连续 127 次 cron 跳过 (2026-05-25 之后彻底停更)。
+    2) 保存窗口必须限定在【开盘后、收盘前】(09:30 ≤ now < 15:00):
+       - 08:00 launchd 跑 generate_report.py 时未开盘, sina 返回昨收,
+         change_pct≈0 → 存进去会毒化快照 (复盘会把"昨收"当成早盘预测基准,
+         算出假的"预测偏差")。因此 08:00 那趟**不写**快照。
+       - 17:00 那趟用收盘价, 会覆盖真实早盘快照 → 因此"文件已存在则不写"。
+       - 只有 09:35 Hermes cron 那趟 (开盘后) 会真正落盘。
+    """
     snap_file = get_morning_snapshot_filename()
-    if not os.path.exists(snap_file):
-        with open(snap_file, 'w', encoding='utf-8') as f:
-            json.dump({
-                'version': '2.4',
-                'timestamp': datetime.now().isoformat(),
-                'prices': prices,
-            }, f, ensure_ascii=False, indent=2)
-        print(f"[AAna] 早盘快照已保存: {snap_file}")
+    now = datetime.now()
+    # 仅开盘后~收盘前写快照 (见 docstring)
+    if not (9 <= now.hour < 15):
+        return False
+    if os.path.exists(snap_file):
+        return False
+    with open(snap_file, 'w', encoding='utf-8') as f:
+        json.dump({
+            'version': '2.4',
+            'timestamp': datetime.now().isoformat(),
+            'prices': prices,
+        }, f, ensure_ascii=False, indent=2)
+    print(f"[AAna] 早盘快照已保存: {snap_file}")
+    return True
 
 # ============================================
 # Git pull: 每次运行前拉取最新代码
@@ -1318,6 +1336,20 @@ def generate_report():
         f.write(content)
     print(f"[AAna] 选股报告已生成: {filename}")
 
+    # 🔴 2026-11-03 修复 (P1 断链): 保存早盘快照供收盘后复盘对比
+    # 这个调用点在 2026-05-23 的 v2.5 重构 (93f7ad8) 中被删掉，导致快照永不生成
+    # → generate_review_report() 连续 127 次 cron 跳过 → 复盘评分报告停更。
+    # 放在 prices 全部 enrich (综合评分/评级/stop_soft/stop_hard) 之后 —— 复盘报告
+    # 会读这些字段 (morn_score / morn_rating / stop_soft / stop_hard)。
+    # save_morning_snapshot 内部已限定 9 ≤ hour < 15 且不覆盖已有文件:
+    # - 08:00 launchd 那趟未开盘 → 不写
+    # - 17:00 那趟用收盘价 → 不覆盖
+    # - 09:35 Hermes cron 那趟（开盘后）→ 真正落盘
+    try:
+        save_morning_snapshot(prices)
+    except Exception as _snap_err:
+        print(f"[AAna] 早盘快照保存失败（非致命）: {_snap_err}")
+
 def generate_review_report():
     """生成每日复盘评分报告 + 模拟交易结算"""
     today = get_today_str()
@@ -1523,14 +1555,48 @@ def generate_review_report():
     print(f"[AAna] \u590d\u76d8\u8bc4\u5206\u62a5\u544a\u5df2\u751f\u6210: {filename}")
 
     # Git push
+    # 🔴 2026-11-03 修复 (P0): 原实现 `git add '.'` 会把工作区**所有**改动一起 stage,
+    # 包括 cleanup 脚本删掉的旧报告 (8/23 事故同款: git add -A 删 1174 文件致
+    # x-compass 全线 404)。快照链路修复后本函数首次真正执行, 这颗雷被激活 →
+    # 必须改成**白名单逐路径 stage**。
+    # 数量守卫: commit 前后比对 `git ls-files reports/ | wc -l`, 减少则中止 push。
     try:
         os.chdir(PROJECT_DIR)
-        subprocess.run(['git', 'add', '.'], check=True, capture_output=True)
-        subprocess.run(['git', 'commit', '-m', 'feat: add {} review report v2.5 (auto)'.format(today)], check=True, capture_output=True)
+
+        def _reports_tracked_count():
+            r = subprocess.run(['git', 'ls-files', 'reports/'],
+                               capture_output=True, text=True)
+            return len([x for x in r.stdout.splitlines() if x.strip()])
+
+        before_count = _reports_tracked_count()
+
+        # 白名单: 只 stage 本函数自己产出的文件
+        whitelist = [os.path.relpath(filename, PROJECT_DIR)]
+        trade_file = os.path.join(PROJECT_DIR, 'data', 'paper_trades.json')
+        if os.path.exists(trade_file):
+            whitelist.append(os.path.relpath(trade_file, PROJECT_DIR))
+
+        for rel in whitelist:
+            subprocess.run(['git', 'add', '--', rel], check=True, capture_output=True)
+
+        subprocess.run(['git', 'commit', '-m',
+                        'feat: add {} review report v2.5 (auto)'.format(today)],
+                       check=True, capture_output=True)
+
+        after_count = _reports_tracked_count()
+        if after_count < before_count:
+            raise RuntimeError(
+                f'reports/ \u8ddf\u8e2a\u6587\u4ef6\u6570\u51cf\u5c11 ({before_count} \u2192 {after_count}), '
+                f'\u7591\u4f3c\u8bef\u5220\u65e7\u62a5\u544a, \u4e2d\u6b62 push'
+            )
+
         subprocess.run(['git', 'push', 'origin', 'main'], check=True, capture_output=True)
-        print(f"[AAna] \u590d\u76d8\u62a5\u544a\u5df2\u63a8\u9001 GitHub")
+        print(f"[AAna] \u590d\u76d8\u62a5\u544a\u5df2\u63a8\u9001 GitHub "
+              f"(reports/ \u8ddf\u8e2a\u6570 {before_count} \u2192 {after_count})")
     except subprocess.CalledProcessError as e:
         print(f"[AAna] Git \u5931\u8d25: {e}")
+    except RuntimeError as e:
+        print(f"[AAna] Git \u4e2d\u6b62: {e}")
 
     return filename
 
@@ -1549,6 +1615,6 @@ REC_TUNING = {
     "weak_sectors": ['造纸', 'semi', '印制电路板', '房地产开发', '其他家用轻工', '影视动漫'],
     "overall_win_rate": 49.9,
     "total_records": 367,
-    "generated_at": "2026-10-29T20:14:31.240567",
+    "generated_at": "2026-11-02T20:00:46.461235",
 }
 # === REC_OPTIMIZER_TUNING_END ===
