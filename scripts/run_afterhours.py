@@ -943,6 +943,70 @@ def _growth_top_industries(industry):
     return f"今日涨幅榜领涨方向为 {names}"
 
 
+def _growth_dump_spread(cyb_pct, kc50_pct, sh_pct):
+    """成长方向杀跌的**价差口径**判定（v1.34 新增，_growth_lead_spread 的镜像）。
+
+    ⚠️ 2026-11-03 实战: v1.29 的"主板稳态 + 成长方向杀跌型"用**绝对阈值**
+    `kc50<-2.0 and cyb<-1.5 and sh>-0.5` 判"主板稳态"。当日实测
+    上证 **-0.82%** / 创业板 **-2.73%** / 科创50 **-3.81%**：
+      - 上证 -0.82% 不 > -0.5% → 窄口径不命中
+      - v1.27 第七层要求创业板也破 -3.0%（实测 -2.73%，差 0.27pp）→ 也不命中
+    结果战报把一个"成长方向被单边绞杀"的日子标成"➡️ 震荡"，
+    只字未提当日真正的结构（元件 -5.13% / 半导体 -5.09% / 电子化学品 -5.05%
+    vs 保险 +2.67% / 机场航运 +2.01%）。
+
+    价差口径（不看绝对值，看**相对强弱**）:
+      1. 创业板与科创50 **同时**下跌（成长方向整体走弱）
+      2. 科创50 相对上证 **落后** ≥ 1.5pp（主板明显抗跌 → 结构分化而非普跌）
+      3. 上证 ≥ -1.5%（排除全市场杀跌 —— 那种情况交给模式⑤/模式⑦处理）
+
+    与窄口径**取并集**：窄口径命中时仍按原逻辑走，两者合并覆盖面更大
+    但不改变原有已验证场景的判定。
+    """
+    if cyb_pct >= 0 or kc50_pct >= 0:
+        return False
+    if sh_pct < -1.5:                      # 上证自身已重挫 → 全市场杀跌
+        return False
+    return (sh_pct - kc50_pct) >= 1.5     # 科创50 相对主板明显落后
+
+
+def _defensive_strong_industries(industry):
+    """红利防御板块今日**领涨**情况（数据驱动，不写死板块）。
+
+    ⚠️ v1.33 已把"建议里写死的板块名"改成数据驱动（_growth_top_industries /
+    _defensive_weak_industries）。但"成长方向杀跌日"的防御建议仍沿用
+    v1.29 写死的"央企/红利股作为底仓对冲"，在红利防御**全线下跌**的日子
+    会给出方向完全相反的建议（v1.31 已在领涨日踩过这个坑）。
+    """
+    ind = industry or {}
+    top = ind.get("top") or []
+    defense_kw = ("银行", "保险", "证券", "白酒", "贵金属", "煤炭", "石油", "石油开采",
+                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口")
+    hits = [r for r in top if any(k in str(r.get("name", "")) for k in defense_kw)]
+    if hits:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in hits[:3])
+        return f"红利防御今日领涨（{names}）"
+    if top:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in top[:3])
+        return f"涨幅榜以 {names} 为主，未见红利防御领涨"
+    return "行业涨跌数据缺失，无法确认防御方向强弱"
+
+
+def _growth_bottom_industries(industry):
+    """成长方向今日**领跌**板块（数据驱动，不写死板块名）。
+
+    v1.29 的建议写死"杀跌中的半导体/元件等成长板块"—— 那是 2026-10-26 当天的
+    真实板块名，写死在代码里会在别的日子**说错**（2026-11-03 领跌的是
+    元件/半导体/电子化学品/通信设备/自动化设备，恰好撞上，但不可依赖）。
+    """
+    ind = industry or {}
+    bottom = ind.get("bottom") or []
+    if bottom:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in bottom[:3])
+        return f"今日跌幅榜集中在 {names}"
+    return "行业跌幅榜数据缺失，无法定位领跌方向"
+
+
 def _defensive_weak_industries(industry):
     """成长领涨日：真实走弱的防御/红利板块（数据驱动，不写死板块）。
 
@@ -1046,7 +1110,13 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
                     f"其余指数普跌）")
         if sh_pct < -1.5 and kc50_pct < -5:
             base = "📉 平稳转急跌型（模式⑦）"
-        elif kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
+        elif ((kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5)
+              or _growth_dump_spread(cyb_pct, kc50_pct, sh_pct)):
+            # ⚠️ 2026-11-03 新增（v1.34）: 价差口径并入窄口径（union）。
+            # 窄口径用绝对阈值 sh>-0.5 判"主板稳态"，2026-11-03 实测上证 -0.82%
+            # 差 0.32pp 落空 → 成长方向被单边绞杀的日子被标成"震荡"。
+            # 价差口径看的是**相对强弱**（科创50 相对上证落后 ≥1.5pp），
+            # 对"主板小跌 + 成长被杀"的真实结构性分化更稳健。
             base = "📊 主板稳态 + 成长方向杀跌型（结构性分化）"
         elif other_5_avg is not None and kc50_pct < -3.0 and abs(other_5_avg) < 0.5:
             base = "📊 主板稳态 + 科创50单点跳水型"
@@ -1062,6 +1132,22 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
         # 双层嵌套：模式⑤（外层大盘）+ 第七层（内层结构）
         base += " + 主板稳态·成长方向集体杀跌（v1.27第七层）"
     return base
+
+
+def _alpha_zone(alpha):
+    """Alpha 区间描述（数据驱动，v1.34 新增）。
+
+    ⚠️ 旧代码在"模式①"分支硬编码"（中性区间）"字样，与它自己打印的
+    Alpha 数值可能自相矛盾 —— 2026-11-03 实测 Alpha **-1.73pp** 被标成
+    "中性区间"。措辞必须由数值决定。
+    """
+    if alpha > 0.5:
+        return "正 Alpha"
+    if alpha >= 0.0:
+        return "中性区间"
+    if alpha >= -1.0:
+        return "小幅负 Alpha"
+    return "显著负 Alpha"
 
 
 def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg_neg,
@@ -1118,9 +1204,21 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
                         f"baseline 均值 {baseline_avg:+.2f}%（未达追高门槛）—— "
                         f"主因是大盘系统性风险，非追高")
         else:
-            mode, label = "①", "模式① 风格切换 / 边缘归因"
-            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
-                    f"Alpha {alpha:+.2f}pp（中性区间）—— 主因偏题材错配")
+            # ⚠️ 2026-11-03 修订（v1.34）: 旧代码硬编码"（中性区间）"字样，
+            # 与它自己打印的 Alpha 数值可能自相矛盾（2026-11-03 实测
+            # Alpha -1.73pp 却被标成"中性区间"）。改为**数据驱动**。
+            if baseline_avg >= 5.0 and avg <= -1.5 and not tail_dive:
+                # ★ v1.34 新模式 ⑩-i —— ⑩-h 的"非极端情绪日"变体
+                mode, label = "⑩-i", "模式⑩-i 昨日+6%追高 + 成长方向全天单边杀跌（均值未破 -3%）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（未破 -3%），"
+                        f"baseline 全部为昨日 +5% 以上强势股（均值 {baseline_avg:+.2f}%），"
+                        f"{neg_cont}/{n} 负延续、Δ 均值 {avg - baseline_avg:+.2f}pp；"
+                        f"杀跌全天发生、盘中已同步（14:45→15:00 无 ≥3.5pp 尾盘跳水）—— "
+                        f"主因是**昨日强势股追高**在成长方向单边杀跌中被反向兑现")
+            else:
+                mode, label = "①", "模式① 风格切换 / 边缘归因"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                        f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）—— 主因偏题材错配")
     elif hit_rate <= 0.40:
         if avg < -3.0 and baseline_avg > 4.0:
             # ★ v1.32 新模式 ⑩-h
@@ -1678,15 +1776,43 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！创业板/科创50收盘 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%\n"
         md += "2️⃣ **回避：** 追高强势股 + 小盘题材投机\n"
         md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头股是否扛住杀跌\n"
-    elif other_5_avg is not None and kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5:
+    elif ((other_5_avg is not None and kc50_pct < -2.0 and cyb_pct < -1.5 and sh_pct > -0.5)
+              or _growth_dump_spread(cyb_pct, kc50_pct, sh_pct)):
         # ⚠️ 2026-10-26 新增（v1.29）: 主板稳态 + 成长方向杀跌（结构性分化）
         # 明日观察要点要指出"成长杀跌但候选池跑赢"的仓位含义：结构市不追成长回撤。
+        # ⚠️ 2026-11-03 修订（v1.34）: ① 触发条件并入价差口径（见 _growth_dump_spread）；
+        # ② 删除 v1.29 写死的"+1.01pp 超额 / 9/10 负延续"（2026-10-26 当天的快照），
+        #    改为按**当日实测**候选池数据生成；③ 删除写死的"半导体/元件"板块名，
+        #    改为数据驱动的跌幅榜；④ 防御建议按当日红利防御真实涨跌给出。
+        pool_neg_cont = sum(1 for r in hit_rows if r[4] < 0) if hit_rows else 0
+        if hit_rows:
+            pool_line = (f"候选池 {len(positives)}/{len(hit_rows)} 命中、较上证 "
+                         f"{avg - sh_pct:+.2f}pp、{pool_neg_cont}/{len(hit_rows)} 负延续")
+        else:
+            pool_line = "候选池无有效样本，不据此调仓"
         md += (f"1️⃣ **大盘性质：** 📊 主板稳态（上证 {sh_pct:+.2f}%）+ 成长方向杀跌"
                f"（创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%），结构性分化——"
-               f"明日看点是成长杀跌是否向主板扩散（上证跌破 -0.5% 即确认）\n")
-        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 今日热度回落（对比 {comparison_date or '上期'}），"
-               f"延续条件：龙头不跌停、成交不萎缩50%；杀跌中的半导体/元件等成长板块先看企稳再接\n")
-        md += "3️⃣ **防御/仓位：** 候选池今日 +1.01pp 超额但 9/10 负延续，追高资金退潮期优先低位补涨方向，不追昨日+4%强势股\n"
+               f"明日看点是成长杀跌是否向主板扩散（上证跌破 -1.5% 即确认）\n")
+        # ⚠️ 2026-11-03 修订（v1.34）: "今日热度回落"是**写死**的措辞，
+        # 但当日 Top3 题材里 羊字辈 ↑2 / 固态电池 ↑2 / 三季报增长 ↓16 ——
+        # 混合方向，说"回落"与数据不符。改为按当日**实际**环比方向描述。
+        _top3 = themes[:3]
+        _diffs = [(t, ct.get(t, 0) - cy.get(t, 0)) for t in _top3]
+        _up = sum(1 for _, d in _diffs if d > 0)
+        _down = sum(1 for _, d in _diffs if d < 0)
+        if _up > _down:
+            _heat_dir = "热度整体回升"
+        elif _down > _up:
+            _heat_dir = "热度整体回落"
+        else:
+            _heat_dir = "热度方向分化"
+        md += (f"2️⃣ **主线持续性：** {', '.join(_top3)} {_heat_dir}"
+               f"（对比 {comparison_date or '上期'}），"
+               f"延续条件：龙头不跌停、成交不萎缩50%；{_growth_bottom_industries(industry)}，"
+               f"先看企稳再接\n")
+        md += (f"3️⃣ **防御/仓位：** {pool_line}；追高资金退潮期优先低位补涨方向，"
+               f"不追昨日+4%强势股。{_defensive_strong_industries(industry)} —— "
+               f"防御方向按当日真实涨跌选，不要凭固定印象买红利\n")
     elif (cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0) or _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
         # ⚠️ 2026-10-28 新增（v1.31）: 成长领涨型（主板滞涨 + 成长集体走强）
         # 建议方向必须与"成长强、主板弱"的资金流向一致 —— 旧的"央企/红利对冲"

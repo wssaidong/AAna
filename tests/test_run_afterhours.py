@@ -820,3 +820,119 @@ def test_dragon_tiger_note_distinguishes_trading_day_from_non_trading(monkeypatc
     monkeypatch.setattr(run_afterhours, "ths_hot", lambda d: [])
     res2 = run_afterhours.get_daily_dragon_tiger("2026-11-02")
     assert "非交易日" in res2["note"], res2["note"]
+
+
+# ── v1.34（2026-11-03 实战）: 成长方向单边杀跌被判成"震荡" + 建议写死旧数据 ────
+
+def test_growth_dump_detected_by_spread_not_only_absolute_thresholds():
+    """2026-11-03 实战: 上证 -0.82% / 创业板 -2.73% / 科创50 -3.81%。
+
+    v1.29 窄口径 (kc50<-2.0 and cyb<-1.5 and sh>-0.5) 不命中
+    （上证 -0.82% 不 > -0.5%），v1.27 第七层也不命中
+    （创业板 -2.73% 未破 -3.0%），战报误标"震荡"并丢掉
+    "成长方向被单边绞杀"这一当天最重要的结构信息。
+    """
+    feature = run_afterhours.classify_market_feature(
+        -2.143, -0.82, -2.73, -3.81, [], other_5_avg=-1.158,
+        other_idx_pcts=[-0.82, -1.21, -0.83, -0.20],
+    )
+    assert "成长方向杀跌" in feature, feature
+    assert "震荡" not in feature.replace("主板稳态", ""), feature
+
+
+def test_growth_dump_spread_does_not_fire_on_broad_market_selloff():
+    """全市场普跌（上证也重挫）不是"主板稳态+成长杀跌"，应走极端情绪/模式⑦。"""
+    feature = run_afterhours.classify_market_feature(
+        -3.40, -2.60, -4.00, -4.30, [], other_5_avg=-3.00,
+        other_idx_pcts=[-2.60, -3.00, -2.80, -3.20],
+    )
+    assert "成长方向杀跌" not in feature, feature
+    assert "极端情绪日" in feature, feature
+
+
+def test_growth_dump_spread_does_not_fire_when_growth_leads():
+    """成长领涨日不应被"成长杀跌"价差口径误伤。"""
+    assert not run_afterhours._growth_dump_spread(1.87, 3.11, 1.08)
+
+
+def test_growth_dump_advice_uses_real_pool_and_industry_data():
+    """v1.29 建议分支写死了 2026-10-26 当天的"+1.01pp 超额 / 9/10 负延续"
+    和"半导体/元件"板块名 —— 必须改为当日实测数据。"""
+    industry = {
+        "top": [
+            {"name": "保险", "change_pct": 2.67},
+            {"name": "机场航运", "change_pct": 2.01},
+            {"name": "养殖业", "change_pct": 1.89},
+        ],
+        "bottom": [
+            {"name": "元件", "change_pct": -5.13},
+            {"name": "半导体", "change_pct": -5.09},
+            {"name": "电子化学品", "change_pct": -5.05},
+        ],
+    }
+    hit_rows = [
+        ("002956", "西麦食品", 6.69, 2.22, -4.47),
+        ("605118", "力鼎光电", 6.99, -10.00, -16.99),
+        ("603160", "汇顶科技", 5.69, -1.92, -7.61),
+        ("000860", "顺鑫农业", 5.59, -1.14, -6.73),
+        ("002242", "九阳股份", 5.37, -1.93, -7.30),
+    ]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    md = run_afterhours.format_feishu(
+        "2026-11-03", _minimal_indices(), ["固态电池"], {"固态电池": 4}, {},
+        hit_rows, positives, negatives, avg, 2.22, -4.40,
+        -0.82, -2.73, -3.81, [], 52,
+        industry=industry,
+    )
+    # 写死的旧快照数字必须消失
+    assert "+1.01pp" not in md, md
+    assert "9/10 负延续" not in md, md
+    # 当日实测候选池数据必须出现
+    assert "1/5 命中" in md, md
+    assert "5/5 负延续" in md, md
+    # 板块名必须来自当日数据
+    assert "保险 +2.67%" in md, md
+    assert "元件 -5.13%" in md, md
+    # 防御建议按当日红利防御真实涨跌给出
+    assert "红利防御今日领涨" in md, md
+
+
+def test_pool_attribution_alpha_zone_is_data_driven():
+    """v1.34: "模式①"分支硬编码"（中性区间）"，与实测 Alpha -1.73pp 自相矛盾。
+
+    2026-11-03 实测: 1/5 命中、均值 -2.55%、Alpha -1.73pp、baseline 全部
+    +5.37%~+6.99%（昨日强势股）→ 应判 ⑩-i（追高 + 全天单边杀跌），
+    而不是"模式① 风格切换 + 中性区间"。
+    """
+    hit_rows = [
+        ("002956", "西麦食品", 6.69, 2.22, -4.47),
+        ("605118", "力鼎光电", 6.99, -10.00, -16.99),
+        ("603160", "汇顶科技", 5.69, -1.92, -7.61),
+        ("000860", "顺鑫农业", 5.59, -1.14, -6.73),
+        ("002242", "九阳股份", 5.37, -1.93, -7.30),
+    ]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 2.22, -4.40,
+        sh_pct=-0.82, market_avg=-2.143,
+        tail_dive=False, in_hot_count=0, hot_count=52,
+    )
+    assert mode == "⑩-i", (mode, label)
+    assert "追高" in label, label
+    assert "5/5 负延续" in attr, attr
+    # 极端情绪日标签不能误加（大盘均值 -2.14% 未破 -3%）
+    assert "模式⑤" not in attr, attr
+    # "中性区间" 措辞不得出现在显著负 Alpha 上
+    assert "中性区间" not in attr, attr
+
+
+def test_alpha_zone_describes_sign_magnitude():
+    """Alpha 措辞必须由数值决定，不得硬编码。"""
+    assert run_afterhours._alpha_zone(1.2) == "正 Alpha"
+    assert run_afterhours._alpha_zone(0.2) == "中性区间"
+    assert run_afterhours._alpha_zone(-0.7) == "小幅负 Alpha"
+    assert run_afterhours._alpha_zone(-1.73) == "显著负 Alpha"
