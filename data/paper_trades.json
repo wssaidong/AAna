@@ -5082,89 +5082,118 @@
       "reason": "AAna v2.4 尾盘评分 83",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-03",
+      "code": "002093",
+      "name": "国脉科技",
+      "action": "sell",
+      "price": 7.21,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -4.0,
+      "pnl_pct": -0.55
+    },
+    {
+      "date": "2026-11-03",
+      "code": "002354",
+      "name": "天娱数科",
+      "action": "sell",
+      "price": 7.8,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -9.0,
+      "pnl_pct": -1.14
+    },
+    {
+      "date": "2026-11-03",
+      "code": "605179",
+      "name": "一鸣食品",
+      "action": "sell",
+      "price": 22.35,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -119.0,
+      "pnl_pct": -5.06
+    },
+    {
+      "date": "2026-11-03",
+      "code": "600031",
+      "name": "三一重工",
+      "action": "sell",
+      "price": 18.07,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 23.0,
+      "pnl_pct": 1.29
+    },
+    {
+      "date": "2026-11-03",
+      "code": "600882",
+      "name": "妙可蓝多",
+      "action": "sell",
+      "price": 19.32,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -14.0,
+      "pnl_pct": -0.72
+    },
+    {
+      "date": "2026-11-03",
+      "code": "002903",
+      "name": "宇环数控",
+      "action": "sell",
+      "price": 24.23,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -16.0,
+      "pnl_pct": -0.66
+    },
+    {
+      "date": "2026-11-03",
+      "code": "603093",
+      "name": "南华期货",
+      "action": "sell",
+      "price": 13.01,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -17.0,
+      "pnl_pct": -1.29
+    },
+    {
+      "date": "2026-11-03",
+      "code": "600851",
+      "name": "海欣股份",
+      "action": "sell",
+      "price": 8.77,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.68
+    },
+    {
+      "date": "2026-11-03",
+      "code": "002841",
+      "name": "视源股份",
+      "action": "sell",
+      "price": 41.72,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -39.0,
+      "pnl_pct": -0.93
+    },
+    {
+      "date": "2026-11-03",
+      "code": "603297",
+      "name": "永新光学",
+      "action": "sell",
+      "price": 94.86,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 126.0,
+      "pnl_pct": 1.35
     }
   ],
-  "positions": {
-    "002093": {
-      "date": "2026-11-02",
-      "name": "国脉科技",
-      "shares": 100,
-      "entry_price": 7.25,
-      "highest_price": 7.25,
-      "entry_date": "2026-11-02"
-    },
-    "002354": {
-      "date": "2026-11-02",
-      "name": "天娱数科",
-      "shares": 100,
-      "entry_price": 7.89,
-      "highest_price": 7.89,
-      "entry_date": "2026-11-02"
-    },
-    "605179": {
-      "date": "2026-11-02",
-      "name": "一鸣食品",
-      "shares": 100,
-      "entry_price": 23.54,
-      "highest_price": 23.54,
-      "entry_date": "2026-11-02"
-    },
-    "600031": {
-      "date": "2026-11-02",
-      "name": "三一重工",
-      "shares": 100,
-      "entry_price": 17.84,
-      "highest_price": 17.84,
-      "entry_date": "2026-11-02"
-    },
-    "600882": {
-      "date": "2026-11-02",
-      "name": "妙可蓝多",
-      "shares": 100,
-      "entry_price": 19.46,
-      "highest_price": 19.46,
-      "entry_date": "2026-11-02"
-    },
-    "002903": {
-      "date": "2026-11-02",
-      "name": "宇环数控",
-      "shares": 100,
-      "entry_price": 24.39,
-      "highest_price": 24.39,
-      "entry_date": "2026-11-02"
-    },
-    "603093": {
-      "date": "2026-11-02",
-      "name": "南华期货",
-      "shares": 100,
-      "entry_price": 13.18,
-      "highest_price": 13.18,
-      "entry_date": "2026-11-02"
-    },
-    "600851": {
-      "date": "2026-11-02",
-      "name": "海欣股份",
-      "shares": 100,
-      "entry_price": 8.83,
-      "highest_price": 8.83,
-      "entry_date": "2026-11-02"
-    },
-    "002841": {
-      "date": "2026-11-02",
-      "name": "视源股份",
-      "shares": 100,
-      "entry_price": 42.11,
-      "highest_price": 42.11,
-      "entry_date": "2026-11-02"
-    },
-    "603297": {
-      "date": "2026-11-02",
-      "name": "永新光学",
-      "shares": 100,
-      "entry_price": 93.6,
-      "highest_price": 93.6,
-      "entry_date": "2026-11-02"
-    }
-  },
+  "positions": {},
   "daily_snapshots": []
 }

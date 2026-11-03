@@ -345,13 +345,45 @@ def parse_top10_content(content):
     return rows
 
 
+# 深度分析报告里承载"候选池"的二级标题在不同日期叫法不同:
+#   候选池 (10-27 / 10-30 / 11-01 / 11-02) | 深度排名 (10-29) | 逐股深度评分 (11-03)
+# ⚠️ 2026-11-03 实战: 旧实现只认 "候选池" → 10-29 的"深度排名"、11-03 的
+# "逐股深度评分" 整张池表被漏掉, 回捞恒为 0 行。
+#   11-03 后果: 08:03 盘前版选股报告**从未被 git 提交**(深度分析 autopilot 的
+#   commit 只带 深度分析.md/脚本/data, 不带当日选股报告), 而 09:37 开盘后
+#   重跑又覆盖了工作区那份 → 盘前池四源(工作区/HEAD/git 历史/深度分析表)全落空,
+#   盘后战报只能输出"三源均无候选池", 11-02 修的"虚假 100% 命中率"虽不复现,
+#   但**真实 5 只盘前池被整个丢弃** → 盘后战报缺失盘前池评估。
+#   修法: 标题关键词白名单 + 表头**结构语义**双重判定(见下)。
+_POOL_SECTION_KEYWORDS = ("候选池", "深度排名", "逐股深度评分")
+
+
+def _is_pool_table_header(cells):
+    """池表表头判定: 必须同时含精确单元格"代码" + 基准日涨跌幅列。
+
+    涨跌幅列以 "涨跌" 结尾 ("10-26 涨跌" / "11-02 涨跌"), 但**排除**
+    "涨跌幅" / "实时涨跌%" —— 那是复核表/盘中表的列名, 不是基准日池表。
+    """
+    if "代码" not in cells:
+        return False
+    return any(c.endswith("涨跌") for c in cells)
+
+
 def _parse_top10_from_deep_analysis(date_str):
-    """从 {date}-深度分析.md 的"候选池"表格回捞候选池。
+    """从 {date}-深度分析.md 的候选池表格回捞候选池。
 
     ⚠️ 2026-10-26 实战: 选股报告的 Top10 section 会被**盘中重跑覆盖**成空
     (09:37 重跑用盘中实时情绪把"停止交易"状态写回同一个文件, 把 08:02 盘前
     版的 10 只候选池清空)。深度分析报告 08:34 生成时读的还是盘前版,
-    其"二、候选池"表格保留了完整的 10 只 + 基准日涨跌幅 → 作为回捞来源。
+    其候选池表格保留了完整的 10 只 + 基准日涨跌幅 → 作为回捞来源。
+
+    ⚠️ 2026-11-03 实战: 池表所在二级标题按日改名 (候选池/深度排名/逐股深度评分),
+    旧实现只认"候选池" → 10-29 起漏解析。现改为:
+      1) 二级标题命中 _POOL_SECTION_KEYWORDS 任一关键词;
+      2) 本节内**按表头结构语义**定位池表 (精确列"代码" + 以"涨跌"结尾的
+         基准日涨跌幅列) —— 不依赖固定表名, 也不误取"昨日复核"表的
+         "10-29 收盘 / 实收" 列。
+      3) 只解析该表的连续数据行 (表结束即停), 不跨表捞。
 
     表格形如:
       | 深度排名 | 股票 | 代码 | 10-23 涨跌 | ... |
@@ -361,27 +393,45 @@ def _parse_top10_from_deep_analysis(date_str):
     try:
         with open(path) as f:
             content = f.read()
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         return []
     lines = content.split("\n")
     start = None
     for i, line in enumerate(lines):
-        if "候选池" in line and line.startswith("##"):
+        if line.startswith("##") and any(k in line for k in _POOL_SECTION_KEYWORDS):
             start = i
             break
     if start is None:
         return []
-    rows = []
-    seen = set()
-    for line in lines[start + 1:]:
+
+    def _cells_of(line):
+        return [c.strip().replace("**", "").replace("🥇", "").replace("🥈", "")
+                .replace("🥉", "").replace("🆕", "") for c in line.split("|")]
+
+    # 在本节内按结构语义定位池表表头
+    header_idx = None
+    for j in range(start + 1, len(lines)):
+        line = lines[j]
         if re.match(r"^#{1,3}\s+", line):
             break
         if not line.startswith("|"):
             continue
-        if "代码" in line:
-            continue
-        cells = [c.strip().replace("**", "").replace("🥇", "").replace("🥈", "")
-                 .replace("🥉", "").replace("🆕", "") for c in line.split("|")]
+        if _is_pool_table_header(_cells_of(line)):
+            header_idx = j
+            break
+    if header_idx is None:
+        return []
+
+    rows = []
+    seen = set()
+    for line in lines[header_idx + 1:]:
+        if re.match(r"^#{1,3}\s+", line):
+            break
+        if not line.startswith("|"):
+            break  # 表结束
+        if set(line.replace("|", "").replace(":", "").strip()) <= {"-"}:
+            continue  # 分隔行
+        cells = _cells_of(line)
         code = next((c for c in cells if re.match(r"^\d{6}$", c)), None)
         if not code or code in seen:
             continue

@@ -541,6 +541,96 @@ _POPULATED_DEEP_ANALYSIS = """# 深度分析 — 2026-10-29 (周四交易日盘�
 盘前情绪偏暖, 冰点守卫未触发。
 """
 
+# ⚠️ 2026-11-03 实战: 池表所在二级标题按日改名, 且**前一节还有一张同含"代码"
+# 列的"昨日复核"表**(列名是"收盘/实收"而非基准日"涨跌")。旧实现只认"候选池"
+# 标题 → 整张池表漏解析; 若只改成"任意含代码的表" → 会误取昨日复核表。
+# 这里同时锁两条: (1) 新标题"逐股深度评分"必须能回捞; (2) 昨日复核表不得混入。
+_RENAMED_SECTION_DEEP_ANALYSIS = """# 深度分析 — 2026-11-03 (周二交易日盘前 · 候选池 5 只)
+
+## 一、报告确认
+
+| 项 | 值 |
+|---|---|
+| 采用报告 Top10 表 | **5 只** (原始数据行 5 行) |
+
+## 二、昨日 (11-02) 尾盘深度 Top5 当日实现复核 (11-02 收盘, 腾讯快照)
+
+| 深度分 | 股票 | 代码 | 11-02 实收 | vs 大盘均 +1.34% | 快照日 |
+|---|---|---|---|---|---|
+| 60.0 中性 | 妙可蓝多 | 600882 | **+6.04%** | ✅ 胜 +4.70pp | 20261102 |
+
+## 三、逐股深度评分 (技术50% + 基本面30% + 估值20%, 含失真修正 v1)
+
+| 深度分 | 股票 | 代码 | 现价 | 11-02 涨跌 | 技术/55 | 基本面/30 | 估值/15 | 状态 |
+|---|---|---|---|---|---|---|---|---|
+| **85.6 买入** | **西麦食品** | **002956** | ¥20.25 | **+6.69%** (#2) | 48 | **26** | 12 | 未破 |
+| 62.7 中性 | 力鼎光电 | 605118 | ¥37.20 | +6.99% (#1) | 36 | 26 | 3 | 未破 |
+| 51.6 中性 | 汇顶科技 | 603160 | ¥59.96 | +5.69% (#3) | 48 | 0 | 6 | 未破 |
+"""
+
+
+def test_pool_table_parsed_when_section_renamed_from_candidate_pool(
+    monkeypatch, tmp_path
+):
+    """池表二级标题改名后仍须回捞 (11-03 实战: "候选池" → "逐股深度评分")。
+
+    2026-11-03 生产 bug: 08:03 盘前版选股报告从未入库 git, 而 09:37 开盘后
+    重跑又覆盖了工作区那份 → 盘前池四源(工作区/HEAD/git 历史/深度分析表)
+    全落空, 盘后战报输出"三源均无候选池", 真实 5 只盘前池被整个丢弃。
+    根因: _parse_top10_from_deep_analysis 只认"候选池"标题, 漏掉新标题。
+    """
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    (tmp_path / "2026-11-03-深度分析.md").write_text(
+        _RENAMED_SECTION_DEEP_ANALYSIS, encoding="utf-8"
+    )
+    rows = run_afterhours._parse_top10_from_deep_analysis("2026-11-03")
+    codes = [r[0] for r in rows]
+    assert codes == ["002956", "605118", "603160"], rows
+    # 基准日涨跌幅 (prev_close 口径), 不是现价也不是昨日复核表的实收
+    assert rows[0][2] == 6.69, rows
+
+
+def test_pool_table_excludes_yesterday_review_table(monkeypatch, tmp_path):
+    """池表回捞不得混入"昨日复核"表 (列名是收盘/实收, 非基准日涨跌)。"""
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    (tmp_path / "2026-11-03-深度分析.md").write_text(
+        _RENAMED_SECTION_DEEP_ANALYSIS, encoding="utf-8"
+    )
+    rows = run_afterhours._parse_top10_from_deep_analysis("2026-11-03")
+    assert "600882" not in [r[0] for r in rows], rows
+
+
+def test_resolve_candidate_pool_recovers_pool_via_renamed_deep_analysis_section(
+    monkeypatch, tmp_path
+):
+    """端到端: 盘前池四源全落空时, 深度分析(改名章节)仍能救回 prev_close 池。"""
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
+    (tmp_path / "2026-11-03-深度分析.md").write_text(
+        _RENAMED_SECTION_DEEP_ANALYSIS, encoding="utf-8"
+    )
+    # 工作区 = 开盘后重跑版 (intraday 口径, 空表) → 口径不符必须拒绝
+    (tmp_path / "2026-11-03-选股报告.md").write_text(
+        "# A股选股报告 — 2026-11-03 v2.5\n\n"
+        "> **生成时间：** 2026-11-03 09:37:55\n\n"
+        "### 🏆 重点关注 Top 10\n\n"
+        "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 | 技术分 | 综合评分 |\n"
+        "|:----:|:----:|:----:|:----:|:------:|:------:|:--------:|\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_git_head_top10_with_semantics", lambda d: ([], "unknown")
+    )
+    monkeypatch.setattr(
+        run_afterhours, "_git_history_premarket_top10", lambda d: ([], None, False)
+    )
+
+    rows, source, note, sem = run_afterhours.resolve_candidate_pool("2026-11-03")
+
+    assert sem == "prev_close", sem
+    assert len(rows) == 3, rows
+    assert "深度分析" in source, source
+    assert rows[0][0] == "002956", rows
+
 
 def test_empty_pool_detected_from_deep_analysis_when_premarket_never_committed(
     monkeypatch, tmp_path
