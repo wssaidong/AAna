@@ -90,7 +90,7 @@
 | 横截面一次算全池（`groupby('symbol')` 后向量化） | `strategy/rps_breakout.py`（120 日窗全市场一次算） | `snapshot_many()` 宽表实现（列=代码）：**同长度分组建一个 DataFrame，每类指标全池一次 rolling/ewm**。实测 groupby.rolling 按组分发的固定开销在 300 组 × ~20 次分组操作下达 588ms，宽表方案 118ms（5×），故选宽表 |
 | 宁缺毋滥（数据不足返回空而非凑数） | `strategy/*.py` 各形态的最低 bar 数守卫 | snapshot 沿用旧口径（不足根数回退全样本均值 / RSI None / MACD None），不新增行为 |
 
-### 真实耗时对比（M1 Pro / Python 3.11.15 / pandas 3.0.5，合成K线固定种子零网络，3 轮取最小；打点脚本与日志 `~/.aana/s2/`）
+### 真实耗时对比（Intel i5-8259U / Python 3.11.15 / pandas 3.0.5，合成K线固定种子零网络，3 轮取最小；打点脚本与日志 `~/.aana/s2/`。XWI-83 QA 复核：原稿误标 "M1 Pro"，实测机器为 Intel i5-8259U，七项 workload 复跑偏差全部 ±2% 以内可复现）
 
 | workload | 旧实现 | 向量化后 | 倍数 |
 |---|---|---|---|

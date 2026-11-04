@@ -15,13 +15,19 @@ data/quotes.py — AAna 统一行情数据服务
   kl = qs.kline("603906", period="daily", count=60)
 """
 
-import os
 import json
+import os
 import time
 import warnings
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 import requests
-from datetime import datetime, date
-from typing import Optional, List, Dict, Any
+
+try:  # XWI-80 P0-1: 本地日线库（store 优先、网络兜底）；缺库不阻塞行情
+    from data import market_store
+except Exception:  # pragma: no cover
+    market_store = None
 
 warnings.filterwarnings('ignore')
 
@@ -32,6 +38,8 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
 SINA_HQ     = "http://hq.sinajs.cn/list="
 TENCENT_QT  = "https://qt.gtimg.cn/q="
 TENCENT_KL  = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+# 2026-10-29: fqkline 被 WAF 拦 (HTTP 501) 时的降级端点 (不复权, 字段顺序同 fqkline)
+TENCENT_KL_NOAJ = "https://web.ifzq.gtimg.cn/appstock/app/kline/kline"
 THS_HOT     = "http://zx.10jqka.com.cn/event/api/getharden/"
 EM_PUSH2    = "https://push2.eastmoney.com/api/qt/stock/get"
 EM_PUSH2IND = "https://push2.eastmoney.com/api/qt/clist/get"
@@ -109,11 +117,17 @@ class QuoteService:
               count: int = 30, adjust: str = "qfq",
               allow_sina_fallback: bool = True) -> List[Dict[str, Any]]:
         """
-        获取历史K线（腾讯 → 新浪 fallback）
+        获取历史K线（XWI-80 P0-1 起：本地日线库 store 优先 → 腾讯 → 新浪 fallback）
         period: daily / weekly / monthly
         count: 获取K线根数
         adjust: qfq / hfq / ""（前复权/后复权/不复权）
         返回: [{date, open, high, low, close, vol}, ...]
+
+        store 优先（data/market_store.py，仅 daily）：
+          - 命中（库里该口径 >= count 根）→ 直接返回，零网络请求
+          - 未命中/库存不足 → 走网络，成功后回写 store
+          - 回写口径如实标注：新浪 fallback 与腾讯 NOAJ 降级拿到的是不复权
+            价，一律按 raw 入库，绝不伪装成 qfq（qfq/raw 分行存储互不串）
 
         ⚠️ v2026-10-26 新增 allow_sina_fallback（默认 True = 保持原行为）:
         新浪 fallback 只提供**不复权**日线，腾讯 fqkline 提供**前复权**。
@@ -122,9 +136,25 @@ class QuoteService:
         计算**收益率**的场景必须传 allow_sina_fallback=False，拿不到前复权序列时
         宁可留空也不要用不复权价凑出脏收益率（见 feedback_loop._kline_cached）。
         """
-        kl = self._tencent_kline(code, period, count, adjust)
+        if period == "daily" and market_store is not None:
+            try:
+                cached = market_store.load_kline_cached(code, count=count, adjust=adjust)
+                if cached:
+                    return cached
+            except Exception:
+                pass  # store 故障不影响行情主链路
+
+        kl, actual_adjust = self._tencent_kline(code, period, count, adjust,
+                                                return_adjust=True)
         if not kl and allow_sina_fallback:
             kl = self._sina_kline_fallback(code, count)
+            actual_adjust = 'raw'  # 新浪日线 = 不复权，绝不标成 qfq
+
+        if kl and period == "daily" and actual_adjust and market_store is not None:
+            try:
+                market_store.save_kline_cached(code, kl, adjust=actual_adjust)
+            except Exception:
+                pass  # 回写失败不影响返回
         return kl
 
     def block_industry(self, top_n: int = 10) -> List[Dict[str, Any]]:
@@ -228,30 +258,74 @@ class QuoteService:
         except Exception:
             return {}
 
-    def _tencent_kline(self, code: str, period: str, count: int, adjust: str) -> List[Dict[str, Any]]:
+    def _tencent_kline(self, code: str, period: str, count: int, adjust: str,
+                       return_adjust: bool = False):
+        """拉腾讯日K。return_adjust=True 时返回 (bars, 实际复权口径)：
+        口径以 payload 实际键位为准（qfqday/hfqday 键 = 请求口径，裸 day 键
+        = 'raw' 不复权）；NOAJ 降级端点恒 'raw'。默认返回 bars（向后兼容）。"""
+        mkt = 'sh' if code.startswith(('6', '9')) else ('bj' if code.startswith(('8', '4', '3')) else 'sz')
+        for url, params, forced in (
+            (TENCENT_KL, {"param": f"{mkt}{code},day,,,{count},{adjust}"}, None),
+            # 2026-10-29: fqkline qfq 端点被腾讯 WAF 拦 (HTTP 501) 时降级到
+            # kline/kline 不复权端点 (与 scripts/deep_analysis_pm_20261026.py 同款降级)。
+            # 两端点 bar 字段顺序一致 = [date, open, close, high, low, vol]。
+            (TENCENT_KL_NOAJ, {"param": f"{mkt}{code},day,,,{count},"}, 'raw'),
+        ):
+            bars, used = self._parse_tencent_bars(url, params, mkt, code, adjust)
+            if bars:
+                return (bars, forced or used) if return_adjust else bars
+        return ([], None) if return_adjust else []
+
+    @staticmethod
+    def _parse_tencent_bars(url: str, params: dict, mkt: str, code: str,
+                            adjust: str) -> tuple[List[Dict[str, Any]], Optional[str]]:
+        """拉取并解析腾讯日K bar，返回 (bars, 实际口径)。
+
+        口径判定跟着 payload 键位走：{adjust}day 键 → 请求口径；裸 day 键
+        → 'raw'。XWI-83 QA 修复：原实现从 fqkline 端点静默回退取裸 day
+        (不复权) 数据，却仍被 _tencent_kline 推定标成 qfq —— 002178 的
+        raw 冒充 qfq 入库、10-21→10-22 复现 -3.73% 假跌幅的根因。
+        标签必须反映数据真实口径，不能推定。
+
+        ⚠️ 2026-10-29 P0 字段错位修复:
+          腾讯 fqkline 每根 bar 实际是 [date, open, close, high, low, vol]
+          原实现写成 [date, open, high, low, close, vol] → 把「收盘价」当成
+          「最低价」用, 把「最高价」当成「收盘价」用, 把「最低价」当成
+          「最高价」用。三重错位, 且 low > high 物理不可能。
+          证据 (2026-10-29 三重独立验证):
+            1) 新浪实时 hq.sinajs.cn 逐项比对: 正确映射 14/14 匹配,
+               错位映射 0/14
+            2) 内部不变量 low <= open <= high: 正确映射 0% 违例,
+               错位映射 99.4% 违例 (854 根 bar)
+            3) 本仓库 scripts/deep_analysis_2026*.py 一直用 k[2]=close /
+               k[3]=high / k[4]=low (正确顺序), 与本处原实现相互矛盾
+          影响: 所有基于 close 的收益率/MA/MACD/RSI 全部偏移 (收-低 = 当日
+               下跌幅度), 实测同批样本胜率 93% (错位) vs 50% (正确) ——
+               直接污染 feedback_loop 胜率与 backtest 结论。
+        """
         try:
-            mkt = 'sh' if code.startswith(('6', '9')) else ('bj' if code.startswith(('8', '4', '3')) else 'sz')
-            url = TENCENT_KL
-            params = {"param": f"{mkt}{code},day,,,{count},{adjust}"}
             r = _retry_req(url, params)
             if not r:
-                return []
+                return [], None
             text = r.text.strip()
             if '=' in text:
                 text = text.split('=', 1)[1]
             data = json.loads(text)
-            day_data = (data.get('data', {})
-                        .get(f'{mkt}{code}', {})
-                        .get(f'{adjust}day', [])
-                        or data.get('data', {}).get(f'{mkt}{code}', {}).get('day', []))
-            return [
+            node = data.get('data', {}).get(f'{mkt}{code}', {})
+            day_data = node.get(f'{adjust}day', [])
+            actual = adjust if adjust in ('qfq', 'hfq') else 'raw'
+            if not day_data:
+                day_data = node.get('day', [])
+                actual = 'raw'
+            bars = [
                 {'date': item[0], 'open': _sf(item[1]),
-                 'high': _sf(item[2]), 'low': _sf(item[3]),
-                 'close': _sf(item[4]), 'vol': _sf(item[5])}
+                 'close': _sf(item[2]), 'high': _sf(item[3]),
+                 'low': _sf(item[4]), 'vol': _sf(item[5])}
                 for item in day_data if len(item) >= 6
             ]
+            return bars, actual
         except Exception:
-            return []
+            return [], None
 
     def _sina_kline_fallback(self, code: str, count: int) -> List[Dict[str, Any]]:
         """新浪K线作为腾讯的降级方案（仅日线，不支持前复权）"""
