@@ -1,0 +1,348 @@
+{
+ "date": "2026-11-04",
+ "generated": "14:52:16",
+ "sector_stats_n": 93,
+ "overall_win_rate": 49.473684210526315,
+ "results": [
+  {
+   "code": "002352",
+   "name": "顺丰控股",
+   "price": 33.68,
+   "pe_ttm": 15.6,
+   "pb": 1.68,
+   "mcap_yi": 1562.4,
+   "float_mcap_yi": 1719.41,
+   "turnover_pct": 0.77,
+   "vol_ratio": 1.31,
+   "v24_score": 100,
+   "ind_sina": "物流",
+   "ind_em": "物流",
+   "tech_score": 46,
+   "fund_score": 11,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 27.131,
+    "single_q_loss": false
+   },
+   "total": 72.8,
+   "rating": "增持",
+   "target": 35.36,
+   "stop": 31.42,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=70 偏热",
+    "20日区间位置 83% 突破区",
+    "60日涨幅 -2% 回调",
+    "量能比 1.27 正常"
+   ],
+   "fund_notes": [
+    "ROE 8.1% 良好",
+    "净利增速 -1% 负增长",
+    "营收增速 +6%"
+   ],
+   "val_notes": [
+    "PE 16 合理",
+    "PB 1.68 合理"
+   ],
+   "tech_stat": {
+    "rsi": 69.9,
+    "pos20": 83.0,
+    "chg60": -2.2,
+    "vol_ratio_5d": 1.27,
+    "ma5": 33.13,
+    "ma20": 31.77,
+    "ma60": 31.99,
+    "hi20": 34.4,
+    "lo20": 30.16,
+    "chg_1d": -0.71,
+    "last_date": "2026-11-04",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 8.1,
+    "ni_growth": -1.122497,
+    "rev_growth": 5.534066
+   },
+   "chg_pct": -0.71,
+   "chg_report": -0.38,
+   "sector_stat_key": "物流",
+   "sector_win_rate": "100% (1/1)",
+   "stop_broken": false
+  },
+  {
+   "code": "600487",
+   "name": "亨通光电",
+   "price": 43.23,
+   "pe_ttm": 16.49,
+   "pb": 2.88,
+   "mcap_yi": 1060.71,
+   "float_mcap_yi": 1066.22,
+   "turnover_pct": 7.53,
+   "vol_ratio": 1.44,
+   "v24_score": 83,
+   "ind_sina": "通信传输设备",
+   "ind_em": "通信设备",
+   "tech_score": 25,
+   "fund_score": 30,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 30.436,
+    "single_q_loss": false
+   },
+   "total": 72.7,
+   "rating": "增持",
+   "target": 47.37,
+   "stop": 40.05,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=46 健康",
+    "20日区间位置 26% 偏低",
+    "60日涨幅 -14% 弱势",
+    "量能比 1.40 正常"
+   ],
+   "fund_notes": [
+    "ROE 17.9% 优秀",
+    "净利增速 +159%",
+    "营收增速 +30%"
+   ],
+   "val_notes": [
+    "PE 16 合理",
+    "PB 2.88 合理"
+   ],
+   "tech_stat": {
+    "rsi": 46.1,
+    "pos20": 26.0,
+    "chg60": -14.0,
+    "vol_ratio_5d": 1.4,
+    "ma5": 42.84,
+    "ma20": 47.97,
+    "ma60": 58.42,
+    "hi20": 55.49,
+    "lo20": 38.81,
+    "chg_1d": 6.87,
+    "last_date": "2026-11-04",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 17.87,
+    "ni_growth": 159.416031,
+    "rev_growth": 29.717624
+   },
+   "chg_pct": 6.87,
+   "chg_report": 6.45,
+   "sector_stat_key": "通信传输设备",
+   "sector_win_rate": "100% (1/1)",
+   "stop_broken": false
+  },
+  {
+   "code": "002518",
+   "name": "科士达",
+   "price": 27.83,
+   "pe_ttm": 24.31,
+   "pb": 3.18,
+   "mcap_yi": 157.28,
+   "float_mcap_yi": 162.03,
+   "turnover_pct": 2.42,
+   "vol_ratio": 1.49,
+   "v24_score": 85,
+   "ind_sina": "储能设备",
+   "ind_em": "其他电源设备Ⅱ",
+   "tech_score": 25,
+   "fund_score": 22,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 2.114,
+    "single_q_loss": false
+   },
+   "total": 60.7,
+   "rating": "中性",
+   "target": 30.59,
+   "stop": 25.86,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=46 健康",
+    "20日区间位置 22% 偏低",
+    "60日涨幅 -13% 弱势",
+    "量能比 1.45 正常"
+   ],
+   "fund_notes": [
+    "ROE 10.1% 良好",
+    "净利增速 +12%",
+    "营收增速 +16%"
+   ],
+   "val_notes": [
+    "PE 24 合理",
+    "PB 3.18 中等"
+   ],
+   "tech_stat": {
+    "rsi": 46.4,
+    "pos20": 22.0,
+    "chg60": -13.4,
+    "vol_ratio_5d": 1.45,
+    "ma5": 26.47,
+    "ma20": 28.54,
+    "ma60": 33.25,
+    "hi20": 36.24,
+    "lo20": 25.51,
+    "chg_1d": 6.96,
+    "last_date": "2026-11-04",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 10.08,
+    "ni_growth": 12.482712,
+    "rev_growth": 15.527034
+   },
+   "chg_pct": 6.96,
+   "chg_report": 6.88,
+   "sector_stat_key": "高低压设备",
+   "sector_win_rate": "100% (2/2)",
+   "stop_broken": false
+  },
+  {
+   "code": "603859",
+   "name": "能科科技",
+   "price": 37.63,
+   "pe_ttm": 54.58,
+   "pb": 2.39,
+   "mcap_yi": 92.08,
+   "float_mcap_yi": 100.25,
+   "turnover_pct": 6.98,
+   "vol_ratio": 0.9,
+   "v24_score": 83,
+   "ind_sina": "工控自动化",
+   "ind_em": "IT服务Ⅱ",
+   "tech_score": 25,
+   "fund_score": 6,
+   "val_score": 9,
+   "val_score_raw": 9,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 0.284,
+    "single_q_loss": false
+   },
+   "total": 40.7,
+   "rating": "减持",
+   "target": 41.34,
+   "stop": 34.95,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=54 健康",
+    "20日区间位置 30% 偏低",
+    "60日涨幅 -10% 弱势",
+    "量能比 0.88 正常"
+   ],
+   "fund_notes": [
+    "ROE 3.4% 弱",
+    "净利增速 -25% 负增长",
+    "营收增速 +16%"
+   ],
+   "val_notes": [
+    "PE 55 高",
+    "PB 2.39 合理"
+   ],
+   "tech_stat": {
+    "rsi": 54.1,
+    "pos20": 30.0,
+    "chg60": -10.2,
+    "vol_ratio_5d": 0.88,
+    "ma5": 37.75,
+    "ma20": 38.82,
+    "ma60": 39.17,
+    "hi20": 47.86,
+    "lo20": 33.34,
+    "chg_1d": 6.12,
+    "last_date": "2026-11-04",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 3.37,
+    "ni_growth": -25.413143,
+    "rev_growth": 16.246476
+   },
+   "chg_pct": 6.12,
+   "chg_report": 5.98,
+   "sector_stat_key": "软件开发",
+   "sector_win_rate": "75% (3/4)",
+   "stop_broken": false
+  },
+  {
+   "code": "603407",
+   "name": "长裕集团",
+   "price": 42.82,
+   "pe_ttm": 52.04,
+   "pb": 7.7,
+   "mcap_yi": 15.38,
+   "float_mcap_yi": 174.65,
+   "turnover_pct": 11.3,
+   "vol_ratio": 1.37,
+   "v24_score": 83,
+   "ind_sina": "unknown",
+   "ind_em": "化学原料",
+   "tech_score": 15,
+   "fund_score": 23,
+   "val_score": 3,
+   "val_score_raw": 3,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 1.241,
+    "single_q_loss": false
+   },
+   "total": 40.6,
+   "rating": "减持",
+   "target": 47.0,
+   "stop": 39.74,
+   "tech_notes": [
+    "均线偏弱",
+    "RSI=43 偏弱",
+    "20日区间位置 17% 偏低",
+    "60日涨幅 -26% 弱势",
+    "量能比 1.33 正常"
+   ],
+   "fund_notes": [
+    "ROE 14.0% 良好",
+    "净利增速 +49%",
+    "营收增速 +10%"
+   ],
+   "val_notes": [
+    "PE 52 高",
+    "PB 7.70 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 43.2,
+    "pos20": 17.0,
+    "chg60": -26.4,
+    "vol_ratio_5d": 1.33,
+    "ma5": 42.11,
+    "ma20": 47.1,
+    "ma60": 54.96,
+    "hi20": 58.13,
+    "lo20": 39.62,
+    "chg_1d": 6.76,
+    "last_date": "2026-11-04",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 14.04,
+    "ni_growth": 49.184088,
+    "rev_growth": 9.945072
+   },
+   "chg_pct": 6.76,
+   "chg_report": 6.53,
+   "sector_stat_key": "其他化学制品",
+   "sector_win_rate": "50% (1/2)",
+   "stop_broken": false
+  }
+ ]
+}
