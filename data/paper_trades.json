@@ -5195,5 +5195,17 @@
     }
   ],
   "positions": {},
-  "daily_snapshots": []
+  "daily_snapshots": [
+    {
+      "date": "2026-11-04",
+      "cash": 96990.0,
+      "position_value": 0.0,
+      "total_value": 96990.0,
+      "daily_pnl": -3010.0,
+      "total_pnl": -3010.0,
+      "total_pnl_pct": -3.01,
+      "realized_pnl": -3010.0,
+      "positions": []
+    }
+  ]
 }
