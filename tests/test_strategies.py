@@ -13,10 +13,12 @@ import pytest
 
 import strategies
 from strategies import (
+    FILTER_REGISTRY,
     STRATEGY_REGISTRY,
     BaseStrategy,
     CompositeStrategy,
     ShapeFilter,
+    filter_and_score,
     quick_score,
 )
 
@@ -31,10 +33,10 @@ def synth_klines(seed: int = 7, n: int = 60, start: float = 10.0, drift: float =
         px = max(1.0, px * (1 + rnd.uniform(drift * -0.75 - 0.015, drift + 0.005)))
         o = px * (1 + rnd.uniform(-0.005, 0.005))
         h = max(px, o) * 1.005
-        l = min(px, o) * 0.995
+        low = min(px, o) * 0.995
         bars.append({
             "date": f"2026-{i // 28 + 1:02d}-{i % 28 + 1:02d}",
-            "open": round(o, 2), "high": round(h, 2), "low": round(l, 2),
+            "open": round(o, 2), "high": round(h, 2), "low": round(low, 2),
             "close": round(px, 2), "vol": round(rnd.uniform(1e5, 5e6), 0),
         })
     return bars
@@ -123,6 +125,8 @@ def test_every_strategy_file_registers_plugin():
     files = {m.name for m in pkgutil.iter_modules(strategies.__path__)} - infra
     contributors = {
         cls.__module__.split(".")[-1] for cls in STRATEGY_REGISTRY.values()
+    } | {
+        cls.__module__.split(".")[-1] for cls in FILTER_REGISTRY.values()
     }
     assert files <= contributors, f"未注册的策略文件: {files - contributors}"
 
@@ -145,6 +149,51 @@ def test_registered_strategy_empty_inputs(key, fake_market):
     strat = STRATEGY_REGISTRY[key]()
     s = strat.score("999999", [], {})
     assert 0 <= s <= 100
+
+
+# ── 逐形态过滤器自动生成用例 ──────────────────────────────
+@pytest.mark.parametrize("key", sorted(FILTER_REGISTRY))
+def test_registered_filter_contract(key):
+    """不变量：任意注册过滤器返回 list[str]、是输入子集、元素非空、空输入安全。"""
+    flt = FILTER_REGISTRY[key]()
+    assert flt.name
+    codes = ["600000", "600001", "600002", "unknown"]
+    klines_map = {c: synth_klines(seed=i) for i, c in enumerate(codes[:3])}
+    out = flt.run(codes, klines_map)
+    assert isinstance(out, list)
+    assert all(isinstance(c, str) and c for c in out)
+    assert set(out) <= set(codes)
+    assert flt.run([], {}) == []
+
+
+def test_ma_bull_filter_selects():
+    """均线多头判定：严格上涨序列入选，严格下跌序列排除。"""
+    from strategies.filters import MABullFilter
+
+    def linear(n=60, step=0.5, start=10.0):
+        return [
+            {"date": f"d{i}", "open": start, "high": start + step, "low": start,
+             "close": start + step * i, "vol": 1000.0 + i}
+            for i in range(n)
+        ]
+
+    rising, falling = linear(step=0.5), linear(step=-0.3)
+    out = MABullFilter().run(["up", "down"], {"up": rising, "down": falling})
+    assert out == ["up"]
+
+
+def test_filter_and_score_composition(fake_market):
+    """形态筛选层 × 评分层组合：先筛后打分，输出按分数降序。"""
+    from strategies.filters import MABullFilter
+
+    codes = [f"60{i:04d}" for i in range(4)]
+    klines_map = {c: synth_klines(seed=i) for i, c in enumerate(codes)}
+    ranked = filter_and_score(
+        codes, klines_map, MABullFilter(), STRATEGY_REGISTRY["momentum"]()
+    )
+    assert all(r["code"] in codes for r in ranked)
+    scores = [r["score"] for r in ranked]
+    assert scores == sorted(scores, reverse=True)
 
 
 # ── 契约层 ──────────────────────────────────────────────

@@ -146,81 +146,17 @@ class QuoteService:
         计算技术指标（基于K线）
         返回: {rsi, ma5, ma10, ma20, ma60, macd_dif, macd_dea, macd_hist,
                vol_ratio, change_pct, ...}
+
+        XWI-81 P1-4 起指标计算整体委托 data/indicators.snapshot()：
+        pandas rolling/ewm 向量化（禁 iterrows / Python 循环算均线），
+        输出与旧实现逐字段一致 —— tests/test_indicators.py 以旧实现逐行
+        拷贝为 oracle 锁定该契约（含旧口径的 MA 不足回退与 DEA 一阶滞后）。
         """
         klines = self.kline(code, count=60)
         if not klines:
             return {}
-        closes = [k['close'] for k in klines]
-        prices = klines[-1]
-        vol_list = [k['vol'] for k in klines]
-
-        ma = lambda n: sum(closes[-n:]) / n if len(closes) >= n else (sum(closes) / len(closes) if closes else None)
-
-        # RSI
-        def calc_rsi(c, p=14):
-            if len(c) < p + 1:
-                return None
-            gains, losses = [], []
-            for i in range(1, len(c)):
-                d = c[i] - c[i-1]
-                gains.append(max(d, 0))
-                losses.append(max(-d, 0))
-            ag = sum(gains[-p:]) / p
-            al = sum(losses[-p:]) / p
-            if al == 0:
-                return 100.0
-            return round(100 - 100 / (1 + ag / al), 2)
-
-        # MACD (EMA式)
-        def ema(d, p):
-            k = 2 / (p + 1)
-            e = d[0]
-            for v in d[1:]:
-                e = v * k + e * (1 - k)
-            return e
-
-        dif_list, dea_list = [], []
-        if len(closes) >= 26:
-            for i in range(25, len(closes)):
-                d = closes[:i+1]
-                dif = ema(d, 12) - ema(d, 26)
-                dea = dif * 0.8 + (dif_list[-1] if dif_list else dif) * 0.2 if dif_list else dif
-                dif_list.append(dif)
-                dea_list.append(dea)
-
-        macd_hist = [(dif_list[-1] - dea_list[-1]) * 2] if dif_list and dea_list else [0]
-
-        # 量比
-        vol_ratio = None
-        if len(vol_list) >= 6:
-            avg5 = sum(vol_list[-6:-1]) / 5
-            vol_ratio = round(vol_list[-1] / avg5, 2) if avg5 else None
-
-        # 涨跌
-        yesterday_close = klines[-2]['close'] if len(klines) >= 2 else prices['close']
-        change_pct = round((prices['close'] - yesterday_close) / yesterday_close * 100, 2) \
-            if yesterday_close else 0
-
-        return {
-            'code': code,
-            'name': prices.get('name', code),
-            'price': prices.get('close') or prices.get('price'),
-            'open': prices.get('open'),
-            'high': prices.get('high'),
-            'low': prices.get('low'),
-            'close': prices.get('close') or prices.get('price'),
-            'vol': prices.get('vol'),
-            'change_pct': change_pct,
-            'ma5': ma(5),
-            'ma10': ma(10),
-            'ma20': ma(20),
-            'ma60': ma(60),
-            'rsi': calc_rsi(closes),
-            'macd_dif': round(dif_list[-1], 4) if dif_list else None,
-            'macd_dea': round(dea_list[-1], 4) if dea_list else None,
-            'macd_hist': round(macd_hist[-1], 4),
-            'vol_ratio': vol_ratio,
-        }
+        from data import indicators
+        return indicators.snapshot(klines, code=code)
 
     # ── 私有方法 ──────────────────────────────────────────────
 

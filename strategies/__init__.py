@@ -12,7 +12,8 @@ import 时通过 @register_strategy / @register_filter 自注册，新增策略�
   ├── momentum.py     # 动量策略（RSI + 涨幅）
   ├── technical.py    # 技术面策略（均线多头 + MACD + 量价）
   ├── value.py        # 价值策略（PE/PB/ROE）
-  └── composite.py    # 复合策略（加权组合多个策略）
+  ├── composite.py    # 复合策略（加权组合多个策略）
+  └── filters.py      # 形态筛选层实现（ShapeFilter.run() -> list[str] 落点）
 
 使用示例：
   from strategies import CompositeStrategy, MomentumStrategy, TechnicalStrategy
@@ -24,7 +25,7 @@ import 时通过 @register_strategy / @register_filter 自注册，新增策略�
 
 import importlib
 import pkgutil
-from typing import Any, Optional
+from typing import Any
 
 from strategies.base import (
     FILTER_REGISTRY,
