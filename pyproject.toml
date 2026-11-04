@@ -35,6 +35,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "black>=24.0.0",
     "ruff>=0.4.0",
+    "hypothesis>=6.100.0",  # XWI-82 P1-5: 属性测试（仅 dev，不进运行时依赖）
 ]
 
 [project.scripts]

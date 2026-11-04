@@ -118,3 +118,75 @@
 - 60bar 单只路径的 ~5× 指标层退化：如 S5 认为不可接受，备选方案是池级调用方迁移 `snapshot_many`（S3 一并做）或给 `technical()` 加进程内 LRU（按 code+最后bar日期），本阶段不动调用方（红线：`scripts/feedback_loop.py` 等生产路径向后兼容）。
 - `ruff check .` 全仓库仍有 ~1.9k 历史违规（基线即如此）；本阶段新增/重写文件（strategies/ 7 个、data/indicators.py、2 个测试文件）ruff 全绿，`quotes.py` 的 31 个（UP006×28 等）全部为 S1 之前就存在的注解风格问题，未清（不混入本阶段 diff）。
 - hypothesis 属性测试（P1-5）在 S3：届时 `tests/test_strategies.py` 的注册表 parametrize 结构可直接复用。
+
+## P0-3 RPS 横截面相对强度（XWI-82, S3/5）
+
+**交付**：`analysis_tools/rps.py`（横截面 RPS 引擎 + store 适配 + 雪球全市场快照 + CLI `python -m analysis_tools.rps`）+ `tests/test_rps.py`（23 用例，TDD 先行）。RPS 定位为**候选池扩容信号**：不改 AAna 技术50%+基本面30%+估值20% 评分体系，不动回测。
+
+### 吸收了什么（借鉴点 → Sequoia-X 源位置）
+
+| 吸收点 | Sequoia-X 位置 | AAna 落地 |
+|---|---|---|
+| 纵向涨幅 `groupby('symbol')['close'].shift(period)` → pct | `strategy/rps_breakout.py:31-32` | `compute_returns()`：`drop_duplicates(symbol,date)` 防脏行 + `sort_values` 稳定序 + shift 按 **bar 数**对齐（停牌断档不产生假窗口）+ 基期/现价 ≤0 → NaN（不产出 ±inf） |
+| 横截面排位 `rank(pct=True) * 100` | `rps_breakout.py:39` | `compute_rps()`：`groupby('date')` 排位——且**每个交易日都算**（Sequoia-X 只取最新日），得到 RPS 时间序列，回看池子何时开始落后 |
+| 历史不足 dropna 不凑数 | `rps_breakout.py:36` | ret=NaN → 不参与当日排名（rank 默认跳过 NaN），单测锁定 |
+| 突破判定 `close >= rolling(window).max(high) × 0.90` | `rps_breakout.py:43-52` | `add_breakout()`：`min_periods=window//2` 同款（历史略欠也允许判定） |
+| 一次读全库再向量化 | `rps_breakout.py:18-28` | `load_pool_history()` 单条 SQL 读整库（adjust 显式过滤）→ 全部 rolling/shift/rank，零 iterrows |
+| backfill 断点续传 | `data/engine.py` backfill（已入库 skip） | `backfill_pool_history()`：store 已有 ≥count 根 → skip 零网络；口径不符（NOAJ 降级=raw）→ missing 绝不入 qfq |
+
+### AAna 侧的关键决策（Sequoia-X 没有的问题）
+
+1. **全市场数据源的现实**：Sequoia-X 的 RPS 建立在 baostock 日 cron 积累的全市场库上。AAna 侧 push2.eastmoney 全市场快照本机 IP 级限流（2026-11-04 实测 push2/82.push2/push2delay 三 host 全部 RemoteDisconnected），逐票拉全市场几百只 K 线被 XWI-82 明确禁止。落地为**两层口径**：
+   - 池内 RPS：腾讯 qfq 120 日窗（store 读，复权口径显式）——Sequoia-X 同款口径；
+   - 全市场 RPS：雪球 screener `current_year_percent`（YTD 涨幅，前复权口径）批量分页（~50 请求一次，落地 `~/.aana/rps_market_snapshot_YYYYMMDD.csv` 当天缓存，重跑零网络），4997 只一次覆盖。
+   - 两列**并列展示绝不互相换算**（窗口不同：120 日 vs YTD），CLI 每行输出都带口径标注。
+2. **RPS 是扩容信号不是打分因子**：Top-N 表标出 `<- 池外(扩容候选)`，背离对照表回答「池内第 1 但全市场第 X」——这是池子视野盲区的直接度量，供人工/后续流程把池外强势票纳入候选，而不是把 RPS 塞进评分权重。
+3. **backfill 复用 S1 架构**：每票 1 次腾讯请求拿 321 根（fqkline 单次容量足够 120 日窗），线程池共享 QuoteService、口径校验、幂等重跑——77 票 24675 行入库 1.49s。
+
+### 真实数据（2026-11-04 收盘后实测）
+
+- 全市场 YTD RPS：n=4997，分布每十分位 ~500 只（rank 均匀性自检）；Top-20 全部为池外（YTD +247%~+1396%，科创板/次新居多）。
+- 池内 120 日 RPS（qfq）：n=77 只默认池（+10 只评分 Top10 补充，n=87）。
+- **背离实例（issue 验收点）**：AAna 深度评分第 1 瀚蓝环境 600323（92.0 买入级）池内 120 日 RPS 82.8（第 16/87），全市场 YTD RPS 86.7（**第 ~666/4997**）；评分第 5 鱼跃医疗 002223 全市场**第 ~2891/4997**（后 42%）；评分垫底的 000678 反而是池内动量第 1（RPS 100.0）。解读：评分体系选「质量防御」，全市场横截面显示池子整体动量偏弱——扩容信号即「全市场 RPS≥90 且池外的票」该进池视野。
+
+### 没吸收什么及原因
+
+| Sequoia-X 做法 | 不吸收原因 |
+|---|---|
+| RPS≥90 + 突破 = 买入策略本体 | AAna 定位为扩容信号（候选池发现层），买卖决策仍走评分+铁律+情绪守卫；突破判定只作为 Top-N 表的展示列 |
+| 全库=全市场（baostock cron 积累） | 数据源红线（不把 baostock 加回）；AAna 全市场横截面用雪球批量 YTD，池内用腾讯 qfq 120 日，口径各自显式 |
+| RPS 只算最新交易日 | AAna 算全日期序列（成本为零：同一次 groupby rank），可回看池子相对强度的演变 |
+
+### 遗留 / 交接给后续阶段
+
+- 全市场 **120 日** RPS：需 push2 恢复（f24=60 日涨幅字段，单请求全市场）或雪球个股 K 线批量（cookie 会话已具备）；当前 YTD 是无逐票风暴前提下唯一批量可得的窗口，S4/S5 可决定是否补 120 日口径。
+- 雪球 screener 无官方文档，字段/分页上限（size=100、maxPage）以 2026-11-04 实测为准，`fetch_market_snapshot_ytd` 失败自动降级为「池内 RPS 照常、全市场列缺失」并打 WARN。
+- RPS cron 化（收盘后自动 backfill+快照）与「扩容候选 → groups.json」的落池动作，待 S4/S5 排期。
+
+## P1-5 hypothesis 属性测试（XWI-82, S3/5）
+
+**交付**：`hypothesis>=6.100.0` 进 `pyproject.toml` **dev extras**（实测装 6.170.14，不进运行时依赖）+ `tests/test_property_rps.py`（7 属性）+ `tests/test_property_strategies.py`（5 属性）。`pytest tests/ -k property -q` → **12 passed in 7.05s**。
+
+### 吸收了什么（借鉴点 → Sequoia-X 源位置）
+
+| 吸收点 | Sequoia-X 位置 | AAna 落地 |
+|---|---|---|
+| `@given(...) + @settings(max_examples=30, deadline=None)` 写法 | `tests/test_strategy.py:17-23` | 同款参数规模；断言「输入任意 → 输出必合法」不变量而非具体样例 |
+| 属性聚焦输出契约（list[str] 且非空） | `test_strategy.py:39-40` | AAna 契约是评分制：score ∈ [0,100] 且永不抛异常；过滤器输出 ⊆ 输入且保序 |
+
+### AAna 侧的属性清单
+
+- RPS 引擎（`test_property_rps.py`）：有界性（非 NaN RPS ∈ [0,100]）、完备性（RPS 有值 ⇔ ret 有值）、横截面单调性（同日 ret 升序 ⇒ RPS 不降）、分布守恒（分桶和 = 非NaN 数）、Top-N 合法（≤n 行、降序、同一天）、纯函数（不改输入）、breakout 必为 bool。输入域：0-6 只 × 0-30 日、随机停牌断档（85% 保留）、close 含 0.0 脏价。
+- 策略层（`test_property_strategies.py`）：**注册表发现式**——遍历 `STRATEGY_REGISTRY`/`FILTER_REGISTRY`，S2 之后新增的策略文件自动被属性测试覆盖，不改测试文件；任意 (code, klines 0-80 根, tech 含 None/0/负/极端值) → score ∈ [0,100]；`ValueStrategy` 对任意 financials（None PE/负 ROE）有界；Composite 每个子分有界；`filter_and_score` 降序。
+
+### 没吸收什么及原因
+
+| Sequoia-X 做法 | 不吸收原因 |
+|---|---|
+| 属性测试里构造真实 `DataEngine` + `Settings` + tempfile DB + patch 网络层 | 重型 fixture 每个例子重建一遍（30 examples × DB）；AAna 侧被测对象是纯函数/可注入数据的类，`conftest.py` 已全局隔离 market_store，属性测试零网络零盘 |
+| 只测一个策略类的返回类型 | AAna 走注册表遍历，所有当前与未来策略一次覆盖 |
+
+### 真实成本
+
+- 属性测试 12 个（30 examples/个）7.05s，占全量 `pytest tests/ -q`（423 passed, 1 skipped, 42.79s）的 16%，可接受；`max_examples=30` 沿用 Sequoia-X 规模，CI 里想加密度改 profile 即可。
+- 发现即防住的真实风险：`min(100, NaN)` 伪 100 分（NaN 输入域因此显式排除在契约外，见测试 docstring）、`_check_range` 负 low 除法放大（被 `min(100,…)` 兜住，有界性不破——属性测试锁的就是这道底）。
