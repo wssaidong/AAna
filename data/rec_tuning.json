@@ -9,10 +9,10 @@
     "其他家用轻工",
     "影视动漫"
   ],
-  "total_records": 380,
-  "overall_win_rate": 49.473684210526315,
+  "total_records": 392,
+  "overall_win_rate": 50.51020408163265,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-04T20:00:41.939922",
+  "generated_at": "2026-11-05T15:01:30.268689",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -24,20 +24,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 179,
-      "win_count": 103,
-      "win_rate": 57.54189944134078,
-      "avg_change": 1.631173184357542,
+      "count": 191,
+      "win_count": 113,
+      "win_rate": 59.16230366492147,
+      "avg_change": 1.675916230366492,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 380,
-      "win_count": 188,
-      "win_rate": 49.473684210526315,
-      "avg_change": 0.3626052631578954
+      "count": 392,
+      "win_count": 198,
+      "win_rate": 50.51020408163265,
+      "avg_change": 0.4232397959183679
     }
   },
   "sector_stats": {
@@ -260,10 +260,10 @@
     "航运": {
       "sector": "航运",
       "sector_name": "",
-      "count": 1,
+      "count": 2,
       "win_count": 1,
-      "win_rate": 100.0,
-      "avg_change": 2.24
+      "win_rate": 50.0,
+      "avg_change": 0.45000000000000007
     },
     "光学元件": {
       "sector": "光学元件",
@@ -500,18 +500,18 @@
     "综合": {
       "sector": "综合",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 4.26
+      "avg_change": 4.79
     },
     "物流": {
       "sector": "物流",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 3.87
+      "avg_change": 3.3
     },
     "地面兵装": {
       "sector": "地面兵装",
@@ -676,10 +676,10 @@
     "工控自动化": {
       "sector": "工控自动化",
       "sector_name": "",
-      "count": 3,
-      "win_count": 3,
+      "count": 4,
+      "win_count": 4,
       "win_rate": 100.0,
-      "avg_change": 3.283333333333333
+      "avg_change": 3.51
     },
     "医疗服务": {
       "sector": "医疗服务",
@@ -700,10 +700,10 @@
     "通信传输设备": {
       "sector": "通信传输设备",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 3,
+      "win_count": 3,
       "win_rate": 100.0,
-      "avg_change": 4.5
+      "avg_change": 2.57
     },
     "其它通用机械": {
       "sector": "其它通用机械",
@@ -784,6 +784,46 @@
       "win_count": 1,
       "win_rate": 100.0,
       "avg_change": 5.23
+    },
+    "元件": {
+      "sector": "元件",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 2.2
+    },
+    "非金属新材料": {
+      "sector": "非金属新材料",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 5.03
+    },
+    "女装": {
+      "sector": "女装",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.14
+    },
+    "储能设备": {
+      "sector": "储能设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 3.01
+    },
+    "商用载客车": {
+      "sector": "商用载客车",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.89
     }
   }
 }
