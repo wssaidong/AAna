@@ -5916,6 +5916,128 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-05",
+      "cash": 77591.0,
+      "position_value": 19306.0,
+      "total_value": 96897.0,
+      "daily_pnl": 0.0,
+      "total_pnl": -3103.0,
+      "total_pnl_pct": -3.1,
+      "realized_pnl": -3103.0,
+      "positions": [
+        {
+          "code": "600573",
+          "name": "惠泉啤酒",
+          "shares": 100,
+          "entry_price": 12.82,
+          "current_price": 12.82,
+          "highest_price": 12.82,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603016",
+          "name": "新宏泰",
+          "shares": 100,
+          "entry_price": 28.59,
+          "current_price": 28.59,
+          "highest_price": 28.59,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600078",
+          "name": "澄星股份",
+          "shares": 100,
+          "entry_price": 9.5,
+          "current_price": 9.5,
+          "highest_price": 9.5,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000676",
+          "name": "智度股份",
+          "shares": 100,
+          "entry_price": 7.02,
+          "current_price": 7.02,
+          "highest_price": 7.02,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603091",
+          "name": "众鑫股份",
+          "shares": 100,
+          "entry_price": 46.64,
+          "current_price": 46.64,
+          "highest_price": 46.64,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000688",
+          "name": "国城矿业",
+          "shares": 100,
+          "entry_price": 21.26,
+          "current_price": 21.26,
+          "highest_price": 21.26,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002335",
+          "name": "科华数据",
+          "shares": 100,
+          "entry_price": 25.49,
+          "current_price": 25.49,
+          "highest_price": 25.49,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002174",
+          "name": "游族网络",
+          "shares": 100,
+          "entry_price": 11.59,
+          "current_price": 11.59,
+          "highest_price": 11.59,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603466",
+          "name": "风语筑",
+          "shares": 100,
+          "entry_price": 14.0,
+          "current_price": 14.0,
+          "highest_price": 14.0,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603032",
+          "name": "德新科技",
+          "shares": 100,
+          "entry_price": 16.15,
+          "current_price": 16.15,
+          "highest_price": 16.15,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
