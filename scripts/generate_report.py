@@ -544,6 +544,26 @@ def get评级(综合评分):
 # ============================================
 # 数据获取
 # ============================================
+# v2026-11-05 P1 修复: 指数代码的交易所前缀**不能**套用个股规则。
+#   000001 作为个股是 sz(平安银行), 作为指数是 sh(上证指数);
+#   000688 作为个股是 sz(国城矿业), 作为指数是 sh(科创50)。
+# 旧实现 get_stock_data_sina(['000001',...]) 走 get_market_sina() → sz000001
+#   → 复盘评分报告"大盘环境对比"表把**平安银行**当成上证指数显示。
+#   11-05 实测: 报告写"上证指数 11.73 / -0.09%" (真实上证 3665 / -0.34%),
+#   数值差 300 倍且涨跌方向都反 —— 属于会让复盘结论跑偏的静默错误。
+# 与 aana_afternoon_screen.py:108 (10-23 同款 P0 修复) 保持一致。
+_INDEX_SINA_PREFIX = {
+    '000001': 'sh',  # 上证指数
+    '000016': 'sh',  # 上证50
+    '000300': 'sh',  # 沪深300
+    '000688': 'sh',  # 科创50
+    '000905': 'sh',  # 中证500
+    '399001': 'sz',  # 深证成指
+    '399005': 'sz',  # 中小板指
+    '399006': 'sz',  # 创业板指
+}
+
+
 def get_stock_data_sina(codes):
     """使用新浪财经API获取股票/指数数据"""
     import requests
@@ -593,6 +613,60 @@ def get_stock_data_sina(codes):
         if code not in results:
             results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
     
+    return results
+
+
+def get_index_data_sina(codes):
+    """指数行情 (sina)。与个股分开取数 —— 指数代码的交易所前缀与个股不同。
+
+    v2026-11-05 P1 修复: 复用 get_stock_data_sina() 拉指数 → get_market_sina('000001')
+    → 'sz000001' = **平安银行** (不是上证指数); '000688' → 'sz000688' = 国城矿业 (不是科创50)。
+    复盘评分报告"大盘环境对比"表因此把个股当指数显示 (11-05 实测: 上证指数写成 11.73,
+    真实 3665.70; 涨跌方向也反)。个股池里 000001 可能真的是平安银行, 所以**不能**
+    在 get_stock_data_sina 里改前缀规则 —— 必须像 aana_afternoon_screen.py:120 那样
+    拆成独立的指数取数函数。
+    字段布局与个股一致: [0]=名称 [2]=昨收 [3]=当前。
+    """
+    import requests
+
+    results = {}
+    try:
+        formatted = [f"{_INDEX_SINA_PREFIX.get(c, 'sh')}{c}" for c in codes]
+        url = f'https://hq.sinajs.cn/list={",".join(formatted)}'
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+            'Referer': 'http://finance.sina.com.cn'
+        }
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.encoding = 'gbk'
+        lines = resp.text.strip().split('\n')
+        for i, line in enumerate(lines):
+            if '=' not in line:
+                continue
+            code = codes[i] if i < len(codes) else ''
+            parts = line.split('=')[1].strip('";\n ').split(',')
+            if len(parts) < 4:
+                continue
+            name = parts[0]
+            yesterday_close = float(parts[2]) if parts[2] else 0
+            price = float(parts[3]) if parts[3] else 0
+            change_pct = ((price - yesterday_close) / yesterday_close * 100) if yesterday_close else 0
+            amount = float(parts[9]) if len(parts) > 9 and parts[9] else 0
+            results[code] = {
+                'code': code,
+                'name': name,
+                'price': price,
+                'change_pct': change_pct,
+                'amount': amount * 10000,
+                'yesterday_close': yesterday_close,
+            }
+    except Exception as e:
+        print(f"新浪指数API失败: {e}")
+
+    for code in codes:
+        if code not in results:
+            results[code] = {'code': code, 'name': '', 'price': 0, 'change_pct': 0, 'amount': 0}
+
     return results
 
 def format_price(price):
@@ -1385,7 +1459,16 @@ def generate_review_report():
             '000688': '科创50',
         }
         index_codes = list(index_map.keys())
-        index_data = get_stock_data_sina(index_codes)
+        # v2026-11-05 P1 修复: 指数必须走 get_index_data_sina() (专属前缀 sh000001=上证指数),
+        # 不能复用个股取数 (get_stock_data_sina('000001') → sz000001 = 平安银行)。
+        index_data = get_index_data_sina(index_codes)
+        # sanity check: 指数点位应在合理量级, 否则说明又拿到个股了 (fail-closed 拒绝, 不写盘)
+        _BAD_INDEX = {'000001', '000300', '000688'}
+        for _c in list(index_data.keys()):
+            _p = index_data[_c].get('price', 0)
+            if _c in _BAD_INDEX and 0 < _p < 1000:
+                print(f"[AAna] ⚠️ 指数 {_c}({index_map.get(_c,'')}) 点位异常 {_p} — 疑似取到个股, 丢弃该指数")
+                index_data.pop(_c, None)
     except Exception as e:
         print(f"[AAna] 指数数据获取失败: {e}")
         index_data = {}
@@ -1448,14 +1531,22 @@ def generate_review_report():
         })
 
     # ===== 生成报告内容 =====
+    # v2026-11-05 P1 修复: 指数行必须用 index_data (get_index_data_sina, 专属前缀
+    # sh000001=上证指数), **不能**用 current_prices —— current_prices 来自
+    # get_stock_data_sina(all_codes), 而 all_codes 含早盘快照里的指数代码
+    # (000001/399001/399006/000300) → 按个股规则前缀 → sz000001 = 平安银行。
+    # 实测症状: 复盘报告写"上证指数 | - | 11.62 | -1.02%" (真实 3665 / -0.34%),
+    # 数值差 300 倍且涨跌方向反 —— 静默污染复盘结论。
     index_rows = []
     for code, name in index_map.items():
-        info = current_prices.get(code, {})
+        info = index_data.get(code, {})
         price = info.get('price', 0)
         change = info.get('change_pct', 0)
         if price > 0:
             emoji = '\U0001f534' if change > 0 else '\U0001f7e2'
             index_rows.append("| {} | - | {:.2f} | {} {:+.2f}% |".format(name, price, emoji, change))
+        else:
+            print(f"[AAna] 指数 {code}({name}) 无有效数据, 该行留空 (fail-closed, 不落个股值)")
 
     # 模拟交易：收盘市价更新 + 自动止损
     paper_pnl = 0
@@ -1467,8 +1558,13 @@ def generate_review_report():
             mark_to_market(today_str, quotes)
             auto_stop_loss(today_str, quotes)
             auto_take_profit_trail(today_str, quotes)
-            ps = paper_summary()
-            paper_pnl = ps.get('total_pnl', 0)
+            # v2026-11-05 P0 修复: paper_summary() 返回 str(组合报告文本)而非 dict,
+            # ps.get('total_pnl') 必炸 AttributeError → 模拟交易结算被整个 except 吞掉,
+            # 报告"模拟交易汇总"缺失且收益恒 +0.00 (11-04/11-05 连续复现)。
+            # 改读盯市落盘后的 daily_snapshots 末条 total_pnl (含浮盈)。
+            with open(os.path.join(PROJECT_DIR, 'data', 'paper_trades.json'), 'r', encoding='utf-8') as _pf:
+                _snaps = json.load(_pf).get('daily_snapshots') or []
+            paper_pnl = float(_snaps[-1]['total_pnl']) if _snaps else 0.0
             print(f"[\u6a21\u62df\u4ea4\u6613] \u4f53\u7ecf\u6536\u76ca: {paper_pnl:+.2f}")
         except Exception as e:
             print(f"[\u6a21\u62df\u4ea4\u6613] {e}")
