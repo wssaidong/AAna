@@ -5302,90 +5302,119 @@
       "reason": "AAna v2.4 尾盘评分 82",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-05",
+      "code": "002352",
+      "name": "顺丰控股",
+      "action": "sell",
+      "price": 33.98,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 18.0,
+      "pnl_pct": 0.53
+    },
+    {
+      "date": "2026-11-05",
+      "code": "002354",
+      "name": "天娱数科",
+      "action": "sell",
+      "price": 8.22,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 9.0,
+      "pnl_pct": 1.11
+    },
+    {
+      "date": "2026-11-05",
+      "code": "603738",
+      "name": "泰晶科技",
+      "action": "sell",
+      "price": 24.08,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -71.0,
+      "pnl_pct": -2.86
+    },
+    {
+      "date": "2026-11-05",
+      "code": "600498",
+      "name": "烽火通信",
+      "action": "sell",
+      "price": 26.7,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -45.0,
+      "pnl_pct": -1.66
+    },
+    {
+      "date": "2026-11-05",
+      "code": "603407",
+      "name": "长裕集团",
+      "action": "sell",
+      "price": 43.84,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 109.0,
+      "pnl_pct": 2.55
+    },
+    {
+      "date": "2026-11-05",
+      "code": "603040",
+      "name": "新坐标",
+      "action": "sell",
+      "price": 36.51,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -13.0,
+      "pnl_pct": -0.35
+    },
+    {
+      "date": "2026-11-05",
+      "code": "603688",
+      "name": "石英股份",
+      "action": "sell",
+      "price": 33.3,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -54.0,
+      "pnl_pct": -1.6
+    },
+    {
+      "date": "2026-11-05",
+      "code": "600234",
+      "name": "科新发展",
+      "action": "sell",
+      "price": 16.38,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.36
+    },
+    {
+      "date": "2026-11-05",
+      "code": "601919",
+      "name": "中远海控",
+      "action": "sell",
+      "price": 17.66,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -27.0,
+      "pnl_pct": -1.51
+    },
+    {
+      "date": "2026-11-05",
+      "code": "603587",
+      "name": "地素时尚",
+      "action": "sell",
+      "price": 13.77,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -13.0,
+      "pnl_pct": -0.94
     }
   ],
-  "positions": {
-    "002352": {
-      "date": "2026-11-04",
-      "name": "顺丰控股",
-      "shares": 100,
-      "entry_price": 33.8,
-      "highest_price": 33.8,
-      "entry_date": "2026-11-04"
-    },
-    "002354": {
-      "date": "2026-11-04",
-      "name": "天娱数科",
-      "shares": 100,
-      "entry_price": 8.13,
-      "highest_price": 8.13,
-      "entry_date": "2026-11-04"
-    },
-    "603738": {
-      "date": "2026-11-04",
-      "name": "泰晶科技",
-      "shares": 100,
-      "entry_price": 24.79,
-      "highest_price": 24.79,
-      "entry_date": "2026-11-04"
-    },
-    "600498": {
-      "date": "2026-11-04",
-      "name": "烽火通信",
-      "shares": 100,
-      "entry_price": 27.15,
-      "highest_price": 27.39,
-      "entry_date": "2026-11-04"
-    },
-    "603407": {
-      "date": "2026-11-04",
-      "name": "长裕集团",
-      "shares": 100,
-      "entry_price": 42.75,
-      "highest_price": 42.75,
-      "entry_date": "2026-11-04"
-    },
-    "603040": {
-      "date": "2026-11-04",
-      "name": "新坐标",
-      "shares": 100,
-      "entry_price": 36.64,
-      "highest_price": 36.64,
-      "entry_date": "2026-11-04"
-    },
-    "603688": {
-      "date": "2026-11-04",
-      "name": "石英股份",
-      "shares": 100,
-      "entry_price": 33.84,
-      "highest_price": 33.84,
-      "entry_date": "2026-11-04"
-    },
-    "600234": {
-      "date": "2026-11-04",
-      "name": "科新发展",
-      "shares": 100,
-      "entry_price": 16.44,
-      "highest_price": 16.44,
-      "entry_date": "2026-11-04"
-    },
-    "601919": {
-      "date": "2026-11-04",
-      "name": "中远海控",
-      "shares": 100,
-      "entry_price": 17.93,
-      "highest_price": 17.93,
-      "entry_date": "2026-11-04"
-    },
-    "603587": {
-      "date": "2026-11-04",
-      "name": "地素时尚",
-      "shares": 100,
-      "entry_price": 13.9,
-      "highest_price": 13.98,
-      "entry_date": "2026-11-04"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -5519,6 +5548,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-05",
+      "cash": 96897.0,
+      "position_value": 0.0,
+      "total_value": 96897.0,
+      "daily_pnl": -118.0,
+      "total_pnl": -3103.0,
+      "total_pnl_pct": -3.1,
+      "realized_pnl": -3103.0,
+      "positions": []
     }
   ]
 }
