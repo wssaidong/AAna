@@ -1,0 +1,353 @@
+{
+ "date": "2026-11-05",
+ "generated": "14:50:36",
+ "sector_stats_n": 93,
+ "overall_win_rate": 49.473684210526315,
+ "results": [
+  {
+   "code": "000676",
+   "name": "智度股份",
+   "price": 7.03,
+   "pe_ttm": 33.57,
+   "pb": 2.02,
+   "mcap_yi": 88.51,
+   "float_mcap_yi": 88.56,
+   "turnover_pct": 8.04,
+   "vol_ratio": 1.06,
+   "v24_score": 93,
+   "ind_sina": "移动互联网服务",
+   "ind_em": "广告营销",
+   "tech_score": 49,
+   "fund_score": 19,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 0.982,
+    "single_q_loss": false
+   },
+   "total": 79.5,
+   "rating": "买入",
+   "target": 7.38,
+   "stop": 6.52,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=59 健康",
+    "20日区间位置 83% 突破区",
+    "60日涨幅 -10% 弱势",
+    "量能比 1.02 正常"
+   ],
+   "fund_notes": [
+    "ROE 5.6% 一般",
+    "净利增速 +102%",
+    "营收增速 +5%"
+   ],
+   "val_notes": [
+    "PE 34 偏高",
+    "PB 2.02 合理"
+   ],
+   "tech_stat": {
+    "rsi": 59.3,
+    "pos20": 83.0,
+    "chg60": -10.4,
+    "vol_ratio_5d": 1.02,
+    "ma5": 6.78,
+    "ma20": 6.57,
+    "ma60": 6.79,
+    "hi20": 7.27,
+    "lo20": 5.87,
+    "chg_1d": 4.3,
+    "last_date": "2026-11-05",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 5.57,
+    "ni_growth": 102.479799,
+    "rev_growth": 4.613471
+   },
+   "chg_pct": 4.3,
+   "chg_report": 4.01,
+   "sector_stat_key": "移动互联网服务",
+   "sector_win_rate": "67% (2/3)",
+   "sector_near": "数字营销邻近键[营销服务] 0% (0/1) | 传媒邻近键[传媒] 100% (1/1)",
+   "stop_broken": false
+  },
+  {
+   "code": "600078",
+   "name": "澄星股份",
+   "price": 9.5,
+   "pe_ttm": 26.32,
+   "pb": 3.31,
+   "mcap_yi": 62.94,
+   "float_mcap_yi": 64.57,
+   "turnover_pct": 3.33,
+   "vol_ratio": 0.9,
+   "v24_score": 93,
+   "ind_sina": "磷化工及磷酸盐",
+   "ind_em": "农化制品",
+   "tech_score": 38,
+   "fund_score": 26,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 1.471,
+    "single_q_loss": false
+   },
+   "total": 76.5,
+   "rating": "买入",
+   "target": 10.02,
+   "stop": 8.82,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=56 健康",
+    "20日区间位置 70% 中上",
+    "60日涨幅 -14% 弱势",
+    "量能比 0.87 正常"
+   ],
+   "fund_notes": [
+    "ROE 14.6% 良好",
+    "净利增速 +848%",
+    "营收增速 +35%"
+   ],
+   "val_notes": [
+    "PE 26 合理",
+    "PB 3.31 中等"
+   ],
+   "tech_stat": {
+    "rsi": 56.2,
+    "pos20": 70.0,
+    "chg60": -13.9,
+    "vol_ratio_5d": 0.87,
+    "ma5": 9.11,
+    "ma20": 9.15,
+    "ma60": 10.17,
+    "hi20": 10.02,
+    "lo20": 8.29,
+    "chg_1d": 4.4,
+    "last_date": "2026-11-05",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 14.64,
+    "ni_growth": 848.204459,
+    "rev_growth": 35.154385
+   },
+   "chg_pct": 4.4,
+   "chg_report": 4.18,
+   "sector_stat_key": "其他化学制品",
+   "sector_win_rate": "50% (1/2)",
+   "sector_near": "化工邻近键[农药] 0% (0/1)",
+   "stop_broken": false
+  },
+  {
+   "code": "000829",
+   "name": "天音控股",
+   "price": 9.43,
+   "pe_ttm": 148.97,
+   "pb": 3.25,
+   "mcap_yi": 96.58,
+   "float_mcap_yi": 96.67,
+   "turnover_pct": 2.51,
+   "vol_ratio": 1.03,
+   "v24_score": 93,
+   "ind_sina": "专业连锁",
+   "ind_em": "专业连锁Ⅱ",
+   "tech_score": 48,
+   "fund_score": 18,
+   "val_score": 4,
+   "val_score_raw": 4,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 0.134,
+    "single_q_loss": false
+   },
+   "total": 67.0,
+   "rating": "增持",
+   "target": 9.9,
+   "stop": 8.74,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=51 健康",
+    "20日区间位置 81% 突破区",
+    "60日涨幅 +10% 健康",
+    "量能比 0.99 正常"
+   ],
+   "fund_notes": [
+    "ROE 1.0% 弱",
+    "净利增速 +151%",
+    "营收增速 +30%"
+   ],
+   "val_notes": [
+    "PE 149 过高/异常",
+    "PB 3.25 中等"
+   ],
+   "tech_stat": {
+    "rsi": 51.1,
+    "pos20": 81.0,
+    "chg60": 9.9,
+    "vol_ratio_5d": 0.99,
+    "ma5": 8.75,
+    "ma20": 8.96,
+    "ma60": 8.86,
+    "hi20": 9.8,
+    "lo20": 7.82,
+    "chg_1d": 4.78,
+    "last_date": "2026-11-05",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 0.99,
+    "ni_growth": 151.134995,
+    "rev_growth": 29.503079
+   },
+   "chg_pct": 4.78,
+   "chg_report": 4.44,
+   "sector_stat_key": "百货",
+   "sector_win_rate": "100% (2/2)",
+   "sector_near": "零售/营销邻近键[营销服务] 0% (0/1)",
+   "stop_broken": false
+  },
+  {
+   "code": "600573",
+   "name": "惠泉啤酒",
+   "price": 12.83,
+   "pe_ttm": 32.92,
+   "pb": 2.21,
+   "mcap_yi": 32.08,
+   "float_mcap_yi": 32.08,
+   "turnover_pct": 5.25,
+   "vol_ratio": 0.96,
+   "v24_score": 93,
+   "ind_sina": "啤酒",
+   "ind_em": "非白酒",
+   "tech_score": 30,
+   "fund_score": 19,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 0.672,
+    "single_q_loss": false
+   },
+   "total": 62.3,
+   "rating": "中性",
+   "target": 14.11,
+   "stop": 11.93,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=45 偏弱",
+    "20日区间位置 58% 中上",
+    "60日涨幅 +32% 偏热",
+    "量能比 0.92 正常"
+   ],
+   "fund_notes": [
+    "ROE 8.2% 良好",
+    "净利增速 +18%",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE 33 偏高",
+    "PB 2.21 合理"
+   ],
+   "tech_stat": {
+    "rsi": 44.5,
+    "pos20": 58.0,
+    "chg60": 31.7,
+    "vol_ratio_5d": 0.92,
+    "ma5": 12.44,
+    "ma20": 12.59,
+    "ma60": 10.84,
+    "hi20": 14.15,
+    "lo20": 10.99,
+    "chg_1d": 4.48,
+    "last_date": "2026-11-05",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 8.2,
+    "ni_growth": 17.710033,
+    "rev_growth": 2.034573
+   },
+   "chg_pct": 4.48,
+   "chg_report": 4.48,
+   "sector_stat_key": "白酒",
+   "sector_win_rate": "100% (5/5)",
+   "sector_near": "食品饮料邻近键-啤酒/白酒同板块[白酒] 100% (5/5)",
+   "stop_broken": false
+  },
+  {
+   "code": "603016",
+   "name": "新宏泰",
+   "price": 28.59,
+   "pe_ttm": 78.69,
+   "pb": 5.11,
+   "mcap_yi": 42.36,
+   "float_mcap_yi": 42.36,
+   "turnover_pct": 2.61,
+   "vol_ratio": 1.3,
+   "v24_score": 93,
+   "ind_sina": "电气设备",
+   "ind_em": "电网设备",
+   "tech_score": 42,
+   "fund_score": 7,
+   "val_score": 3,
+   "val_score_raw": 3,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 0.147,
+    "single_q_loss": false
+   },
+   "total": 49.2,
+   "rating": "减持",
+   "target": 31.44,
+   "stop": 26.58,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=48 健康",
+    "20日区间位置 51% 中上",
+    "60日涨幅 -3% 回调",
+    "量能比 1.26 正常"
+   ],
+   "fund_notes": [
+    "ROE 4.8% 一般",
+    "净利增速 -20% 负增长",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE 79 高",
+    "PB 5.11 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 48.1,
+    "pos20": 51.0,
+    "chg60": -2.9,
+    "vol_ratio_5d": 1.26,
+    "ma5": 27.42,
+    "ma20": 28.05,
+    "ma60": 29.65,
+    "hi20": 32.2,
+    "lo20": 24.81,
+    "chg_1d": 4.15,
+    "last_date": "2026-11-05",
+    "kline_len": 121
+   },
+   "fund_stat": {
+    "roe": 4.82,
+    "ni_growth": -19.651728,
+    "rev_growth": 2.205098
+   },
+   "chg_pct": 4.15,
+   "chg_report": 4.12,
+   "sector_stat_key": "高低压设备",
+   "sector_win_rate": "100% (2/2)",
+   "sector_near": "电气设备邻近键[电机] 75% (3/4)",
+   "stop_broken": false
+  }
+ ]
+}
