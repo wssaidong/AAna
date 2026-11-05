@@ -385,6 +385,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--workers", type=int, default=8, help="并发线程数")
     parser.add_argument("--stats", action="store_true", help="打印库统计")
     parser.add_argument("--db", default=None, help="覆盖 DB 路径")
+    parser.add_argument("--allow-intraday", action="store_true",
+                        help="允许盘中写当日 bar（仅供测试，生产勿用）")
     args = parser.parse_args(argv)
 
     st = MarketStore(db_path=args.db)
@@ -396,6 +398,19 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     if args.sync:
         date_str = args.date or _today()
+        # 🔴 2026-11-05 P0 加固: 盘中 sync 会把「当时快照」当 bar 入库,
+        # 之后 kline() 的 store 优先路径把它当最终值返回 (feedback_loop
+        # 实测 81 只 11-04 盘中 bar 污染 → ret_1d 假收益率)。
+        # 未收盘时默认拒绝写入当日 bar (--allow-intraday 显式豁免, 仅供测试)。
+        allow_intraday = getattr(args, "allow_intraday", False)
+        if date_str == _today() and not allow_intraday:
+            now = datetime.now()
+            after_close = (now.hour > 15) or (now.hour == 15 and now.minute >= 5)
+            if not after_close:
+                print("[sync] REFUSE: 目标日=今天且未到收盘(15:05 后才允许)。"
+                      "盘中 bar 是未定格快照, 入库会被 store 优先路径当成最终值。"
+                      "确要写入请加 --allow-intraday (仅供测试)。")
+                return 2
         if args.symbols:
             symbols = [s.strip() for s in args.symbols.split(",") if s.strip()]
         else:

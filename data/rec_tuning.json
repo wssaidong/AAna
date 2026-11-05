@@ -9,10 +9,10 @@
     "其他家用轻工",
     "影视动漫"
   ],
-  "total_records": 392,
-  "overall_win_rate": 50.51020408163265,
+  "total_records": 394,
+  "overall_win_rate": 50.76142131979695,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-05T15:01:30.268689",
+  "generated_at": "2026-11-05T16:47:36.078747",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -24,20 +24,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 191,
-      "win_count": 113,
-      "win_rate": 59.16230366492147,
-      "avg_change": 1.675916230366492,
+      "count": 193,
+      "win_count": 115,
+      "win_rate": 59.58549222797927,
+      "avg_change": 1.6870984455958546,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 392,
-      "win_count": 198,
-      "win_rate": 50.51020408163265,
-      "avg_change": 0.4232397959183679
+      "count": 394,
+      "win_count": 200,
+      "win_rate": 50.76142131979695,
+      "avg_change": 0.43507614213198026
     }
   },
   "sector_stats": {
@@ -132,10 +132,10 @@
     "汽车零部件": {
       "sector": "汽车零部件",
       "sector_name": "",
-      "count": 23,
-      "win_count": 20,
-      "win_rate": 86.95652173913044,
-      "avg_change": 3.2604347826086952
+      "count": 24,
+      "win_count": 21,
+      "win_rate": 87.5,
+      "avg_change": 3.242083333333333
     },
     "煤炭开采": {
       "sector": "煤炭开采",
@@ -532,10 +532,10 @@
     "移动互联网服务": {
       "sector": "移动互联网服务",
       "sector_name": "",
-      "count": 3,
-      "win_count": 2,
-      "win_rate": 66.66666666666666,
-      "avg_change": 1.2766666666666666
+      "count": 4,
+      "win_count": 3,
+      "win_rate": 75.0,
+      "avg_change": 1.63
     },
     "软饮料": {
       "sector": "软饮料",

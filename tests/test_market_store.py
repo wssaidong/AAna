@@ -16,6 +16,7 @@ tests/test_market_store.py — XWI-80 P0-1 本地日线库 market_store 测试
 """
 import sqlite3
 import sys
+from datetime import datetime
 
 import pytest
 
@@ -370,6 +371,54 @@ class TestCli:
         out = capsys.readouterr().out
         assert code == 0
         assert 'inserted=2' in out and '[stats]' in out and 'rows=2' in out
+
+    def test_intraday_sync_refused(self, tmp_path, monkeypatch, capsys):
+        """🔴 2026-11-05 P0: 盘中 --sync 当日 bar 必须拒绝 (返回 2, 零写入)。
+
+        实战根因: 11-04 11:17 盘中 sync 把 81 只「当时快照」当 11-04 bar 入库,
+        kline() store 优先路径把它当最终值 → feedback_loop ret_1d 假收益率
+        (002354 3.96 vs 真实 2.69)。
+        """
+        db = str(tmp_path / "cli.db")
+        monkeypatch.setenv("AANA_MARKET_STORE_DB", db)
+        monkeypatch.setattr(ms, 'default_symbols', lambda **kw: ['600000'])
+        monkeypatch.setattr(ms, '_today', lambda: '2026-01-05')
+        frozen = datetime(2026, 1, 5, 14, 30)   # 盘中
+        monkeypatch.setattr('data.market_store.datetime',
+                            type('DT', (datetime,), {'now': classmethod(lambda cls, tz=None: frozen)}))
+
+        class _QS:
+            def _tencent_kline(self, *a, **k):
+                raise AssertionError("盘中 sync 不应触网")
+
+        monkeypatch.setattr('data.market_store._new_quote_service', lambda: _QS())
+        code = ms.main(['--sync', '--date', '2026-01-05'])
+        out = capsys.readouterr().out
+        assert code == 2, "盘中 sync 必须返回 2"
+        assert 'REFUSE' in out
+        st = ms.MarketStore()
+        assert not st.has_bar('600000', '2026-01-05', adjust='qfq'), "盘中 sync 不得写库"
+
+    def test_intraday_sync_allow_intraday_bypasses(self, tmp_path, monkeypatch, capsys):
+        """--allow-intraday 显式豁免盘中拒绝（仅供测试的逃生门要可用）"""
+        db = str(tmp_path / "cli.db")
+        monkeypatch.setenv("AANA_MARKET_STORE_DB", db)
+        monkeypatch.setattr(ms, 'default_symbols', lambda **kw: ['600000'])
+        monkeypatch.setattr(ms, '_today', lambda: '2026-01-05')
+        frozen = datetime(2026, 1, 5, 14, 30)
+        monkeypatch.setattr('data.market_store.datetime',
+                            type('DT', (datetime,), {'now': classmethod(lambda cls, tz=None: frozen)}))
+        fake = FakeQS(plan={'600000': [mk_bar('2026-01-05')]})
+
+        class _QS:
+            def _tencent_kline(self, *a, **k):
+                return fake._tencent_kline(*a, **k)
+
+        monkeypatch.setattr('data.market_store._new_quote_service', lambda: _QS())
+        code = ms.main(['--sync', '--date', '2026-01-05', '--allow-intraday'])
+        out = capsys.readouterr().out
+        assert code == 0
+        assert 'inserted=1' in out
 
 
 # ── 默认股票池 ─────────────────────────────────────────────────────────────
