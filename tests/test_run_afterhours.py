@@ -936,3 +936,133 @@ def test_alpha_zone_describes_sign_magnitude():
     assert run_afterhours._alpha_zone(0.2) == "中性区间"
     assert run_afterhours._alpha_zone(-0.7) == "小幅负 Alpha"
     assert run_afterhours._alpha_zone(-1.73) == "显著负 Alpha"
+
+
+# ── v1.35: 深度分析 JSON 快照 = 盘前池第 5 真源（虚假 100% 命中率修复）─────
+
+def _make_pre_market_json(path, *, session="pre_market", base_date="2026-11-04",
+                          results=None, guard_ice=False, pool_size=None):
+    import json
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "date": path.stem.replace("deep_analysis_", ""),
+        "session": session,
+        "base_date": base_date,
+        "pool_size": pool_size if pool_size is not None else len(results or []),
+        "guard_ice": guard_ice,
+        "results": results if results is not None else [],
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+
+
+def test_deep_analysis_json_snapshot_restores_premarket_pool(monkeypatch, tmp_path):
+    """2026-11-05 实战: 盘前版选股报告从未入 git + 工作区被 09:37 重跑覆盖 +
+    深度分析.md 消失 → 四源全落空，旧代码兜底用重跑版（9/9=100% 虚假命中率）。
+    JSON 快照（session=pre_market）是盘前池真值，必须被回捞为 prev_close 口径。
+    """
+    import json
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path / "reports"))
+    # 工作区 = 开盘后重跑版（intraday 口径）
+    (tmp_path / "reports").mkdir(parents=True)
+    (tmp_path / "reports" / "2026-11-05-选股报告.md").write_text(
+        "**生成时间：** 2026-11-05 09:37\n"
+        "### 🏆 重点关注 Top 10\n"
+        "| 排名 | 股票 | 代码 | 价格 | 涨跌幅 |\n"
+        "| 1 | 📊甲 | 600506 | 18.97 | +4.35% |\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(run_afterhours, "_git_head_top10_with_semantics",
+                        lambda d: ([], "unknown"))
+    monkeypatch.setattr(run_afterhours, "_git_history_premarket_top10",
+                        lambda d, max_commits=12: ([], None, False))
+    monkeypatch.setattr(run_afterhours, "_parse_top10_from_deep_analysis", lambda d: [])
+
+    results = [
+        {"code": "001287", "name": "中电港", "price": 20.75, "chg_pct": 6.74},
+        {"code": "600118", "name": "中国卫星", "price": 56.19, "chg_pct": 6.66},
+    ]
+    _make_pre_market_json(tmp_path / "data" / "deep_analysis_20261105.json",
+                          results=results, pool_size=10)
+
+    rows, source, note, sem = run_afterhours.resolve_candidate_pool("2026-11-05")
+
+    assert [c for c, _, _ in rows] == ["001287", "600118"], rows
+    assert rows[0][2] == 6.74, rows  # baseline = base_date 收盘涨跌
+    assert sem == "prev_close", (source, sem)
+    assert "JSON快照" in source, source
+    assert "重跑版" not in source, source
+
+
+def test_deep_analysis_json_snapshot_empty_confirms_empty_pool(monkeypatch, tmp_path):
+    """盘前 JSON 快照存在且 results 为空（冰点守卫）→ 明确返回空池，
+    绝不回落到口径未确认的开盘后重跑版。"""
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path / "reports"))
+    (tmp_path / "reports").mkdir(parents=True)
+    (tmp_path / "reports" / "2026-11-05-选股报告.md").write_text(
+        "**生成时间：** 2026-11-05 09:37\n"
+        "### 🏆 重点关注 Top 10\n"
+        "| 排名 | 股票 | 代码 | 涨跌幅 |\n| 1 | 📊甲 | 600506 | +4.35% |\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(run_afterhours, "_git_head_top10_with_semantics",
+                        lambda d: ([], "unknown"))
+    monkeypatch.setattr(run_afterhours, "_git_history_premarket_top10",
+                        lambda d, max_commits=12: ([], None, False))
+    monkeypatch.setattr(run_afterhours, "_parse_top10_from_deep_analysis", lambda d: [])
+    _make_pre_market_json(tmp_path / "data" / "deep_analysis_20261105.json",
+                          results=[], guard_ice=True, pool_size=0)
+
+    rows, source, note, sem = run_afterhours.resolve_candidate_pool("2026-11-05")
+
+    assert rows == [], f"空池不得回落到重跑版: {rows}"
+    assert "空池" in source, source
+    assert "冰点守卫" in note, note
+    assert sem == "prev_close"
+
+
+def test_deep_analysis_json_snapshot_rejects_non_premarket_and_self_ref(monkeypatch, tmp_path):
+    """防自指纪律: ① pm/旧版快照（无 session）不认; ② base_date ≥ 当日不认;
+    ③ 文件不存在返回 ([], None) —— 调用方继续走后续来源。"""
+    monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path / "reports"))
+    data = tmp_path / "data"
+    # ① 无 session（2026-10 及更早的历史 JSON）
+    _make_pre_market_json(data / "deep_analysis_20261020.json",
+                          session=None, base_date=None,
+                          results=[{"code": "600001", "name": "甲", "chg_pct": 1.0}])
+    rows, meta = run_afterhours._deep_analysis_json_top10("2026-10-20")
+    assert rows == [] and meta is None
+    # ② base_date == 当日（自指）
+    _make_pre_market_json(data / "deep_analysis_20261105.json",
+                          base_date="2026-11-05",
+                          results=[{"code": "600001", "name": "甲", "chg_pct": 1.0}])
+    rows, meta = run_afterhours._deep_analysis_json_top10("2026-11-05")
+    assert rows == [] and meta is None
+    # ③ 文件不存在
+    rows, meta = run_afterhours._deep_analysis_json_top10("2026-11-06")
+    assert rows == [] and meta is None
+
+
+# ── v1.35: 成长领涨价差口径防御条件修正（0.1%~0.5% 平盘滞涨日漏判）─────────
+
+def test_growth_lead_spread_fires_on_flat_positive_mainboard():
+    """2026-11-05 实战: 上证 +0.10%（平盘微红）/ 创业板 +0.87% / 科创50 +1.68%
+    （领先 1.58pp）。旧防御条件 sh_pct < 0.5 把平盘微红误当"全市场偏弱"，
+    成长领涨被误杀 → 战报标"震荡"且"红利对冲"建议买在当日最弱的
+    煤炭/油气/电信运营商。上证 > 0 即应放行。"""
+    assert run_afterhours._growth_lead_spread(0.87, 1.68, 0.10) is True
+
+
+def test_growth_lead_spread_still_rejected_when_sh_down():
+    """防御本意保留: 上证真正下跌（< 0）时，科创50 相对抗跌≠结构性走强。"""
+    assert run_afterhours._growth_lead_spread(-1.00, 0.30, -0.20) is False
+    assert run_afterhours._growth_lead_spread(0.87, 1.68, -0.10) is False
+
+
+def test_2026_11_05_market_feature_is_growth_lead_not_oscillation():
+    """当日实战数字端到端: classify_market_feature 必须输出"成长领涨型"。"""
+    feature = run_afterhours.classify_market_feature(
+        0.96, 0.10, 0.87, 1.68, [], other_5_avg=0.79,
+        other_idx_pcts=[0.10, 1.19, 1.67, 0.29],
+    )
+    assert "成长领涨型" in feature, feature
+    assert "震荡" not in feature, feature

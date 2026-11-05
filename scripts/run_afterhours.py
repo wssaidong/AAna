@@ -139,51 +139,151 @@ def theme_counter(hot_list):
     return c
 
 
+def _ths_industry_page(session, page, url_tmpl, headers, retries=4):
+    """抓同花顺行业板块单页，带 WAF 重试。
+
+    ⚠️ 2026-11-04 实战: 同花顺对无 v-cookie 的请求会**间歇性**返回 WAF 挡板页
+    (实测 http 无 cookie 只有 4/6 次成功)。挡板页仍含 `<tbody>` 与一行占位
+    `['1', '', '0.00', ...]`，**长度仅 ~1.8KB**。
+
+    ⚠️ 更危险的坑: akshare 的 `stock_board_industry_summary_ths()` 用
+    `pd.read_html` 解析，挡板页会被解析成"1 行空板块"而不报错 → 若恰好第 1 页
+    被挡、第 2 页成功，函数会**静默返回第 2 页的部分数据**（实测 41 行、
+    序号从 51 开始），当天涨幅第一的板块（半导体 +10.55%）直接丢失，
+    "行业今日全貌"和"明日观察要点"的板块名全部失真。
+
+    对策（本函数）：
+      1. 带 v-cookie 请求（实测 6/6 稳定，挡板率 0）
+      2. 逐页重试，挡板页（无 page_info / 无有效板块名）视为失败重试
+      3. 校验完整性：总行数与 page_info 声明的分页规模一致才返回
+    """
+    import time
+
+    for attempt in range(retries):
+        try:
+            r = session.get(url_tmpl.format(page=page), headers=headers, timeout=15)
+            text = r.text
+            # 挡板页判定：没有分页信息，或表格里没有真实板块名
+            if 'class="page_info"' not in text:
+                raise ValueError("WAF 挡板页（无 page_info）")
+            if len(text) < 5000:
+                raise ValueError(f"WAF 挡板页（内容过短 {len(text)}B）")
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(text, features="lxml")
+            rows = []
+            for tr in soup.select("table tbody tr"):
+                tds = [td.get_text(strip=True) for td in tr.find_all("td")]
+                if len(tds) < 3:
+                    continue
+                name = tds[1].strip()
+                if not name:          # 占位行（挡板页特征）
+                    continue
+                try:
+                    pct = float(tds[2])
+                except (TypeError, ValueError):
+                    continue
+                rows.append({
+                    "name": name,
+                    "change_pct": pct,
+                    "code": "",
+                    "up_count": tds[6] if len(tds) > 6 else 0,
+                    "down_count": tds[7] if len(tds) > 7 else 0,
+                    "leader": tds[9] if len(tds) > 9 else "",
+                    "leader_change": tds[11] if len(tds) > 11 else 0,
+                })
+            if not rows:
+                raise ValueError("表格无有效板块行")
+            import re as _re
+            m = _re.search(r'class="page_info"[^>]*>\s*(\d+)\s*/\s*(\d+)', text)
+            total_pages = int(m.group(2)) if m else page
+            return rows, total_pages
+        except Exception:
+            if attempt < retries - 1:
+                time.sleep(0.6 * (attempt + 1))
+    return [], 0
+
+
 def _industry_ranking_ths(top_n=10):
     """同花顺行业板块 fallback — 东财 push2 全断时使用。
 
     ⚠️ 2026-10-26 实战: 东财 push2 **主域 + push2delay 双双 RemoteDisconnected**
     (已连续多日不可用), 行业全貌整段降级为"无数据" → 战报丢失最重要的
-    "行业今日全貌"章节。同花顺行业接口 (akshare stock_board_industry_summary_ths)
-    实测可用, 返回 90 个行业板块的涨跌幅/净流入/涨跌家数。
+    "行业今日全貌"章节。同花顺行业接口返回 90 个行业板块的涨跌幅/净流入/涨跌家数。
+
+    ⚠️ 2026-11-04 实战: 不再用 akshare 的 `stock_board_industry_summary_ths()`。
+    该函数有两个叠加缺陷：
+      (a) 首次请求常撞同花顺 WAF 挡板页 → `soup.find('span.page_info')` 返回
+          None → AttributeError，整个 fallback 抛异常（实测 6 次里 4 次失败）
+      (b) 更糟：它用 `pd.read_html` 解析，挡板页会被解析成"1 行空板块"而**不报错**；
+          若第 1 页被挡、第 2 页成功，就**静默返回第 2 页的部分数据**
+          （实测 41 行、序号从 51 开始），当天涨幅第一的板块（半导体 +10.55%）
+          直接丢失 → "行业今日全貌"与"明日观察要点"里的板块名全部失真，
+          且失真方式很隐蔽（不报错、有数据、只是不完整）。
+    改为自带 WAF 重试 + 完整性校验的直接抓取（见 _ths_industry_page）。
 
     返回契约与东财一致: {top, bottom, total, fetched, universe, source}
       - top:    涨幅榜（降序）
       - bottom: 跌幅榜（升序，最差在前）
     """
+    rows, err = [], ""
     try:
-        import akshare as ak
-        df = ak.stock_board_industry_summary_ths()
+        import requests as _rq
+        from py_mini_racer import MiniRacer
+        from akshare.stock_feature.stock_board_industry_ths import _get_file_content_ths
+
+        # 同花顺需要 JS 生成的 v cookie，无 cookie 会间歇性撞 WAF
+        headers = {
+            "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                           "(KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36"),
+        }
+        try:
+            _js = MiniRacer()
+            _js.eval(_get_file_content_ths("ths.js"))
+            headers["Cookie"] = f"v={_js.call('v')}"
+        except Exception as e:
+            err = f"(v-cookie 生成失败，退化为无 cookie 请求: {e})"
+
+        url_tmpl = ("http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/"
+                    "page/{page}/ajax/1/")
+        sess = _rq.Session()
+        page, total_pages = 1, 0
+        while page <= 10:
+            page_rows, total_pages = _ths_industry_page(sess, page, url_tmpl, headers)
+            if not page_rows:
+                err = (err + "; " if err else "") + f"第 {page} 页抓取失败（WAF 挡板或超时）"
+                break
+            rows.extend(page_rows)
+            if total_pages and page >= total_pages:
+                break
+            page += 1
+        # 完整性校验：THS 行业一览表共 90 个板块（2 页 50+40）
+        if rows and len(rows) < 80:
+            err = (err + "; " if err else "") + \
+                f"数据不完整（仅 {len(rows)}/90 个板块，疑似部分页被 WAF 拦截）"
     except Exception as e:
         return {"top": [], "bottom": [], "total": 0, "fetched": 0,
                 "universe": 0, "source": "ths", "error": f"ths 行业接口失败: {e}"}
-    if df is None or len(df) == 0:
+
+    if not rows:
         return {"top": [], "bottom": [], "total": 0, "fetched": 0,
-                "universe": 0, "source": "ths", "error": "ths 行业接口返回空"}
-    rows = []
-    for _, r in df.iterrows():
-        try:
-            pct = float(r.get("涨跌幅"))
-        except (TypeError, ValueError):
-            continue
-        rows.append({
-            "name": str(r.get("板块", "")).strip(),
-            "change_pct": pct,
-            "code": "",
-            "up_count": r.get("上涨家数", 0),
-            "down_count": r.get("下跌家数", 0),
-            "leader": str(r.get("领涨股", "")).strip(),
-            "leader_change": r.get("领涨股-涨跌幅", 0),
-        })
+                "universe": 0, "source": "ths",
+                "error": f"ths 行业接口未取到有效数据: {err or '未知原因'}"}
+
+    # 去重（同页可能重复），保留最后一次出现的涨跌幅
+    dedup = {r["name"]: r for r in rows}
+    rows = list(dedup.values())
     rows.sort(key=lambda x: -x["change_pct"])
-    return {
+    result = {
         "top": rows[:top_n],
         "bottom": list(reversed(rows[-top_n:])) if rows else [],
         "total": len(rows),
         "fetched": len(rows),
-        "universe": len(rows),
+        "universe": 90,
         "source": "ths",
     }
+    if err:
+        result["error"] = err
+    return result
 
 
 def get_industry_ranking(top_n=10):
@@ -694,6 +794,30 @@ def resolve_candidate_pool(date_str):
         notes.append("已从深度分析报告的候选池表格回捞")
         return rows, "深度分析报告候选池表", "".join(notes), "prev_close"
 
+    # 4.6) ⚠️ 2026-11-05 实战（v1.35 新增·第 5 真源）: 深度分析 JSON 机器快照
+    #      （data/deep_analysis_YYYYMMDD.json, session=pre_market）。当日盘前版
+    #      选股报告从未被 git 提交且工作区被 09:37 重跑覆盖、深度分析.md 的
+    #      池表也被重跑清空/文件消失时，v1.31/v1.33 的四源全落空 → 兜底把
+    #      重跑版当"盘前池"，输出虚假 100% 命中率（本会话实测 9/9=100%/
+    #      +6.34pp，真实盘前池 9/10=90%/+1.21pp）。JSON 快照的 chg_pct 经
+    #      腾讯 K 线逐股核对 == base_date 收盘涨跌幅（天然 prev_close 口径）。
+    #      ⚠️ 顺序纪律: 排在 git 历史盘前版/深度分析.md 之后 —— 有文本报告
+    #      优先用文本报告；JSON 是最后的"真值兜底"，仍优先于"口径未确认"的重跑版。
+    try:
+        json_rows, json_meta = _deep_analysis_json_top10(date_str)
+    except Exception:
+        json_rows, json_meta = [], None
+    if json_rows and json_meta:
+        notes.append(
+            f"已从深度分析 JSON 快照回捞盘前候选池（session=pre_market, "
+            f"base_date={json_meta['base_date']}，chg_pct=基准日收盘涨跌幅·昨收口径）"
+        )
+        return (json_rows, f"深度分析JSON快照盘前池(base {json_meta['base_date']})",
+                "".join(notes), "prev_close")
+    if json_meta and json_meta.get("empty"):
+        notes.append(json_meta["evidence"])
+        return [], f"深度分析JSON快照确认空池（{date_str}）", "".join(notes), "prev_close"
+
     # 4.5) ⚠️ 2026-11-02 实战（v1.33 新增）: 深度分析报告是**盘前候选池是否为空
     #      （冰点守卫·设计行为）**的单一真源。当日 08:03 盘前版选股报告**从未
     #      被 git 提交**（只有 09:38 开盘后重跑版入库），于是 v1.31 的三源回捞
@@ -726,6 +850,79 @@ def resolve_candidate_pool(date_str):
         pass
 
     return [], "无", "⚠️ 三源均无候选池（选股报告/深度分析报告）", "unknown"
+
+
+def _deep_analysis_json_top10(date_str):
+    """从 data/deep_analysis_YYYYMMDD.json 机器快照回捞盘前候选池（第 5 真源）。
+
+    ⚠️ 2026-11-05 实战（v1.35 新增）: 深度分析 autopilot 每天把盘前池快照写进
+    data/deep_analysis_YYYYMMDD.json（session="pre_market"、base_date=前一交易日、
+    results[].chg_pct=基准日涨跌、results[].price=基准日收盘价）。当日盘前版
+    选股报告**从未被 git 提交**且工作区被 09:37 开盘后重跑覆盖时
+    （v1.33 的"从未入库"变体），四源回捞全落空 → 兜底把盘中重跑版当
+    "盘前池"评估，输出虚假命中率（本会话实测：9/9=100% / +6.34pp 超额，
+    而真实盘前池 9/10=90% / +1.21pp）。
+
+    快照语义（已用腾讯 K 线逐股核对）:
+      chg_pct == base_date 当日收盘涨跌幅（昨收口径），price == base_date 收盘价
+      → 天然 prev_close baseline，与选股报告的"涨跌幅"列同语义。
+
+    返回 (rows, meta):
+      rows: [(code6, name, baseline_pct)]（可空）
+      meta: None = 快照不可用/非盘前快照（调用方继续走后续来源）;
+            dict = 快照存在且为盘前快照（rows 空时 meta["empty"]/meta["evidence"]
+            描述空池原因，供空池判定使用）。
+
+    ⚠️ 防自指纪律:
+      - 只认 session == "pre_market" 的快照（盘后/尾盘变体文件名 deep_analysis_pm_*
+        没有 session/base_date 字段，天然被排除）;
+      - 只认 base_date < date_str 的快照（base_date 即当日 → baseline 与收盘自指）;
+      - 历史 JSON（2026-10 及更早）没有 session/base_date 字段 → 排除，行为不变。
+    """
+    import json as _json
+    data_dir = os.path.join(os.path.dirname(REPORT_DIR.rstrip("/")), "data")
+    path = os.path.join(data_dir, f"deep_analysis_{date_str.replace('-', '')}.json")
+    if not os.path.exists(path):
+        return [], None
+    try:
+        with open(path) as f:
+            jd = _json.load(f)
+    except (OSError, ValueError):
+        return [], None
+    if not isinstance(jd, dict):
+        return [], None
+    if jd.get("session") != "pre_market":
+        return [], None
+    base_date = jd.get("base_date")
+    if not base_date or str(base_date) >= date_str:
+        # base_date 缺失或 ≥ 当日 → 口径无法确认，宁可不用
+        return [], None
+    results = jd.get("results") or []
+    rows, seen = [], set()
+    for r in results:
+        code = str((r or {}).get("code") or "")
+        if not re.match(r"^\d{6}$", code) or code in seen:
+            continue
+        pct = (r or {}).get("chg_pct")
+        if pct is None:
+            continue
+        rows.append((code, (r or {}).get("name") or code, float(pct)))
+        seen.add(code)
+        if len(rows) >= 10:
+            break
+    meta = {"session": "pre_market", "base_date": str(base_date),
+            "guard_ice": bool(jd.get("guard_ice")), "pool_size": jd.get("pool_size")}
+    if rows:
+        return rows, meta
+    # 盘前快照存在但 results 为空 → 结合 guard_ice 给出空池证据
+    reason = "冰点守卫短路（设计行为）" if meta["guard_ice"] else "上游无推荐"
+    meta["empty"] = True
+    meta["evidence"] = (
+        f"⚠️ 深度分析 JSON 快照（session=pre_market, base_date={base_date}）确认 "
+        f"{date_str} 盘前候选池为空（{reason}）—— 机器快照是盘前池真值，"
+        f"绝不回落到开盘后重跑版"
+    )
+    return [], meta
 
 
 def detect_empty_premarket_pool_from_deep_analysis(date_str):
@@ -1044,14 +1241,24 @@ def _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
     价差口径（不看绝对值，看**相对强弱**）:
       1. 科创50 与创业板**同时**上涨（成长方向整体走强）
       2. 科创50 相对上证领先 ≥ 1.5pp（主板明显滞涨）
-      3. 四大核心整体不弱（上证 ≥ 0.5%）—— 排除"全市场下跌中的相对抗跌"
+      3. 上证未单边下跌（上证 > 0%）—— 排除"全市场下跌中的相对抗跌"
+
+    ⚠️ 2026-11-05 实战（v1.35 修订）: 防御条件 `sh_pct < 0.5` 是**错误的排除**——
+    当日上证 **+0.10%**（平盘微红，绝非普跌）、创业板 +0.87%、科创50 +1.68%
+    （领先 1.58pp ≥ 1.5pp），三大成长信号全部满足，仅因 0.10% < 0.5% 被
+    误杀 → 战报再次标"震荡"并给"央企/红利对冲"建议；而当日行业榜
+    **光伏辅材 +9.94% / 光伏加工设备 +9.58% / 视频媒体 +9.27% 领涨，
+    动力煤 -2.20% / 煤炭开采 -1.97% / 油气开采 -1.92% / 电信运营商 -1.81%
+    垫底**——红利防御全线垫底，"震荡→红利对冲"建议第三次买在当日最弱板块。
+    "排除全市场下跌"的本意只需上证**未单边下跌**（> 0），不需要 ≥ +0.5%；
+    上证 +0.1%~+0.5% 的"主板平盘滞涨"正是成长领涨型的典型形态。
 
     与窄口径并存：窄口径命中时（创业板 ≥2.0 且上证 <1.0）仍按原逻辑走，
     两者取或集，扩大召回但不改变原有已验证场景的判定。
     """
     if cyb_pct <= 0 or kc50_pct <= 0:
         return False
-    if sh_pct < 0.5:                      # 全市场偏弱 → 不是"结构性走强"
+    if sh_pct <= 0:                       # 上证单边下跌 → 相对抗跌不叫"领涨"
         return False
     return (kc50_pct - sh_pct) >= 1.5     # 科创50 相对主板明显领先
 
@@ -1256,8 +1463,12 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
     else:
         if alpha > 0.5:
             mode, label = "④-a", "模式④-a 健康中等命中（跑赢大盘）"
+            # ⚠️ 2026-11-05 修订（v1.35）: 旧文案写死"个别标的题材错配"，
+            # 与末尾 in_hot_count==0 时追加的"**题材完全错配**"自相矛盾
+            # （当日实战 9/10 命中 +1.21pp 却 0/10 进强势股池，两句话同屏打架）。
+            # 题材错配度由下方 in_hot 分支按数据生成，此处不再预判。
             attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
-                    f"Alpha {alpha:+.2f}pp —— 策略有效，个别标的题材错配")
+                    f"Alpha {alpha:+.2f}pp —— 策略有效（超额为正）")
         elif alpha >= 0.0:
             mode, label = "④-b", "模式④-b 边缘中等命中（大盘托底但延续性差）"
             attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp（边缘），"
