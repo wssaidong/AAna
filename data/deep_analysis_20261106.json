@@ -1,0 +1,392 @@
+{
+ "date": "2026-11-06",
+ "base_date": "2026-11-05",
+ "report": "/Users/cai/code/AAna/reports/2026-11-06-选股报告.md",
+ "report_size": 7796,
+ "report_mtime": "2026-11-06T08:03:40",
+ "trading_day": true,
+ "session": "pre_market",
+ "generated": "08:35:42",
+ "sentiment_snap": {
+  "score": 73,
+  "label": "回暖",
+  "zt_count": 85,
+  "dt_count": 8,
+  "position": 0.7
+ },
+ "mk_avg": 0.61,
+ "sh_close_pct": 0.1,
+ "pool_size": 3,
+ "guard_ice": false,
+ "guard_reason": "",
+ "run_id": "01a1ae43-a4b0-774b-b28c-7fe15b47a8f2",
+ "overall_win_rate": 50.76142131979695,
+ "total_records": 394,
+ "sector_count": 98,
+ "price_check_match": 3,
+ "nds_tuning": {
+  "score_threshold": 63,
+  "cold_sectors": [
+   "啤酒",
+   "电气设备",
+   "磷化工及磷酸盐",
+   "铅锌",
+   "储能设备",
+   "装修装饰",
+   "交通运输",
+   "专业连锁"
+  ],
+  "weak_sectors": [
+   "semi",
+   "其他家用轻工",
+   "印制电路板",
+   "影视动漫",
+   "房地产开发",
+   "造纸"
+  ]
+ },
+ "yesterday_review": {
+  "am_top1": {
+   "source": "11-05 早盘深度池 Top1 (20261105ZZ gid=1876)",
+   "verified_on": "2026-11-05",
+   "results": [
+    {
+     "code": "001287",
+     "name": "中电港",
+     "total": 94.5,
+     "rating": "买入",
+     "stop": 20.13,
+     "entry": 20.75,
+     "group": "20261105ZZ(gid=1876)",
+     "close": 20.88,
+     "chg_pct": 0.63,
+     "quote_ts": "20261105161457",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.63
+    }
+   ]
+  },
+  "pm_top5": {
+   "source": "11-05 尾盘深度池 Top5 (20261105PP gid=1886)",
+   "verified_on": "2026-11-05",
+   "n_beat_mkt": 5,
+   "n_positive": 5,
+   "results": [
+    {
+     "code": "000829",
+     "name": "天音控股",
+     "total": 67.0,
+     "rating": "增持",
+     "stop": 8.74,
+     "entry": 9.43,
+     "close": 9.43,
+     "chg_pct": 4.78,
+     "quote_ts": "20261105161500",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.0
+    },
+    {
+     "code": "600078",
+     "name": "澄星股份",
+     "total": 76.5,
+     "rating": "买入",
+     "stop": 8.82,
+     "entry": 9.5,
+     "close": 9.51,
+     "chg_pct": 4.51,
+     "quote_ts": "20261105161442",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.11
+    },
+    {
+     "code": "000676",
+     "name": "智度股份",
+     "total": 79.5,
+     "rating": "买入",
+     "stop": 6.52,
+     "entry": 7.03,
+     "group": "20261105PP(gid=1886)",
+     "close": 7.04,
+     "chg_pct": 4.45,
+     "quote_ts": "20261105161500",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.14
+    },
+    {
+     "code": "600573",
+     "name": "惠泉啤酒",
+     "total": 62.3,
+     "rating": "中性",
+     "stop": 11.93,
+     "entry": 12.83,
+     "close": 12.8,
+     "chg_pct": 4.23,
+     "quote_ts": "20261105161457",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": -0.23
+    },
+    {
+     "code": "603016",
+     "name": "新宏泰",
+     "total": 49.2,
+     "rating": "减持",
+     "stop": 26.58,
+     "entry": 28.59,
+     "close": 28.59,
+     "chg_pct": 4.15,
+     "quote_ts": "20261105161437",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.0
+    }
+   ]
+  }
+ },
+ "recommend": {
+  "code": "600633",
+  "name": "浙数文化",
+  "total": 80.0,
+  "rating": "买入",
+  "chg_pct": 4.51,
+  "chg_rank": 2,
+  "sector_win_rate": "75% (3/4)",
+  "industry": "传媒-数字文化+互联网游戏平台 (边锋网络休闲游戏/大数据/数字文化)"
+ },
+ "eligible_pool": [
+  {
+   "code": "600633",
+   "name": "浙数文化",
+   "total": 80.0,
+   "rating": "买入"
+  },
+  {
+   "code": "603258",
+   "name": "电魂网络",
+   "total": 69.3,
+   "rating": "增持"
+  }
+ ],
+ "results": [
+  {
+   "code": "600633",
+   "name": "浙数文化",
+   "rank": 2,
+   "price": 11.35,
+   "pe_ttm": 28.93,
+   "pb": 1.39,
+   "mcap_yi": 143.93,
+   "float_mcap_yi": 143.93,
+   "turnover_pct": 3.99,
+   "vol_ratio": 1.47,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "移动互联网服务",
+   "ind_em": "游戏Ⅱ",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": null,
+   "total": 80.0,
+   "rating": "买入",
+   "target": 11.92,
+   "stop": 11.01,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=57 健康",
+    "20日区间位置 97% 突破区",
+    "60日涨幅 +0% 健康",
+    "量能比 1.47 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 29 合理",
+    "PB 1.39 合理"
+   ],
+   "tech_stat": {
+    "rsi": 57.3,
+    "pos20": 97.0,
+    "chg60": 0.3,
+    "vol_ratio_5d": 1.47,
+    "ma5": 10.67,
+    "ma20": 10.62,
+    "ma60": 10.44,
+    "hi20": 11.4,
+    "lo20": 9.72,
+    "chg_1d": 4.51,
+    "last_date": "2026-11-05",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.51,
+   "chg_date": "2026-11-05",
+   "beat_mkt": true,
+   "industry": "传媒-数字文化+互联网游戏平台 (边锋网络休闲游戏/大数据/数字文化)",
+   "sector_stat_key": "移动互联网服务",
+   "sector_win_rate": "75% (3/4)",
+   "sector_near": "邻近键-传媒(浙报党报数字文化)[传媒] 100% (1/1)",
+   "sector_cold_warn": null,
+   "stop_broken": false,
+   "chg_rank": 2
+  },
+  {
+   "code": "603258",
+   "name": "电魂网络",
+   "rank": 1,
+   "price": 16.85,
+   "pe_ttm": -14.02,
+   "pb": 2.21,
+   "mcap_yi": 40.67,
+   "float_mcap_yi": 40.91,
+   "turnover_pct": 16.6,
+   "vol_ratio": 1.97,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "移动互联网服务",
+   "ind_em": "游戏Ⅱ",
+   "tech_score": 55,
+   "fund_score": 10,
+   "val_score": 7,
+   "val_score_raw": 7,
+   "distorted": false,
+   "single_quarter": null,
+   "total": 69.3,
+   "rating": "增持",
+   "target": 17.77,
+   "stop": 16.34,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=58 健康",
+    "20日区间位置 82% 突破区",
+    "60日涨幅 +25% 健康",
+    "量能比 1.97 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE -14 过高/异常",
+    "PB 2.21 合理"
+   ],
+   "tech_stat": {
+    "rsi": 58.5,
+    "pos20": 82.0,
+    "chg60": 25.4,
+    "vol_ratio_5d": 1.97,
+    "ma5": 15.72,
+    "ma20": 15.12,
+    "ma60": 13.96,
+    "hi20": 17.77,
+    "lo20": 12.6,
+    "chg_1d": 4.79,
+    "last_date": "2026-11-05",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.79,
+   "chg_date": "2026-11-05",
+   "beat_mkt": true,
+   "industry": "传媒-网络游戏/电子竞技 (《梦三国》IP, 电竞+AI 布局)",
+   "sector_stat_key": "移动互联网服务",
+   "sector_win_rate": "75% (3/4)",
+   "sector_near": "邻近键-传媒(数字娱乐)[传媒] 100% (1/1) | 警戒键-影视动漫(weak_sectors 在列)[影视动漫] 33% (1/3)",
+   "sector_cold_warn": "⚠️ 影视动漫(游戏同属传媒娱乐链) 在 weak_sectors 6 键中; PE(TTM) -14 亏损待失真修正判定",
+   "stop_broken": false,
+   "chg_rank": 1
+  },
+  {
+   "code": "600506",
+   "name": "统一股份",
+   "rank": 3,
+   "price": 19.0,
+   "pe_ttm": 167.27,
+   "pb": 9.46,
+   "mcap_yi": 47.43,
+   "float_mcap_yi": 47.43,
+   "turnover_pct": 16.85,
+   "vol_ratio": 1.05,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "其他种植业",
+   "ind_em": "炼化及贸易",
+   "tech_score": 40,
+   "fund_score": 10,
+   "val_score": 1,
+   "val_score_raw": 1,
+   "distorted": false,
+   "single_quarter": null,
+   "total": 47.7,
+   "rating": "减持",
+   "target": 20.9,
+   "stop": 18.43,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=68 偏热",
+    "20日区间位置 70% 中上",
+    "60日涨幅 +31% 偏热",
+    "量能比 1.05 正常"
+   ],
+   "fund_notes": [
+    "ROE 缺失",
+    "净利增速缺失",
+    "营收增速缺失"
+   ],
+   "val_notes": [
+    "PE 167 过高/异常",
+    "PB 9.46 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 68.5,
+    "pos20": 70.0,
+    "chg60": 31.5,
+    "vol_ratio_5d": 1.05,
+    "ma5": 18.59,
+    "ma20": 16.78,
+    "ma60": 16.33,
+    "hi20": 20.9,
+    "lo20": 14.67,
+    "chg_1d": 4.51,
+    "last_date": "2026-11-05",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": null,
+    "ni_growth": null,
+    "rev_growth": null,
+    "error": "No module named 'akshare'"
+   },
+   "chg_pct": 4.51,
+   "chg_date": "2026-11-05",
+   "beat_mkt": true,
+   "industry": "石化-润滑油 (统一石化重组入主, 壳遗留种植业资产)",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "sector_near": "邻近键-化工大类(冷样本 0/2)[chem] 0% (0/2) | 邻近键-化学制品制造同类(1/1)[涂料油漆油墨制造] 100% (1/1)",
+   "sector_cold_warn": "⚠️ 行业双源分裂: sina 其他种植业(壳遗留) vs 东财 炼化及贸易; 胜率库无炼化/润滑油键(冷启动); PE 167/PB 9.46 高估值",
+   "stop_broken": false,
+   "chg_rank": 3
+  }
+ ]
+}
