@@ -6089,6 +6089,17 @@
       "total_pnl_pct": -3.54,
       "realized_pnl": -3542.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-06",
+      "cash": 96458.0,
+      "position_value": 0.0,
+      "total_value": 96458.0,
+      "daily_pnl": 0.0,
+      "total_pnl": -3542.0,
+      "total_pnl_pct": -3.54,
+      "realized_pnl": -3542.0,
+      "positions": []
     }
   ]
 }
