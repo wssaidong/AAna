@@ -5522,90 +5522,119 @@
       "reason": "AAna v2.4 尾盘评分 88",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-06",
+      "code": "600573",
+      "name": "惠泉啤酒",
+      "action": "sell",
+      "price": 12.76,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.47
+    },
+    {
+      "date": "2026-11-06",
+      "code": "603016",
+      "name": "新宏泰",
+      "action": "sell",
+      "price": 27.96,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -63.0,
+      "pnl_pct": -2.2
+    },
+    {
+      "date": "2026-11-06",
+      "code": "600078",
+      "name": "澄星股份",
+      "action": "sell",
+      "price": 9.13,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -37.0,
+      "pnl_pct": -3.89
+    },
+    {
+      "date": "2026-11-06",
+      "code": "000676",
+      "name": "智度股份",
+      "action": "sell",
+      "price": 6.76,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -26.0,
+      "pnl_pct": -3.7
+    },
+    {
+      "date": "2026-11-06",
+      "code": "603091",
+      "name": "众鑫股份",
+      "action": "sell",
+      "price": 46.63,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -1.0,
+      "pnl_pct": -0.02
+    },
+    {
+      "date": "2026-11-06",
+      "code": "000688",
+      "name": "国城矿业",
+      "action": "sell",
+      "price": 20.72,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -54.0,
+      "pnl_pct": -2.54
+    },
+    {
+      "date": "2026-11-06",
+      "code": "002335",
+      "name": "科华数据",
+      "action": "sell",
+      "price": 24.5,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -99.0,
+      "pnl_pct": -3.88
+    },
+    {
+      "date": "2026-11-06",
+      "code": "002174",
+      "name": "游族网络",
+      "action": "sell",
+      "price": 11.19,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -40.0,
+      "pnl_pct": -3.45
+    },
+    {
+      "date": "2026-11-06",
+      "code": "603466",
+      "name": "风语筑",
+      "action": "sell",
+      "price": 13.4,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -60.0,
+      "pnl_pct": -4.29
+    },
+    {
+      "date": "2026-11-06",
+      "code": "603032",
+      "name": "德新科技",
+      "action": "sell",
+      "price": 15.62,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -53.0,
+      "pnl_pct": -3.28
     }
   ],
-  "positions": {
-    "600573": {
-      "date": "2026-11-05",
-      "name": "惠泉啤酒",
-      "shares": 100,
-      "entry_price": 12.82,
-      "highest_price": 12.82,
-      "entry_date": "2026-11-05"
-    },
-    "603016": {
-      "date": "2026-11-05",
-      "name": "新宏泰",
-      "shares": 100,
-      "entry_price": 28.59,
-      "highest_price": 28.59,
-      "entry_date": "2026-11-05"
-    },
-    "600078": {
-      "date": "2026-11-05",
-      "name": "澄星股份",
-      "shares": 100,
-      "entry_price": 9.5,
-      "highest_price": 9.5,
-      "entry_date": "2026-11-05"
-    },
-    "000676": {
-      "date": "2026-11-05",
-      "name": "智度股份",
-      "shares": 100,
-      "entry_price": 7.02,
-      "highest_price": 7.02,
-      "entry_date": "2026-11-05"
-    },
-    "603091": {
-      "date": "2026-11-05",
-      "name": "众鑫股份",
-      "shares": 100,
-      "entry_price": 46.64,
-      "highest_price": 46.64,
-      "entry_date": "2026-11-05"
-    },
-    "000688": {
-      "date": "2026-11-05",
-      "name": "国城矿业",
-      "shares": 100,
-      "entry_price": 21.26,
-      "highest_price": 21.26,
-      "entry_date": "2026-11-05"
-    },
-    "002335": {
-      "date": "2026-11-05",
-      "name": "科华数据",
-      "shares": 100,
-      "entry_price": 25.49,
-      "highest_price": 25.49,
-      "entry_date": "2026-11-05"
-    },
-    "002174": {
-      "date": "2026-11-05",
-      "name": "游族网络",
-      "shares": 100,
-      "entry_price": 11.59,
-      "highest_price": 11.59,
-      "entry_date": "2026-11-05"
-    },
-    "603466": {
-      "date": "2026-11-05",
-      "name": "风语筑",
-      "shares": 100,
-      "entry_price": 14.0,
-      "highest_price": 14.0,
-      "entry_date": "2026-11-05"
-    },
-    "603032": {
-      "date": "2026-11-05",
-      "name": "德新科技",
-      "shares": 100,
-      "entry_price": 16.15,
-      "highest_price": 16.15,
-      "entry_date": "2026-11-05"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -6038,6 +6067,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-06",
+      "cash": 96458.0,
+      "position_value": 0.0,
+      "total_value": 96458.0,
+      "daily_pnl": -439.0,
+      "total_pnl": -3542.0,
+      "total_pnl_pct": -3.54,
+      "realized_pnl": -3542.0,
+      "positions": []
     }
   ]
 }
