@@ -79,6 +79,100 @@ def _sf(val, default=None):
     """
     return _safe_float(val, default=default)
 
+def _probe_qfq_endpoint(code: str, count: int = 90):
+    """
+    探针: 用 1 只股票验证腾讯 qfq 通道是否可用, 返回 (bars, actual_adjust)。
+
+    actual_adjust == 'qfq' → 通道正常 (前复权口径可用)
+    actual_adjust == 'raw' → fqkline 端点被 WAF 拦 (HTTP 501), 已降级到 NOAJ 不复权端点
+                              → 口径不符, sync_day 会把整池判 missing (宁缺毋滥)
+    None / 空 bars        → 网络失败或该股无数据
+
+    ⚠️ 为什么不直接整池 sync: WAF 拦截时整池 74 只 × 3 次重试 ≈ 22s 纯浪费,
+    且并发拉取会进一步提高 WAF 触发率。先探针, 不通就整池跳过。
+    """
+    try:
+        from data.quotes import QuoteService
+        qs = QuoteService()
+        bars, actual = qs._tencent_kline(code, "daily", count, "qfq", return_adjust=True)
+        return list(bars or []), actual
+    except Exception:
+        return [], None
+
+
+def _ensure_store_current(verbose=True):
+    """
+    收盘后把本地日线库 (market_store) 补到最新交易日 —— 防止 store 长期停在 T-1。
+
+    🔴 2026-11-09 根因 (第 2 次复现, 首次 2026-11-06):
+      `save_kline_cached()` 故意**不写当日 bar** (盘中快照未定格, 教训 z) →
+      但全系统**没有任何调度在收盘后跑 `market_store --sync`** → 库里永远缺当日 bar。
+      而 `kline()` 是 store 优先: 库里该口径根数够 (>= count) 就零网络返回 →
+      于是拿到的是**截至 T-1 的陈旧 K 线**, 线上已有的正确值被永久压制。
+      后果: ret_3d / ret_5d 静默算不出 (留空而非报错), 反馈闭环"看起来正常"但数据缺 3~5 日。
+      11-09 实测: 11-04 池 14 只只有 603407 一只算出 ret_3d (它库存 <260 根走了网络),
+      其余 13 只因库存 523 根命中 store → 全部留空。
+
+    修法: 收盘后 (>=15:05) 自动 sync 最新交易日, 补齐当日 bar。
+    - 非交易日 / 未到收盘 / 库已最新 → 直接 no-op (零网络)
+    - 盘中绝不写当日 bar (沿用 market_store 的 REFUSE 保护)
+    - sync 失败不阻断主流程 (反馈闭环照常跑, 只是收益率可能留空)
+
+    返回 (synced: bool, detail: str)
+    """
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
+
+    # 1) 非交易日 → no-op
+    try:
+        sys.path.insert(0, str(PROJECT / "scripts"))
+        from generate_report import is_trading_day
+        ok, reason = is_trading_day(today)
+    except Exception:
+        ok, reason = True, ""   # 判定失败不阻断 (保守放行, 交给 sync_day 自己 missing)
+    if not ok:
+        return False, f"非交易日 ({reason})"
+
+    # 2) 未到收盘 → no-op (盘中 bar 是未定格快照, 绝不入库)
+    after_close = (now.hour > 15) or (now.hour == 15 and now.minute >= 5)
+    if not after_close:
+        return False, f"未到收盘 ({now.strftime('%H:%M')})"
+
+    # 3) 库已含当日 bar → no-op (零网络)
+    try:
+        from data import market_store as ms
+        st = ms.MarketStore()
+        if not st.enabled:
+            return False, "market_store 未启用"
+        have = st.symbols_with_bar(today, "qfq")
+        # 当日 bar 一个都没入库 → 需要 sync
+        if not have:
+            symbols = ms.default_symbols()
+            if not symbols:
+                return False, "同步池为空"
+
+            # 3a) 先用 1 只探针验通道 —— 腾讯 fqkline(qfq) 端点会被 WAF 拦 (HTTP 501),
+            #     此时 _tencent_kline 降级到 NOAJ 不复权端点 → 口径 raw ≠ qfq →
+            #     sync_day 按「口径不符, 宁缺毋滥」全部判 missing。
+            #     不先探针就整池跑: 74 只 × 3 次重试 ≈ 22s 纯浪费, 且拉高 WAF 触发率。
+            probe_bars, probe_adjust = _probe_qfq_endpoint(symbols[0], count=90)
+            if probe_adjust != "qfq":
+                return False, (f"qfq 通道不可用 (实际口径={probe_adjust or '无数据'}), "
+                               f"跳过 sync 避免整池空跑")
+            if not any(str(b.get("date", ""))[:10] == today for b in probe_bars):
+                return False, "qfq 通道可用但今日 bar 未发布 (非交易日或数据延迟), 跳过 sync"
+
+            r = st.sync_day(today, symbols=symbols, adjust="qfq", count=90, workers=8)
+            detail = (f"sync {today}: fetched={r.fetched} inserted={r.inserted_rows} "
+                      f"missing={r.missing} failed={r.failed} elapsed={r.elapsed_s}s")
+            if verbose:
+                print(f"   [store 补齐] {detail}", file=sys.stderr)
+            return True, detail
+        return False, f"库已含 {today} bar ({len(have)} 只)"
+    except Exception as e:
+        return False, f"sync 跳过: {type(e).__name__}: {e}"
+
+
 def _detect_trend(klines):
     """
     从K线检测趋势状态：上升/震荡/下降
@@ -823,6 +917,12 @@ def main():
         sys.exit(2)
 
     # 3. 计算 N 日收益率
+    # 🔴 2026-11-09: 收盘后先把本地日线库补到最新交易日, 否则 store 优先路径
+    # 会返回截至 T-1 的陈旧 K 线 → ret_3d/ret_5d 静默留空 (第 2 次复现, 根因见
+    # _ensure_store_current docstring)。非交易日/未收盘/库已最新时零网络 no-op。
+    _synced, _detail = _ensure_store_current()
+    print(f"   [store 状态] {_detail}", file=sys.stderr)
+
     print("📐 计算收益率...", file=sys.stderr)
     feedback_rows = calculate_returns(rec_rows, trade_data)
     print(f"   计算完成: {len(feedback_rows)} 条", file=sys.stderr)

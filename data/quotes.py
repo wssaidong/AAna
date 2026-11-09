@@ -40,6 +40,12 @@ TENCENT_QT  = "https://qt.gtimg.cn/q="
 TENCENT_KL  = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 # 2026-10-29: fqkline 被 WAF 拦 (HTTP 501) 时的降级端点 (不复权, 字段顺序同 fqkline)
 TENCENT_KL_NOAJ = "https://web.ifzq.gtimg.cn/appstock/app/kline/kline"
+# 2026-11-09: web.ifzq.gtimg.cn 整站被 WAF 拦 (HTTP 501 → waf.tencent.com/501page.html)
+# 时, 同域的 proxy.finance.qq.com 仍能提供**同样的 fqkline 前复权 payload**
+# (实测 002352/600498 的 11-04~11-06 bar 与主端点入库值 diff=0.0)。
+# ⚠️ 它返回的 payload 键位语义与主端点一致 (qfqday=前复权 / day=不复权),
+#    所以复用同一个 _parse_tencent_bars 解析器即可, 不需要改口径判定逻辑。
+TENCENT_KL_ALT = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get"
 THS_HOT     = "http://zx.10jqka.com.cn/event/api/getharden/"
 EM_PUSH2    = "https://push2.eastmoney.com/api/qt/stock/get"
 EM_PUSH2IND = "https://push2.eastmoney.com/api/qt/clist/get"
@@ -266,6 +272,10 @@ class QuoteService:
         mkt = 'sh' if code.startswith(('6', '9')) else ('bj' if code.startswith(('8', '4', '3')) else 'sz')
         for url, params, forced in (
             (TENCENT_KL, {"param": f"{mkt}{code},day,,,{count},{adjust}"}, None),
+            # 2026-11-09: 主端点整站被 WAF 拦 (501) 时, 同域 proxy.finance.qq.com
+            # 仍提供同样的前复权 payload → 优先于下面的 NOAJ 不复权降级,
+            # 这样行情仍保持 qfq 口径 (不复权价会让收益率算错, 见 10-29 教训)。
+            (TENCENT_KL_ALT, {"param": f"{mkt}{code},day,,,{count},{adjust}"}, None),
             # 2026-10-29: fqkline qfq 端点被腾讯 WAF 拦 (HTTP 501) 时降级到
             # kline/kline 不复权端点 (与 scripts/deep_analysis_pm_20261026.py 同款降级)。
             # 两端点 bar 字段顺序一致 = [date, open, close, high, low, vol]。
