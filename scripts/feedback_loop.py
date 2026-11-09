@@ -114,7 +114,10 @@ def _ensure_store_current(verbose=True):
       其余 13 只因库存 523 根命中 store → 全部留空。
 
     修法: 收盘后 (>=15:05) 自动 sync 最新交易日, 补齐当日 bar。
-    - 非交易日 / 未到收盘 / 库已最新 → 直接 no-op (零网络)
+    - 非交易日 / 未到收盘 / 库已**全量**含当日 bar → 直接 no-op (零网络)
+    - 🔴 2026-11-09 16:00 E2E 升级: 判据从「库里有没有当日 bar」改为
+      「同步池内是否有缺失」— 旧判据下**部分缺失** (实测 59/72) 被当成"已最新",
+      缺的 13 只永远不补 (正是本函数要修的故障态换个马甲复现)。
     - 盘中绝不写当日 bar (沿用 market_store 的 REFUSE 保护)
     - sync 失败不阻断主流程 (反馈闭环照常跑, 只是收益率可能留空)
 
@@ -138,37 +141,60 @@ def _ensure_store_current(verbose=True):
     if not after_close:
         return False, f"未到收盘 ({now.strftime('%H:%M')})"
 
-    # 3) 库已含当日 bar → no-op (零网络)
+    # 3) 同步池全量就绪 → no-op (零网络); 缺任意一只 (含部分缺失) → 增量补齐
     try:
         from data import market_store as ms
         st = ms.MarketStore()
         if not st.enabled:
             return False, "market_store 未启用"
         have = st.symbols_with_bar(today, "qfq")
-        # 当日 bar 一个都没入库 → 需要 sync
-        if not have:
-            symbols = ms.default_symbols()
-            if not symbols:
-                return False, "同步池为空"
+        symbols = ms.default_symbols()
+        if not symbols:
+            return False, "同步池为空"
+        missing = [s for s in symbols if s not in have]
+        if not missing:
+            return False, f"库已含 {today} bar (池 {len(symbols)} 只全部就绪)"
 
-            # 3a) 先用 1 只探针验通道 —— 腾讯 fqkline(qfq) 端点会被 WAF 拦 (HTTP 501),
-            #     此时 _tencent_kline 降级到 NOAJ 不复权端点 → 口径 raw ≠ qfq →
-            #     sync_day 按「口径不符, 宁缺毋滥」全部判 missing。
-            #     不先探针就整池跑: 74 只 × 3 次重试 ≈ 22s 纯浪费, 且拉高 WAF 触发率。
-            probe_bars, probe_adjust = _probe_qfq_endpoint(symbols[0], count=90)
+        # 3a) 先用探针验通道 —— 腾讯 fqkline(qfq) 端点会被 WAF 拦 (HTTP 501),
+        #     此时 _tencent_kline 降级到 NOAJ 不复权端点 → 口径 raw ≠ qfq →
+        #     sync_day 按「口径不符, 宁缺毋滥」全部判 missing。
+        #     不先探针就整池跑: 74 只 × 3 次重试 ≈ 22s 纯浪费, 且拉高 WAF 触发率。
+        #     探针候选从【缺失集合】挑 (不是 symbols[0]): 缺的那几只才是要拉的。
+        #     🔴 2026-11-09 16:00 二次实证: **单只 raw ≠ 通道挂** — 无除权事件的
+        #     股票 (001239) qfqday 键缺失 → 解析器降级 day → 报 raw。若在第一只
+        #     raw 就中止, 通道明明正常也被判死 (实测 15 只缺失, 首只 raw,
+        #     第二只 qfq+今日 bar)。正确语义: 任一候选 qfq+今日 bar → 通道通;
+        #     **全部候选 raw** 才判 WAF 拦截; raw 单只交给 sync_day 宁缺毋滥。
+        raw_seen = False
+        qfq_no_today = False
+        for cand in missing[:3]:
+            probe_bars, probe_adjust = _probe_qfq_endpoint(cand, count=90)
             if probe_adjust != "qfq":
-                return False, (f"qfq 通道不可用 (实际口径={probe_adjust or '无数据'}), "
-                               f"跳过 sync 避免整池空跑")
-            if not any(str(b.get("date", ""))[:10] == today for b in probe_bars):
-                return False, "qfq 通道可用但今日 bar 未发布 (非交易日或数据延迟), 跳过 sync"
+                raw_seen = True
+                continue
+            # bar 形态防御: dict{"date":...} 或 "YYYY-MM-DD,..." 字符串两种都兼容
+            has_today = any(
+                (str(b.get("date", ""))[:10] if isinstance(b, dict) else str(b)[:10]) == today
+                for b in probe_bars
+            )
+            if has_today:
+                break
+            qfq_no_today = True
+        else:
+            if raw_seen and not qfq_no_today:
+                return False, ("qfq 通道不可用 (WAF 拦截, 候选全部降级 raw), "
+                               f"跳过 sync 避免整池空跑 (缺失 {len(missing)} 只)")
+            return False, ("qfq 通道可用但缺失股票均无当日 bar "
+                           "(停牌或数据延迟), 跳过 sync")
 
-            r = st.sync_day(today, symbols=symbols, adjust="qfq", count=90, workers=8)
-            detail = (f"sync {today}: fetched={r.fetched} inserted={r.inserted_rows} "
-                      f"missing={r.missing} failed={r.failed} elapsed={r.elapsed_s}s")
-            if verbose:
-                print(f"   [store 补齐] {detail}", file=sys.stderr)
-            return True, detail
-        return False, f"库已含 {today} bar ({len(have)} 只)"
+        # sync_day 对已入库 (symbol,date,adjust) 自动 skip → 增量补齐, 不重复写
+        r = st.sync_day(today, symbols=symbols, adjust="qfq", count=90, workers=8)
+        detail = (f"sync {today}: 池{len(symbols)} 缺{len(missing)} "
+                  f"fetched={r.fetched} inserted={r.inserted_rows} "
+                  f"missing={r.missing} failed={r.failed} elapsed={r.elapsed_s}s")
+        if verbose:
+            print(f"   [store 补齐] {detail}", file=sys.stderr)
+        return True, detail
     except Exception as e:
         return False, f"sync 跳过: {type(e).__name__}: {e}"
 
