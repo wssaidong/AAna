@@ -5632,9 +5632,200 @@
       "reason": "止损/止盈/到期",
       "pnl": -53.0,
       "pnl_pct": -3.28
+    },
+    {
+      "date": "2026-11-09",
+      "code": "600732",
+      "name": "爱旭股份",
+      "action": "buy",
+      "price": 13.14,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "002943",
+      "name": "宇晶股份",
+      "action": "buy",
+      "price": 29.93,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "002465",
+      "name": "海格通信",
+      "action": "buy",
+      "price": 10.13,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "603375",
+      "name": "盛景微",
+      "action": "buy",
+      "price": 42.93,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "603666",
+      "name": "亿嘉和",
+      "action": "buy",
+      "price": 25.94,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "002635",
+      "name": "安洁科技",
+      "action": "buy",
+      "price": 13.93,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "002173",
+      "name": "创新医疗",
+      "action": "buy",
+      "price": 16.83,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "600547",
+      "name": "山东黄金",
+      "action": "buy",
+      "price": 26.76,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 97",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "600933",
+      "name": "爱柯迪",
+      "action": "buy",
+      "price": 14.63,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 97",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-09",
+      "code": "002713",
+      "name": "东易日盛",
+      "action": "buy",
+      "price": 7.74,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 97",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600732": {
+      "date": "2026-11-09",
+      "name": "爱旭股份",
+      "shares": 100,
+      "entry_price": 13.14,
+      "highest_price": 13.14,
+      "entry_date": "2026-11-09"
+    },
+    "002943": {
+      "date": "2026-11-09",
+      "name": "宇晶股份",
+      "shares": 100,
+      "entry_price": 29.93,
+      "highest_price": 30.0,
+      "entry_date": "2026-11-09"
+    },
+    "002465": {
+      "date": "2026-11-09",
+      "name": "海格通信",
+      "shares": 100,
+      "entry_price": 10.13,
+      "highest_price": 10.13,
+      "entry_date": "2026-11-09"
+    },
+    "603375": {
+      "date": "2026-11-09",
+      "name": "盛景微",
+      "shares": 100,
+      "entry_price": 42.93,
+      "highest_price": 42.93,
+      "entry_date": "2026-11-09"
+    },
+    "603666": {
+      "date": "2026-11-09",
+      "name": "亿嘉和",
+      "shares": 100,
+      "entry_price": 25.94,
+      "highest_price": 25.94,
+      "entry_date": "2026-11-09"
+    },
+    "002635": {
+      "date": "2026-11-09",
+      "name": "安洁科技",
+      "shares": 100,
+      "entry_price": 13.93,
+      "highest_price": 13.93,
+      "entry_date": "2026-11-09"
+    },
+    "002173": {
+      "date": "2026-11-09",
+      "name": "创新医疗",
+      "shares": 100,
+      "entry_price": 16.83,
+      "highest_price": 16.83,
+      "entry_date": "2026-11-09"
+    },
+    "600547": {
+      "date": "2026-11-09",
+      "name": "山东黄金",
+      "shares": 100,
+      "entry_price": 26.76,
+      "highest_price": 26.76,
+      "entry_date": "2026-11-09"
+    },
+    "600933": {
+      "date": "2026-11-09",
+      "name": "爱柯迪",
+      "shares": 100,
+      "entry_price": 14.63,
+      "highest_price": 14.63,
+      "entry_date": "2026-11-09"
+    },
+    "002713": {
+      "date": "2026-11-09",
+      "name": "东易日盛",
+      "shares": 100,
+      "entry_price": 7.74,
+      "highest_price": 7.74,
+      "entry_date": "2026-11-09"
+    }
+  },
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -6111,6 +6302,128 @@
       "total_pnl_pct": -3.54,
       "realized_pnl": -3542.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-09",
+      "cash": 76262.0,
+      "position_value": 20203.0,
+      "total_value": 96465.0,
+      "daily_pnl": 7.0,
+      "total_pnl": -3535.0,
+      "total_pnl_pct": -3.54,
+      "realized_pnl": -3542.0,
+      "positions": [
+        {
+          "code": "600732",
+          "name": "爱旭股份",
+          "shares": 100,
+          "entry_price": 13.14,
+          "current_price": 13.14,
+          "highest_price": 13.14,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002943",
+          "name": "宇晶股份",
+          "shares": 100,
+          "entry_price": 29.93,
+          "current_price": 30.0,
+          "highest_price": 30.0,
+          "unreal_pnl": 7.0,
+          "unreal_pct": 0.23,
+          "days_held": 0
+        },
+        {
+          "code": "002465",
+          "name": "海格通信",
+          "shares": 100,
+          "entry_price": 10.13,
+          "current_price": 10.13,
+          "highest_price": 10.13,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603375",
+          "name": "盛景微",
+          "shares": 100,
+          "entry_price": 42.93,
+          "current_price": 42.93,
+          "highest_price": 42.93,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603666",
+          "name": "亿嘉和",
+          "shares": 100,
+          "entry_price": 25.94,
+          "current_price": 25.94,
+          "highest_price": 25.94,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002635",
+          "name": "安洁科技",
+          "shares": 100,
+          "entry_price": 13.93,
+          "current_price": 13.93,
+          "highest_price": 13.93,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002173",
+          "name": "创新医疗",
+          "shares": 100,
+          "entry_price": 16.83,
+          "current_price": 16.83,
+          "highest_price": 16.83,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600547",
+          "name": "山东黄金",
+          "shares": 100,
+          "entry_price": 26.76,
+          "current_price": 26.76,
+          "highest_price": 26.76,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600933",
+          "name": "爱柯迪",
+          "shares": 100,
+          "entry_price": 14.63,
+          "current_price": 14.63,
+          "highest_price": 14.63,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002713",
+          "name": "东易日盛",
+          "shares": 100,
+          "entry_price": 7.74,
+          "current_price": 7.74,
+          "highest_price": 7.74,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
