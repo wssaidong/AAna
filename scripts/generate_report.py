@@ -1708,9 +1708,9 @@ if __name__ == "__main__":
 REC_TUNING = {
     "score_threshold": 60,
     "hold_days": 1,
-    "weak_sectors": ['造纸', 'semi', '印制电路板', '房地产开发', '其他家用轻工', '影视动漫'],
-    "overall_win_rate": 49.4,
-    "total_records": 405,
-    "generated_at": "2026-11-09T20:00:51.870629",
+    "weak_sectors": ['造纸', 'semi', '印制电路板', '房地产开发', '其他家用轻工', '影视动漫', '装修装饰'],
+    "overall_win_rate": 50.2,
+    "total_records": 418,
+    "generated_at": "2026-11-10T20:00:47.791252",
 }
 # === REC_OPTIMIZER_TUNING_END ===
