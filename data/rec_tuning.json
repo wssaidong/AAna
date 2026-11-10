@@ -7,12 +7,13 @@
     "印制电路板",
     "房地产开发",
     "其他家用轻工",
-    "影视动漫"
+    "影视动漫",
+    "装修装饰"
   ],
-  "total_records": 405,
-  "overall_win_rate": 49.382716049382715,
+  "total_records": 418,
+  "overall_win_rate": 50.23923444976076,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-09T20:00:51.870629",
+  "generated_at": "2026-11-10T16:00:57.768273",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -24,20 +25,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 204,
-      "win_count": 115,
-      "win_rate": 56.372549019607845,
-      "avg_change": 1.4618137254901957,
+      "count": 217,
+      "win_count": 125,
+      "win_rate": 57.6036866359447,
+      "avg_change": 1.5929493087557602,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 405,
-      "win_count": 200,
-      "win_rate": 49.382716049382715,
-      "avg_change": 0.3556049382716056
+      "count": 418,
+      "win_count": 210,
+      "win_rate": 50.23923444976076,
+      "avg_change": 0.45808612440191465
     }
   },
   "sector_stats": {
@@ -132,10 +133,10 @@
     "汽车零部件": {
       "sector": "汽车零部件",
       "sector_name": "",
-      "count": 24,
+      "count": 25,
       "win_count": 21,
-      "win_rate": 87.5,
-      "avg_change": 3.242083333333333
+      "win_rate": 84.0,
+      "avg_change": 3.1067999999999993
     },
     "煤炭开采": {
       "sector": "煤炭开采",
@@ -476,10 +477,10 @@
     "装修装饰": {
       "sector": "装修装饰",
       "sector_name": "",
-      "count": 2,
+      "count": 3,
       "win_count": 1,
-      "win_rate": 50.0,
-      "avg_change": 5.175
+      "win_rate": 33.33333333333333,
+      "avg_change": 3.4066666666666663
     },
     "电机": {
       "sector": "电机",
@@ -516,10 +517,10 @@
     "地面兵装": {
       "sector": "地面兵装",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -0.07
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 0.955
     },
     "仪器仪表": {
       "sector": "仪器仪表",
@@ -628,10 +629,10 @@
     "电子零部件制造": {
       "sector": "电子零部件制造",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 7.22
+      "avg_change": 7.635
     },
     "金属制品": {
       "sector": "金属制品",
@@ -684,10 +685,10 @@
     "医疗服务": {
       "sector": "医疗服务",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 2.06
+      "avg_change": 2.54
     },
     "采掘服务": {
       "sector": "采掘服务",
@@ -708,10 +709,10 @@
     "其它通用机械": {
       "sector": "其它通用机械",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 3.49
+      "avg_change": 6.74
     },
     "改性塑料": {
       "sector": "改性塑料",
@@ -872,6 +873,62 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": -2.55
+    },
+    "光伏设备": {
+      "sector": "光伏设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -1.37
+    },
+    "机床工具": {
+      "sector": "机床工具",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.0
+    },
+    "互联网信息服务": {
+      "sector": "互联网信息服务",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 6.83
+    },
+    "黄金": {
+      "sector": "黄金",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.05
+    },
+    "其它专用机械": {
+      "sector": "其它专用机械",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 5.43
+    },
+    "平面媒体": {
+      "sector": "平面媒体",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 9.99
+    },
+    "稀土": {
+      "sector": "稀土",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.76
     }
   }
 }
