@@ -5742,90 +5742,119 @@
       "reason": "AAna v2.4 尾盘评分 97",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-10",
+      "code": "600732",
+      "name": "爱旭股份",
+      "action": "sell",
+      "price": 13.14,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-10",
+      "code": "002943",
+      "name": "宇晶股份",
+      "action": "sell",
+      "price": 30.02,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 9.0,
+      "pnl_pct": 0.3
+    },
+    {
+      "date": "2026-11-10",
+      "code": "002465",
+      "name": "海格通信",
+      "action": "sell",
+      "price": 10.25,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 12.0,
+      "pnl_pct": 1.18
+    },
+    {
+      "date": "2026-11-10",
+      "code": "603375",
+      "name": "盛景微",
+      "action": "sell",
+      "price": 44.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 107.0,
+      "pnl_pct": 2.49
+    },
+    {
+      "date": "2026-11-10",
+      "code": "603666",
+      "name": "亿嘉和",
+      "action": "sell",
+      "price": 26.84,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 90.0,
+      "pnl_pct": 3.47
+    },
+    {
+      "date": "2026-11-10",
+      "code": "002635",
+      "name": "安洁科技",
+      "action": "sell",
+      "price": 14.05,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 12.0,
+      "pnl_pct": 0.86
+    },
+    {
+      "date": "2026-11-10",
+      "code": "002173",
+      "name": "创新医疗",
+      "action": "sell",
+      "price": 17.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 17.0,
+      "pnl_pct": 1.01
+    },
+    {
+      "date": "2026-11-10",
+      "code": "600547",
+      "name": "山东黄金",
+      "action": "sell",
+      "price": 27.1,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 34.0,
+      "pnl_pct": 1.27
+    },
+    {
+      "date": "2026-11-10",
+      "code": "600933",
+      "name": "爱柯迪",
+      "action": "sell",
+      "price": 14.7,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 7.0,
+      "pnl_pct": 0.48
+    },
+    {
+      "date": "2026-11-10",
+      "code": "002713",
+      "name": "东易日盛",
+      "action": "sell",
+      "price": 7.89,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 15.0,
+      "pnl_pct": 1.94
     }
   ],
-  "positions": {
-    "600732": {
-      "date": "2026-11-09",
-      "name": "爱旭股份",
-      "shares": 100,
-      "entry_price": 13.14,
-      "highest_price": 13.14,
-      "entry_date": "2026-11-09"
-    },
-    "002943": {
-      "date": "2026-11-09",
-      "name": "宇晶股份",
-      "shares": 100,
-      "entry_price": 29.93,
-      "highest_price": 30.0,
-      "entry_date": "2026-11-09"
-    },
-    "002465": {
-      "date": "2026-11-09",
-      "name": "海格通信",
-      "shares": 100,
-      "entry_price": 10.13,
-      "highest_price": 10.13,
-      "entry_date": "2026-11-09"
-    },
-    "603375": {
-      "date": "2026-11-09",
-      "name": "盛景微",
-      "shares": 100,
-      "entry_price": 42.93,
-      "highest_price": 42.93,
-      "entry_date": "2026-11-09"
-    },
-    "603666": {
-      "date": "2026-11-09",
-      "name": "亿嘉和",
-      "shares": 100,
-      "entry_price": 25.94,
-      "highest_price": 25.94,
-      "entry_date": "2026-11-09"
-    },
-    "002635": {
-      "date": "2026-11-09",
-      "name": "安洁科技",
-      "shares": 100,
-      "entry_price": 13.93,
-      "highest_price": 13.93,
-      "entry_date": "2026-11-09"
-    },
-    "002173": {
-      "date": "2026-11-09",
-      "name": "创新医疗",
-      "shares": 100,
-      "entry_price": 16.83,
-      "highest_price": 16.83,
-      "entry_date": "2026-11-09"
-    },
-    "600547": {
-      "date": "2026-11-09",
-      "name": "山东黄金",
-      "shares": 100,
-      "entry_price": 26.76,
-      "highest_price": 26.76,
-      "entry_date": "2026-11-09"
-    },
-    "600933": {
-      "date": "2026-11-09",
-      "name": "爱柯迪",
-      "shares": 100,
-      "entry_price": 14.63,
-      "highest_price": 14.63,
-      "entry_date": "2026-11-09"
-    },
-    "002713": {
-      "date": "2026-11-09",
-      "name": "东易日盛",
-      "shares": 100,
-      "entry_price": 7.74,
-      "highest_price": 7.74,
-      "entry_date": "2026-11-09"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -6424,6 +6453,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-10",
+      "cash": 96761.0,
+      "position_value": 0.0,
+      "total_value": 96761.0,
+      "daily_pnl": 296.0,
+      "total_pnl": -3239.0,
+      "total_pnl_pct": -3.24,
+      "realized_pnl": -3239.0,
+      "positions": []
     }
   ]
 }
