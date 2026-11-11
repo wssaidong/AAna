@@ -1,6 +1,6 @@
 {
-  "date_for": "2026-10-31",
-  "score_threshold": 60,
+  "date_for": "2026-11-11",
+  "score_threshold": 63,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
@@ -8,12 +8,19 @@
     "印制电路板",
     "影视动漫",
     "房地产开发",
+    "装修装饰",
     "造纸"
   ],
-  "position_final": 50,
+  "position_final": 45,
   "position_base": 50,
   "watchlist": [],
-  "cold_sectors": [],
+  "cold_sectors": [
+    "传媒",
+    "复合肥",
+    "计算机应用",
+    "汽车",
+    "改性塑料"
+  ],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -26,21 +33,30 @@
         "印制电路板",
         "房地产开发",
         "其他家用轻工",
-        "影视动漫"
+        "影视动漫",
+        "装修装饰"
       ]
     },
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 0,
-      "position_delta": 0,
+      "threshold_delta": 3,
+      "position_delta": -5,
       "weak_sectors_added": [],
       "watchlist": [],
-      "cold_sectors": [],
-      "reasons": []
+      "cold_sectors": [
+        "传媒",
+        "复合肥",
+        "计算机应用",
+        "汽车",
+        "改性塑料"
+      ],
+      "reasons": [
+        "E. 冷启动盲区: 5 只来自 5 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['传媒', '复合肥', '计算机应用', '汽车', '改性塑料']"
+      ]
     }
   ],
-  "generated_at": "2026-10-30T16:10:40",
+  "generated_at": "2026-11-10T16:10:53",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
