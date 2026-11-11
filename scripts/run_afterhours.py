@@ -104,6 +104,23 @@ def ths_hot(date_str):
     return out
 
 
+def _code_prefix(code):
+    """6位代码 → 腾讯市场前缀（北交所 920xxx 走 bj，勿按 "9 开头 → sh"）。
+
+    ⚠️ 2026-11-11 修复（v1.38）: 本文件原有 3 处内联前缀逻辑
+    `'sh' if c.startswith('6') else 'sz'`，把北交所 920xxx 拼成 `sh920xxx`
+    → 腾讯返回无行情 → 涨跌幅静默为 0 → 该股在同花顺强势股池里被当成
+    "非涨停"过滤掉（2026-11-11 实测：920157 宇特光电 +29.99% 涨停，
+    当日北交所涨幅第一，却因取不到价而从"新晋异动 Top5"候选池消失）。
+
+    统一走 ds.get_prefix()（已修 920/43/83/87/88 → bj），避免三处逻辑漂移。
+    """
+    try:
+        return ds.get_prefix(str(code).strip())
+    except Exception:
+        return "sz"
+
+
 def enrich_with_quote(hot_list):
     if not hot_list:
         return hot_list
@@ -112,14 +129,13 @@ def enrich_with_quote(hot_list):
         c = h.get("code", "")
         if not c:
             continue
-        prefix = "sh" if c.startswith("6") or c.startswith("9") else "sz"
-        codes.append(f"{prefix}{c}")
+        codes.append(f"{_code_prefix(c)}{c}")
     q = tencent_quote(codes)
     for h in hot_list:
         c = h.get("code", "")
         if not c:
             continue
-        prefix = "sh" if c.startswith("6") or c.startswith("9") else "sz"
+        prefix = _code_prefix(c)
         # 2026-08-31 修复: ds.tencent_quote 用 price/last_close (而非 current/prev_close)
         # 同时兼容两种命名: 优先 ds 标准字段, fallback 到旧字段
         q_entry = q.get(f"{prefix}{c}") or q.get(c) or {}
@@ -130,6 +146,30 @@ def enrich_with_quote(hot_list):
     return hot_list
 
 
+#: 同花顺「名称派生伪题材」标签 —— 这些不是板块主线，是按**股票名称**归的类目。
+#: 2026-11-09 实战: "“东方”"(7 次) / "“羊”字辈"(4 次) 分列题材热度榜 #2/#4，
+#: 把真实主线（商业航天/人形机器人）挤到后面，且 "“东方”" 会通过
+#: dynamic_top → final_priority 泄漏进新晋异动标签与"明日观察要点"的主线句。
+#: 识别特征: 标签被**中文双引号包裹**（同花顺只对名称派生类目加引号）。
+#: 已逐日核验 2026-11-02/03/04/05/06/09 六天，引号标签**全部**是名称派生伪题材：
+#:   "“东方”"    → 东方创业/东方环宇/东方通信/大东方/东方嘉盛/日出东方/东方新能（名称含"东方"）
+#:   "“羊”字辈"  → 红太阳/东方海洋/阳光照明/大西洋/鲁阳节能/安阳钢铁/光洋股份/盛洋科技
+#:                  （名称含"羊/洋/阳"）
+PSEUDO_THEME_QUOTE = "“"
+
+
+def is_pseudo_theme(tag):
+    """判断一个同花顺题材标签是否为「名称派生伪题材」。
+
+    ⚠️ 2026-11-09 新增（v1.36）: 伪题材会被当真实主线展示**并泄漏进建议**，
+    必须与 "ST板块" 一样在**展示层**过滤（不改 ths_hot 源数据）。
+
+    与 "ST板块" 的区别: ST板块 是**投机类目**（退市/摘帽/扭亏），
+    伪题材是**名称派生类目**（按股票名里的字归类），两者都不是板块主线。
+    """
+    return str(tag or "").strip().startswith(PSEUDO_THEME_QUOTE)
+
+
 def theme_counter(hot_list):
     c = Counter()
     for item in hot_list:
@@ -137,6 +177,16 @@ def theme_counter(hot_list):
             if r.strip():
                 c[r.strip()] += 1
     return c
+
+
+def filter_real_themes(counter, top_n=10):
+    """从题材计数中滤掉伪类目，返回真实主线题材列表。
+
+    ⚠️ 2026-11-09 新增（v1.36）: 同时过滤 "ST板块"（投机类目）与
+    引号包裹的**名称派生伪题材**。两类都不是板块主线。
+    """
+    return [t for t, _ in counter.most_common()
+            if t != "ST板块" and not is_pseudo_theme(t)][:top_n]
 
 
 def _ths_industry_page(session, page, url_tmpl, headers, retries=4):
@@ -286,6 +336,37 @@ def _industry_ranking_ths(top_n=10):
     return result
 
 
+def _industry_base_name(name):
+    """去掉东财行业名末尾的层级后缀（Ⅰ/Ⅱ/Ⅲ/Ⅳ），得到板块"基名"。
+
+    ⚠️ 2026-11-09 新增（v1.36）: 东财 m:90+t:2 的 496 个行业板块里，
+    **同一板块会按申万层级重复出现**（如 焦炭Ⅱ 与 焦炭Ⅲ 涨跌幅完全相同）。
+    全量实测 456 个基名 / 496 条记录 → 39 个基名存在层级重复（38 个 ×2 + 1 个 ×3）。
+    """
+    return re.sub(r"[ⅠⅡⅢⅣIV]+$", "", str(name or "")).strip()
+
+
+def dedupe_industry_hierarchy(rows):
+    """按基名去重行业板块（保留首次出现的层级）。
+
+    ⚠️ 2026-11-09 实战（v1.36）: 涨幅 Top10 里 **焦炭Ⅲ +5.39%** 和
+    **焦炭Ⅱ +5.39%** 是同一板块的两个层级，占掉 2 个席位；燃气Ⅲ/燃气Ⅱ 同理。
+    战报会让人误以为"有两个板块领涨"，实际只是同一个板块被计了两次。
+
+    去重后 Top10 变成真正 10 个不同板块（焦炭/卫浴电器/汽车综合服务/煤炭/燃气/
+    动力煤/印制电路板/煤炭开采/稀土/视频媒体），跌幅榜同理。
+    """
+    seen = set()
+    out = []
+    for r in rows:
+        base = _industry_base_name(r.get("name"))
+        if base in seen:
+            continue
+        seen.add(base)
+        out.append(r)
+    return out
+
+
 def get_industry_ranking(top_n=10):
     """东财行业涨跌 — 用 ds.industry_comparison（已内置 fid=f3 排序 + 全量分页）
 
@@ -298,12 +379,19 @@ def get_industry_ranking(top_n=10):
 
     ⚠️ 2026-10-26 新增: 东财 push2 双域断连时降级到同花顺行业板块
     (见 _industry_ranking_ths), 保住"行业今日全貌"章节。
+
+    ⚠️ 2026-11-09 新增（v1.36）: **层级去重**。东财 496 个板块里同一板块按
+    申万层级重复出现（焦炭Ⅱ/焦炭Ⅲ 涨跌幅完全相同），Top10 会被同一个板块
+    占掉多个席位。这里**多取 6 倍**行再去重切片，保证去重后仍能填满 top_n 条
+    （去重最多把 3 条压成 1 条，6 倍冗余足够）。
     """
-    raw = ds.industry_comparison(top_n=top_n)  # ds 已同时给出 top/bottom 各 top_n 条
+    # ⚠️ 去重前多取冗余行，否则同一板块的层级重复会让榜单条目不足 top_n。
+    fetch_n = max(top_n * 6, 60)
+    raw = ds.industry_comparison(top_n=fetch_n)  # ds 已同时给出 top/bottom 各 top_n 条
     if not isinstance(raw, dict):
         raw = {"top": [], "bottom": [], "total": 0, "error": "ds 返回非 dict"}
-    top = raw.get("top", []) or []
-    bottom = raw.get("bottom", []) or []
+    top = dedupe_industry_hierarchy(raw.get("top", []) or [])
+    bottom = dedupe_industry_hierarchy(raw.get("bottom", []) or [])
     source = raw.get("source", "scripts.data_sources.industry_comparison")
     error = raw.get("error", "")
 
@@ -313,8 +401,8 @@ def get_industry_ranking(top_n=10):
         if ths.get("top"):
             ths["error"] = error  # 保留东财失败原因用于展示
             return {
-                "top": ths["top"],
-                "bottom": ths["bottom"],
+                "top": dedupe_industry_hierarchy(ths["top"]),
+                "bottom": dedupe_industry_hierarchy(ths["bottom"]),
                 "total": ths["total"],
                 "returned": ths["fetched"],
                 "universe": ths["universe"],
@@ -1036,10 +1124,10 @@ def evaluate_t1_pool(prev_rows, prev_date, indices):
     if not prev_rows:
         return {}
     codes = [c for c, _, _ in prev_rows]
-    q = tencent_quote([f"{'sh' if c.startswith('6') else 'sz'}{c}" for c in codes])
+    q = tencent_quote([f"{_code_prefix(c)}{c}" for c in codes])
     rows = []
     for code, name, baseline in prev_rows:
-        key = f"{'sh' if code.startswith('6') else 'sz'}{code}"
+        key = f"{_code_prefix(code)}{code}"
         entry = q.get(key) or q.get(code) or {}
         pct = entry.get("change_pct")
         if pct is None:
@@ -1066,6 +1154,52 @@ def evaluate_t1_pool(prev_rows, prev_date, indices):
     }
 
 
+def pool_theme_overlap(pool_codes, themes):
+    """测算候选池与当日主线题材的**概念级重合度**。
+
+    ⚠️ 2026-11-10 新增（v1.37）: **不能用"候选池有没有进入同花顺涨停池"
+    来推断题材是否错配**。
+
+    同花顺 `getharden` 是**涨停股池**（当日强势/涨停标的），它只能证明
+    "这只票今天涨停了"，**不能证明"这只票不属于某个题材"**。二者在
+    大盘股普涨日会系统性背离：题材对、但票没涨停 → 涨停池重合度 0，
+    而真实题材重合度可能很高。
+
+    2026-11-10 实战: 候选池 8 只中 **6 只持有当日 #1 题材（人形机器人）
+    与 #3 题材（商业航天）**（拓普集团=机器人执行器 / 中国卫星=小卫星总装），
+    涨停池重合度却是 0/8 → 旧口径输出**事实错误**的归因
+    "题材完全错配 —— 所选标的未参与当日主线"，而实际候选池整体跑赢大盘
+    +3.05pp、7/8 命中。
+
+    本函数改用东财 F10 核心概念（`ds.em_core_concepts`）做**概念级**匹配：
+    候选池个股的概念板块 ∩ 当日 Top 题材 → 真实主线重合度。
+
+    返回 (overlap_count, detail)：
+      overlap_count: 命中当日主线的候选池只数
+      detail:        [{code, name, themes:[...]}, ...]
+    """
+    if not pool_codes or not themes:
+        return 0, []
+    try:
+        from data_sources import em_core_concepts as _ecc
+    except Exception:
+        return 0, []
+    theme_list = [t for t in themes if t]
+    detail = []
+    for code in pool_codes:
+        try:
+            boards = _ecc(code) or []
+        except Exception:
+            boards = []
+        if not boards:
+            continue
+        hits = [t for t in theme_list
+                if any(t in b or b in t for b in boards)]
+        if hits:
+            detail.append({"code": code, "themes": hits})
+    return len(detail), detail
+
+
 def resolve_theme_label(reason, final_priority):
     """从同花顺 reason 解析题材标签。
 
@@ -1078,8 +1212,14 @@ def resolve_theme_label(reason, final_priority):
       3. 无任何标签 → None（调用方跳过该股）。
     """
     tags = [t.strip() for t in str(reason or "").split("+")
-            if t.strip() and t.strip() != "ST板块"]
-    matched = next((theme for theme in (final_priority or []) if theme in str(reason or "")), None)
+            if t.strip() and t.strip() != "ST板块" and not is_pseudo_theme(t)]
+    # ⚠️ 2026-11-09 修订（v1.36）: priority 列表本身也要过滤。
+    # 旧实现用 `theme in str(reason)` 匹配**原始** reason 字符串，
+    # 所以 priority 里若混进伪题材（dynamic_top 场景），仍会被选中。
+    # 现在生产链路上 dynamic_top 已过滤，但让本函数**自洽**更安全。
+    priority = [t for t in (final_priority or [])
+                if t != "ST板块" and not is_pseudo_theme(t)]
+    matched = next((theme for theme in priority if theme in str(reason or "")), None)
     if matched:
         cands = [t for t in tags if matched in t]
         if cands:
@@ -1178,7 +1318,12 @@ def _defensive_strong_industries(industry):
     ind = industry or {}
     top = ind.get("top") or []
     defense_kw = ("银行", "保险", "证券", "白酒", "贵金属", "煤炭", "石油", "石油开采",
-                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口")
+                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口",
+                  # ⚠️ 2026-11-09 新增: 焦炭/动力煤 是煤炭的申万子板块，
+                  # 同属资源+高股息防御资产。2026-11-09 焦炭Ⅲ +5.39% 是**全市场涨幅
+                  # 第一**，若关键词漏掉它，防御建议会报"煤炭 +3.47%"而漏掉真正领涨的
+                  # 焦炭板块（战报"行业全貌"里排 #1 的板块在建议里消失）。
+                  "焦炭", "动力煤")
     hits = [r for r in top if any(k in str(r.get("name", "")) for k in defense_kw)]
     if hits:
         names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in hits[:3])
@@ -1204,6 +1349,24 @@ def _growth_bottom_industries(industry):
     return "行业跌幅榜数据缺失，无法定位领跌方向"
 
 
+def _growth_top_branch_names(industry, n=3):
+    """成长领涨日：涨幅榜前列**真实板块名**（供"该跟哪条主线"给出可执行指引）。
+
+    ⚠️ 2026-11-11 新增（v1.38）: 成长领涨分支的建议里写死了
+    "（半导体/设备/材料）"—— 那是 2026-10-28 当天的真实板块名。写死即
+    每日可能说错: 2026-11-11 实测当日涨幅榜前三是
+    **其他数字媒体 +7.27% / 通信网络设备及器件 +7.19% / 通信线缆及配套 +6.04%**，
+    与"半导体/设备/材料"毫无关系 —— 照抄会让用户去跟一条当日根本没涨的线。
+    与 v1.33/v1.35/v1.36 记录的"写死板块名"同类，此处一并数据驱动。
+    """
+    ind = industry or {}
+    top = ind.get("top") or []
+    if not top:
+        return "当日涨幅榜数据缺失，无法确认该跟哪条主线"
+    names = " / ".join(str(r.get("name", "")) for r in top[:n])
+    return names
+
+
 def _defensive_weak_industries(industry):
     """成长领涨日：真实走弱的防御/红利板块（数据驱动，不写死板块）。
 
@@ -1214,7 +1377,12 @@ def _defensive_weak_industries(industry):
     ind = industry or {}
     bottom = ind.get("bottom") or []
     defense_kw = ("银行", "保险", "证券", "白酒", "贵金属", "煤炭", "石油", "石油开采",
-                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口")
+                  "燃气", "电力", "公用事业", "高速公路", "机场", "航运", "港口",
+                  # ⚠️ 2026-11-09 新增: 焦炭/动力煤 是煤炭的申万子板块，
+                  # 同属资源+高股息防御资产。2026-11-09 焦炭Ⅲ +5.39% 是**全市场涨幅
+                  # 第一**，若关键词漏掉它，防御建议会报"煤炭 +3.47%"而漏掉真正领涨的
+                  # 焦炭板块（战报"行业全貌"里排 #1 的板块在建议里消失）。
+                  "焦炭", "动力煤")
     hits = [r for r in bottom if any(k in str(r.get("name", "")) for k in defense_kw)]
     if hits:
         names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in hits[:4])
@@ -1357,12 +1525,57 @@ def _alpha_zone(alpha):
     return "显著负 Alpha"
 
 
+def _theme_group_split(hit_rows, theme_overlap_detail):
+    """按"概念级是否持有当日主线题材"把候选池切成两组，返回两组的收益对比。
+
+    ⚠️ 2026-11-11 新增（v1.38）: 判断"题材错配"是不是**主因**，不能只看
+    命中只数（theme_overlap_count）—— 必须看**题材命中组 vs 未命中组的收益差**。
+    2026-11-11 实战: 候选池 5/10 命中、Alpha -0.55pp，旧代码直接归因
+    "模式① 风格切换（题材错配）"；但概念级拆分显示 —— 持有当日主线题材的
+    6 只均值 **+2.70%**，未持有的 4 只均值 **-4.28%**（差 **+6.97pp**），
+    **题材选择其实是有效的**；真正拖累来自"昨日 +4% 追高"的延续性失败
+    （8/10 负延续、Δ 均值 -4.47pp）。照旧输出"题材错配"等于把**有效的**
+    选股能力说成失效 —— 与 v1.35 ④-a 文案自相矛盾属同一类缺陷
+    （"说错话但不报错"）。
+
+    返回 dict 或 None（无法拆分时）:
+      n_hit / avg_hit: 命中当日主线的只数 / 均值
+      n_miss / avg_miss: 未命中的只数 / 均值
+      spread: avg_hit - avg_miss（正 = 题材选择有效）
+    """
+    if not hit_rows or not theme_overlap_detail:
+        return None
+    codes = {d.get("code") for d in theme_overlap_detail if d.get("code")}
+    if not codes:
+        return None
+    hit_group = [r for r in hit_rows if r[0] in codes]
+    miss_group = [r for r in hit_rows if r[0] not in codes]
+    if not hit_group or not miss_group:
+        return None
+    avg_hit = sum(r[3] for r in hit_group) / len(hit_group)
+    avg_miss = sum(r[3] for r in miss_group) / len(miss_group)
+    return {
+        "n_hit": len(hit_group), "avg_hit": avg_hit,
+        "n_miss": len(miss_group), "avg_miss": avg_miss,
+        "spread": avg_hit - avg_miss,
+    }
+
+
 def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg_neg,
                                sh_pct, market_avg, market_feature="",
-                               tail_dive=False, in_hot_count=0, hot_count=0):
+                               tail_dive=False, in_hot_count=0, hot_count=0,
+                               theme_overlap_count=0, theme_overlap_detail=None):
     """候选池失败模式判定 —— 八态速查表 + ⑩ 系列（v1.32 新增）。
 
     返回 (mode_key, label, attribution_text) 或 (None, None, None)。
+
+    ⚠️ 2026-11-10 新增参数（v1.37）:
+      theme_overlap_count: 候选池中**概念级**持有当日 Top 题材的只数
+        （东财 F10 概念 ∩ 当日主线题材）。⚠️ 这与 `in_hot_count`（进入同花顺
+        **涨停池**的只数）是**两个不同口径** —— 旧代码用 in_hot_count==0 断言
+        "题材完全错配"，在"题材对但票没涨停"的日子会输出**事实错误**的归因。
+        详见函数体内 v1.37 注释。
+      theme_overlap_detail: [{code, themes:[...]}, ...]，用于列出命中详情。
 
     判定依据（references/candidate-pool-failure-modes.md 八态速查表 +
     ⑩-a..⑩-g 子类）：
@@ -1457,9 +1670,29 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
                     f"Alpha {alpha:+.2f}pp（显著负）、正负差距 {gap:.2f}pp —— "
                     f"高Beta分化 + 题材错配双层")
         else:
-            mode, label = "①", "模式① 风格切换（题材错配）"
-            attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp（中性）—— "
-                    f"主因是题材错配")
+            # ⚠️ 2026-11-11 修订（v1.38）: "题材错配"必须**先验证据**再断言。
+            # 旧代码在 40-60% 命中率 + 中性 Alpha 时无条件写"模式① 风格切换
+            # （题材错配）"，与它自己打印的"主线题材命中 6/10"同屏打架。
+            # 2026-11-11 实战: 概念级拆分显示题材命中组 +2.70% vs 未命中组
+            # -4.28%（差 +6.97pp）→ **题材选择是有效的**，真正的拖累是
+            # "昨日+4%追高"（baseline≥4.4% 组 -2.83% vs 低位组 +2.64%）。
+            # 断言"题材错配"会把**有效的**选股能力说成失效 → 必须按数据分流。
+            _split = _theme_group_split(hit_rows, theme_overlap_detail)
+            _theme_effective = bool(_split and _split["spread"] > 0)
+            if _split and _split["spread"] > 0:
+                # 题材命中组跑赢未命中组 → 题材选择有效，不是错配主因。
+                mode, label = "①*", "模式①* 追高延续性失败（题材选择有效，非题材错配）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp"
+                        f"（{_alpha_zone(alpha)}）—— **题材选择有效**：命中当日主线题材的 "
+                        f"{_split['n_hit']} 只均值 {_split['avg_hit']:+.2f}%，"
+                        f"未命中的 {_split['n_miss']} 只均值 {_split['avg_miss']:+.2f}%"
+                        f"（差 {_split['spread']:+.2f}pp），**主因不是题材错配**；"
+                        f"实际拖累是昨日强势股追高（baseline 均值 {baseline_avg:+.2f}%，"
+                        f"{neg_cont}/{n} 负延续、Δ 均值 {avg - baseline_avg:+.2f}pp）")
+            else:
+                mode, label = "①", "模式① 风格切换（题材错配）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp"
+                        f"（{_alpha_zone(alpha)}）—— 主因是题材错配")
     else:
         if alpha > 0.5:
             mode, label = "④-a", "模式④-a 健康中等命中（跑赢大盘）"
@@ -1478,13 +1711,35 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
             attr = (f"候选池 {len(positives)}/{n} 命中、Alpha {alpha:+.2f}pp、"
                     f"正负差距 {gap:.2f}pp —— 主因是个股选择而非系统性")
 
-    # 题材错配度（候选池命中今日强势股/涨停池的只数）
-    if in_hot_count == 0 and n:
-        attr += ("；**题材完全错配** —— 候选池无一只进入今日强势股/涨停池"
-                 f"（{hot_count} 只），所选标的未参与当日主线")
-    elif n:
-        attr += (f"；候选池 {in_hot_count}/{n} 只进入今日强势股/涨停池"
-                 f"（主线命中率 {in_hot_count / n * 100:.0f}%）")
+    # 题材错配度 —— ⚠️ 2026-11-10 修订（v1.37）
+    # 旧口径: `in_hot_count == 0` → 直接断言"题材完全错配 —— 所选标的未参与
+    # 当日主线"。**这是事实错误**: 同花顺 getharden 是**涨停股池**，
+    # in_hot_count == 0 只说明"候选池今天没涨停"，**不能**说明"候选池不属于
+    # 当日主线题材"。2026-11-10 实测: 候选池 8 只中 6 只持有当日 #1 题材
+    # （人形机器人）与 #3 题材（商业航天），涨停池重合度却是 0/8 ——
+    # 旧口径把"题材对但没涨停"误报成"题材完全错配"，且同日战报同时打印
+    # "策略有效（超额为正）+3.05pp"，两句自相矛盾。
+    # 新口径: 以**概念级主线重合度**（东财 F10 概念 ∩ 当日 Top 题材）为准，
+    # 涨停池重合度只作为"当日涨停参与度"的补充口径单独陈述。
+    if n:
+        theme_overlap_detail = theme_overlap_detail or []
+        _hit_themes = sorted({t for d in theme_overlap_detail for t in d.get("themes", [])})
+        if theme_overlap_count > 0:
+            attr += (f"；**主线题材命中 {theme_overlap_count}/{n}**"
+                     f"（概念级口径：{'/'.join(_hit_themes)}）")
+            if in_hot_count == 0:
+                attr += (f"；但候选池 {in_hot_count}/{n} 进入今日涨停池"
+                         f"（{hot_count} 只涨停）—— 属**题材对但未涨停**，"
+                         f"非题材错配")
+            else:
+                attr += (f"；候选池 {in_hot_count}/{n} 同时进入今日涨停池"
+                         f"（{hot_count} 只）")
+        elif in_hot_count == 0:
+            attr += ("；**题材完全错配** —— 候选池无一只持有当日 Top 题材，"
+                     f"且无一进入今日涨停池（{hot_count} 只）")
+        else:
+            attr += (f"；候选池 {in_hot_count}/{n} 只进入今日强势股/涨停池"
+                     f"（主线命中率 {in_hot_count / n * 100:.0f}%，概念级题材未命中）")
 
     if extreme:
         attr += f"。**大盘层**：模式⑤ 极端情绪日（四大核心均值 {market_avg:+.2f}%）"
@@ -1537,7 +1792,7 @@ def generate_full_report(date_str):
         print("      ⚠️ 最近10日无非空题材数据，环比按0处理")
     ct = theme_counter(hot)
     cy = theme_counter(hot_yest)
-    themes = [t for t, _ in ct.most_common() if t != "ST板块"][:10]
+    themes = filter_real_themes(ct, 10)
 
     print("      拉东财行业板块涨跌…")
     industry = get_industry_ranking(10)
@@ -1556,10 +1811,10 @@ def generate_full_report(date_str):
 
     print(f"[5/5] 计算候选池命中率…")
     top10_codes = [c for c, _, _ in top10]
-    qq = tencent_quote([f"{'sh' if c.startswith('6') else 'sz'}{c}" for c in top10_codes])
+    qq = tencent_quote([f"{_code_prefix(c)}{c}" for c in top10_codes])
     hit_rows = []
     for code, name, baseline in top10:
-        key = f"{'sh' if code.startswith('6') else 'sz'}{code}"
+        key = f"{_code_prefix(code)}{code}"
         actual = qq.get(key, {}).get("change_pct", 0)
         delta = actual - baseline
         hit_rows.append((code, name, baseline, actual, delta))
@@ -1589,6 +1844,10 @@ def generate_full_report(date_str):
     # "为什么"——skill 交付物 #2 明确要求"命中率 vs 预期 + **偏差归因**"。
     hot_code_set = {h.get("code", "") for h in hot}
     in_hot_count = sum(1 for c in top10_codes if c in hot_code_set)
+    # ⚠️ v1.37（2026-11-10）: **概念级主线重合度**。
+    # in_hot_count（同花顺涨停池重合度）**不能**替代它 —— 涨停池只证明
+    # "今天涨停了"，不证明"不属于某题材"。见 pool_theme_overlap() 文档。
+    theme_overlap_count, theme_overlap_detail = pool_theme_overlap(top10_codes, themes)
     # 候选池行业暴露（偏差归因用，东财 f127；失败时静默降级为空 dict）
     pool_industries = {}
     try:
@@ -1663,10 +1922,13 @@ def generate_full_report(date_str):
         hit_rows, avg, positives, negatives, avg_pos, avg_neg,
         sh_pct, market_avg,
         tail_dive=tail_dive, in_hot_count=in_hot_count, hot_count=len(hot),
+        theme_overlap_count=theme_overlap_count,
+        theme_overlap_detail=theme_overlap_detail,
     )
     if pool_mode:
         print(f"      候选池归因: {pool_mode} {pool_label}")
-        print(f"      主线重合: {in_hot_count}/{len(hit_rows)} 进入今日强势股池")
+        print(f"      涨停池重合: {in_hot_count}/{len(hit_rows)} 进入今日强势股池")
+        print(f"      概念级题材重合: {theme_overlap_count}/{len(hit_rows)} 持有当日 Top 题材")
 
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
@@ -1675,7 +1937,8 @@ def generate_full_report(date_str):
                               gap_md, gap_rows, comparison_date, industry, dragon,
                               pool_note=pool_note, gap_source=gap_source, t1=t1,
                               pool_mode=pool_mode, pool_label=pool_label,
-                              pool_attr=pool_attr, pool_industries=pool_industries)
+                              pool_attr=pool_attr, pool_industries=pool_industries,
+                              theme_overlap_detail=theme_overlap_detail)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
@@ -1769,7 +2032,8 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    gap_md="", gap_rows=None, comparison_date=None,
                    industry=None, dragon=None, pool_note="",
                    gap_source=None, t1=None, pool_mode=None, pool_label=None,
-                   pool_attr=None, pool_industries=None):
+                   pool_attr=None, pool_industries=None,
+                   theme_overlap_detail=None):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     md = (f"📊 **盘后战报｜生成时间 {now} CST｜"
           f"目标交易日 {date_str} 15:00 收盘**\n\n")
@@ -1829,7 +2093,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         other_idx_pcts=[indices.get(k, {}).get("change_pct", 0)
                         for k in ("sh000001", "sz399001", "sz399005", "sz399300")],
     )
-    md += f"\n⚠️ **市场特征：** {market_feature}（根据 {hot_count} 只强势股判断）\n"
+    md += f"\n⚠️ **市场特征：** {market_feature}\n"
     md += f"- 四大核心指数平均 {market_avg:+.2f}%｜上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
 
     md += "📈 **大盘收盘表现：**\n"
@@ -1887,10 +2151,22 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
             md += f"\n🔍 **偏差归因：{pool_mode} {pool_label}**\n"
             if pool_attr:
                 md += f"- {pool_attr}\n"
+            # ⚠️ v1.37（2026-11-10）: 概念级主线命中明细 —— 让用户看到
+            # "哪几只候选池持有当日主线题材"，而不是只看到一个合计数字。
+            if theme_overlap_detail:
+                _name_by_code = {r[0]: r[1] for r in hit_rows}
+                ov_parts = " / ".join(
+                    f"{d['code']}{_name_by_code.get(d['code'], '')}·{'+'.join(d['themes'])}"
+                    for d in theme_overlap_detail[:8]
+                )
+                md += f"- 主线题材命中明细（概念级）：{ov_parts}\n"
             if pool_industries:
+                # ⚠️ v1.37: 旧代码 `[:6]` 静默截断 —— 2026-11-10 实测 8 只候选池
+                # 只显示 6 个（603131/600118 被丢），渲染层谎报行业暴露范围。
+                # 数据层 8/8 全量可得 → 展示全量，不做静默截断。
                 ind_summary = " / ".join(
                     f"{code}·{pool_industries[code]}" for code in
-                    [r[0] for r in hit_rows if r[0] in pool_industries][:6]
+                    [r[0] for r in hit_rows if r[0] in pool_industries]
                 )
                 if ind_summary:
                     md += f"- 行业暴露：{ind_summary}\n"
@@ -2037,11 +2313,17 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                f"明日若成长高开回落而主板补涨，说明是单日资金切换而非趋势\n")
         md += (f"3️⃣ **防御方向：** ⚠️ 今日{_defensive_weak_industries(industry)}，"
                "「央企/红利对冲」在成长领涨日恰好买在弱势侧 —— 明日防御应转向"
-               "**跟随主线的高景气分支**（半导体/设备/材料），红利仅作低位观察而非对冲盘\n")
+               f"**跟随主线的高景气分支**（当日涨幅榜前列："
+               f"{_growth_top_branch_names(industry)}），红利仅作低位观察而非对冲盘\n")
     else:
         md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"
-        md += "3️⃣ **防御：** 央企/红利股作为底仓对冲\n"
+        # ⚠️ 2026-11-09 修订（v1.36）: "央企/红利股作为底仓对冲"是**写死**的措辞。
+        # v1.31/v1.33/v1.35 已连续三次记录"红利对冲"建议买在当日最弱板块
+        # （写死的板块名/方向不随当日行情变）。本兜底分支是**最常走**的分支，
+        # 同样必须数据驱动: 按当日涨幅榜里的红利防御真实表现给方向。
+        md += (f"3️⃣ **防御方向：** {_defensive_strong_industries(industry)} —— "
+               "防御方向按当日真实涨跌选，不要凭固定印象买红利\n")
     if gap_md:
         # 外发正文只保留数据源文件名，不泄露本机绝对路径。
         gap_md = re.sub(r"(?<=数据源：)(?:/[^\s（]+/)+", "", gap_md)

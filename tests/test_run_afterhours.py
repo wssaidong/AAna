@@ -1066,3 +1066,408 @@ def test_2026_11_05_market_feature_is_growth_lead_not_oscillation():
     )
     assert "成长领涨型" in feature, feature
     assert "震荡" not in feature, feature
+
+
+# ── v1.36: 名称派生伪题材过滤 + 行业层级去重 + 兜底防御建议数据驱动 ─────────
+
+def test_pseudo_theme_detected_by_chinese_quote():
+    """同花顺「名称派生伪题材」必须被识别。
+
+    2026-11-09 实战: "“东方”"(7 次) / "“羊”字辈"(4 次) 是同花顺按**股票名称**
+    归的类目（东方创业/东方环宇/东方通信/大东方/东方嘉盛/日出东方/东方新能；
+    红太阳/光洋股份/盛洋科技…），不是板块主线，却分列题材热度榜 #2/#4，
+    把真实主线（商业航天/人形机器人）挤到后面，并把 "“东方”" 通过
+    dynamic_top → final_priority 泄漏进新晋异动标签和"明日观察要点"的主线句。
+    """
+    assert run_afterhours.is_pseudo_theme("“东方”") is True
+    assert run_afterhours.is_pseudo_theme("“羊”字辈") is True
+    assert run_afterhours.is_pseudo_theme("“羊字辈”") is True
+    # 真实题材不得被误杀
+    for real in ("商业航天", "人形机器人", "三季报扭亏", "回购", "PCB", "冰雪经济"):
+        assert run_afterhours.is_pseudo_theme(real) is False, real
+    # ST板块 是投机类目，同样不是主线（但不是引号伪题材）
+    assert run_afterhours.is_pseudo_theme("ST板块") is False
+
+
+def test_filter_real_themes_removes_pseudo_and_st():
+    """题材热度榜必须同时剔除 ST板块 与 名称派生伪题材。"""
+    from collections import Counter
+    ct = Counter({
+        "“东方”": 7, "商业航天": 7, "“羊”字辈": 4, "人形机器人": 5,
+        "ST板块": 3, "三季报扭亏": 3,
+    })
+    themes = run_afterhours.filter_real_themes(ct, 10)
+    assert "“东方”" not in themes
+    assert "“羊”字辈" not in themes
+    assert "ST板块" not in themes
+    assert themes[0] == "商业航天"
+    assert themes[1] == "人形机器人"
+    assert "三季报扭亏" in themes
+
+
+def test_resolve_theme_label_skips_pseudo_theme():
+    """新晋异动标签不得落到名称派生伪题材上。
+
+    2026-11-09: 东方创业 reason="“东方”+货物贸易+现代物流+上海国企"，
+    若 dynamic_top 含 "“东方”"，旧实现会把它当主线标签展示。
+    """
+    # 伪题材在 priority 里（dynamic_top 场景）也不能被选中
+    assert run_afterhours.resolve_theme_label(
+        "“东方”+货物贸易+现代物流+上海国企", ["“东方”", "商业航天"]) == "货物贸易"
+    # priority 未命中 → 跳过伪题材取首个真实标签
+    assert run_afterhours.resolve_theme_label(
+        "“羊”字辈+百草枯+农业无人机", ["商业航天"]) == "百草枯"
+
+
+def test_industry_hierarchy_dedupe_removes_same_sector_levels():
+    """东财行业榜同一板块的多个层级必须去重。
+
+    2026-11-09 实战: 涨幅 Top10 里 "焦炭Ⅲ +5.39%" 与 "焦炭Ⅱ +5.39%" 是
+    同一板块的两个申万层级，占掉 2 个席位；燃气Ⅲ/燃气Ⅱ 同理。
+    全量实测 456 基名 / 496 记录 → 39 个基名存在层级重复。
+    """
+    rows = [
+        {"name": "焦炭Ⅲ", "change_pct": 5.39},
+        {"name": "焦炭Ⅱ", "change_pct": 5.39},
+        {"name": "卫浴电器", "change_pct": 5.10},
+        {"name": "燃气Ⅲ", "change_pct": 3.25},
+        {"name": "燃气Ⅱ", "change_pct": 3.25},
+        {"name": "综合Ⅱ", "change_pct": -0.04},
+        {"name": "综合Ⅲ", "change_pct": -0.04},
+    ]
+    out = run_afterhours.dedupe_industry_hierarchy(rows)
+    names = [r["name"] for r in out]
+    assert names == ["焦炭Ⅲ", "卫浴电器", "燃气Ⅲ", "综合Ⅱ"]
+    # 去重后同一基名不再出现两次
+    bases = [run_afterhours._industry_base_name(n) for n in names]
+    assert len(bases) == len(set(bases))
+
+
+def test_industry_base_name_strips_roman_level_suffix():
+    assert run_afterhours._industry_base_name("焦炭Ⅲ") == "焦炭"
+    assert run_afterhours._industry_base_name("燃气Ⅱ") == "燃气"
+    assert run_afterhours._industry_base_name("银行") == "银行"
+    assert run_afterhours._industry_base_name("银行Ⅱ") == "银行"
+
+
+def test_industry_ranking_dedupes_and_still_fills_top_n(monkeypatch):
+    """去重后仍必须填满 top_n 条（不能因为层级重复导致榜单缺条）。
+
+    2026-11-09 实战: 涨幅 Top10 被焦炭Ⅱ/Ⅲ + 燃气Ⅱ/Ⅲ 占掉 4 席，
+    实际只有 6 个不同板块。修复后应给出 10 个**不同**板块。
+    """
+    # 构造 60 行：前 20 行里有 4 行是同板块的层级重复
+    rows = []
+    for i in range(60):
+        if i == 1:
+            rows.append({"name": "焦炭Ⅱ", "change_pct": 5.39, "code": f"c{i}"})
+        elif i == 2:
+            rows.append({"name": "燃气Ⅱ", "change_pct": 3.25, "code": f"c{i}"})
+        elif i == 3:
+            rows.append({"name": "燃气Ⅲ", "change_pct": 3.25, "code": f"c{i}"})
+        elif i == 0:
+            rows.append({"name": "焦炭Ⅲ", "change_pct": 5.39, "code": f"c{i}"})
+        else:
+            rows.append({"name": f"行业{i}", "change_pct": 5.0 - i * 0.1, "code": f"c{i}"})
+    fake = {"top": list(rows), "bottom": list(reversed(rows)),
+            "total": 496, "fetched": 496, "universe": 496, "source": "fake"}
+    monkeypatch.setattr(run_afterhours.ds, "industry_comparison", lambda top_n=20: fake)
+
+    got = run_afterhours.get_industry_ranking(10)
+    assert len(got["top"]) == 10
+    bases = [run_afterhours._industry_base_name(r["name"]) for r in got["top"]]
+    assert len(bases) == len(set(bases)), bases
+    assert "焦炭" in bases and "燃气" in bases
+    assert len(got["bottom"]) == 10
+    bbases = [run_afterhours._industry_base_name(r["name"]) for r in got["bottom"]]
+    assert len(bbases) == len(set(bbases)), bbases
+
+
+# ── 2026-11-10 v1.37 回归测试（概念级主线重合度）────────────────────────
+#
+# 生产 bug: 候选池偏差归因用 `in_hot_count == 0`（同花顺**涨停池**重合度）
+# 推断"题材完全错配 —— 所选标的未参与当日主线"。涨停池只证明"今天涨停了"，
+# 不证明"不属于某题材"。2026-11-10 实测: 候选池 8 只中 6 只持有当日 #1 题材
+# （人形机器人）与 #3 题材（商业航天），涨停池重合度 0/8 → 战报输出**事实
+# 错误**的归因，且与同屏的"策略有效（超额为正）+3.05pp"自相矛盾。
+
+
+def test_pool_theme_overlap_counts_concept_level_hits(monkeypatch):
+    """概念级主线重合度：按东财 F10 概念 ∩ 当日 Top 题材匹配。"""
+    boards = {
+        "601689": ["汽车零部件", "人形机器人", "机器人执行器"],
+        "600118": ["航天装备Ⅱ", "商业航天"],
+        "002351": ["消费电子", "AI应用"],
+    }
+    import data_sources
+    monkeypatch.setattr(data_sources, "em_core_concepts", lambda c: boards.get(c, []))
+
+    n, detail = run_afterhours.pool_theme_overlap(
+        ["601689", "600118", "002351"], ["人形机器人", "商业航天", "AI眼镜"]
+    )
+    assert n == 2, detail
+    by_code = {d["code"]: d["themes"] for d in detail}
+    assert "人形机器人" in by_code["601689"]
+    assert "商业航天" in by_code["600118"]
+    # 002351 只有 AI应用，与三个主线题材都不重合
+    assert "002351" not in by_code
+
+
+def test_pool_theme_overlap_handles_empty_inputs(monkeypatch):
+    """空输入 / 接口失败 → 返回 0，不抛异常。"""
+    import data_sources
+    monkeypatch.setattr(data_sources, "em_core_concepts", lambda c: [])
+    assert run_afterhours.pool_theme_overlap([], ["机器人"]) == (0, [])
+    assert run_afterhours.pool_theme_overlap(["601689"], []) == (0, [])
+    n, detail = run_afterhours.pool_theme_overlap(["601689"], ["机器人"])
+    assert (n, detail) == (0, [])
+
+
+def test_attribution_does_not_claim_theme_mismatch_when_concepts_match():
+    """概念级重合 > 0 时，禁止输出"题材完全错配"（生产 bug 的直接回归）。"""
+    hit_rows = [("601689", "拓普集团", 4.45, 3.68, -0.77),
+                ("600118", "中国卫星", 4.55, 4.64, 0.09),
+                ("000700", "模塑科技", 3.89, 4.65, 0.76),
+                ("002351", "漫步者", 1.99, 2.03, 0.04)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "601689", "themes": ["人形机器人"]},
+              {"code": "600118", "themes": ["商业航天"]},
+              {"code": "000700", "themes": ["人形机器人"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives,
+        sum(r[3] for r in positives) / len(positives),
+        sum(r[3] for r in negatives) / len(negatives) if negatives else 0,
+        sh_pct=0.08, market_avg=0.76,
+        tail_dive=False, in_hot_count=0, hot_count=93,
+        theme_overlap_count=3, theme_overlap_detail=detail,
+    )
+    assert "题材完全错配" not in attr, attr
+    assert "主线题材命中 3/4" in attr, attr
+    assert "题材对但未涨停" in attr, attr
+    assert "人形机器人" in attr and "商业航天" in attr, attr
+
+
+def test_attribution_claims_theme_mismatch_only_when_no_concept_overlap():
+    """概念级重合 = 0 且涨停池重合 = 0 → 才允许"题材完全错配"。"""
+    hit_rows = [("603683", "海兴电力", 4.99, -6.20, -11.19),
+                ("002242", "九阳股份", 4.62, -1.20, -5.82)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 0, -3.70,
+        sh_pct=0.08, market_avg=0.76,
+        tail_dive=False, in_hot_count=0, hot_count=93,
+        theme_overlap_count=0, theme_overlap_detail=[],
+    )
+    assert "题材完全错配" in attr, attr
+
+
+def test_feishu_renders_theme_overlap_detail():
+    """战报必须打印"哪几只候选池持有当日主线题材"。"""
+    hit_rows = [("601689", "拓普集团", 4.45, 3.68, -0.77),
+                ("600118", "中国卫星", 4.55, 4.64, 0.09)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    md = run_afterhours.format_feishu(
+        "2026-11-10", _minimal_indices(), ["人形机器人"], {"人形机器人": 15}, {},
+        hit_rows, positives, negatives, 4.16, 4.16, 0,
+        0.08, 1.46, 0.64, [], 93,
+        pool_mode="④-a", pool_label="模式④-a 健康中等命中（跑赢大盘）",
+        pool_attr="候选池 2/2 命中、整体均值 +4.16%",
+        theme_overlap_detail=[{"code": "601689", "themes": ["人形机器人"]},
+                              {"code": "600118", "themes": ["商业航天"]}],
+    )
+    assert "主线题材命中明细" in md, md
+    assert "601689拓普集团" in md, md
+    assert "人形机器人" in md, md
+
+
+def test_market_feature_does_not_misattribute_basis_to_hot_count():
+    """市场特征由指数+时点差判定，不得标注"根据 N 只强势股判断"。"""
+    md = run_afterhours.format_feishu(
+        "2026-11-10", _minimal_indices(), [], {}, {}, [], [], [],
+        0, 0, 0, 0.33, 5.64, 4.09, [], 93,
+    )
+    assert "只强势股判断" not in md, md
+
+
+# ══════════════════════════════════════════════════════════════════════
+# v1.38 (2026-11-11) 回归测试 —— 三处"说错话但不报错"的展示层缺陷
+# ══════════════════════════════════════════════════════════════════════
+
+
+def test_bj_920_code_uses_bj_prefix_not_sh():
+    """v1.38: 北交所 920xxx 段必须走 bj 前缀。
+
+    旧逻辑 `startswith(("6","9")) → sh` 把 920157 拼成 `sh920157`，
+    腾讯返回 `v_pv_none_match="1"`（无行情）→ 涨跌幅静默丢失 →
+    该股在同花顺强势股池里被当成"非涨停"过滤掉。
+    2026-11-11 实测: 920157 宇特光电当日 +29.99% 涨停，
+    是当日涨幅第一的北交所标的，却因取不到价而从"新晋异动 Top5"消失。
+    """
+    import data_sources as ds
+
+    assert ds.get_prefix("920157") == "bj"
+    assert ds.get_prefix("430139") == "bj"
+    assert ds.get_prefix("833171") == "bj"
+    assert ds.get_prefix("871981") == "bj"
+    # 上交所段不受影响
+    assert ds.get_prefix("600519") == "sh"
+    assert ds.get_prefix("688001") == "sh"
+    assert ds.get_prefix("900901") == "sh"   # B股仍属上交所
+    # 深市段不受影响
+    assert ds.get_prefix("000001") == "sz"
+    assert ds.get_prefix("300750") == "sz"
+
+
+def test_run_afterhours_code_prefix_matches_data_sources():
+    """v1.38: run_afterhours 的 _code_prefix 必须与 ds.get_prefix 同源。"""
+    assert run_afterhours._code_prefix("920157") == "bj"
+    assert run_afterhours._code_prefix("600519") == "sh"
+    assert run_afterhours._code_prefix("000001") == "sz"
+
+
+def test_enrich_with_quote_keeps_bj_stock_price():
+    """v1.38: enrich_with_quote 必须能给北交所标的补上涨跌幅。"""
+    hot = [{"code": "920157", "name": "宇特光电", "reason": "光连接+CPO"}]
+    fake_quote = {"bj920157": {"price": 57.69, "last_close": 44.38, "change_pct": 29.99}}
+
+    monkey = run_afterhours.tencent_quote
+    run_afterhours.tencent_quote = lambda codes: fake_quote
+    try:
+        out = run_afterhours.enrich_with_quote(list(hot))
+    finally:
+        run_afterhours.tencent_quote = monkey
+
+    assert out[0]["change_pct"] == 29.99, out
+
+
+def test_attribution_does_not_claim_theme_mismatch_when_theme_selection_worked():
+    """v1.38: 题材选择**有效**时不得断言"主因是题材错配"。
+
+    2026-11-11 实战: 候选池 5/10 命中、Alpha -0.55pp，旧代码归因
+    "模式① 风格切换（题材错配）"。但概念级拆分显示 ——
+    命中当日主线题材的 6 只均值 +2.70%，未命中的 4 只均值 -4.28%
+    （差 +6.97pp）→ **题材选择是有效的**，真正拖累是"昨日+4%追高"
+    （baseline≥4.4% 组 -2.83% vs 低位组 +2.64%）。
+    断言"题材错配"等于把有效的选股能力说成失效。
+    """
+    hit_rows = [
+        ("002273", "水晶光电", 4.48, -1.54, -6.02),
+        ("603667", "五洲新春", 4.58, -0.87, -5.45),
+        ("002181", "粤 传 媒", 4.08, -2.00, -6.08),
+        ("603683", "晶华新材", 4.25, 0.58, -3.67),
+        ("605118", "力鼎光电", 4.15, 2.10, -2.05),
+        ("000026", "飞亚达", 4.26, 10.02, 5.76),
+        ("000700", "模塑科技", 4.65, 5.49, 0.84),
+        ("002864", "盘龙药业", 4.96, -7.22, -12.18),
+        ("002747", "埃斯顿", 3.91, 2.49, -1.42),
+        ("001219", "青岛食品", 4.41, -9.99, -14.40),
+    ]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "002273", "themes": ["人形机器人"]},
+              {"code": "603667", "themes": ["人形机器人"]},
+              {"code": "603683", "themes": ["机器人"]},
+              {"code": "000026", "themes": ["商业航天"]},
+              {"code": "000700", "themes": ["人形机器人"]},
+              {"code": "002747", "themes": ["人形机器人"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives,
+        sum(r[3] for r in positives) / len(positives),
+        sum(r[3] for r in negatives) / len(negatives),
+        sh_pct=0.46, market_avg=1.92,
+        tail_dive=False, in_hot_count=1, hot_count=85,
+        theme_overlap_count=6, theme_overlap_detail=detail,
+    )
+    assert mode == "①*", (mode, label)
+    # 标签不得断言"题材错配"（注意"非题材错配"含子串，故断言肯定式短语）
+    assert "风格切换" not in label, label
+    assert "主因是题材错配" not in label, label
+    assert "题材选择有效" in label, label
+    # 归因必须写明题材选择有效 + 追高是真正拖累
+    assert "题材选择有效" in attr, attr
+    assert "主因不是题材错配" in attr, attr
+    assert "追高" in attr, attr
+    assert "8/10 负延续" in attr, attr
+    # 题材命中组/未命中组数据必须出现在归因里
+    assert "+2.70%" in attr, attr
+    assert "-4.28%" in attr, attr
+
+
+def test_attribution_still_claims_theme_mismatch_when_theme_selection_failed():
+    """v1.38: 题材命中组**跑输**未命中组时，"题材错配"归因照旧成立。"""
+    hit_rows = [("601689", "拓普集团", 4.45, -3.68, -8.13),
+                ("600118", "中国卫星", 4.55, -1.20, -5.75),
+                ("000700", "模塑科技", 3.89, 2.03, -1.86),
+                ("002351", "漫步者", 1.99, 4.65, 2.66)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "601689", "themes": ["人形机器人"]},
+              {"code": "600118", "themes": ["商业航天"]},
+              {"code": "000700", "themes": ["人形机器人"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives,
+        sum(r[3] for r in positives) / len(positives),
+        sum(r[3] for r in negatives) / len(negatives),
+        sh_pct=0.46, market_avg=1.92,
+        tail_dive=False, in_hot_count=0, hot_count=85,
+        theme_overlap_count=3, theme_overlap_detail=detail,
+    )
+    assert mode == "①", (mode, label)
+    assert "题材错配" in label, label
+
+
+def test_growth_lead_advice_does_not_hardcode_sector_names():
+    """v1.38: 成长领涨日建议里的板块名必须来自当日涨幅榜，不得写死。
+
+    旧代码写死"（半导体/设备/材料）"—— 那是 2026-10-28 当天的真实板块名。
+    2026-11-11 实测当日涨幅榜前三是 其他数字媒体 +7.27% /
+    通信网络设备及器件 +7.19% / 通信线缆及配套 +6.04%，与写死的名字无关。
+    """
+    industry = {
+        "top": [{"name": "其他数字媒体", "change_pct": 7.27},
+                {"name": "通信网络设备及器件", "change_pct": 7.19},
+                {"name": "通信线缆及配套", "change_pct": 6.04}],
+        "bottom": [{"name": "纺织鞋类制造", "change_pct": -8.40},
+                   {"name": "涂料", "change_pct": -3.17},
+                   {"name": "白酒Ⅱ", "change_pct": -2.97}],
+    }
+    md = run_afterhours.format_feishu(
+        "2026-11-11", _minimal_indices(), ["三季报增长", "人形机器人", "CPO"],
+        {"三季报增长": 13, "人形机器人": 10, "CPO": 5}, {},
+        [], [], [], 0, 0, 0,
+        0.46, 3.11, 2.80, [], 85,
+        industry=industry,
+    )
+    assert "半导体/设备/材料" not in md, md
+    assert "其他数字媒体" in md, md
+    assert "通信网络设备及器件" in md, md
+
+
+def test_industry_base_name_dedup_keeps_distinct_boards():
+    """v1.38: 东财行业榜按申万层级重复（焦炭Ⅱ/焦炭Ⅲ 同分占 2 席）需去重。"""
+    rows = [{"name": "焦炭Ⅱ", "change_pct": 5.39},
+            {"name": "焦炭Ⅲ", "change_pct": 5.39},
+            {"name": "其他数字媒体", "change_pct": 7.27},
+            {"name": "通信网络设备及器件", "change_pct": 7.19}]
+    out = run_afterhours.dedupe_industry_hierarchy(rows)
+    names = [r["name"] for r in out]
+    assert names.count("焦炭Ⅱ") == 1, names
+    assert "焦炭Ⅲ" not in names, names
+    assert "其他数字媒体" in names, names
+
+
+def test_pseudo_theme_filtered_from_heat_topics():
+    """v1.38: 同花顺"名称派生伪题材"（引号包裹）不得进题材榜。"""
+    from collections import Counter
+    c = Counter({"“东方系”": 3, "三季报增长": 13, "人形机器人": 10, "ST板块": 5})
+    real = run_afterhours.filter_real_themes(c, top_n=10)
+    assert "“东方系”" not in real, real
+    assert "ST板块" not in real, real
+    assert real[0] == "三季报增长", real

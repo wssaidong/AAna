@@ -13,6 +13,7 @@ v2.6 修复映射:
   - B6: intraday_agent 跌停  → limit_down>0 保护
 """
 import os
+import re
 import sys
 
 import pytest
@@ -93,18 +94,25 @@ class TestB3SinaFieldIndex:
         assert abs(change_pct - 1.366) < 0.01  # 浙江荣泰 9-18 实际涨 1.31%
 
     def test_data_sources_sina_parser_fixed(self):
-        """data_sources.py:280 应该用 parts[3] 取现价"""
+        """data_sources.py 的 sina_quote 应该用 parts[3] 取现价
+
+        ⚠️ 2026-11-11 修订（v1.38）: 原实现只在**固定行号窗口** 271-300 内
+        找 `price = safe_float(parts[3])`，文件一旦在上方增删行（本次
+        v1.38 修 get_prefix 的北交所 920xxx 段，行号下移 ~30 行）就
+        误报"找不到 sina 解析行"——**代码没坏，是测试锚点坏了**。
+        改为: 按函数名定位 sina_quote 的函数体，再在其中查找字段下标。
+        """
         path = os.path.join(os.path.dirname(__file__), '..', 'scripts', 'data_sources.py')
         with open(path) as f:
-            lines = f.readlines()
-        # 找 sina 解析段 (around line 280)
-        for i, l in enumerate(lines[270:300], start=271):
-            if 'price = safe_float(parts[3])' in l:
-                return  # ✓ 修复正确
-            if 'price = safe_float(parts[2])' in l and 'data_sources' in path:
-                # 旧错误: parts[2] 是昨收
-                pytest.fail(f"data_sources.py:280 仍用 parts[2] 作 price (Kimi B3 未修复)")
-        pytest.fail("data_sources.py:280 找不到 sina 解析行, 请人工检查")
+            src = f.read()
+        # 定位 sina_quote 函数体（从 def 到下一个顶层 def）
+        m = re.search(r"^def sina_quote\(.*?(?=^def |\Z)", src, re.S | re.M)
+        assert m, "data_sources.py 找不到 sina_quote 函数"
+        body = m.group(0)
+        assert 'price = safe_float(parts[3])' in body, (
+            "sina_quote 应使用 parts[3] 取现价 (parts[2] 是昨收), 实际解析行:\n" + body)
+        assert 'price = safe_float(parts[2])' not in body, (
+            "sina_quote 仍用 parts[2] 作 price (Kimi B3 未修复)")
 
 
 # ===========================================================

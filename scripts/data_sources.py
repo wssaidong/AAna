@@ -66,8 +66,23 @@ def safe_float(value) -> Optional[float]:
 
 
 def get_prefix(code: str) -> str:
-    """6位代码 → 市场前缀"""
-    if code.startswith(("6", "9")):
+    """6位代码 → 市场前缀
+
+    ⚠️ 2026-11-11 修复（v1.38）: **北交所 920xxx 段**此前被误判成上交所。
+    旧逻辑 `startswith(("6","9")) → sh` 把 920157 拼成 `sh920157`,
+    腾讯返回 `v_pv_none_match="1"`（无行情）→ 该股涨跌幅**静默丢失**，
+    在同花顺强势股池里被当成"非涨停"过滤掉（实测 2026-11-11：
+    920157 宇特光电当日 **+29.99%** 涨停，是当日涨幅第一的北交所标的，
+    却因取不到价而从"新晋异动 Top5"候选池里凭空消失）。
+
+    北交所代码段（腾讯 bj 前缀）:
+      - 920xxx  ← 新三板精选层平移后的北交所段（2026-11-11 实测 bj920157 可取价）
+      - 43xxxx / 83xxxx / 87xxxx / 88xxxx  ← 北交所老段（bj430139/bj833171 可取价）
+      - 900xxx（B股）/ 6xxxxx / 688xxx → 上交所 sh
+    """
+    if code.startswith(("920", "43", "83", "87", "88")):
+        return "bj"
+    elif code.startswith(("6", "9")):
         return "sh"
     elif code.startswith("8"):
         return "bj"
@@ -177,7 +192,12 @@ def tencent_quote(codes: list) -> dict:
             chosen_prefix = explicit  # caller 已显式带前缀, 信任
         else:
             # 自动推断
-            if bare.startswith(("6", "9")):
+            # ⚠️ 2026-11-11 修复（v1.38）: 920xxx 是**北交所**段（bj 前缀），
+            # 不能按 "9 开头 → sh" 处理（sh920157 腾讯返回无行情）。与
+            # get_prefix() 保持同一套规则。
+            if bare.startswith(("920", "43", "83", "87", "88")):
+                chosen_prefix = "bj"
+            elif bare.startswith(("6", "9")):
                 chosen_prefix = "sh"
             elif bare.startswith("8"):
                 chosen_prefix = "bj"
@@ -608,12 +628,27 @@ def _save_industry_cache(cache: dict) -> None:
 
 
 # 行业关键词映射 — akshare stock_zyjs_ths 兜底用
+#
+# ⚠️ 顺序敏感: `_mine_industry_from_main_business()` 按 dict 迭代序做**首次命中即返回**,
+#    所以**更具体的 key 必须排在更通用的 key 前面**, 否则通用词会抢先命中:
+#      "汽车零部件" 必须在 "汽车" 之前  (否则 "汽车锻造零部件…" → '汽车', 丢掉零部件层级)
+#      "家具"       必须在 "家电" 之前  (否则 "户外家具…" → '家电', 与 sina 的 '家具' 口径不一致)
+#    新增 key 时请按"从具体到通用"插入, 不要一律追加到末尾。
+#
+# 🆕 v2026-11-04 补 4 个 key (603407 / 001221 / 001239 / 001282 四只 sina 行业格
+#    为空的次新股, mainbiz 兜底全部落 'unknown' → sector 列写空 → 逃过板块黑名单):
+#      其他化学制品 / 家具 / 机械基础件 / 汽车零部件
+#    命名一律对齐 **sina 申万行业口径** (与 rec_feedback.csv 的 sector 列同源),
+#    不得用东财口径 ('化学原料'/'航运港口'/'银行Ⅱ'…) —— 两套口径混用会把
+#    sector_stats 桶打散 (实测 91 只对照股里 70 只两套口径不一致), 见 SKILL.md 教训 (k)。
 INDUSTRY_KEYWORDS = {
     "白酒": ["白酒", "茅台", "五粮液", "洋河", "泸州老窖", "酒类"],
     "空调": ["空调", "美的", "格力", "海尔"],
     "冰箱": ["冰箱"],
     "洗衣机": ["洗衣机"],
+    "家具": ["户外家具", "家居五金", "家具制造", "家具生产"],
     "家电": ["家电", "家用电器"],
+    "汽车零部件": ["汽车锻造零部件", "汽车零部件", "锻造零部件", "汽车金属"],
     "汽车": ["汽车", "整车", "新能源车", "乘用车", "商用车"],
     "电池": ["电池", "锂电", "动力电池", "储能"],
     "半导体": ["半导体", "集成电路", "芯片", "晶圆"],
@@ -625,8 +660,10 @@ INDUSTRY_KEYWORDS = {
     "中药": ["中药"],
     "医药": ["医药", "生物医药", "制药"],
     "石油加工": ["石油加工", "石油化工", "炼油"],
+    "其他化学制品": ["精细化工", "基础化工", "化学制品", "锆产品", "特种尼龙", "氟化学"],
     "煤炭": ["煤炭", "焦煤"],
     "钢铁": ["钢铁", "钢材"],
+    "机械基础件": ["齿轮锻件", "金属结构件", "机械基础件"],
     "房地产": ["房地产", "房地产开发"],
     "建筑工程": ["建筑工程", "建筑装饰", "建筑安装"],
     "食品": ["食品", "乳品", "调味品", "肉制品"],
@@ -771,6 +808,50 @@ def industry_for_codes(codes: list, manual_override: dict = None) -> dict:
     Returns: {code: industry_str, ...}
     """
     return {c: industry_for_code(c, manual_override) for c in codes}
+
+
+def em_core_concepts(code: str) -> list:
+    """东财 F10 核心概念板块（题材归属）。
+
+    ⚠️ 2026-11-10 新增（v1.37）: **候选池主线重合度必须用"题材概念"判定，
+    不能用"是否进入同花顺涨停池"代替**。
+
+    2026-11-10 实战: 候选池 8 只中 **6 只持有当日 #1 题材（人形机器人）与 #3
+    题材（商业航天）**（拓普集团=机器人执行器 / 中国卫星=小卫星总装），
+    但因当日是大盘股普涨日（非涨停日），候选池无一进入同花顺**涨停池** ——
+    旧口径把"未涨停"误判成"题材完全错配"，输出了**事实错误**的归因
+    （`题材完全错配 —— 所选标的未参与当日主线`）。
+
+    同花顺 `getharden` 是**涨停股池**，只能证明"这只票今天涨停了"，
+    **不能证明"这只票不属于某个题材"** —— 两者不是同一件事。
+
+    本函数走东财 F10 `CoreConception` 接口取个股的**概念板块列表**
+    （含行业 + 概念 + 地域），供战报做"候选池 × 当日主线题材"的重合度测算。
+
+    返回: [板块名, ...]（失败返回 []，调用方须容忍空列表）
+    """
+    import requests
+
+    mkt = "SH" if str(code).startswith("6") else "SZ"
+    url = ("https://emweb.securities.eastmoney.com/PC_HSF10/CoreConception/PageAjax"
+           f"?code={mkt}{code}")
+    try:
+        r = requests.get(url, headers={"User-Agent": UA,
+                                       "Referer": "https://emweb.securities.eastmoney.com/"},
+                         timeout=12)
+        j = r.json()
+    except Exception:
+        return []
+    boards = j.get("ssbk") if isinstance(j, dict) else None
+    if not isinstance(boards, list):
+        return []
+    out = []
+    for b in boards:
+        if isinstance(b, dict):
+            name = str(b.get("BOARD_NAME") or "").strip()
+            if name and name not in out:
+                out.append(name)
+    return out
 
 
 def baidu_concept_blocks(code: str) -> dict:
