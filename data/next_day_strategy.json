@@ -1,5 +1,5 @@
 {
-  "date_for": "2026-11-11",
+  "date_for": "2026-11-12",
   "score_threshold": 63,
   "hold_days": 1,
   "weak_sectors": [
@@ -15,11 +15,14 @@
   "position_base": 50,
   "watchlist": [],
   "cold_sectors": [
-    "传媒",
-    "复合肥",
-    "计算机应用",
-    "汽车",
-    "改性塑料"
+    "百货",
+    "电子零部件制造",
+    "其他电子",
+    "其他塑料制品",
+    "线缆部件及其他",
+    "家具",
+    "专用设备",
+    "其他化学制品"
   ],
   "tuning_log": [
     {
@@ -45,18 +48,21 @@
       "weak_sectors_added": [],
       "watchlist": [],
       "cold_sectors": [
-        "传媒",
-        "复合肥",
-        "计算机应用",
-        "汽车",
-        "改性塑料"
+        "百货",
+        "电子零部件制造",
+        "其他电子",
+        "其他塑料制品",
+        "线缆部件及其他",
+        "家具",
+        "专用设备",
+        "其他化学制品"
       ],
       "reasons": [
-        "E. 冷启动盲区: 5 只来自 5 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['传媒', '复合肥', '计算机应用', '汽车', '改性塑料']"
+        "E. 冷启动盲区: 8 只来自 8 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['百货', '电子零部件制造', '其他电子', '其他塑料制品', '线缆部件及其他']"
       ]
     }
   ],
-  "generated_at": "2026-11-10T16:10:53",
+  "generated_at": "2026-11-11T16:10:48",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"

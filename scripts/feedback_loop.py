@@ -79,6 +79,18 @@ def _sf(val, default=None):
     """
     return _safe_float(val, default=default)
 
+def _to_str_or_empty(v):
+    """
+    值 → 字符串; 只有 None / '' / 空白 / 占位符 ('--','-') 才返回 ''。
+    🔴 2026-11-11: 取代 `str(v or "")` 的 falsy-zero 写法 — 0 与 0.0 是
+    合法计算结果 (如 T+1 恰好平盘), 不得被 `or ""` 吞成空串。
+    """
+    if v is None:
+        return ""
+    s = str(v).strip()
+    return "" if s in ("", "--", "-") else s
+
+
 def _probe_qfq_endpoint(code: str, count: int = 90):
     """
     探针: 用 1 只股票验证腾讯 qfq 通道是否可用, 返回 (bars, actual_adjust)。
@@ -165,12 +177,13 @@ def _ensure_store_current(verbose=True):
         #     raw 就中止, 通道明明正常也被判死 (实测 15 只缺失, 首只 raw,
         #     第二只 qfq+今日 bar)。正确语义: 任一候选 qfq+今日 bar → 通道通;
         #     **全部候选 raw** 才判 WAF 拦截; raw 单只交给 sync_day 宁缺毋滥。
-        raw_seen = False
+        raw_cands: list[str] = []
         qfq_no_today = False
+        channel_ok = False
         for cand in missing[:3]:
             probe_bars, probe_adjust = _probe_qfq_endpoint(cand, count=90)
             if probe_adjust != "qfq":
-                raw_seen = True
+                raw_cands.append(cand)
                 continue
             # bar 形态防御: dict{"date":...} 或 "YYYY-MM-DD,..." 字符串两种都兼容
             has_today = any(
@@ -178,14 +191,47 @@ def _ensure_store_current(verbose=True):
                 for b in probe_bars
             )
             if has_today:
+                channel_ok = True
                 break
             qfq_no_today = True
-        else:
-            if raw_seen and not qfq_no_today:
-                return False, ("qfq 通道不可用 (WAF 拦截, 候选全部降级 raw), "
-                               f"跳过 sync 避免整池空跑 (缺失 {len(missing)} 只)")
-            return False, ("qfq 通道可用但缺失股票均无当日 bar "
-                           "(停牌或数据延迟), 跳过 sync")
+
+        if not channel_ok:
+            if raw_cands and not qfq_no_today:
+                # 🔴 2026-11-10 实证修复: 缺失候选全部 raw **不等于** 通道挂。
+                #   缺失集合可能只含 1 只「无除权事件 → 上游无 qfqday 键」的股
+                #   (603407 长裕集团) —— 此时通道是通的 (同日 69/70 只 qfq 正常入库),
+                #   只是该股拿不到 qfq。旧逻辑误判「WAF 拦截」→ 跳过整池 sync
+                #   → 连带其它正常股永远补不上当日 bar (ret_1d 静默留空, 教训 z 同款)。
+                #   教训 (ab): 阴性结论必须多样本交叉 → 用【池内非缺失股】做对照探针。
+                missing_set = set(missing)
+                controls = [s for s in symbols if s not in missing_set][:3]
+                ctrl_qfq = False
+                ctrl_has_today = False
+                for ctrl in controls:
+                    cb, ca = _probe_qfq_endpoint(ctrl, count=90)
+                    if ca != "qfq":
+                        continue
+                    ctrl_qfq = True
+                    if any(
+                        (str(b.get("date", ""))[:10] if isinstance(b, dict) else str(b)[:10]) == today
+                        for b in (cb or [])
+                    ):
+                        ctrl_has_today = True
+                        break
+                if ctrl_qfq and ctrl_has_today:
+                    # 对照股: qfq + 当日 bar → 通道 + 当日数据发布都正常
+                    # → 继续 sync (raw 候选由 sync_day 逐股「宁缺毋滥」自判 missing)
+                    channel_ok = True
+                elif ctrl_qfq:
+                    # 对照股 qfq 但无当日 bar → 全市场当日数据尚未发布 (数据延迟)
+                    return False, ("qfq 通道可用但缺失股票均无当日 bar "
+                                   "(停牌或数据延迟), 跳过 sync")
+                else:
+                    return False, ("qfq 通道不可用 (WAF 拦截, 候选与对照股均降级 raw), "
+                                   f"跳过 sync 避免整池空跑 (缺失 {len(missing)} 只)")
+            else:
+                return False, ("qfq 通道可用但缺失股票均无当日 bar "
+                               "(停牌或数据延迟), 跳过 sync")
 
         # sync_day 对已入库 (symbol,date,adjust) 自动 skip → 增量补齐, 不重复写
         r = st.sync_day(today, symbols=symbols, adjust="qfq", count=90, workers=8)
@@ -557,12 +603,18 @@ def append_feedback(rows):
             added += 1
             continue
         # 已存在：只补空字段，不覆盖已有值
+        # 🔴 2026-11-11 修复 (falsy-zero): 旧写法 `str(new.get(col, "") or "").strip()`
+        #   会把合法计算出的 ret=0.0 (float, falsy) 吞成 "" → 「T+1 恰好平盘」
+        #   被当成「未计算」永不回填。实证: 600418 江淮汽车 rec=2026-11-10,
+        #   昨收 20.03 → T+1 收盘 20.03 (腾讯实时独立复核一致), ret_1d=0.0 是
+        #   真实结果, 但一直显示「-」。判空必须用 _is_missing(): 只把
+        #   None / "" / 空白 / 占位符当"未计算", 0 与 0.0 是合法值。
         touched = False
         for col in ("trend", "ret_1d", "ret_3d", "ret_5d", "ret_15d"):
-            nv = str(new.get(col, "") or "").strip()
-            ov = str(old.get(col, "") or "").strip()
+            nv = _to_str_or_empty(new.get(col))
+            ov = _to_str_or_empty(old.get(col))
             if nv and not ov:
-                old[col] = new[col]
+                old[col] = nv
                 touched = True
         if touched:
             backfilled += 1
@@ -639,6 +691,34 @@ def _valid_rows(rows, top_n=20):
                 dedup[key] = r
     valid = sorted(dedup.values(), key=lambda r: (r.get("rec_date", ""), r.get("code", "")))
     return valid[-top_n:] if len(valid) > top_n else valid
+
+
+def _latest_rows(rows, top_n=20):
+    """
+    取【最近 N 行】用于详情表展示 —— 与 _valid_rows 的区别: **保留 ret_* 为空的行**。
+
+    🔴 2026-11-10 实证: _valid_rows 会把 ret_1d 为空的行全部丢掉 (无法算胜率),
+    于是「最新推荐详情」表实际展示的是**更早**的池 (今日池 10 只 ret_1d 待 T+1 →
+    整池消失), 表格标题「最新推荐详情」与内容不符 → 用户看不到今日选股。
+    统计口径仍用 _valid_rows (没有收益率就进不了胜率分母), 展示口径用本函数。
+
+    去重规则与 _valid_rows 一致: 同 (code, rec_date) 保留 ret_* 填得最全的一行。
+    """
+    dedup = {}
+    for r in rows:
+        key = (r.get("code", ""), r.get("rec_date", ""))
+        prev = dedup.get(key)
+        if prev is None:
+            dedup[key] = r
+        else:
+            score_new = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                            if str(r.get(c, "") or "").strip())
+            score_old = sum(1 for c in ("ret_1d", "ret_3d", "ret_5d", "ret_15d")
+                            if str(prev.get(c, "") or "").strip())
+            if score_new >= score_old:
+                dedup[key] = r
+    ordered = sorted(dedup.values(), key=lambda r: (r.get("rec_date", ""), r.get("code", "")))
+    return ordered[-top_n:] if len(ordered) > top_n else ordered
 
 
 def compute_stats(rows, top_n=20):
@@ -873,7 +953,12 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
         "|------|------|------|--------|------|--------|--------|--------|--------|",
     ])
 
-    for r in _valid_rows(feedback_rows, 20):
+    # 🔴 2026-11-10: 详情表用 _latest_rows (保留 ret_* 为空的行) ——
+    #   旧实现用 _valid_rows → 今日池 (ret_1d 待 T+1) 整池被丢弃,
+    #   标题写「最新推荐详情」却展示更早的池 → 用户看不到今日选股。
+    #   统计口径 (compute_stats) 仍用 _valid_rows: 没收益率不进胜率分母。
+    display_rows = _latest_rows(feedback_rows, 20)
+    for r in display_rows:
         ret_1d = _sf(r.get("ret_1d"))
         ret_3d = _sf(r.get("ret_3d"))
         ret_5d = _sf(r.get("ret_5d"))
@@ -886,6 +971,19 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
         trend_str = r.get("trend", "震荡")
         lines.append(
             f"| {r['date']} | {r['code']} | {r['name']} | {r['rec_date']} | {trend_emoji}{trend_str} | {ret_1d_str} | {ret_3d_str} | {ret_5d_str} | {ret_15d_str} |"
+        )
+
+    # 🔴 2026-11-10: 明示「待回填」行数 —— 详情表含 ret_* 为空的行 (T+1 未到),
+    #   不加说明读者会以为「-」= 数据缺失而非「尚未到 T+1」。
+    _pending = sum(
+        1 for r in display_rows
+        if not str(r.get("ret_1d", "") or "").strip()
+    )
+    if _pending:
+        lines.append("")
+        lines.append(
+            f"> ⏳ 本表 **{_pending} 行** 的 1 日收益为「-」= **T+1 尚未发生 / 尚未回填**"
+            f"（非数据缺失）；标题口径胜率只统计已有收益率的行。"
         )
 
     lines.extend([

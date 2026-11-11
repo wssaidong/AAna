@@ -1,9 +1,9 @@
 {
-  "date": "2026-11-10",
-  "total_recs": 10,
+  "date": "2026-11-11",
+  "total_recs": 11,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 10,
+  "no_data": 11,
   "win_rate": 0,
   "baseline": null,
   "causes": {
@@ -31,60 +31,90 @@
       "hit": true,
       "items": [
         {
-          "code": "603721",
-          "name": "中广天择",
-          "sector_cn": "传媒",
+          "code": "601086",
+          "name": "国芳集团",
+          "sector_cn": "百货",
           "sector_enum": "unknown",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "002881",
+          "name": "美格智能",
+          "sector_cn": "电子零部件制造",
+          "sector_enum": "elec",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "002008",
+          "name": "大族激光",
+          "sector_cn": "其他电子",
+          "sector_enum": "elec",
           "n": 1,
           "ret_1d": null,
           "note": "板块样本 1 < 3"
         },
         {
-          "code": "002539",
-          "name": "云图控股",
-          "sector_cn": "复合肥",
+          "code": "601208",
+          "name": "东材科技",
+          "sector_cn": "其他塑料制品",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
-          "note": "板块 复合肥 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+          "note": "板块 其他塑料制品 (enum=unknown) 未在 sec_stats 里, cold sector risk"
         },
         {
-          "code": "603636",
-          "name": "南威软件",
-          "sector_cn": "计算机应用",
+          "code": "600869",
+          "name": "远东股份",
+          "sector_cn": "线缆部件及其他",
+          "sector_enum": "unknown",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "002631",
+          "name": "德尔未来",
+          "sector_cn": "家具",
+          "sector_enum": "unknown",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "603800",
+          "name": "洪田股份",
+          "sector_cn": "专用设备",
           "sector_enum": "unknown",
           "n": 0,
           "ret_1d": null,
-          "note": "板块 计算机应用 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+          "note": "板块 专用设备 (enum=unknown) 未在 sec_stats 里, cold sector risk"
         },
         {
-          "code": "600418",
-          "name": "江淮汽车",
-          "sector_cn": "汽车",
-          "sector_enum": "auto",
-          "n": 0,
-          "ret_1d": null,
-          "note": "板块 汽车 (enum=auto) 未在 sec_stats 里, cold sector risk"
-        },
-        {
-          "code": "002838",
-          "name": "道恩股份",
-          "sector_cn": "改性塑料",
+          "code": "603002",
+          "name": "宏昌电子",
+          "sector_cn": "其他化学制品",
           "sector_enum": "unknown",
-          "n": 1,
+          "n": 2,
           "ret_1d": null,
-          "note": "板块样本 1 < 3"
+          "note": "板块样本 2 < 3"
         }
       ],
       "watchlist": [],
       "cold_sectors": [
-        "传媒",
-        "复合肥",
-        "计算机应用",
-        "汽车",
-        "改性塑料"
+        "百货",
+        "电子零部件制造",
+        "其他电子",
+        "其他塑料制品",
+        "线缆部件及其他",
+        "家具",
+        "专用设备",
+        "其他化学制品"
       ],
-      "summary": "5 只命中冷启动板块 (5 个不同板块), 单次冷板块: ['传媒', '复合肥', '计算机应用', '汽车', '改性塑料']"
+      "summary": "8 只命中冷启动板块 (8 个不同板块), 单次冷板块: ['百货', '电子零部件制造', '其他电子', '其他塑料制品', '线缆部件及其他']"
     }
   },
   "hit_causes": [
@@ -98,14 +128,17 @@
     "watchlist": [],
     "position_delta": -5,
     "reasons": [
-      "E. 冷启动盲区: 5 只来自 5 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['传媒', '复合肥', '计算机应用', '汽车', '改性塑料']"
+      "E. 冷启动盲区: 8 只来自 8 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['百货', '电子零部件制造', '其他电子', '其他塑料制品', '线缆部件及其他']"
     ],
     "cold_sectors": [
-      "传媒",
-      "复合肥",
-      "计算机应用",
-      "汽车",
-      "改性塑料"
+      "百货",
+      "电子零部件制造",
+      "其他电子",
+      "其他塑料制品",
+      "线缆部件及其他",
+      "家具",
+      "专用设备",
+      "其他化学制品"
     ]
   }
 }
