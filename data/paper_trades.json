@@ -5962,90 +5962,119 @@
       "reason": "AAna v2.4 尾盘评分 93",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-11",
+      "code": "600699",
+      "name": "均胜电子",
+      "action": "sell",
+      "price": 21.74,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -30.0,
+      "pnl_pct": -1.36
+    },
+    {
+      "date": "2026-11-11",
+      "code": "603721",
+      "name": "中广天择",
+      "action": "sell",
+      "price": 22.25,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.27
+    },
+    {
+      "date": "2026-11-11",
+      "code": "002539",
+      "name": "云图控股",
+      "action": "sell",
+      "price": 11.77,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 11.0,
+      "pnl_pct": 0.94
+    },
+    {
+      "date": "2026-11-11",
+      "code": "003033",
+      "name": "征和工业",
+      "action": "sell",
+      "price": 81.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 15.0,
+      "pnl_pct": 0.19
+    },
+    {
+      "date": "2026-11-11",
+      "code": "002979",
+      "name": "雷赛智能",
+      "action": "sell",
+      "price": 55.5,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -39.0,
+      "pnl_pct": -0.7
+    },
+    {
+      "date": "2026-11-11",
+      "code": "603636",
+      "name": "南威软件",
+      "action": "sell",
+      "price": 9.03,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -7.0,
+      "pnl_pct": -0.77
+    },
+    {
+      "date": "2026-11-11",
+      "code": "002354",
+      "name": "天娱数科",
+      "action": "sell",
+      "price": 8.39,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -10.0,
+      "pnl_pct": -1.18
+    },
+    {
+      "date": "2026-11-11",
+      "code": "002795",
+      "name": "永和智控",
+      "action": "sell",
+      "price": 6.86,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -3.0,
+      "pnl_pct": -0.44
+    },
+    {
+      "date": "2026-11-11",
+      "code": "600418",
+      "name": "江淮汽车",
+      "action": "sell",
+      "price": 19.8,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -14.0,
+      "pnl_pct": -0.7
+    },
+    {
+      "date": "2026-11-11",
+      "code": "002838",
+      "name": "道恩股份",
+      "action": "sell",
+      "price": 20.57,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -8.0,
+      "pnl_pct": -0.39
     }
   ],
-  "positions": {
-    "600699": {
-      "date": "2026-11-10",
-      "name": "均胜电子",
-      "shares": 100,
-      "entry_price": 22.04,
-      "highest_price": 22.04,
-      "entry_date": "2026-11-10"
-    },
-    "603721": {
-      "date": "2026-11-10",
-      "name": "中广天择",
-      "shares": 100,
-      "entry_price": 22.31,
-      "highest_price": 22.31,
-      "entry_date": "2026-11-10"
-    },
-    "002539": {
-      "date": "2026-11-10",
-      "name": "云图控股",
-      "shares": 100,
-      "entry_price": 11.66,
-      "highest_price": 11.66,
-      "entry_date": "2026-11-10"
-    },
-    "003033": {
-      "date": "2026-11-10",
-      "name": "征和工业",
-      "shares": 100,
-      "entry_price": 80.85,
-      "highest_price": 80.85,
-      "entry_date": "2026-11-10"
-    },
-    "002979": {
-      "date": "2026-11-10",
-      "name": "雷赛智能",
-      "shares": 100,
-      "entry_price": 55.89,
-      "highest_price": 55.98,
-      "entry_date": "2026-11-10"
-    },
-    "603636": {
-      "date": "2026-11-10",
-      "name": "南威软件",
-      "shares": 100,
-      "entry_price": 9.1,
-      "highest_price": 9.1,
-      "entry_date": "2026-11-10"
-    },
-    "002354": {
-      "date": "2026-11-10",
-      "name": "天娱数科",
-      "shares": 100,
-      "entry_price": 8.49,
-      "highest_price": 8.49,
-      "entry_date": "2026-11-10"
-    },
-    "002795": {
-      "date": "2026-11-10",
-      "name": "永和智控",
-      "shares": 100,
-      "entry_price": 6.89,
-      "highest_price": 6.89,
-      "entry_date": "2026-11-10"
-    },
-    "600418": {
-      "date": "2026-11-10",
-      "name": "江淮汽车",
-      "shares": 100,
-      "entry_price": 19.94,
-      "highest_price": 19.94,
-      "entry_date": "2026-11-10"
-    },
-    "002838": {
-      "date": "2026-11-10",
-      "name": "道恩股份",
-      "shares": 100,
-      "entry_price": 20.65,
-      "highest_price": 20.65,
-      "entry_date": "2026-11-10"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -6777,6 +6806,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-11",
+      "cash": 96670.0,
+      "position_value": 0.0,
+      "total_value": 96670.0,
+      "daily_pnl": -95.0,
+      "total_pnl": -3330.0,
+      "total_pnl_pct": -3.33,
+      "realized_pnl": -3330.0,
+      "positions": []
     }
   ]
 }
