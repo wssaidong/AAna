@@ -7041,6 +7041,128 @@
       "total_pnl_pct": -3.33,
       "realized_pnl": -3330.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-11",
+      "cash": 69610.0,
+      "position_value": 27060.0,
+      "total_value": 96670.0,
+      "daily_pnl": 0.0,
+      "total_pnl": -3330.0,
+      "total_pnl_pct": -3.33,
+      "realized_pnl": -3330.0,
+      "positions": [
+        {
+          "code": "601086",
+          "name": "国芳集团",
+          "shares": 100,
+          "entry_price": 13.47,
+          "current_price": 13.47,
+          "highest_price": 13.47,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002881",
+          "name": "美格智能",
+          "shares": 100,
+          "entry_price": 44.18,
+          "current_price": 44.18,
+          "highest_price": 44.18,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002008",
+          "name": "大族激光",
+          "shares": 100,
+          "entry_price": 56.72,
+          "current_price": 56.72,
+          "highest_price": 56.72,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002174",
+          "name": "游族网络",
+          "shares": 100,
+          "entry_price": 11.67,
+          "current_price": 11.67,
+          "highest_price": 11.67,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "601208",
+          "name": "东材科技",
+          "shares": 100,
+          "entry_price": 35.28,
+          "current_price": 35.28,
+          "highest_price": 35.28,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600869",
+          "name": "远东股份",
+          "shares": 100,
+          "entry_price": 14.9,
+          "current_price": 14.9,
+          "highest_price": 14.9,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002631",
+          "name": "德尔未来",
+          "shares": 100,
+          "entry_price": 10.22,
+          "current_price": 10.22,
+          "highest_price": 10.22,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603926",
+          "name": "铁流股份",
+          "shares": 100,
+          "entry_price": 17.06,
+          "current_price": 17.06,
+          "highest_price": 17.06,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603800",
+          "name": "洪田股份",
+          "shares": 100,
+          "entry_price": 37.96,
+          "current_price": 37.96,
+          "highest_price": 37.96,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603270",
+          "name": "金帝股份",
+          "shares": 100,
+          "entry_price": 29.14,
+          "current_price": 29.14,
+          "highest_price": 29.14,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
