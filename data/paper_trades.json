@@ -6182,90 +6182,119 @@
       "reason": "AAna v2.4 尾盘评分 93",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-12",
+      "code": "601086",
+      "name": "国芳集团",
+      "action": "sell",
+      "price": 13.29,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -18.0,
+      "pnl_pct": -1.34
+    },
+    {
+      "date": "2026-11-12",
+      "code": "002881",
+      "name": "美格智能",
+      "action": "sell",
+      "price": 44.2,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 2.0,
+      "pnl_pct": 0.05
+    },
+    {
+      "date": "2026-11-12",
+      "code": "002008",
+      "name": "大族激光",
+      "action": "sell",
+      "price": 56.88,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 16.0,
+      "pnl_pct": 0.28
+    },
+    {
+      "date": "2026-11-12",
+      "code": "002174",
+      "name": "游族网络",
+      "action": "sell",
+      "price": 11.6,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -7.0,
+      "pnl_pct": -0.6
+    },
+    {
+      "date": "2026-11-12",
+      "code": "601208",
+      "name": "东材科技",
+      "action": "sell",
+      "price": 35.2,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -8.0,
+      "pnl_pct": -0.23
+    },
+    {
+      "date": "2026-11-12",
+      "code": "600869",
+      "name": "远东股份",
+      "action": "sell",
+      "price": 14.95,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 5.0,
+      "pnl_pct": 0.34
+    },
+    {
+      "date": "2026-11-12",
+      "code": "002631",
+      "name": "德尔未来",
+      "action": "sell",
+      "price": 10.2,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -2.0,
+      "pnl_pct": -0.2
+    },
+    {
+      "date": "2026-11-12",
+      "code": "603926",
+      "name": "铁流股份",
+      "action": "sell",
+      "price": 17.12,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 6.0,
+      "pnl_pct": 0.35
+    },
+    {
+      "date": "2026-11-12",
+      "code": "603800",
+      "name": "洪田股份",
+      "action": "sell",
+      "price": 38.34,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 38.0,
+      "pnl_pct": 1.0
+    },
+    {
+      "date": "2026-11-12",
+      "code": "603270",
+      "name": "金帝股份",
+      "action": "sell",
+      "price": 29.55,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 41.0,
+      "pnl_pct": 1.41
     }
   ],
-  "positions": {
-    "601086": {
-      "date": "2026-11-11",
-      "name": "国芳集团",
-      "shares": 100,
-      "entry_price": 13.47,
-      "highest_price": 13.47,
-      "entry_date": "2026-11-11"
-    },
-    "002881": {
-      "date": "2026-11-11",
-      "name": "美格智能",
-      "shares": 100,
-      "entry_price": 44.18,
-      "highest_price": 44.18,
-      "entry_date": "2026-11-11"
-    },
-    "002008": {
-      "date": "2026-11-11",
-      "name": "大族激光",
-      "shares": 100,
-      "entry_price": 56.72,
-      "highest_price": 56.72,
-      "entry_date": "2026-11-11"
-    },
-    "002174": {
-      "date": "2026-11-11",
-      "name": "游族网络",
-      "shares": 100,
-      "entry_price": 11.67,
-      "highest_price": 11.67,
-      "entry_date": "2026-11-11"
-    },
-    "601208": {
-      "date": "2026-11-11",
-      "name": "东材科技",
-      "shares": 100,
-      "entry_price": 35.28,
-      "highest_price": 35.28,
-      "entry_date": "2026-11-11"
-    },
-    "600869": {
-      "date": "2026-11-11",
-      "name": "远东股份",
-      "shares": 100,
-      "entry_price": 14.9,
-      "highest_price": 14.9,
-      "entry_date": "2026-11-11"
-    },
-    "002631": {
-      "date": "2026-11-11",
-      "name": "德尔未来",
-      "shares": 100,
-      "entry_price": 10.22,
-      "highest_price": 10.22,
-      "entry_date": "2026-11-11"
-    },
-    "603926": {
-      "date": "2026-11-11",
-      "name": "铁流股份",
-      "shares": 100,
-      "entry_price": 17.06,
-      "highest_price": 17.06,
-      "entry_date": "2026-11-11"
-    },
-    "603800": {
-      "date": "2026-11-11",
-      "name": "洪田股份",
-      "shares": 100,
-      "entry_price": 37.96,
-      "highest_price": 37.96,
-      "entry_date": "2026-11-11"
-    },
-    "603270": {
-      "date": "2026-11-11",
-      "name": "金帝股份",
-      "shares": 100,
-      "entry_price": 29.14,
-      "highest_price": 29.14,
-      "entry_date": "2026-11-11"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -7163,6 +7192,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-12",
+      "cash": 96743.0,
+      "position_value": 0.0,
+      "total_value": 96743.0,
+      "daily_pnl": 73.0,
+      "total_pnl": -3257.0,
+      "total_pnl_pct": -3.26,
+      "realized_pnl": -3257.0,
+      "positions": []
     }
   ]
 }
