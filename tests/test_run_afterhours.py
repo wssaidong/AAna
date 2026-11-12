@@ -504,6 +504,81 @@ def test_pool_failure_mode_10h_classified():
     assert "置信度低" in attr, attr
 
 
+# ── v1.39（2026-11-12 实战）: 非极端情绪日的"池子局部崩盘"被误标成 ⑤ 系统性崩盘 ──
+
+def test_pool_failure_mode_10j_pool_local_crash_not_systemic():
+    """2026-11-12 实战形态: 候选池 2/10 命中、均值 -4.44%（破 -3%）、
+    baseline 均值 +3.73%（未达追高门槛）、**大盘四大核心均值仅 -1.01%
+    （科创50 还 +0.73%）** → 旧代码落 ⑤ 分支，标签写死
+    "系统性崩盘（大盘系统性风险 + 题材错配）"，与归因正文自相矛盾
+    （正文说"主因是大盘系统性风险"——但大盘没崩；又说"非题材错配"
+    ——但标签里写着"题材错配"）。必须判 **⑩-j** 且**不得**出现
+    "系统性崩盘"标签与"题材错配"预判。"""
+    # 当日真实收盘: 001283 -7.73 / 002472 -5.67 / 000888 -2.93 / 603337 -9.49
+    # 002553 -2.74 / 002979 -7.61 / 603009 -3.98 / 002911 +0.86 / 002009 -6.28 / 603990 +1.22
+    hit_rows = [("001283", "豪鹏科技", 3.29, -7.73, -11.02),
+                ("002472", "双环传动", 3.82, -5.67, -9.49),
+                ("000888", "峨眉山Ａ", 3.22, -2.93, -6.15),
+                ("603337", "杰克科技", 3.21, -9.49, -12.70),
+                ("002553", "南方精工", 4.07, -2.74, -6.81),
+                ("002979", "雷赛智能", 4.02, -7.61, -11.63),
+                ("603009", "北特科技", 3.32, -3.98, -7.30),
+                ("002911", "佛燃能源", 4.65, 0.86, -3.79),
+                ("002009", "天奇股份", 3.48, -6.28, -9.76),
+                ("603990", "麦迪科技", 4.24, 1.22, -3.02)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "001283", "themes": ["机器人"]},
+              {"code": "002472", "themes": ["机器人"]},
+              {"code": "603337", "themes": ["机器人"]},
+              {"code": "002553", "themes": ["机器人"]},
+              {"code": "002979", "themes": ["机器人"]},
+              {"code": "603009", "themes": ["机器人"]},
+              {"code": "002009", "themes": ["机器人"]},
+              {"code": "603990", "themes": ["机器人"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 1.04, -5.80,
+        sh_pct=-0.67, market_avg=-1.01,          # 大盘没崩
+        tail_dive=False, in_hot_count=0, hot_count=37,
+        theme_overlap_count=8, theme_overlap_detail=detail,
+    )
+    assert mode == "⑩-j", (mode, label)
+    assert "系统性崩盘" not in label, label
+    # 大盘未崩 → 不得预判"题材错配"（题材错配断言由证据分支生成）
+    assert "题材错配" not in label, label
+    # 归因必须显式说明大盘未崩 + 非系统性崩盘
+    assert "未崩" in attr, attr
+    assert "非系统性崩盘" in attr, attr
+    # 组间拆分数字必须出现在归因里（当日实测: 命中组 -5.29% vs 未命中组 -1.04%）
+    assert "-5.29%" in attr, attr
+    assert "-1.04%" in attr, attr
+    # 大盘层模式⑤后缀不得误加（extreme=False）
+    assert "大盘层" not in attr, attr
+
+
+def test_pool_failure_mode_5_label_only_on_true_extreme_day():
+    """真·极端情绪日（四大核心均值 < -3%）仍判 ⑤，但标签不得再写死"题材错配"
+    （v1.37 起"题材错配"必须由证据分支决定）。"""
+    hit_rows = [("603683", "海兴电力", 1.49, -9.90, -11.39),
+                ("002242", "九阳股份", 1.62, -6.20, -7.82),
+                ("000810", "创新维", 1.88, -8.30, -10.18),
+                ("001233", "华兰生物", 1.74, -5.00, -6.74),
+                ("600056", "第三药", 1.55, -4.00, -5.55)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 0, -6.68,
+        sh_pct=-3.20, market_avg=-3.50,          # 真·极端情绪日
+        tail_dive=False, in_hot_count=0, hot_count=52,
+    )
+    assert mode == "⑤", (mode, label)
+    assert "系统性崩盘" in label, label
+    # v1.39: 标签不再写死"题材错配"
+    assert "题材错配" not in label, label
+
+
 # ── v1.33（2026-11-02 实战）: 盘前池空表未被 git 提交 → 虚假 100% 命中率 ──────
 
 _EMPTY_DEEP_ANALYSIS = """# 深度分析 — 2026-11-02 (周一交易日盘前 · 冰点快照延续 · 0 推荐 · 空仓观望)

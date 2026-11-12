@@ -1618,11 +1618,44 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
                 attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（破 -3%），"
                         f"baseline 均值 {baseline_avg:+.2f}%（昨日强势股追高）—— "
                         f"在大盘杀跌中被系统性绞杀")
-            else:
-                mode, label = "⑤", "模式⑤ 系统性崩盘（大盘系统性风险 + 题材错配）"
+            elif extreme:
+                # ⚠️ 2026-11-12 修订（v1.39）: 只有**大盘真·极端情绪日**（四大核心
+                # 均值 < -3%）才配叫"系统性崩盘"；且 v1.37 之后"题材错配"必须
+                # 由证据决定（见下方 theme_overlap 分支），不得写死在标签里。
+                mode, label = "⑤", "模式⑤ 系统性崩盘（大盘系统性风险）"
                 attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%，"
                         f"baseline 均值 {baseline_avg:+.2f}%（未达追高门槛）—— "
-                        f"主因是大盘系统性风险，非追高")
+                        f"主因是大盘系统性风险（四大核心均值 {market_avg:+.2f}%），非追高")
+            else:
+                # ★ v1.39 新模式 ⑩-j —— "⑤" 的**非极端情绪日**变体（2026-11-12 实战:
+                # 候选池 2/10 命中、均值 -4.44%、Alpha -3.77pp，但四大核心均值仅
+                # -1.01%、科创50 还 +0.73% —— 旧代码落进 ⑤ 分支，标签写死
+                # "系统性崩盘（大盘系统性风险 + 题材错配）"，与它自己打印的
+                # "主因是大盘系统性风险" + "主线题材命中 8/10…非题材错配" 三处
+                # 自相矛盾。大盘没崩 → 池子自己崩 → 主因必须按
+                # _theme_group_split 的组间收益差数据分流，不得预判。
+                _split = _theme_group_split(hit_rows, theme_overlap_detail)
+                if _split and _split["spread"] > 0:
+                    mode, label = "⑩-j", "模式⑩-j 候选池局部崩盘（大盘未崩，题材选择有效、非题材标的拖累）"
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（破 -3%）、"
+                            f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）；大盘**未崩**"
+                            f"（四大核心均值 {market_avg:+.2f}%，未达极端情绪阈值 -3%）—— "
+                            f"**非系统性崩盘**；持有当日主线题材的 {_split['n_hit']} 只均值 "
+                            f"{_split['avg_hit']:+.2f}%，未命中的 {_split['n_miss']} 只均值 "
+                            f"{_split['avg_miss']:+.2f}%（差 {_split['spread']:+.2f}pp）—— "
+                            f"题材选择有效，拖累来自**未持有主线**的标的；"
+                            f"baseline 均值 {baseline_avg:+.2f}%（未达追高门槛）、{neg_cont}/{n} 负延续")
+                else:
+                    _s = (f"持有主线题材的 {_split['n_hit']} 只均值 {_split['avg_hit']:+.2f}%，"
+                          f"未命中的 {_split['n_miss']} 只均值 {_split['avg_miss']:+.2f}%"
+                          f"（差 {_split['spread']:+.2f}pp）—— 拖累集中在**题材方向本身**"
+                          if _split else "题材组拆分样本不足，无法定位拖累方向")
+                    mode, label = "⑩-j", "模式⑩-j 候选池局部崩盘（大盘未崩，题材方向被集中抛售）"
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%（破 -3%）、"
+                            f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）；大盘**未崩**"
+                            f"（四大核心均值 {market_avg:+.2f}%，未达极端情绪阈值 -3%）—— "
+                            f"**非系统性崩盘**，是候选池自身被抛售；{_s}；"
+                            f"baseline 均值 {baseline_avg:+.2f}%（未达追高门槛）、{neg_cont}/{n} 负延续")
         else:
             # ⚠️ 2026-11-03 修订（v1.34）: 旧代码硬编码"（中性区间）"字样，
             # 与它自己打印的 Alpha 数值可能自相矛盾（2026-11-03 实测
