@@ -124,19 +124,43 @@ def test_load_feedback_data_no_duplicate_sector_samples():
 
 
 def test_unsettled_record_not_counted_as_zero_loss():
-    """ret_1d 为空的未结算记录不得当成 0% 亏损计入统计。"""
+    """ret_1d 为空的未结算记录不得当成 0% 亏损计入统计。
+
+    🔴 2026-11-12 修正断言口径 (原断言过宽, 在 HEAD 上就已失败):
+    原写法是「不得存在 actual_change == 0.0 的记录」, 用**代理指标**表达
+    「空值不得被当成 0%」。但 11-11 的 falsy-zero 修复 (commit 5912833) 让
+    **合法**的 ret_1d == 0.0 (T+1 恰好平盘, 真实市场状态) 第一次进入 CSV ——
+    全表唯一一只就是 600418 江淮汽车 (2026-11-10 池, 昨收 20.03 → T+1 收盘
+    20.03, 腾讯实时独立复核一致)。旧断言把这个**真实平盘**误判成「未结算被
+    当成 0% 亏损」→ 11-11 起每次跑全量测试都 1 failed (与本次改动无关)。
+
+    ⇒ 改为断言**真正的不变量**: 每一条 actual_change == 0.0 的记录,
+      其源 CSV 行的 ret_1d 必须**非空且确为 0.0** (即真实平盘);
+      若源行 ret_1d 为空 → 说明未结算被伪造成 0% 亏损 → 才是真缺陷。
+    """
     path = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "data", "rec_feedback.csv")
     if not os.path.exists(path):
         return
     recs = load_feedback_data(path)
-    # 未结算的行被 continue 掉 → 不应出现 actual_change == 0.0 且 is_win == False
-    # 的"零收益"记录 (真正的 0.00% 收益极罕见, 且不应由空值伪造)
-    zero_losers = [r for r in recs if r.actual_change == 0.0 and not r.is_win]
-    assert not zero_losers, (
-        f"仍有 {len(zero_losers)} 条未结算记录被当成 0% 亏损: "
-        f"{[(r.code, r.date) for r in zero_losers[:5]]}"
+
+    # 源表 ret_1d 原文: (code, date) → ret_1d 字符串
+    with open(path, newline="", encoding="utf-8") as f:
+        raw = {(r.get("code", ""), r.get("date", "")): (r.get("ret_1d") or "").strip()
+               for r in csv.DictReader(f)}
+
+    fabricated = []
+    for r in recs:
+        if r.actual_change != 0.0 or r.is_win:
+            continue
+        src = raw.get((r.code, r.date))
+        # 源行缺失或 ret_1d 为空 → 未结算被伪造成 0% 亏损 (真缺陷)
+        if src is None or src in ("", "--", "-"):
+            fabricated.append((r.code, r.date, src))
+    assert not fabricated, (
+        f"仍有 {len(fabricated)} 条未结算记录被当成 0% 亏损: "
+        f"{[(c, d) for c, d, _ in fabricated[:5]]}"
     )
 
 

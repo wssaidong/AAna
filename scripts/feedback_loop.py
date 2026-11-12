@@ -724,15 +724,32 @@ def _latest_rows(rows, top_n=20):
 def compute_stats(rows, top_n=20):
     """
     计算最近 N 条推荐的统计数据。
-    返回 (win_count, total, winrate, avg_win, avg_loss, profit_ratio)
+    返回 (win_count, total, winrate, avg_win, avg_loss, profit_ratio, flat_count)
+
+    🔴 2026-11-12 修复 (平盘口径): 「亏损」必须**只含真跌** (ret_1d < 0)。
+    背景: 11-11 的 falsy-zero 修复 (commit 5912833) 让**合法的** ret_1d == 0.0
+    (T+1 恰好平盘, 真实市场状态) 第一次真正进入统计层 —— 全表 1168 行里此前
+    只有 600418 江淮汽车这一行是 0.0, 它正是 11-11 修复放行的第一只。
+
+    旧实现 `if ret > 0: wins else: losses` 把平盘塞进「亏损桶」, 造成三处失真:
+      ① 「下跌家数」把平盘误标成下跌 (今日 5 只「下跌」里混了 1 只平盘)
+      ② avg_loss 把 0.0 混进跌幅均值 → 跌幅被稀释 (今日 -0.50% vs 真实 -0.63%)
+      ③ 盈亏比被**虚高** (今日 9.04 vs 真实 7.23) —— 幅度统计被 0.0 拉低分母
+    ⇒ 这是教训 (ae)「合法零」混淆的**另一半**: 写侧(吞成空串)11-11 已修,
+      读侧(平盘当亏损)因之前根本没有 0.0 能走到这层而今天才第一次显形。
+
+    ✅ 胜率分母**仍然**含平盘 —— 平盘不是「未结算」, 是真实市场状态, 不进分母
+       等于把样本悄悄丢掉 (11-11 test_zero_ret_counts_in_stats 锁定
+       total==1 / win==0, 语义是「进分母但不算胜」)。本修复只改**幅度**口径。
     """
     valid = _valid_rows(rows, top_n)
 
     if not valid:
-        return 0, 0, 0.0, 0.0, 0.0, None
+        return 0, 0, 0.0, 0.0, 0.0, None, 0
 
     wins = []
-    losses = []
+    flats = []      # ret == 0.0: 真实平盘 (不算胜, 也不算跌)
+    losses = []     # ret < 0: 真跌
 
     for r in valid:
         # 用 1 日收益率判断胜败
@@ -741,22 +758,27 @@ def compute_stats(rows, top_n=20):
             continue
         if ret > 0:
             wins.append(ret)
-        else:
+        elif ret < 0:
             losses.append(ret)
+        else:
+            flats.append(ret)
 
-    total = len(wins) + len(losses)
+    # 分母含平盘 (11-11 语义, 不改)
+    total = len(wins) + len(flats) + len(losses)
     if total == 0:
-        return 0, 0, 0.0, 0.0, 0.0, None
+        return 0, 0, 0.0, 0.0, 0.0, None, 0
 
     winrate = len(wins) / total
 
     avg_win = sum(wins) / len(wins) if wins else 0.0
+    # 平均跌幅只由真跌构成 (平盘不稀释跌幅)
     avg_loss = sum(losses) / len(losses) if losses else 0.0
 
-    # 盈亏比（avg_win / |avg_loss|）
+    # 盈亏比（avg_win / |avg_loss|）—— 只用真跌, 不被平盘虚高
     profit_ratio = round(avg_win / abs(avg_loss), 2) if avg_loss != 0 else None
 
-    return len(wins), total, round(winrate, 4), round(avg_win, 2), round(avg_loss, 2), profit_ratio
+    return (len(wins), total, round(winrate, 4), round(avg_win, 2),
+            round(avg_loss, 2), profit_ratio, len(flats))
 
 
 def compute_trend_stats(rows, top_n=20):
@@ -789,16 +811,19 @@ def compute_trend_stats(rows, top_n=20):
         if not rets:
             continue
         wins = [r for r in rets if r > 0]
-        losses = [r for r in rets if r <= 0]
+        flats = [r for r in rets if r == 0]
+        losses = [r for r in rets if r < 0]
         total = len(rets)
         winrate = len(wins) / total if total > 0 else 0
         avg_ret = sum(rets) / total if total > 0 else 0
         avg_win = sum(wins) / len(wins) if wins else 0
+        # 🔴 2026-11-12: 下跌均幅只含真跌 (平盘 ret==0.0 不稀释跌幅) —— 同 compute_stats
         avg_loss = sum(losses) / len(losses) if losses else 0
         trend_stats[trend] = {
             "count": total,
             "wins": len(wins),
             "losses": len(losses),
+            "flats": len(flats),
             "winrate": round(winrate * 100, 1),
             "avg_ret": round(avg_ret, 2),
             "avg_win": round(avg_win, 2),
@@ -854,7 +879,7 @@ def compute_calibers(feedback_rows):
 
 def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
     """构建 Markdown 报告"""
-    win_n, total, winrate, avg_win, avg_loss, profit_ratio = stats
+    win_n, total, winrate, avg_win, avg_loss, profit_ratio, flat_n = stats
 
     lines = [
         "# 📈 推荐反馈报告",
@@ -866,7 +891,10 @@ def build_markdown_report(rec_rows, feedback_rows, stats, trend_stats=None):
         f"|------|----|",
         f"| 统计样本 | {total} 只 |",
         f"| 上涨家数 | {win_n} 只 |",
-        f"| 下跌家数 | {total - win_n} 只 |",
+        # 🔴 2026-11-12: 平盘 (ret_1d == 0.0) 单列 —— 它既不是涨也不是跌,
+        # 混进「下跌家数」会把真实平盘误标成下跌 (11-11 放行的第一只就是 600418)。
+        f"| 平盘家数 | {flat_n} 只 |",
+        f"| 下跌家数 | {total - win_n - flat_n} 只 |",
         f"| **胜率** | **{winrate*100:.1f}%** |",
         f"| 平均涨幅 | {avg_win:+.2f}% |" if avg_win else f"| 平均涨幅 | N/A |",
         f"| 平均跌幅 | {avg_loss:+.2f}% |" if avg_loss else f"| 平均跌幅 | N/A |",

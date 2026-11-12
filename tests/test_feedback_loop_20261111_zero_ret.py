@@ -171,6 +171,7 @@ class TestFalsyZeroBackfill:
         fl.append_feedback(new)
 
         all_rows = _read(temp_feedback_csv)
-        win, total, wr, _, _, _ = fl.compute_stats(all_rows, top_n=20)
+        # 🔴 2026-11-12: compute_stats 返回 7 元组 (末位 flat_count = 平盘家数)
+        win, total, wr, _, _, _, _flat = fl.compute_stats(all_rows, top_n=20)
         assert total == 1, f"0.0 行必须进统计分母, 实际 total={total}"
         assert win == 0  # 0.0 不算胜

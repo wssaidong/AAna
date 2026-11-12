@@ -5,15 +5,16 @@
     "造纸",
     "semi",
     "印制电路板",
+    "其他化学制品",
     "房地产开发",
     "其他家用轻工",
     "影视动漫",
     "装修装饰"
   ],
-  "total_records": 428,
-  "overall_win_rate": 50.93457943925234,
+  "total_records": 439,
+  "overall_win_rate": 50.11389521640092,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-11T20:01:03.091643",
+  "generated_at": "2026-11-12T15:28:35.366479",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -25,20 +26,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 227,
-      "win_count": 133,
-      "win_rate": 58.590308370044056,
-      "avg_change": 1.6611453744493392,
+      "count": 238,
+      "win_count": 135,
+      "win_rate": 56.72268907563025,
+      "avg_change": 1.4685714285714284,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 428,
-      "win_count": 218,
-      "win_rate": 50.93457943925234,
-      "avg_change": 0.520771028037384
+      "count": 439,
+      "win_count": 220,
+      "win_rate": 50.11389521640092,
+      "avg_change": 0.4449430523918004
     }
   },
   "sector_stats": {
@@ -133,10 +134,10 @@
     "汽车零部件": {
       "sector": "汽车零部件",
       "sector_name": "",
-      "count": 27,
-      "win_count": 23,
-      "win_rate": 85.18518518518519,
-      "avg_change": 3.1148148148148147
+      "count": 29,
+      "win_count": 24,
+      "win_rate": 82.75862068965517,
+      "avg_change": 2.912413793103448
     },
     "煤炭开采": {
       "sector": "煤炭开采",
@@ -229,10 +230,10 @@
     "其他化学制品": {
       "sector": "其他化学制品",
       "sector_name": "",
-      "count": 2,
+      "count": 3,
       "win_count": 1,
-      "win_rate": 50.0,
-      "avg_change": -2.79
+      "win_rate": 33.33333333333333,
+      "avg_change": -2.9433333333333334
     },
     "冰箱": {
       "sector": "冰箱",
@@ -309,10 +310,10 @@
     "线缆部件及其他": {
       "sector": "线缆部件及其他",
       "sector_name": "",
-      "count": 2,
+      "count": 3,
       "win_count": 2,
-      "win_rate": 100.0,
-      "avg_change": 4.125
+      "win_rate": 66.66666666666666,
+      "avg_change": 1.4100000000000001
     },
     "水电": {
       "sector": "水电",
@@ -389,10 +390,10 @@
     "百货": {
       "sector": "百货",
       "sector_name": "",
-      "count": 2,
-      "win_count": 2,
+      "count": 3,
+      "win_count": 3,
       "win_rate": 100.0,
-      "avg_change": 1.68
+      "avg_change": 1.2666666666666666
     },
     "农林牧渔": {
       "sector": "农林牧渔",
@@ -533,10 +534,10 @@
     "移动互联网服务": {
       "sector": "移动互联网服务",
       "sector_name": "",
-      "count": 7,
+      "count": 8,
       "win_count": 4,
-      "win_rate": 57.14285714285714,
-      "avg_change": 0.13857142857142848
+      "win_rate": 50.0,
+      "avg_change": -0.2750000000000001
     },
     "软饮料": {
       "sector": "软饮料",
@@ -629,10 +630,10 @@
     "电子零部件制造": {
       "sector": "电子零部件制造",
       "sector_name": "",
-      "count": 2,
+      "count": 3,
       "win_count": 2,
-      "win_rate": 100.0,
-      "avg_change": 7.635
+      "win_rate": 66.66666666666666,
+      "avg_change": 3.856666666666667
     },
     "金属制品": {
       "sector": "金属制品",
@@ -653,10 +654,10 @@
     "家具": {
       "sector": "家具",
       "sector_name": "",
-      "count": 2,
+      "count": 3,
       "win_count": 2,
-      "win_rate": 100.0,
-      "avg_change": 4.295
+      "win_rate": 66.66666666666666,
+      "avg_change": 0.7133333333333333
     },
     "园林工程": {
       "sector": "园林工程",
@@ -953,6 +954,30 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": 0.0
+    },
+    "其他电子": {
+      "sector": "其他电子",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -2.57
+    },
+    "其他塑料制品": {
+      "sector": "其他塑料制品",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -2.33
+    },
+    "专用设备": {
+      "sector": "专用设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -2.87
     }
   }
 }
