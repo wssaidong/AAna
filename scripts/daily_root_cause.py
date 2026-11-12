@@ -25,6 +25,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta
@@ -285,19 +286,185 @@ def detect_大盘错配(day_recs: list[dict], day_baseline: float | None) -> dic
 
 
 
+# ============ 大盘基线 (4 大核心指数) ============
+
+# 🔴 2026-11-12 修复 (教训 (ad)): 原实现硬编码 `{date}-复盘报告.md` + 正则 `4 大核心平均`,
+#   而上游 11-04 起只产 `复盘评分.md`、字段已改版为「四大核心指数均值」, 且复盘报告 autopilot
+#   17:00 才生成 (根因 cron 16:05 跑) → 文件名 + 字段 + 时序 三重失配 → D 检测器连续 ~21 天
+#   「无大盘数据」静默禁用 (数据对了, 结论照样消失)。
+#   修法 (双源 + 显式告警, 教训 (s)/(u)):
+#   ① 主源 = 交易所口径指数日线 close-to-close (收盘后即可得, 不依赖任何报告产物)
+#      用上游报告自报值交叉验证过: 11-06 → -2.56% ✓ / 11-09 → +0.02% ✓ (逐项完全吻合)
+#   ② 备源 = 报告解析 (文件名候选 + 正则候选白名单, 兼容上游文案改版)
+#   ③ 两源皆失败 → 显式 WARNING (静默空 ≠ 正常空)
+#
+# 4 大核心指数集合 (与上游复盘报告口径一致, 已按 11-06 / 11-09 两日逐项比对确认):
+#   上证指数 / 深证成指 / 创业板指 / 科创50
+# ⚠️ 指数代码前缀与个股不同 (000001 指数=sh, 个股=sz) —— 同 generate_report.py 的
+#    _INDEX_SINA_PREFIX 坑, 腾讯行情接口不带前缀直接返回空字符串。
+_CORE_INDEXES = [
+    ("sh000001", "上证指数"),
+    ("sz399001", "深证成指"),
+    ("sz399006", "创业板指"),
+    ("sh000688", "科创50"),
+]
+
+# 上游产物文件名候选 (教训 (s): 不能硬编码单一字面量)
+_BASELINE_REPORT_CANDIDATES = ("复盘报告", "复盘评分")
+
+# 字段正则候选 (兼容 "4 大核心平均" / "四大核心指数均值" 两种文案)
+_BASELINE_RE = re.compile(
+    r"(?:4\s*大核心|四大核心(?:指数)?)\s*(?:平均|均值)\s*\**\s*([+-]?[\d.]+)\s*%"
+)
+
+# 收盘判定 (报告里"今日收盘"要过收盘才定格; 盘中快照不能当基线)
+_CLOSE_HH, _CLOSE_MM = 15, 5
+
+
+def _fetch_index_closes(count: int = 30) -> dict[str, list[tuple[str, float]]]:
+    """拉 4 大核心指数的日线收盘价 → {code: [(date, close), ...]} (日期升序)"""
+    import urllib.request
+
+    out: dict[str, list[tuple[str, float]]] = {}
+    for code, _name in _CORE_INDEXES:
+        url = (f"http://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+               f"?param={code},day,,,{count},qfq")
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                raw = resp.read().decode("utf-8", errors="replace")
+            data = json.loads(raw).get("data", {}).get(code, {}) or {}
+            rows = data.get("qfqday") or data.get("day") or []
+            series: list[tuple[str, float]] = []
+            for r in rows:
+                try:
+                    series.append((str(r[0])[:10], float(r[2])))
+                except (TypeError, ValueError, IndexError):
+                    continue
+            if series:
+                out[code] = sorted(series)
+        except Exception:
+            continue
+    return out
+
+
+def _realtime_core_baseline() -> tuple[float | None, str]:
+    """收盘后用腾讯实时快照算 4 核心 close-to-close 均值 (今开/昨收口径)"""
+    import urllib.request
+
+    codes = [c for c, _ in _CORE_INDEXES]
+    try:
+        req = urllib.request.Request(
+            f"http://qt.gtimg.cn/q={','.join(codes)}",
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("gbk", errors="replace")
+    except Exception:
+        return None, "实时快照拉取失败"
+
+    chgs: list[float] = []
+    for line in raw.strip().split("\n"):
+        if '"' not in line:
+            continue
+        body = line.split('"')[1]
+        parts = body.split("~")
+        if len(parts) < 5:
+            continue
+        try:
+            cur, prev = float(parts[3]), float(parts[4])
+        except (TypeError, ValueError):
+            continue
+        if prev > 0:
+            chgs.append((cur / prev - 1) * 100)
+    if len(chgs) != len(_CORE_INDEXES):
+        return None, f"实时快照只取到 {len(chgs)}/{len(_CORE_INDEXES)} 个指数"
+    return sum(chgs) / len(chgs), "腾讯实时快照 close-to-close"
+
+
+def _core_index_baseline_from_kline(date: str) -> tuple[float | None, str]:
+    """从指数日线算 4 核心均值 (close-to-close), 周末/节假日自动落到最近交易日"""
+    series_map = _fetch_index_closes()
+    if len(series_map) < len(_CORE_INDEXES):
+        missing = [n for c, n in _CORE_INDEXES if c not in series_map]
+        return None, f"指数日线缺失 {missing}"
+
+    all_dates: set[str] = set()
+    for s in series_map.values():
+        all_dates |= {d for d, _ in s}
+    # 从最新往前找"所有 4 个指数都有当日 bar 且各自有前一根"的日期
+    for d in sorted((x for x in all_dates if x <= date), reverse=True):
+        chgs: list[float] = []
+        ok = True
+        for code, _name in _CORE_INDEXES:
+            s = series_map[code]
+            dates = [x[0] for x in s]
+            if d not in dates:
+                ok = False
+                break
+            i = dates.index(d)
+            if i == 0:
+                ok = False
+                break
+            prev, cur = s[i - 1][1], s[i][1]
+            if prev <= 0:
+                ok = False
+                break
+            chgs.append((cur / prev - 1) * 100)
+        if ok and len(chgs) == len(_CORE_INDEXES):
+            return sum(chgs) / len(chgs), f"指数日线 close-to-close ({d})"
+    return None, "指数日线无匹配日期"
+
+
+def _baseline_from_report(date: str) -> tuple[float | None, str]:
+    """备源: 从上游报告解析 4 核心均值 (文件名 + 正则双白名单)"""
+    for cand in _BASELINE_REPORT_CANDIDATES:
+        path = REPORTS_DIR / f"{date}-{cand}.md"
+        if not path.exists():
+            continue
+        content = path.read_text(encoding="utf-8", errors="replace")
+        # 盘中快照守卫: 生成时间早于收盘的产物含未定格盘中数据, 不得当收盘基线
+        # (11-12 实测: 复盘评分.md 09:39 生成, 表内 +0.10% vs 真实收盘 -0.67%)
+        gm = re.search(r"生成时间[：:]\s*(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2})", content)
+        if gm and (int(gm.group(2)), int(gm.group(3))) < (_CLOSE_HH, _CLOSE_MM):
+            continue
+        m = _BASELINE_RE.search(content)
+        if m:
+            try:
+                return float(m.group(1)), f"{cand}.md 字段解析"
+            except ValueError:
+                continue
+    return None, "无报告产物"
+
+
+def get_day_baseline_detail(date: str, feedback_rows: list[dict]) -> tuple[float | None, str]:
+    """返回 (4 大核心指数均值, 数据来源说明)"""
+    # 今日且已收盘 → 实时快照最权威 (日线 bar 可能尚未发布)
+    today = datetime.now().strftime("%Y-%m-%d")
+    now = datetime.now()
+    if date == today and (now.hour, now.minute) >= (_CLOSE_HH, _CLOSE_MM):
+        val, src = _realtime_core_baseline()
+        if val is not None:
+            return val, src
+
+    val, src = _core_index_baseline_from_kline(date)
+    if val is not None:
+        return val, src
+
+    val, src = _baseline_from_report(date)
+    if val is not None:
+        return val, src
+
+    # 🔴 教训 (u): 静默空 ≠ 正常空 —— 两源皆失败必须显式告警
+    print(f"[daily_root_cause] ⚠️ 大盘基线不可用 ({date}): 指数日线/实时/报告 三源均未命中, "
+          f"D_大盘错配 检测器本次禁用", file=sys.stderr)
+    return None, "三源均未命中 (已告警)"
+
+
 def get_day_baseline(date: str, feedback_rows: list[dict]) -> float | None:
-    """从当日复盘报告读 4 大指数平均"""
-    report = REPORTS_DIR / f"{date}-复盘报告.md"
-    if not report.exists():
-        return None
-    with open(report, encoding="utf-8") as f:
-        content = f.read()
-    # 找 "4 大核心平均" 字段
-    import re
-    m = re.search(r"4 大核心平均\s*([+-][\d.]+)\s*%", content)
-    if m:
-        return float(m.group(1))
-    return None
+    """从当日行情算 4 大核心指数平均涨跌幅 (收盘口径)"""
+    val, _src = get_day_baseline_detail(date, feedback_rows)
+    return val
 
 
 def make_sector_resolver():
@@ -340,6 +507,11 @@ def analyze_day(date: str, feedback: list[dict], tuning: dict, sector_resolver=N
     day_recs = [r for r in feedback if r.get('date', '').startswith(date)]
 
     baseline = get_day_baseline(date, feedback)
+    _bl_src = ""
+    try:
+        _, _bl_src = get_day_baseline_detail(date, feedback)
+    except Exception:
+        pass
 
     causes = {
         "A_板块错配": detect_板块错配(day_recs, tuning, sector_resolver),
@@ -361,6 +533,7 @@ def analyze_day(date: str, feedback: list[dict], tuning: dict, sector_resolver=N
         "win_count": win, "fail_count": fail, "no_data": no_data,
         "win_rate": win / (win + fail) * 100 if (win + fail) else 0,
         "baseline": baseline,
+        "baseline_source": _bl_src,
         "causes": causes,
         "hit_causes": hit_causes,
     }
@@ -371,8 +544,9 @@ def to_markdown(result: dict) -> str:
     md = [f"# 🔬 AAna 每日根因分析 — {d}", ""]
     md.append(f"> **生成时间:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}  ")
     md.append(f"> **数据源:** data/rec_feedback.csv + data/rec_tuning.json  ")
-    md.append(f"> **大盘基线 (4 大核心平均):** {result['baseline']:+.2f}%  " if result['baseline'] is not None
-              else "> **大盘基线:** 复盘报告未生成")
+    md.append(f"> **大盘基线 (4 大核心平均):** {result['baseline']:+.2f}% ({result.get('baseline_source', '')})  "
+              if result['baseline'] is not None
+              else "> **大盘基线:** 三源均未命中, D 检测器禁用 (已告警)")
     md.append("")
 
     md.append(f"## 📊 当日推荐概览\n")
