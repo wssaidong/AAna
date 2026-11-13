@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-13",
+  "session": "open_verify",
+  "run_id": "01a1d286-f9bb-7e6f-8cd3-0764c5e081d3",
+  "generated": "09:34:40",
+  "source_run": "01a1d250-3fc2-724f-93d5-f0c300b428b1 (08:35 盘前)",
+  "report": "2026-11-13-选股报告.md",
+  "report_mtime": "2026-11-13T08:03:41",
+  "top10_rows_independent": 0,
+  "report_unchanged_since_0835": true,
+  "live_guard": {
+    "is_ice_point": true,
+    "sentiment_label": "冰点",
+    "sentiment_score": 35,
+    "position_ratio": 0.2,
+    "reason": "情绪=冰点/仓位=20%"
+  },
+  "indices": {
+    "000001": {
+      "name": "上证指数",
+      "close": 3653.48,
+      "pct": -0.06,
+      "time": "20261113093439"
+    },
+    "399001": {
+      "name": "深证成指",
+      "close": 11152.83,
+      "pct": -0.4,
+      "time": "20261113093436"
+    },
+    "399006": {
+      "name": "创业板指",
+      "close": 2488.92,
+      "pct": -0.82,
+      "time": "20261113093436"
+    },
+    "000300": {
+      "name": "沪深300",
+      "close": 4030.38,
+      "pct": -0.34,
+      "time": "20261113093439"
+    },
+    "000688": {
+      "name": "科创50",
+      "close": 1324.25,
+      "pct": 1.1,
+      "time": "20261113093439"
+    }
+  },
+  "four_core_avg_pct": -0.04,
+  "groups_20261113_occupied": [],
+  "groups_latest_keys": [
+    "20261111PP",
+    "20261111ZZ",
+    "20261112",
+    "20261112ZZ"
+  ],
+  "verdict": {
+    "recommendations": 0,
+    "create_20261113ZZ": false,
+    "reason": "Top10 表 0 只 (独立解析复核) + 开盘 live 冰点守卫第三口径短路 (score 35 冰点) → 0 推荐, 不建组 (先例: 守卫短路日不建组)",
+    "iron_rule_status": "无候选标的可满足铁律 (当日胜出+正盈利), 0 推荐即合规输出"
+  }
+}
