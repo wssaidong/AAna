@@ -1,9 +1,10 @@
 {
-  "date_for": "2026-11-12",
-  "score_threshold": 63,
+  "date_for": "2026-11-13",
+  "score_threshold": 60,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
+    "其他化学制品",
     "其他家用轻工",
     "印制电路板",
     "影视动漫",
@@ -11,19 +12,10 @@
     "装修装饰",
     "造纸"
   ],
-  "position_final": 45,
+  "position_final": 50,
   "position_base": 50,
   "watchlist": [],
-  "cold_sectors": [
-    "百货",
-    "电子零部件制造",
-    "其他电子",
-    "其他塑料制品",
-    "线缆部件及其他",
-    "家具",
-    "专用设备",
-    "其他化学制品"
-  ],
+  "cold_sectors": [],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -34,6 +26,7 @@
         "造纸",
         "semi",
         "印制电路板",
+        "其他化学制品",
         "房地产开发",
         "其他家用轻工",
         "影视动漫",
@@ -43,26 +36,15 @@
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 3,
-      "position_delta": -5,
+      "threshold_delta": 0,
+      "position_delta": 0,
       "weak_sectors_added": [],
       "watchlist": [],
-      "cold_sectors": [
-        "百货",
-        "电子零部件制造",
-        "其他电子",
-        "其他塑料制品",
-        "线缆部件及其他",
-        "家具",
-        "专用设备",
-        "其他化学制品"
-      ],
-      "reasons": [
-        "E. 冷启动盲区: 8 只来自 8 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['百货', '电子零部件制造', '其他电子', '其他塑料制品', '线缆部件及其他']"
-      ]
+      "cold_sectors": [],
+      "reasons": []
     }
   ],
-  "generated_at": "2026-11-11T16:10:48",
+  "generated_at": "2026-11-12T16:10:56",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
