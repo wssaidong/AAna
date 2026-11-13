@@ -1546,3 +1546,119 @@ def test_pseudo_theme_filtered_from_heat_topics():
     assert "“东方系”" not in real, real
     assert "ST板块" not in real, real
     assert real[0] == "三季报增长", real
+
+
+# ── 2026-11-13 v1.40 回归测试（三处"说错话但不报错"修复）──────────────
+
+def test_t1_section_renders_deviation_attribution():
+    """v1.40: T+1 闭环复核段必须给出偏差归因（skill 交付物 #2）。
+
+    2026-11-13 实战：当日盘前池为空（冰点守卫短路）→ 战报退化到 T+1 段，
+    该段此前**只有数字**（命中率/均值/超额），没有"为什么"。用户看不到
+    "题材方向本身被集中抛售"这一关键结构，只能自己从表格里推。
+    """
+    t1 = {
+        "rows": [("002979", "雷赛智能", 4.02, -1.52, -5.54),
+                 ("603990", "麦迪科技", 4.24, -7.68, -11.92)],
+        "hits": 0, "n": 2, "hit_rate": 0.0, "avg": -4.60, "alpha_sh": -4.01,
+        "avg_baseline": 4.13, "neg_continuation": 2,
+        "best": ("002979", "雷赛智能", 4.02, -1.52, -5.54),
+        "worst": ("603990", "麦迪科技", 4.24, -7.68, -11.92),
+        "prev_date": "2026-11-12",
+    }
+    md = run_afterhours.format_feishu(
+        "2026-11-13", _minimal_indices(), ["人形机器人"], {"人形机器人": 2}, {},
+        [], [], [], 0, 0, 0, -0.59, -3.32, -2.30, [], 38,
+        t1=t1,
+        t1_mode="⑩-j", t1_label="模式⑩-j 候选池局部崩盘（大盘未崩，题材方向被集中抛售）",
+        t1_attr="候选池 0/2 命中、整体均值 -4.60%（破 -3%）",
+        t1_theme_detail=[{"code": "002979", "themes": ["人形机器人"]}],
+    )
+
+    assert "🔍 **偏差归因（2026-11-12 盘前池 → 今日收盘）：⑩-j" in md, md
+    assert "候选池 0/2 命中、整体均值 -4.60%" in md, md
+    assert "主线题材命中明细（概念级）：002979雷赛智能·人形机器人" in md, md
+
+
+def test_t1_attribution_uses_concept_level_overlap_not_limit_up_pool():
+    """v1.40: T+1 归因的题材重合度必须走**概念级**口径（v1.37）。
+
+    2026-11-13 实战：11-12 盘前池 6/10 持有当日主线题材（人形机器人），
+    但 0/10 进入今日涨停池。若沿用 in_hot_count==0 断言"题材完全错配"
+    就是**事实错误** —— 题材对但没涨停 ≠ 题材错配。
+    """
+    rows = [("002979", "雷赛智能", 4.02, -1.52, -5.54),
+            ("603990", "麦迪科技", 4.24, -7.68, -11.92)]
+    detail = [{"code": "002979", "themes": ["人形机器人"]},
+              {"code": "603990", "themes": ["人形机器人"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        rows, -4.60, [], rows, 0, -4.60, -0.59, -2.065,
+        in_hot_count=0, hot_count=38,
+        theme_overlap_count=2, theme_overlap_detail=detail,
+    )
+    assert "主线题材命中 2/2" in attr, attr
+    assert "题材完全错配" not in attr, attr
+    assert "题材对但未涨停" in attr, attr
+
+
+def test_phase12_says_no_sample_when_root_cause_has_zero_records():
+    """v1.40: total_recs=0 时不得说"无显著根因"（无样本 ≠ 无问题）。
+
+    2026-11-13 实战：daily_root_cause.json date=2026-11-12 / total_recs=0
+    （该日尾盘冰点守卫 0 推荐，本就无推荐可复盘）。说"✅ 无显著根因"
+    会被读成"分析过了、策略没问题"，与事实相反。
+    """
+    rc = {"date": "2026-11-12", "total_recs": 0, "hit_causes": [],
+          "causes": {"A_板块错配": {"hit": False, "items": [],
+                                    "summary": "无当日推荐"}}}
+    nd = {"date_for": "2026-11-13", "score_threshold": 60,
+          "position_final": 50, "weak_sectors": [], "cold_sectors": [],
+          "tuning_log": []}
+    md = run_afterhours.phase12_section("2026-11-13", rc, nd)
+
+    assert "无样本" in md, md
+    assert "2026-11-12 推荐记录 0 条" in md, md
+    # "无显著根因" 只允许出现在解释性从句里，不得作为结论标签
+    assert "**根因命中：** ✅ 无显著根因" not in md, md
+
+
+def test_phase12_reports_no_root_cause_only_when_records_were_analyzed():
+    """v1.40: 有样本且未命中根因时，仍可说"无显著根因"（但须标明样本量）。"""
+    rc = {"date": "2026-11-11", "total_recs": 11, "hit_causes": [],
+          "causes": {"A_板块错配": {"hit": False, "items": [], "summary": "无"}}}
+    nd = {"date_for": "2026-11-12", "score_threshold": 63,
+          "position_final": 45, "weak_sectors": [], "cold_sectors": [],
+          "tuning_log": []}
+    md = run_afterhours.phase12_section("2026-11-12", rc, nd)
+
+    assert "✅ 无显著根因" in md, md
+    assert "2026-11-11 已复盘 11 条推荐" in md, md
+    assert "无样本" not in md, md
+
+
+def test_phase12_labels_strategy_by_date_for_relative_to_report_date():
+    """v1.40: 策略段标题必须按 date_for 与报告日的关系如实标注。
+
+    战报 15:30 跑，而根因检测(16:05)+次日调参(16:10)在收盘后才跑 ——
+    此刻盘上的 next_day_strategy.json 仍是**昨天**生成的、date_for=**今天**
+    的那份（今日盘前已用过）。旧代码无条件写"次日策略"，把"今天已生效的
+    参数"说成"明天的参数"。
+    """
+    nd = {"date_for": "2026-11-13", "score_threshold": 60,
+          "position_final": 50, "weak_sectors": [], "cold_sectors": [],
+          "tuning_log": []}
+    rc = {"date": "2026-11-12", "total_recs": 0, "hit_causes": [], "causes": {}}
+
+    same_day = run_afterhours.phase12_section("2026-11-13", rc, nd)
+    assert "今日已生效策略" in same_day, same_day
+    assert "date_for=2026-11-13" in same_day, same_day
+    assert "次日策略:" not in same_day, same_day
+
+    next_day = run_afterhours.phase12_section("2026-11-13", rc,
+                                               {**nd, "date_for": "2026-11-14"})
+    assert "次日策略" in next_day, next_day
+    assert "今日已生效策略" not in next_day, next_day
+
+    stale = run_afterhours.phase12_section("2026-11-13", rc,
+                                           {**nd, "date_for": "2026-11-12"})
+    assert "过期策略参数" in stale, stale

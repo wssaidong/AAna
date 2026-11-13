@@ -1856,6 +1856,8 @@ def generate_full_report(date_str):
     # 用**上一交易日**的盘前池在**今日收盘**的真实表现评估策略有效性。
     # 否则"候选池命中率"整段 N/A，战报失去与盘前情报的闭环。
     t1 = {}
+    t1_mode = t1_label = t1_attr = None
+    t1_theme_detail = []
     if not hit_rows:
         prev_rows, prev_date, prev_source = resolve_previous_pool(date_str)
         if prev_rows:
@@ -1963,6 +1965,39 @@ def generate_full_report(date_str):
         print(f"      涨停池重合: {in_hot_count}/{len(hit_rows)} 进入今日强势股池")
         print(f"      概念级题材重合: {theme_overlap_count}/{len(hit_rows)} 持有当日 Top 题材")
 
+    # ⚠️ 2026-11-13 新增（v1.40）: T+1 池也要跑**偏差归因**。
+    # skill 交付物 #2 是"命中率 vs 预期 + 偏差归因"；此前 T+1 段只给数字
+    # （命中率/均值/超额），不给"为什么" —— 2026-11-13 实战正是纯数字段：
+    # 1/10 命中、均值 -3.13%、10/10 负延续，用户看不到"题材方向本身被集中
+    # 抛售"（命中主线组 -4.14% vs 未命中组 -1.61%）这一关键结构。
+    # 归因输入与当日池同构：baseline=昨收涨跌、actual=今日收盘涨跌、Δ=延续性。
+    # 题材重合度用**今日** Top 题材做概念级匹配（与当日池同一口径，v1.37），
+    # 涨停池重合用今日强势股池。放在此处是因为需要 gap_rows（尾盘跳水判定）
+    # 与 hot_code_set，两者都在上面才算出来。
+    if t1.get("rows"):
+        try:
+            _t1_codes = [r[0] for r in t1["rows"]]
+            _t1_ov_n, _t1_ov_detail = pool_theme_overlap(_t1_codes, themes)
+            _t1_in_hot = sum(1 for c in _t1_codes if c in hot_code_set)
+            _t1_rows = t1["rows"]
+            _t1_pos = [r for r in _t1_rows if r[3] > 0]
+            _t1_neg = [r for r in _t1_rows if r[3] <= 0]
+            _t1_avg_pos = (sum(r[3] for r in _t1_pos) / len(_t1_pos)) if _t1_pos else 0
+            _t1_avg_neg = (sum(r[3] for r in _t1_neg) / len(_t1_neg)) if _t1_neg else 0
+            _t1_tail_dive = bool(gap_rows) and min(r[3] for r in gap_rows) <= -3.5
+            t1_mode, t1_label, t1_attr = classify_pool_failure_mode(
+                _t1_rows, t1.get("avg", 0), _t1_pos, _t1_neg,
+                _t1_avg_pos, _t1_avg_neg, sh_pct, market_avg,
+                tail_dive=_t1_tail_dive, in_hot_count=_t1_in_hot,
+                hot_count=len(hot),
+                theme_overlap_count=_t1_ov_n, theme_overlap_detail=_t1_ov_detail,
+            )
+            t1_theme_detail = _t1_ov_detail
+            if t1_mode:
+                print(f"      T+1 归因: {t1_mode} {t1_label}")
+        except Exception as _t1_attr_err:
+            print(f"      ⚠️ T+1 归因失败（不影响主流程）: {_t1_attr_err}")
+
     # 飞书版（短）
     feishu_md = format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                               positives, negatives, avg, avg_pos, avg_neg,
@@ -1971,7 +2006,9 @@ def generate_full_report(date_str):
                               pool_note=pool_note, gap_source=gap_source, t1=t1,
                               pool_mode=pool_mode, pool_label=pool_label,
                               pool_attr=pool_attr, pool_industries=pool_industries,
-                              theme_overlap_detail=theme_overlap_detail)
+                              theme_overlap_detail=theme_overlap_detail,
+                              t1_mode=t1_mode, t1_label=t1_label, t1_attr=t1_attr,
+                              t1_theme_detail=t1_theme_detail)
 
     # 完整报告
     full_md = format_full_report(date_str, indices, themes, ct, cy, hit_rows,
@@ -2059,6 +2096,86 @@ def realtime_gap_alert(indices, tail_paths, threshold_pct=2.0):
     return md, True, rows, used_path
 
 
+def phase12_section(date_str, rc, nd):
+    """Phase 12 段：昨日根因分析 + 策略参数摘要（独立成函数便于单测）。
+
+    ⚠️ 2026-11-13 新增（v1.40）: 三处"说错话但不报错"的修复都落在这里 ——
+    ① **无样本 ≠ 无根因**: `total_recs == 0` 说明当日**没有推荐记录可供分析**
+       （冰点守卫短路日常见），旧代码写"✅ 无显著根因"会被读成"分析过了、
+       策略没问题"，与事实相反。2026-11-13 实战: 根因文件 date=2026-11-12 /
+       total_recs=0 / hit_causes=[]，该日尾盘冰点守卫 0 推荐，本就无推荐可复盘。
+    ② **策略段标题必须按 `date_for` 分流**: 战报 15:30 跑，而根因检测(16:05)
+       + 次日调参(16:10) 在**收盘后**才跑 —— 此刻盘上的 next_day_strategy.json
+       仍是**昨天**生成的、date_for=**今天**的那份（今日 08:03 盘前已用过它）。
+       旧代码无条件写"次日策略"，把"今天已生效的参数"说成"明天的参数"。
+    ③ 策略段额外标注 `date_for`，让读者能自己核对参数管哪一天。
+    """
+    md = "\n\n━━━ **🔬 昨日根因分析 → 次日调参** ━━━\n\n"
+
+    # 命中根因
+    hit = rc.get("hit_causes", [])
+    _rc_n = rc.get("total_recs", 0)
+    _rc_date = rc.get("date", "")
+    if hit:
+        md += f"📊 **根因命中：** {' / '.join(hit)}\n"
+        for ck, cv in rc.get("causes", {}).items():
+            if cv.get("hit"):
+                md += f"- **{ck}**：{cv.get('summary', '')}\n"
+                for it in cv.get("items", [])[:3]:
+                    cn = it.get("sector_cn") or it.get("sector_enum") or "?"
+                    ret = it.get("ret_1d")
+                    md += (f"  · `{it.get('code', '')} {it.get('name', '')}` ({cn}) "
+                           f"1D={ret:+.2f}%\n") if ret is not None else ""
+    elif _rc_n == 0:
+        md += (f"📊 **根因命中：** ⚠️ **无样本**（{_rc_date} 推荐记录 "
+               f"{_rc_n} 条 —— 当日无推荐可复盘，非「分析后无显著根因」）\n")
+    else:
+        md += (f"📊 **根因命中：** ✅ 无显著根因"
+               f"（{_rc_date} 已复盘 {_rc_n} 条推荐）\n")
+
+    # 策略参数
+    _nd_for = nd.get("date_for") or ""
+    _today = None
+    _nd_dt = None
+    try:
+        _today = datetime.strptime(date_str, "%Y-%m-%d")
+        _nd_dt = datetime.strptime(_nd_for, "%Y-%m-%d") if _nd_for else None
+    except Exception:
+        _today = None
+        _nd_dt = None
+    if _nd_dt is None or _today is None:
+        _scope_label = "策略参数"
+        _scope_note = ""
+    elif _nd_dt == _today:
+        _scope_label = "今日已生效策略"
+        _scope_note = (f"（date_for={_nd_for} = **今日**，今日盘前已按此参数执行；"
+                       f"明日的参数将在今日 16:05 根因检测 + 16:10 自动调参后重算）")
+    elif _nd_dt > _today:
+        _scope_label = "次日策略"
+        _scope_note = f"（date_for={_nd_for}）"
+    else:
+        _scope_label = "过期策略参数"
+        _scope_note = (f"（date_for={_nd_for} < 报告日 {date_str}，"
+                       f"已不是当前生效参数，请以最新 next_day_strategy.json 为准）")
+    md += f"\n🎯 **{_scope_label}:**{_scope_note}\n"
+    md += f"- 推荐阈值: **{nd.get('score_threshold', '—')}** (基准 70)\n"
+    md += f"- 建议仓位: **{nd.get('position_final', '—')}%** (基准 50%)\n"
+    if nd.get("weak_sectors"):
+        md += f"- 板块黑名单: {', '.join(nd['weak_sectors'])}\n"
+    if nd.get("cold_sectors"):
+        md += (f"- ⚠️ 冷启动盲区: {', '.join(nd['cold_sectors'][:5])} "
+               f"(新板块样本<3, 一票否决)\n")
+    # 决策依据
+    for entry in nd.get("tuning_log", []):
+        if entry.get("source") == "daily_root_cause":
+            for r in entry.get("reasons", []):
+                md += f"- 依据: {r}\n"
+    md += ("\n📁 **明日开机动作:** 推荐前 16:05 跑 "
+           "`python3 scripts/daily_root_cause.py` + `auto_tune_next_day.py` "
+           "→ 自动覆盖 `data/next_day_strategy.json`\n")
+    return md
+
+
 def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    positives, negatives, avg, avg_pos, avg_neg,
                    sh_pct, cyb_pct, kc50_pct, selected, hot_count,
@@ -2066,7 +2183,9 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    industry=None, dragon=None, pool_note="",
                    gap_source=None, t1=None, pool_mode=None, pool_label=None,
                    pool_attr=None, pool_industries=None,
-                   theme_overlap_detail=None):
+                   theme_overlap_detail=None,
+                   t1_mode=None, t1_label=None, t1_attr=None,
+                   t1_theme_detail=None):
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
     md = (f"📊 **盘后战报｜生成时间 {now} CST｜"
           f"目标交易日 {date_str} 15:00 收盘**\n\n")
@@ -2243,6 +2362,24 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                        f"（Δ {worst[4]:+.2f}pp）\n")
             md += (f"> ⚠️ 样本为**上一交易日**盘前池（{prev_date}），"
                    f"用于回答「策略选股 T+1 是否有效」，**不代表今日新推荐**。\n")
+            # ⚠️ 2026-11-13 新增（v1.40）: T+1 闭环复核段也要有**偏差归因**。
+            # skill 交付物 #2 是"命中率 vs 预期 + 偏差归因"；此前 T+1 段只给
+            # 数字（命中率/均值/超额），不给"为什么"—— 2026-11-13 实战正是
+            # 纯数字段：1/10 命中、均值 -3.13%、10/10 负延续，用户看不到
+            # "题材方向本身被集中抛售"（命中组 -4.14% vs 未命中组 -1.61%）
+            # 这一关键结构，只能自己从表格里推。
+            if t1_mode:
+                md += (f"\n🔍 **偏差归因（{prev_date} 盘前池 → 今日收盘）："
+                       f"{t1_mode} {t1_label}**\n")
+                if t1_attr:
+                    md += f"- {t1_attr}\n"
+                if t1_theme_detail:
+                    _t1_name_by_code = {r[0]: r[1] for r in t1["rows"]}
+                    _t1_ov = " / ".join(
+                        f"{d['code']}{_t1_name_by_code.get(d['code'], '')}·{'+'.join(d['themes'])}"
+                        for d in t1_theme_detail[:8]
+                    )
+                    md += f"- 主线题材命中明细（概念级）：{_t1_ov}\n"
 
     md += "\n━━━ **新晋异动 Top5** ━━━\n\n"
     dragon = dragon or {}
@@ -2390,35 +2527,7 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
             _nd = _json.loads(_nd_path.read_text(encoding="utf-8"))
 
         if _rc and _nd:
-            md += "\n\n━━━ **🔬 昨日根因分析 → 次日调参** ━━━\n\n"
-            # 命中根因
-            hit = _rc.get("hit_causes", [])
-            if hit:
-                md += f"📊 **根因命中：** {' / '.join(hit)}\n"
-                for ck, cv in _rc.get("causes", {}).items():
-                    if cv.get("hit"):
-                        md += f"- **{ck}**：{cv.get('summary', '')}\n"
-                        for it in cv.get("items", [])[:3]:
-                            cn = it.get("sector_cn") or it.get("sector_enum") or "?"
-                            ret = it.get("ret_1d")
-                            md += f"  · `{it.get('code', '')} {it.get('name', '')}` ({cn}) 1D={ret:+.2f}%\n" if ret is not None else ""
-            else:
-                md += "📊 **根因命中：** ✅ 无显著根因\n"
-
-            # 次日调参
-            md += f"\n🎯 **次日策略:**\n"
-            md += f"- 推荐阈值: **{_nd.get('score_threshold', '—')}** (基准 70)\n"
-            md += f"- 建议仓位: **{_nd.get('position_final', '—')}%** (基准 50%)\n"
-            if _nd.get("weak_sectors"):
-                md += f"- 板块黑名单: {', '.join(_nd['weak_sectors'])}\n"
-            if _nd.get("cold_sectors"):
-                md += f"- ⚠️ 冷启动盲区: {', '.join(_nd['cold_sectors'][:5])} (新板块样本<3, 一票否决)\n"
-            # 决策依据
-            for entry in _nd.get("tuning_log", []):
-                if entry.get("source") == "daily_root_cause":
-                    for r in entry.get("reasons", []):
-                        md += f"- 依据: {r}\n"
-            md += "\n📁 **明日开机动作:** 推荐前 16:05 跑 `python3 scripts/daily_root_cause.py` + `auto_tune_next_day.py` → 自动覆盖 `data/next_day_strategy.json`\n"
+            md += phase12_section(date_str, _rc, _nd)
     except Exception as _phase12_err:
         md += f"\n⚠️ Phase 12 根因 section 加载失败: {_phase12_err}\n"
 
