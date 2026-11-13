@@ -1005,8 +1005,26 @@ def generate_report():
                     sector = _cn
             if 综合评分 < score_thresh:
                 continue  # 评分低于阈值，跳过
-            if sector and sector in weak_sectors:
-                continue  # 板块为弱势板块，跳过
+            # v2026-11-13 P0 修复: 板块黑名单**双路匹配**（中文原名 OR 英文 enum）。
+            #   旧代码只有 `sector in weak_sectors` 单路中文匹配, 而 rec_tuning
+            #   weak_sectors 是「7 个中文名 + 1 个英文 enum(semi)」的混合口径
+            #   ⇒ `semi` 这项在早盘链路 100% 静默失效 (黑名单非空 / 日志正常 /
+            #   从不拦截)。尾盘链路用的是双路规则 ⇒ 同一个黑名单两套口径。
+            #   现统一调用 sector_filter.is_blocked_sector (唯一真源 + 唯一生产
+            #   入口, 教训 (o)/(i): 生产与测试调同一个可调用对象)。
+            #   证据: 被 semi 命中的族在真实反馈数据上 19 笔样本胜率 15.8% /
+            #   平均 -1.78% (确实该拦); 反例探针 汽车零部件/银行/水泥制造/
+            #   小家电/机械基础件/仪器仪表/工控自动化 全部放行 (不误杀)。
+            if weak_sectors:
+                try:
+                    from sector_filter import is_blocked_sector
+                    if is_blocked_sector(sector, weak_sectors):
+                        continue  # 板块为弱势板块，跳过
+                except Exception:
+                    if sector and sector in weak_sectors:
+                        continue  # 板块为弱势板块，跳过 (兜底: 单路中文匹配)
+            elif sector and sector in weak_sectors:
+                continue
 
             price = info.get('price', 0)
             if price <= 0:
@@ -1711,6 +1729,6 @@ REC_TUNING = {
     "weak_sectors": ['造纸', 'semi', '印制电路板', '其他化学制品', '房地产开发', '其他家用轻工', '影视动漫', '装修装饰'],
     "overall_win_rate": 50.1,
     "total_records": 439,
-    "generated_at": "2026-11-12T20:00:49.989800",
+    "generated_at": "2026-11-13T20:00:55.335063",
 }
 # === REC_OPTIMIZER_TUNING_END ===

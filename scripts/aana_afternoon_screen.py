@@ -280,9 +280,11 @@ def get_tencent_kline(code, count=30):
                     result.append({
                         'date': item[0],
                         'open': float(item[1]),
-                        'high': float(item[2]),
-                        'low': float(item[3]),
-                        'close': float(item[4]),
+                        # ⚠️ 2026-10-29 P0: 腾讯 bar 是 [date, open, close, high, low, vol]
+                        #    原写成 [open, high, low, close] 三重错位, 与 data/quotes.py 同源。
+                        'close': float(item[2]),
+                        'high': float(item[3]),
+                        'low': float(item[4]),
                         'vol': float(item[5]),
                     })
                 except (ValueError, IndexError):
@@ -517,67 +519,36 @@ def get_vol_ratio(code, klines):
     return klines[-1]['vol'] / avg_vol_5
 
 
-# ============================================
+# ===========================================
 # 板块映射 (中文行业名 → rec_tuning 英文 enum)
-# ============================================
-# 2026-09-09 新增: rec_tuning.weak_sectors 用的是英文 enum (chem/semi/ai_app...),
-# industry_for_code() 返回的是中文行业名 (化工/半导体/AI...). 直接比较会永远不匹配。
-# 映射表覆盖 rec_tuning 里所有 weak_sectors + 7 个 sector_stats 板块。
-_SECTOR_CN_TO_ENUM = {
-    # rec_tuning 已定义的 7 个英文 enum (来自 feedback 历史)
-    "储能": "energy", "绿电": "energy", "电池": "energy", "锂电": "energy", "动力电池": "energy",
-    "机器人": "robot", "人形机器人": "robot",
-    "AI应用": "ai_app", "AI": "ai_app", "人工智能": "ai_app", "大模型": "ai_app",
-    "半导体": "semi", "半导体设备": "semi", "集成电路": "semi", "芯片": "semi", "晶圆": "semi",
-    "化工": "chem", "化学制剂": "chem", "石油化工": "chem", "石油加工": "chem",
-    "机械": "mach", "工程机械": "mach",
-    "电子": "elec", "消费电子": "elec", "显示器件": "elec",
-    # 没在 weak_sectors 里的常见板块也映射一下，方便后续扩展
-    "白酒": "baijiu", "汽车": "auto", "银行": "bank", "保险": "insurance",
-    "证券": "broker", "医药": "pharma", "中药": "pharma", "互联网": "internet",
-    "通信设备": "telecom", "煤炭": "coal", "钢铁": "steel", "房地产": "realestate",
-    "建筑工程": "construction", "食品": "food", "家电": "home_appliance",
-    "物流": "logistics",
-}
+# ===========================================
+# v2026-11-13: 提取到 scripts/sector_filter.py 作为**唯一真源**。
+#   原先本模块私有一份 `_SECTOR_CN_TO_ENUM` + `_cn_sector_to_enum` +
+#   `_sector_blacklisted`, 而早盘 generate_report 只做「中文原名」单路匹配
+#   ⇒ 同一个黑名单在两条链路用了两套规则, `semi` 这类英文 enum 项在早盘
+#   100% 静默失效 (黑名单非空 / 日志正常 / 从不拦截)。
+#   两条链路现统一调用 sector_filter 的同名函数 ⇒ 口径必然一致 (教训 (o))。
+#   下面保留 `_cn_sector_to_enum` / `_sector_blacklisted` 两个旧名做别名,
+#   以免 daily_root_cause.py / verify_sector_filter_chain.py / tests 里的
+#   `from aana_afternoon_screen import _cn_sector_to_enum` 全部失效。
+try:
+    from sector_filter import (
+        _SECTOR_CN_TO_ENUM,
+        cn_sector_to_enum,
+        sector_blacklisted,
+    )
+except ImportError:  # pragma: no cover - 直接以脚本方式运行时兜底
+    import os as _os
+    import sys as _sys
+    _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__))))
+    from sector_filter import (
+        _SECTOR_CN_TO_ENUM,
+        cn_sector_to_enum,
+        sector_blacklisted,
+    )
 
-
-def _cn_sector_to_enum(sector_cn: str) -> str:
-    """中文行业名 → rec_tuning 英文 enum。未匹配返回 'unknown' (不误杀)。"""
-    if not sector_cn or sector_cn == "unknown":
-        return ""
-    # 精确匹配优先
-    if sector_cn in _SECTOR_CN_TO_ENUM:
-        return _SECTOR_CN_TO_ENUM[sector_cn]
-    # 子串匹配兜底 (例如 "化学制药" 含 "化学")
-    for cn_key, enum_val in _SECTOR_CN_TO_ENUM.items():
-        if cn_key in sector_cn or sector_cn in cn_key:
-            return enum_val
-    return "unknown"  # 有中文行业但未映射到 enum → 'unknown' (让 blacklist 拦截条件失败 → 放过)
-
-
-def _sector_blacklisted(sector_raw: str, sector_enum: str, blacklist) -> bool:
-    """板块黑名单判定 — 中文行业名 OR 英文 enum 双路匹配。
-
-    v2026-10-28 P0 修复 (黑名单 100% 失效根因):
-      rec_tuning.sector_stats 的 key = rec_feedback.csv `sector` 列原值 =
-      industry_for_code() 返回的中文行业名 (如 '房地产开发' / '印制电路板'),
-      而旧代码只拿 enum 去比 → '房地产开发' vs enum 'realestate' 永不相等,
-      中文名黑名单 100% 匹配不上。实际只有 2026-05 那 7 个英文 enum 历史 key
-      能命中 (energy/robot/ai_app/semi/chem/mach/elec), 而它们 n 全部 < 10
-      → strategy_policy 门槛又拦一道 → 实测 blacklist 恒为空,
-      日志 10-13 至今全是 `blacklist=[无]`。
-
-      修法: raw 中文名 OR enum 双路匹配, 同时兼容历史 enum key。
-      注: 不改 rec_optimizer 的分桶口径 (合并 '半导体'/'semi' 会改变胜率 →
-      改变 weak_sectors → 改变实盘推荐, 属策略调整需先回测, 不在本次范围)。
-    """
-    if not blacklist:
-        return False
-    if sector_raw and sector_raw in blacklist:
-        return True
-    if sector_enum and sector_enum in blacklist:
-        return True
-    return False
+_cn_sector_to_enum = cn_sector_to_enum
+_sector_blacklisted = sector_blacklisted
 
 
 # ============================================
