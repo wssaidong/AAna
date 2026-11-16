@@ -1,0 +1,78 @@
+{
+ "date": "2026-11-16",
+ "base_date": "2026-11-13",
+ "report": "/Users/cai/code/AAna/reports/2026-11-16-选股报告.md",
+ "report_size": 5431,
+ "report_mtime": "2026-11-16T08:03:45",
+ "trading_day": true,
+ "session": "pre_market",
+ "generated": "08:34:16",
+ "sentiment_snap": {
+  "score": 30,
+  "label": "冰点",
+  "zt_count": 38,
+  "dt_count": 4,
+  "position": 0.1
+ },
+ "mk_four_avg_close": -2.06,
+ "sh_close_pct": -0.59,
+ "pool_size": 0,
+ "guard_ice": true,
+ "guard_reason": "情绪=冰点/仓位=10%",
+ "guard_live": {
+  "score": 30,
+  "label": "冰点",
+  "is_ice_point": true
+ },
+ "run_id": "01a1e1c3-1b64-7337-a000-16ba521bc79f",
+ "report_anomalies": [
+  "热点板块=数据获取中 (08:02 生成链数据缺失迹象)",
+  "热点主线表标注「2026年4月」为陈旧静态文案",
+  "agents/premarket_agent.py 缺失, 盘前 agent cron 报错"
+ ],
+ "overall_win_rate": 50.11389521640092,
+ "total_records": 439,
+ "sector_count": 117,
+ "rec_tuning_generated_at": "2026-11-13T20:00:55.335063",
+ "nds_tuning": {
+  "score_threshold": 60,
+  "cold_sectors": [],
+  "weak_sectors": [
+   "semi",
+   "其他化学制品",
+   "其他家用轻工",
+   "印制电路板",
+   "影视动漫",
+   "房地产开发",
+   "装修装饰",
+   "造纸"
+  ]
+ },
+ "yesterday_review": {
+  "am_pool_size_1113": 0,
+  "am_leg": "N/A — 11-13 盘前池 0 只, 无 T+1 复核对象 (交易日盘前池空 N/A 第 2 日)",
+  "pm_leg": "N/A — 11-13 14:46 尾盘「今日无符合条件的尾盘买入机会」, 无推荐池"
+ },
+ "gid1991_info_product": {
+  "t0_verdict": {
+   "n_beat_four": 9,
+   "n_beat_sh": 5,
+   "n_positive": 3,
+   "mean_chg": -0.29,
+   "judged_on": "2026-11-13"
+  },
+  "pre_open_snapshot_n": 10,
+  "snapshot_ts": [
+   "20261113"
+  ],
+  "t1_due": "2026-11-16 收盘后 (盘后战报口径)"
+ },
+ "recommend": null,
+ "eligible_pool": [],
+ "results": [],
+ "eastmoney_sync": {
+  "action": "skip",
+  "reason": "0 推荐 (池 0 只 + 冰点守卫双口径短路) → 不创建 20261116ZZ",
+  "groups_20261116_occupied": {}
+ }
+}
