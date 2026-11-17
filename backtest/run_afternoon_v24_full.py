@@ -47,8 +47,9 @@ def fetch_kline(code, count=KLINE_COUNT):
             if not day:
                 day = data.get('data', {}).get(f'{mkt}{code}', {}).get('day', [])
             return [
-                {'date': d[0], 'open': float(d[1]), 'high': float(d[2]),
-                 'low': float(d[3]), 'close': float(d[4]), 'vol': float(d[5])}
+                # ⚠️ 2026-10-29 P0: 腾讯 bar 是 [date, open, close, high, low, vol]
+                {'date': d[0], 'open': float(d[1]), 'close': float(d[2]),
+                 'high': float(d[3]), 'low': float(d[4]), 'vol': float(d[5])}
                 for d in day
             ]
         except Exception as e:

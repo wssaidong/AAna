@@ -1,5 +1,5 @@
 {
-  "date_for": "2026-11-13",
+  "date_for": "2026-11-17",
   "score_threshold": 60,
   "hold_days": 1,
   "weak_sectors": [
@@ -44,7 +44,7 @@
       "reasons": []
     }
   ],
-  "generated_at": "2026-11-12T16:10:56",
+  "generated_at": "2026-11-16T16:10:33",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"

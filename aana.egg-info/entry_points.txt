@@ -1,2 +1,2 @@
 [console_scripts]
-aana = agents.main_agent:main
+aana = scripts.agents.main_agent:run

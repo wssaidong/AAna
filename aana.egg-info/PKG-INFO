@@ -19,6 +19,7 @@ License-File: LICENSE
 Requires-Dist: akshare>=1.14.0
 Requires-Dist: backtrader>=1.9.0
 Requires-Dist: baostock>=0.8.9
+Requires-Dist: duckdb>=1.0.0
 Requires-Dist: pandas>=2.0.0
 Requires-Dist: requests>=2.31.0
 Provides-Extra: dev

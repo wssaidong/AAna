@@ -70,9 +70,10 @@ def fetch_kline(code: str, count: int = 90) -> List[Dict]:
                 {
                     'date': d[0],
                     'open': float(d[1]),
-                    'high': float(d[2]),
-                    'low': float(d[3]),
-                    'close': float(d[4]),
+                    # ⚠️ 2026-10-29 P0: 腾讯 bar 是 [date, open, close, high, low, vol]
+                    'close': float(d[2]),
+                    'high': float(d[3]),
+                    'low': float(d[4]),
                     'vol': float(d[5]),
                 }
                 for d in day

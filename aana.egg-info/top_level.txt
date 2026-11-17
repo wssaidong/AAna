@@ -1,4 +1,3 @@
-agents
 analysis_tools
 backtest
 data

@@ -49,8 +49,9 @@ def get_stock_kline(code: str, days: int = 90) -> list:
         # 取日K线
         day_data = d.get('data', {}).get(sc, {}).get('day', [])
         return [
-            {'date': x[0], 'open': float(x[1]), 'high': float(x[2]),
-             'low': float(x[3]), 'close': float(x[4]), 'volume': float(x[5])}
+            # ⚠️ 2026-10-29 P0: 腾讯 bar 是 [date, open, close, high, low, vol]
+            {'date': x[0], 'open': float(x[1]), 'close': float(x[2]),
+             'high': float(x[3]), 'low': float(x[4]), 'volume': float(x[5])}
             for x in day_data[-days:]
         ]
     except Exception:

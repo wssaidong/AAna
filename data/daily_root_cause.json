@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-12",
+  "date": "2026-11-16",
   "total_recs": 0,
   "win_count": 0,
   "fail_count": 0,
   "no_data": 0,
   "win_rate": 0,
-  "baseline": -1.0164002300435515,
+  "baseline": -3.2341768590254003,
   "baseline_source": "腾讯实时快照 close-to-close",
   "causes": {
     "A_板块错配": {
