@@ -2400,3 +2400,9 @@
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/postmarket_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/postmarket_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/postmarket_agent.py': [Errno 2] No such file or directory
+[2026-11-17 21:30:00] 🌙 复盘子Agent 启动
+[2026-11-17 21:30:00] ==================================================
+[2026-11-17 21:30:00] 📊 21:30 全天数据汇总
+[2026-11-17 21:30:00] 上涨: 14, 下跌: 2
+[2026-11-17 21:30:00] 最强板块: AI算力/芯片 +1.23%
+[2026-11-17 21:30:00] 最弱板块: AI应用 +0.10%
