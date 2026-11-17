@@ -6458,7 +6458,7 @@
       "name": "紫光股份",
       "shares": 100,
       "entry_price": 24.65,
-      "highest_price": 24.65,
+      "highest_price": 24.7,
       "entry_date": "2026-11-17"
     },
     "002947": {
@@ -7471,6 +7471,128 @@
       "total_pnl_pct": -3.26,
       "realized_pnl": -3257.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-17",
+      "cash": 71686.0,
+      "position_value": 25062.0,
+      "total_value": 96748.0,
+      "daily_pnl": 5.0,
+      "total_pnl": -3252.0,
+      "total_pnl_pct": -3.25,
+      "realized_pnl": -3257.0,
+      "positions": [
+        {
+          "code": "000700",
+          "name": "模塑科技",
+          "shares": 100,
+          "entry_price": 14.9,
+          "current_price": 14.9,
+          "highest_price": 14.9,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002432",
+          "name": "九安医疗",
+          "shares": 100,
+          "entry_price": 54.03,
+          "current_price": 54.03,
+          "highest_price": 54.03,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000066",
+          "name": "中国长城",
+          "shares": 100,
+          "entry_price": 11.68,
+          "current_price": 11.68,
+          "highest_price": 11.68,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "003015",
+          "name": "日久光电",
+          "shares": 100,
+          "entry_price": 11.82,
+          "current_price": 11.82,
+          "highest_price": 11.82,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600096",
+          "name": "云天化",
+          "shares": 100,
+          "entry_price": 26.69,
+          "current_price": 26.69,
+          "highest_price": 26.69,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002392",
+          "name": "北京利尔",
+          "shares": 100,
+          "entry_price": 6.63,
+          "current_price": 6.63,
+          "highest_price": 6.63,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000938",
+          "name": "紫光股份",
+          "shares": 100,
+          "entry_price": 24.65,
+          "current_price": 24.7,
+          "highest_price": 24.7,
+          "unreal_pnl": 5.0,
+          "unreal_pct": 0.2,
+          "days_held": 0
+        },
+        {
+          "code": "002947",
+          "name": "恒铭达",
+          "shares": 100,
+          "entry_price": 45.47,
+          "current_price": 45.47,
+          "highest_price": 45.47,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603283",
+          "name": "赛腾股份",
+          "shares": 100,
+          "entry_price": 39.32,
+          "current_price": 39.32,
+          "highest_price": 39.32,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600629",
+          "name": "华建集团",
+          "shares": 100,
+          "entry_price": 15.38,
+          "current_price": 15.38,
+          "highest_price": 15.38,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
