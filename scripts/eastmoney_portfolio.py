@@ -6,6 +6,7 @@ AAna × 东方财富自选股组合管理
 import os
 import json
 import requests
+import shutil
 import subprocess
 from datetime import datetime, timedelta
 
@@ -264,6 +265,52 @@ def find_existing_group_gid():
     return {}
 
 
+def _persist_gid_to_cache(group_name, gid):
+    """
+    把新建组合的 gid 写回 groups.json (v2026-11-04)
+
+    为什么必须写: **空组没有 stkinfolist → 没有 updatetime** → 按日期前缀扫描
+    (find_group_gid / get_or_create_group 2b) 永远扫不到它。11-04 实测:
+    ag 建出 gid=1851 空组后, 后续扫描 1786..1906 全部 -119, 只有缓存里
+    记下 gid 才能找回这个组。
+
+    写入遵循 8/7 安全 SOP: 备份 + 只用位置参数 + 写后校验 + 失败从 .bak 还原。
+    """
+    groups_file = os.path.expanduser(
+        "~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
+    try:
+        history = {}
+        if os.path.exists(groups_file):
+            with open(groups_file) as f:
+                history = json.load(f)
+        if not isinstance(history, dict):
+            history = {}
+        # 不覆盖已有 stocks (SOP-B: 保留服务端真实 codes)
+        entry = history.get(group_name)
+        if isinstance(entry, dict) and entry.get('stocks'):
+            entry['gid'] = gid
+        else:
+            history[group_name] = {
+                'gid': gid,
+                'date': datetime.now().strftime('%Y%m%d'),
+                'stocks': entry.get('stocks', []) if isinstance(entry, dict) else [],
+                'note': '新建空组占位 (由 get_or_create_group 写入, 股票待写入)',
+            }
+        shutil.copy2(groups_file, groups_file + '.bak')
+        try:
+            with open(groups_file, 'w') as f:
+                json.dump(history, f, ensure_ascii=False, indent=2)
+            with open(groups_file) as f:
+                json.load(f)  # 写后校验
+            print(f"[Eastmoney] groups.json 已记录 {group_name} → gid={gid}")
+        except Exception as e:
+            shutil.copy2(groups_file + '.bak', groups_file)
+            print(f"[Eastmoney] groups.json 写入失败 ({e}), 已从 .bak 还原")
+            raise
+    except Exception as e:
+        print(f"[Eastmoney] 缓存 {group_name} 记录失败 ({e}) — 不影响本次同步, 但空组将无法被找回")
+
+
 def get_or_create_group(group_name):
     """
     获取或创建组合，返回 gid
@@ -271,6 +318,14 @@ def get_or_create_group(group_name):
     1. 用唯一名称创建（日期+时间戳后缀）确保每次都是新组合
     2. 如果名称已存在（-131），从响应 data.gid 取（修复之前 gid 丢失问题）
     3. 扫描 gid 范围找同名组合兜底
+
+    v2026-11-04 P0 修复 (缓存 gid 未验证 → 死组):
+      旧实现从 groups.json 命中就直接 return 缓存 gid, **不验证该 gid 是否还存在**。
+      同日组被 dg 退役后 groups.json 仍留着旧 gid → 返回一个已删除的组 →
+      后续 add_stocks 全部 state=-119 失败, 且脚本仍然 print "添加=N" 假装成功。
+      现在改为: 缓存命中后必须 gstkinfos 验证 state=0 且组真实存在, 否则丢弃缓存
+      继续走创建/扫描路径 (落实 8/7 "推断 gid 不能直接 add_stocks" 的同源原则:
+      **任何 gid 在用于 add_stocks 前都必须服务端验证**)。
     """
     # 1. 先查 groups.json 是否有这个组合的记录
     groups_file = os.path.expanduser("~/.hermes/skills/a-stock/eastmoney-portfolio-api/groups.json")
@@ -279,8 +334,16 @@ def get_or_create_group(group_name):
             history = json.load(f)
         if group_name in history and history[group_name].get('gid'):
             gid = history[group_name]['gid']
-            print(f"[Eastmoney] 从 groups.json 找到 {group_name} → gid={gid}")
-            return gid
+            # v2026-11-04: 缓存 gid 必须服务端验证 (可能是已被 dg 掉的死组)
+            try:
+                _r, _raw = api_call(mkurl('gstkinfos', g=gid), max_retries=1)
+                _stks = _r.get('data', {}).get('stkinfolist', [])
+                if _r.get('state') == 0:
+                    print(f"[Eastmoney] 从 groups.json 找到 {group_name} → gid={gid} (已验证存活)")
+                    return gid
+                print(f"[Eastmoney] 缓存 gid={gid} 已失效 (state={_r.get('state')}), 丢弃缓存继续创建")
+            except Exception as _e:
+                print(f"[Eastmoney] 缓存 gid={gid} 验证失败 ({_e}), 丢弃缓存继续创建")
 
     # 2. 尝试创建
     # 幂等修复（2026-07-22）：两种标准命名走幂等路径
@@ -304,6 +367,12 @@ def get_or_create_group(group_name):
     if state == 0:
         gid = result.get('data', {}).get('gid')
         print(f"[Eastmoney] 创建组合 {group_name} → gid={gid}")
+        # v2026-11-04: 新建的空组必须立刻写回 groups.json, 否则下次调用
+        #   会走 ag → -131 → 扫描路径, 而**空组没有 stkinfolist → 没有 updatetime**
+        #   → 按日期前缀扫描永远扫不到它 → get_or_create_group 返回 None。
+        #   (11-04 实测: ag 建出 gid=1851 空组, 随后的扫描 1786..1906 全 -119,
+        #    只有缓存里记下 gid 才能找回这个空组)
+        _persist_gid_to_cache(group_name, gid)
         return gid
     
     if state == -131:

@@ -1082,8 +1082,35 @@ def detect_empty_premarket_pool_from_deep_analysis(date_str):
     return True, evidence
 
 
+def _trading_days_between(start_date, end_date):
+    """返回 (start_date, end_date] 之间的**交易日**数量（含 end，不含 start）。
+
+    ⚠️ 2026-11-16 新增（v1.41）: 战报把 2026-11-12 的池子说成"**上一交易日**
+    盘前池"，但 11-13 是交易日（只是当天盘前池因冰点守卫为空）——
+    11-12 → 11-16 实际跨 **2** 个交易日，措辞把 T+2 说成 T+1，
+    读者会误以为"昨天选的票今天表现如何"，实际是"上周五之前选的票，
+    跨了两个交易日"。
+    """
+    try:
+        from generate_report import is_trading_day as _itd
+    except Exception:
+        return None
+    try:
+        cur = datetime.strptime(start_date, "%Y-%m-%d")
+        end = datetime.strptime(end_date, "%Y-%m-%d")
+    except Exception:
+        return None
+    n = 0
+    while cur < end:
+        cur += timedelta(days=1)
+        ok, _ = _itd(cur.strftime("%Y-%m-%d"))
+        if ok:
+            n += 1
+    return n
+
+
 def resolve_previous_pool(date_str, max_lookback=6):
-    """回捞**上一个交易日**的盘前候选池（昨收口径），用于 T+1 闭环复核。
+    """回捞**上一个有非空盘前池**的交易日（昨收口径），用于 T+1 闭环复核。
 
     ⚠️ 2026-10-28 新增（v1.31）: 当日盘前池为空（冰点守卫短路）时，
     "候选池命中率"整段退化成 N/A，战报就**失去了与盘前情报的闭环** ——
@@ -1091,15 +1118,22 @@ def resolve_previous_pool(date_str, max_lookback=6):
     此时唯一有意义的评估对象是**上一交易日的盘前池在今日收盘的表现**
     （T+1 真实收益），它直接回答"选股策略昨天选的东西今天表现如何"。
 
-    返回 (rows, prev_date, source_label)：
-      - rows: [(code, name, baseline_pct)]，baseline = 上一交易日报告里的昨收涨跌
+    ⚠️ 2026-11-16 修订（v1.41）: 返回值新增 `skipped`（被跳过的交易日及原因），
+    因为"上一个有非空池的交易日"**不一定**是"上一交易日" —— 2026-11-13 是
+    交易日但盘前池因冰点守卫为空，于是回捞到 11-12（跨 2 个交易日）。战报
+    必须据实标注池子归属日与跨度，不能笼统写"上一交易日"。
+
+    返回 (rows, prev_date, source_label, skipped)：
+      - rows: [(code, name, baseline_pct)]，baseline = 该日报告里的昨收涨跌
       - prev_date: 该池的报告日期（找不到返回 None）
       - source_label: 来源说明
+      - skipped: [(date, reason)]，被跳过但**是交易日**的日子（空池/口径不符）
 
     ⚠️ 口径纪律: 只接受**已确认的昨收口径**版本（prev_close），
     否则 baseline 与收盘自指，T+1 收益完全失真。
     """
     cursor = datetime.strptime(date_str, "%Y-%m-%d")
+    skipped = []
     for offset in range(1, max_lookback + 1):
         day = (cursor - timedelta(days=offset)).strftime("%Y-%m-%d")
         # 先看该日是否真的是有行情的交易日（同花顺强势股非空）
@@ -1110,16 +1144,23 @@ def resolve_previous_pool(date_str, max_lookback=6):
         except Exception:
             continue
         if rows and sem == "prev_close":
-            return rows, day, source
-    return [], None, "无"
+            return rows, day, source, skipped
+        # 是交易日但拿不到可用池 —— 记下原因，供战报据实标注
+        if not rows:
+            skipped.append((day, "盘前池为空（冰点守卫短路）"))
+        else:
+            skipped.append((day, f"口径未确认（{sem}）"))
+    return [], None, "无", skipped
 
 
-def evaluate_t1_pool(prev_rows, prev_date, indices):
+def evaluate_t1_pool(prev_rows, prev_date, indices, skipped=None, date_str=None):
     """用**今日收盘价**评估上一交易日盘前池的 T+1 表现。
 
     返回 dict: {rows, hits, n, avg, alpha_sh, avg_baseline, deltas, best, worst}
       - rows: [(code, name, baseline, today_pct, delta)]，delta = 今日涨跌 - baseline
       - alpha_sh: 池内均值 - 今日上证涨跌（真实超额，非自指）
+      - gap_days: 池归属日 → 今日之间的**交易日**跨度（v1.41）
+      - skipped: 期间被跳过的交易日（空池/口径不符，v1.41）
     """
     if not prev_rows:
         return {}
@@ -1139,6 +1180,12 @@ def evaluate_t1_pool(prev_rows, prev_date, indices):
     avg = sum(r[3] for r in rows) / len(rows)
     sh_pct = indices.get("sh000001", {}).get("change_pct", 0)
     sorted_rows = sorted(rows, key=lambda x: x[4], reverse=True)
+    # ⚠️ 2026-11-16（v1.41）: 池归属日到今日的交易日跨度 —— 决定战报该写
+    # "T+1" 还是 "T+N"，以及是否要说明"中间那个交易日盘前池为空"。
+    _gap = None
+    _today = date_str or datetime.now().strftime("%Y-%m-%d")
+    if prev_date:
+        _gap = _trading_days_between(prev_date, _today)
     return {
         "rows": rows,
         "hits": len(hits),
@@ -1151,6 +1198,8 @@ def evaluate_t1_pool(prev_rows, prev_date, indices):
         "best": sorted_rows[0],
         "worst": sorted_rows[-1],
         "prev_date": prev_date,
+        "gap_days": _gap,
+        "skipped": list(skipped or []),
     }
 
 
@@ -1669,9 +1718,38 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
                         f"杀跌全天发生、盘中已同步（14:45→15:00 无 ≥3.5pp 尾盘跳水）—— "
                         f"主因是**昨日强势股追高**在成长方向单边杀跌中被反向兑现")
             else:
-                mode, label = "①", "模式① 风格切换 / 边缘归因"
-                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
-                        f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）—— 主因偏题材错配")
+                # ⚠️ 2026-11-16 修订（v1.41）: 与 v1.38 同一纪律 —— **"题材错配"
+                # 必须先验证据再断言**。旧代码在此分支无条件写"主因偏题材错配"，
+                # 而尾部 in_hot 分支紧接着会追加"属**题材对但未涨停**，非题材错配"
+                # → 同一段归因**同屏自相矛盾**（说错话但不报错家族）。
+                # 2026-11-16 实战（T+1 池 1/10 命中、均值 -2.65%、baseline 均值
+                # +3.73% 全部为昨日 +3.2~+4.7% 强势股、10/10 负延续）：概念级拆分
+                # 显示命中主线 4 只均值 -0.77% vs 未命中 6 只 -3.91%（差 +3.14pp）
+                # → **题材选择是有效的**，真正拖累是昨日强势股追高的延续性失败。
+                _split = _theme_group_split(hit_rows, theme_overlap_detail)
+                if _split and _split["spread"] > 0:
+                    mode, label = "①*", "模式①* 追高延续性失败（题材选择有效，非题材错配）"
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                            f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）—— "
+                            f"**题材选择有效**：命中当日主线题材的 {_split['n_hit']} 只均值 "
+                            f"{_split['avg_hit']:+.2f}%，未命中的 {_split['n_miss']} 只均值 "
+                            f"{_split['avg_miss']:+.2f}%（差 {_split['spread']:+.2f}pp），"
+                            f"**主因不是题材错配**；实际拖累是昨日强势股追高的延续性失败"
+                            f"（baseline 均值 {baseline_avg:+.2f}%，{neg_cont}/{n} 负延续、"
+                            f"Δ 均值 {avg - baseline_avg:+.2f}pp）")
+                elif _split:
+                    # 题材命中组跑输 → 拖累**在题材方向本身**，而非"选错了别的题材"。
+                    mode, label = "①", "模式① 风格切换 / 边缘归因"
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                            f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）—— "
+                            f"主线题材命中组 {_split['avg_hit']:+.2f}% 跑输未命中组 "
+                            f"{_split['avg_miss']:+.2f}%（差 {_split['spread']:+.2f}pp），"
+                            f"主因是**题材方向本身被抛售**"
+                            f"（baseline 均值 {baseline_avg:+.2f}%，{neg_cont}/{n} 负延续）")
+                else:
+                    mode, label = "①", "模式① 风格切换 / 边缘归因"
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                            f"Alpha {alpha:+.2f}pp（{_alpha_zone(alpha)}）—— 主因偏题材错配")
     elif hit_rate <= 0.40:
         if avg < -3.0 and baseline_avg > 4.0:
             # ★ v1.32 新模式 ⑩-h
@@ -1761,9 +1839,20 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
             attr += (f"；**主线题材命中 {theme_overlap_count}/{n}**"
                      f"（概念级口径：{'/'.join(_hit_themes)}）")
             if in_hot_count == 0:
+                # ⚠️ 2026-11-16 修订（v1.41）: "非题材错配"是**结论**，不是
+                # "题材对但未涨停"的事实延伸 —— 必须先看组间收益差。
+                # 若题材命中组反而跑输（spread<=0），说明拖累在题材方向本身，
+                # 此时再写"非题材错配"会与本段前面的归因自相矛盾。
+                _split_tail = _theme_group_split(hit_rows, theme_overlap_detail)
+                _verdict = ""
+                if _split_tail is None or _split_tail["spread"] > 0:
+                    _verdict = "，非题材错配"
+                else:
+                    _verdict = (f"，但题材命中组跑输未命中组 "
+                                f"（{_split_tail['avg_hit']:+.2f}% vs "
+                                f"{_split_tail['avg_miss']:+.2f}%）")
                 attr += (f"；但候选池 {in_hot_count}/{n} 进入今日涨停池"
-                         f"（{hot_count} 只涨停）—— 属**题材对但未涨停**，"
-                         f"非题材错配")
+                         f"（{hot_count} 只涨停）—— 属**题材对但未涨停**{_verdict}")
             else:
                 attr += (f"；候选池 {in_hot_count}/{n} 同时进入今日涨停池"
                          f"（{hot_count} 只）")
@@ -1859,12 +1948,14 @@ def generate_full_report(date_str):
     t1_mode = t1_label = t1_attr = None
     t1_theme_detail = []
     if not hit_rows:
-        prev_rows, prev_date, prev_source = resolve_previous_pool(date_str)
+        prev_rows, prev_date, prev_source, prev_skipped = resolve_previous_pool(date_str)
         if prev_rows:
-            t1 = evaluate_t1_pool(prev_rows, prev_date, indices)
+            t1 = evaluate_t1_pool(prev_rows, prev_date, indices,
+                                  skipped=prev_skipped, date_str=date_str)
             print(f"      T+1 闭环: {prev_date} 盘前池 {len(prev_rows)} 只 → 今日收盘 "
                   f"命中 {t1.get('hits', 0)}/{t1.get('n', 0)}，"
-                  f"均值 {t1.get('avg', 0):+.2f}% vs 上证超额 {t1.get('alpha_sh', 0):+.2f}pp")
+                  f"均值 {t1.get('avg', 0):+.2f}% vs 上证超额 {t1.get('alpha_sh', 0):+.2f}pp"
+                  f"（跨度 {t1.get('gap_days')} 个交易日）")
         else:
             print("      ⚠️ 无上一交易日盘前池，T+1 闭环复核不可用")
 

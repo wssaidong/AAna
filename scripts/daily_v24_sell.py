@@ -91,9 +91,12 @@ def fetch_t1_open(code: str, max_retry: int = 3) -> dict:
             return {
                 'date': last[0],
                 'open': float(last[1]),
-                'high': float(last[2]),
-                'low': float(last[3]),
-                'close': float(last[4]),
+                # ⚠️ 2026-10-29 P0: 腾讯 bar 是 [date, open, close, high, low, vol]
+                #    原写成 [open, high, low, close] 三重错位 → 卖出决策拿到的
+                #    close 实际是最低价, high/low 也互换 → 止盈止损判定全错。
+                'close': float(last[2]),
+                'high': float(last[3]),
+                'low': float(last[4]),
             }
         except Exception as e:
             if attempt == max_retry - 1:
