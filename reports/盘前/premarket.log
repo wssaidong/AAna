@@ -2697,3 +2697,20 @@
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/premarket_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/premarket_agent.py': [Errno 2] No such file or directory
 /Library/Developer/CommandLineTools/usr/bin/python3: can't open file '/Users/cai/code/AAna/agents/premarket_agent.py': [Errno 2] No such file or directory
+[2026-11-18 07:00:00] 🦞 盘前子Agent 启动
+[2026-11-18 07:00:00] ==================================================
+[2026-11-18 07:00:00] 🦞 盘前Agent 启动 - 健康检测
+[2026-11-18 07:00:06] 健康检测结果:
+[2026-11-18 07:00:06]   新浪API: ❌ 失败: HTTPConnectionPool(host='hq.sinajs.cn', port=80): Read timed out. (read timeout=5)
+[2026-11-18 07:00:06]   Git: ✅ 正常
+[2026-11-18 07:00:06]   目录结构: ✅ 正常
+[2026-11-18 07:00:06]   股票池: ✅ 17 只
+[2026-11-18 08:25:00] 🦞 盘前子Agent 启动
+[2026-11-18 08:25:00] ==================================================
+[2026-11-18 08:25:00] 🔧 08:25 系统自检
+[2026-11-18 08:25:00] 获取 17 只股票数据...
+[2026-11-18 08:25:00]   上证指数: ¥12.30 🔴 +0.41%
+[2026-11-18 08:25:00]   深证成指: ¥10690.78 🔴 +0.81%
+[2026-11-18 08:25:00]   创业板指: ¥2320.02 🔴 +0.87%
+[2026-11-18 08:25:00]   科创50: ¥17.80 🔴 +1.14%
+[2026-11-18 08:25:00] 股票数据: 17/17 只有效
