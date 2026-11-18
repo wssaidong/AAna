@@ -1,0 +1,1007 @@
+{
+ "date": "2026-11-18",
+ "base_date": "2026-11-17",
+ "report": "/Users/cai/code/AAna/reports/2026-11-18-选股报告.md",
+ "report_size": 10021,
+ "report_mtime": "2026-11-18T08:03:24",
+ "trading_day": true,
+ "session": "pre_market",
+ "generated": "08:57:20",
+ "sentiment_snap": {
+  "score": 40,
+  "label": "分歧",
+  "zt_count": 36,
+  "dt_count": 4,
+  "position": 0.2
+ },
+ "mk_avg": -0.57,
+ "sh_close_pct": -0.5,
+ "hot_sectors": [
+  "集成电路制造",
+  "橡胶助剂",
+  "厨房小家电",
+  "半导体材料",
+  "钼"
+ ],
+ "hot_hit_count": 0,
+ "pool_size": 10,
+ "guard_ice": false,
+ "guard_reason": "",
+ "guard_live": {
+  "score": 40,
+  "label": "分歧",
+  "is_ice_point": false
+ },
+ "run_id": "01a1e6e9-8bda-7355-90fd-0ba4203a163e",
+ "report_anomalies": [
+  "热点主线表标注「2026年4月」陈旧静态文案 (与 11-16 同病灶)",
+  "盘前简报大盘指数点位异常 (上证¥12.30 数据污染)"
+ ],
+ "overall_win_rate": 50.11389521640092,
+ "total_records": 439,
+ "sector_count": 117,
+ "rec_tuning_generated_at": "2026-11-18T08:54:36.315416",
+ "nds_tuning": {
+  "score_threshold": 63,
+  "cold_sectors": [
+   "医疗器械",
+   "计算机设备",
+   "化工",
+   "耐火材料",
+   "IT服务",
+   "其它专用机械",
+   "房屋建设",
+   "铅锌"
+  ],
+  "weak_sectors": [
+   "semi",
+   "其他化学制品",
+   "其他家用轻工",
+   "印制电路板",
+   "影视动漫",
+   "房地产开发",
+   "装修装饰",
+   "造纸"
+  ]
+ },
+ "price_check_match": 10,
+ "baseline_check": {
+  "chg_min": 0.85,
+  "chg_max": 1.94,
+  "n_gt5": 0,
+  "n_gt7": 0
+ },
+ "yesterday_review": {
+  "am_leg": "N/A — deep_analysis_20261117.json 不存在, 11-17 早盘深度分析未产出 (无 20261117ZZ 组); 裸日期组 20261117 (gid=2006) 与今日 Top10 完全同池",
+  "pm_pool": {
+   "source": "deep_analysis_pm_20261117.json 尾盘池 5 只",
+   "pp_holding": "000700 模塑科技 (gid=2001)",
+   "judged_on": "2026-11-17",
+   "n_beat_mkt": 4,
+   "n_positive": 4,
+   "results": [
+    {
+     "code": "600096",
+     "name": "云天化",
+     "total": 72.5,
+     "rating": "增持",
+     "stop": 24.83,
+     "entry": 26.72,
+     "sector": "磷化工及磷酸盐",
+     "close": 26.75,
+     "chg_pct": 2.65,
+     "quote_ts": "20261117161449",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.11,
+     "stop_broken": false
+    },
+    {
+     "code": "002432",
+     "name": "九安医疗",
+     "total": 66.7,
+     "rating": "增持",
+     "stop": 50.29,
+     "entry": 54.03,
+     "sector": "医疗器械",
+     "close": 54.1,
+     "chg_pct": 1.73,
+     "quote_ts": "20261117161445",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": 0.13,
+     "stop_broken": false
+    },
+    {
+     "code": "003015",
+     "name": "日久光电",
+     "total": 57.2,
+     "rating": "中性",
+     "stop": 10.99,
+     "entry": 11.83,
+     "sector": "光学元件",
+     "close": 11.81,
+     "chg_pct": 1.37,
+     "quote_ts": "20261117161436",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": -0.17,
+     "stop_broken": false
+    },
+    {
+     "code": "000066",
+     "name": "中国长城",
+     "total": 41.3,
+     "rating": "减持",
+     "stop": 10.87,
+     "entry": 11.71,
+     "sector": "计算机设备",
+     "close": 11.7,
+     "chg_pct": 1.3,
+     "quote_ts": "20261117161415",
+     "beat_mkt": true,
+     "pos": true,
+     "pnl_vs_entry": -0.09,
+     "stop_broken": false
+    },
+    {
+     "code": "000700",
+     "name": "模塑科技",
+     "total": 72.0,
+     "rating": "增持",
+     "stop": 13.88,
+     "entry": 14.92,
+     "sector": "汽车零部件",
+     "close": 14.9,
+     "chg_pct": -1.91,
+     "quote_ts": "20261117161500",
+     "beat_mkt": false,
+     "pos": false,
+     "pnl_vs_entry": -0.13,
+     "stop_broken": false
+    }
+   ]
+  }
+ },
+ "recommend": {
+  "code": "002142",
+  "name": "宁波银行",
+  "total": 89.0,
+  "rating": "买入",
+  "stop": 34.46,
+  "target": 37.31
+ },
+ "eligible_pool": [
+  {
+   "code": "002142",
+   "name": "宁波银行",
+   "total": 89.0,
+   "rating": "买入"
+  },
+  {
+   "code": "600801",
+   "name": "华新建材",
+   "total": 82.4,
+   "rating": "买入"
+  },
+  {
+   "code": "600406",
+   "name": "国电南瑞",
+   "total": 74.6,
+   "rating": "增持"
+  },
+  {
+   "code": "600415",
+   "name": "小商品城",
+   "total": 74.4,
+   "rating": "增持"
+  },
+  {
+   "code": "603283",
+   "name": "赛腾股份",
+   "total": 69.5,
+   "rating": "增持"
+  },
+  {
+   "code": "600660",
+   "name": "福耀玻璃",
+   "total": 67.4,
+   "rating": "增持"
+  }
+ ],
+ "eastmoney_sync": {
+  "action": "create_zz_if_recommend",
+  "group_name": "20261118ZZ",
+  "precheck_20261118_occupied": {
+   "20261118": "2011"
+  },
+  "reason": "铁律合格池 Top1 002142 宁波银行 (89.0 买入) → 仅 Top1 入组"
+ },
+ "results": [
+  {
+   "code": "002142",
+   "name": "宁波银行",
+   "rank": 10,
+   "price": 35.53,
+   "pe_ttm": 7.32,
+   "pb": 0.96,
+   "mcap_yi": 2346.12,
+   "float_mcap_yi": 2346.26,
+   "turnover_pct": 0.55,
+   "vol_ratio": 0.95,
+   "v24_score": 64,
+   "report_tech": 78,
+   "ind_sina": "银行",
+   "ind_em": "银行Ⅱ",
+   "cold_weak_hits": [],
+   "tech_score": 55,
+   "fund_score": 19,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 85.87,
+    "single_q_loss": false
+   },
+   "total": 89.0,
+   "rating": "买入",
+   "target": 37.31,
+   "stop": 34.46,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=65 健康",
+    "20日区间位置 97% 突破区",
+    "60日涨幅 +12% 健康",
+    "量能比 0.95 正常"
+   ],
+   "fund_notes": [
+    "ROE 10.5% 良好",
+    "净利增速 +12%",
+    "营收增速 +11%"
+   ],
+   "val_notes": [
+    "PE 7 合理",
+    "PB 0.96 合理"
+   ],
+   "tech_stat": {
+    "rsi": 64.8,
+    "pos20": 97.0,
+    "chg60": 11.8,
+    "vol_ratio_5d": 0.95,
+    "ma5": 34.5,
+    "ma20": 34.08,
+    "ma60": 34.18,
+    "hi20": 35.63,
+    "lo20": 32.7,
+    "chg_1d": 0.85,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 10.4925,
+    "ni_growth": 12.047226,
+    "rev_growth": 11.343131
+   },
+   "chg_pct": 0.85,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "银行-城商行 (宁波本地中小微+消费贷特色, 不良率低位)",
+   "sector_stat_key": "银行",
+   "sector_win_rate": "75.0% (3/4)",
+   "sector_near": null,
+   "sector_cold_warn": null,
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 10
+  },
+  {
+   "code": "600801",
+   "name": "华新建材",
+   "rank": 5,
+   "price": 27.39,
+   "pe_ttm": 15.49,
+   "pb": 1.66,
+   "mcap_yi": 367.49,
+   "float_mcap_yi": 569.44,
+   "turnover_pct": 0.84,
+   "vol_ratio": 0.95,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "水泥制造",
+   "ind_em": "水泥",
+   "cold_weak_hits": [],
+   "tech_score": 40,
+   "fund_score": 26,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 11.135,
+    "single_q_loss": false
+   },
+   "total": 82.4,
+   "rating": "买入",
+   "target": 28.76,
+   "stop": 26.57,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=77 超买",
+    "20日区间位置 94% 突破区",
+    "60日涨幅 +20% 健康",
+    "量能比 0.95 正常"
+   ],
+   "fund_notes": [
+    "ROE 8.1% 良好",
+    "净利增速 +41%",
+    "营收增速 +19%"
+   ],
+   "val_notes": [
+    "PE 15 合理",
+    "PB 1.66 合理"
+   ],
+   "tech_stat": {
+    "rsi": 76.8,
+    "pos20": 94.0,
+    "chg60": 19.8,
+    "vol_ratio_5d": 0.95,
+    "ma5": 26.29,
+    "ma20": 24.22,
+    "ma60": 23.79,
+    "hi20": 27.78,
+    "lo20": 20.87,
+    "chg_1d": 1.94,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 8.12,
+    "ni_growth": 41.045704,
+    "rev_growth": 18.602031
+   },
+   "chg_pct": 1.94,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "建材-水泥+骨料 (华中水泥龙头, 水泥主业+海外布局)",
+   "sector_stat_key": "水泥制造",
+   "sector_win_rate": "100.0% (5/5)",
+   "sector_near": "远邻键-火电(2/3) 仅作参照: 67% (2/3)",
+   "sector_cold_warn": "冷启动预期: 水泥/建材类键不在板块胜率库",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 1
+  },
+  {
+   "code": "600406",
+   "name": "国电南瑞",
+   "rank": 3,
+   "price": 24.5,
+   "pe_ttm": 23.61,
+   "pb": 3.74,
+   "mcap_yi": 1962.0,
+   "float_mcap_yi": 1967.78,
+   "turnover_pct": 1.2,
+   "vol_ratio": 1.93,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "电网自动化",
+   "ind_em": "电网设备",
+   "cold_weak_hits": [],
+   "tech_score": 48,
+   "fund_score": 15,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 18.39,
+    "single_q_loss": false
+   },
+   "total": 74.6,
+   "rating": "增持",
+   "target": 25.73,
+   "stop": 23.77,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=66 偏热",
+    "20日区间位置 96% 突破区",
+    "60日涨幅 +5% 健康",
+    "量能比 1.93 正常"
+   ],
+   "fund_notes": [
+    "ROE 9.2% 良好",
+    "净利增速 +1%",
+    "营收增速 +14%"
+   ],
+   "val_notes": [
+    "PE 24 合理",
+    "PB 3.74 中等"
+   ],
+   "tech_stat": {
+    "rsi": 65.6,
+    "pos20": 96.0,
+    "chg60": 4.7,
+    "vol_ratio_5d": 1.93,
+    "ma5": 23.65,
+    "ma20": 23.53,
+    "ma60": 22.86,
+    "hi20": 24.59,
+    "lo20": 22.2,
+    "chg_1d": 1.28,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 9.2,
+    "ni_growth": 1.161038,
+    "rev_growth": 13.74689
+   },
+   "chg_pct": 1.28,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "电网设备-电网自动化+特高压+电力信息化龙头 (国网系二次设备绝对龙头)",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "sector_near": "邻键-火电(2/3): 67% (2/3)",
+   "sector_cold_warn": "冷启动预期: 电网设备/电力设备类键不在板块胜率库",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 7
+  },
+  {
+   "code": "600415",
+   "name": "小商品城",
+   "rank": 1,
+   "price": 12.47,
+   "pe_ttm": 16.25,
+   "pb": 2.97,
+   "mcap_yi": 683.8,
+   "float_mcap_yi": 683.8,
+   "turnover_pct": 0.8,
+   "vol_ratio": 1.33,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "专业市场",
+   "ind_em": "一般零售",
+   "cold_weak_hits": [],
+   "tech_score": 40,
+   "fund_score": 18,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 14.813,
+    "single_q_loss": false
+   },
+   "total": 74.4,
+   "rating": "增持",
+   "target": 13.09,
+   "stop": 12.1,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=77 超买",
+    "20日区间位置 100% 突破区",
+    "60日涨幅 +5% 健康",
+    "量能比 1.33 正常"
+   ],
+   "fund_notes": [
+    "ROE 14.1% 良好",
+    "净利增速 +0%",
+    "营收增速 +17%"
+   ],
+   "val_notes": [
+    "PE 16 合理",
+    "PB 2.97 合理"
+   ],
+   "tech_stat": {
+    "rsi": 77.0,
+    "pos20": 100.0,
+    "chg60": 5.5,
+    "vol_ratio_5d": 1.33,
+    "ma5": 12.17,
+    "ma20": 11.7,
+    "ma60": 11.72,
+    "hi20": 12.47,
+    "lo20": 10.18,
+    "chg_1d": 1.8,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 14.05,
+    "ni_growth": 0.092823,
+    "rev_growth": 17.288776
+   },
+   "chg_pct": 1.8,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "商贸零售-义乌小商品市场经营+Chinagoods 平台+贸易服务 (市场经营主业+数字贸易)",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "sector_near": null,
+   "sector_cold_warn": "冷启动预期: 商贸零售/贸易类键不在板块胜率库 (117 键无对应)",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 3
+  },
+  {
+   "code": "603283",
+   "name": "赛腾股份",
+   "rank": 2,
+   "price": 39.5,
+   "pe_ttm": 23.27,
+   "pb": 3.63,
+   "mcap_yi": 139.25,
+   "float_mcap_yi": 139.25,
+   "turnover_pct": 7.85,
+   "vol_ratio": 0.92,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "其它专用机械",
+   "ind_em": "自动化设备",
+   "cold_weak_hits": [
+    "cold:其它专用机械"
+   ],
+   "tech_score": 38,
+   "fund_score": 19,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 3.333,
+    "single_q_loss": false
+   },
+   "total": 69.5,
+   "rating": "增持",
+   "target": 46.44,
+   "stop": 38.31,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=57 健康",
+    "20日区间位置 51% 中上",
+    "60日涨幅 -20% 弱势",
+    "量能比 0.92 正常"
+   ],
+   "fund_notes": [
+    "ROE 14.0% 良好",
+    "净利增速 +28%",
+    "营收增速 +12%"
+   ],
+   "val_notes": [
+    "PE 23 合理",
+    "PB 3.63 中等"
+   ],
+   "tech_stat": {
+    "rsi": 56.8,
+    "pos20": 51.0,
+    "chg60": -20.2,
+    "vol_ratio_5d": 0.92,
+    "ma5": 41.73,
+    "ma20": 36.92,
+    "ma60": 41.47,
+    "hi20": 46.44,
+    "lo20": 32.34,
+    "chg_1d": 1.33,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 14.03,
+    "ni_growth": 28.289891,
+    "rev_growth": 12.259932
+   },
+   "chg_pct": 1.33,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "专用设备-3C 自动化检测设备+半导体量测设备 (并购瑞士 Optima 布局半导体检测)",
+   "sector_stat_key": "专用设备",
+   "sector_win_rate": "0.0% (0/1)",
+   "sector_near": "邻键-其它专用机械(1/1 薄样本, cold_sectors): 100% (1/1)",
+   "sector_cold_warn": "披露: 东财键「专用设备」胜率库 0% (0/1) 薄样本; sina 键「其它专用机械」在 cold_sectors (11-11 根因 E 冷启动盲区 8 板块之一)",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 5
+  },
+  {
+   "code": "600660",
+   "name": "福耀玻璃",
+   "rank": 4,
+   "price": 57.75,
+   "pe_ttm": 18.26,
+   "pb": 4.02,
+   "mcap_yi": 1156.72,
+   "float_mcap_yi": 1507.13,
+   "turnover_pct": 0.57,
+   "vol_ratio": 1.08,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "汽车零部件",
+   "ind_em": "汽车零部件",
+   "cold_weak_hits": [],
+   "tech_score": 40,
+   "fund_score": 15,
+   "val_score": 12,
+   "val_score_raw": 12,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 20.362,
+    "single_q_loss": false
+   },
+   "total": 67.4,
+   "rating": "增持",
+   "target": 60.64,
+   "stop": 56.02,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=83 超买",
+    "20日区间位置 100% 突破区",
+    "60日涨幅 +6% 健康",
+    "量能比 1.08 正常"
+   ],
+   "fund_notes": [
+    "ROE 15.7% 优秀",
+    "净利增速 -15% 负增长",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE 18 合理",
+    "PB 4.02 中等"
+   ],
+   "tech_stat": {
+    "rsi": 83.3,
+    "pos20": 100.0,
+    "chg60": 5.7,
+    "vol_ratio_5d": 1.08,
+    "ma5": 56.68,
+    "ma20": 54.68,
+    "ma60": 54.55,
+    "hi20": 57.75,
+    "lo20": 50.5,
+    "chg_1d": 0.96,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 15.66,
+    "ni_growth": -14.968793,
+    "rev_growth": 2.464975
+   },
+   "chg_pct": 0.96,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "汽车零部件-汽车玻璃全球龙头 (全球市占率 30%+, 智能玻璃升级)",
+   "sector_stat_key": "汽车零部件",
+   "sector_win_rate": "82.8% (24/29)",
+   "sector_near": null,
+   "sector_cold_warn": null,
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 9
+  },
+  {
+   "code": "000651",
+   "name": "格力电器",
+   "rank": 9,
+   "price": 40.66,
+   "pe_ttm": 9.18,
+   "pb": 1.51,
+   "mcap_yi": 2241.54,
+   "float_mcap_yi": 2277.53,
+   "turnover_pct": 1.15,
+   "vol_ratio": 1.49,
+   "v24_score": 64,
+   "report_tech": 78,
+   "ind_sina": "空调",
+   "ind_em": "白色家电",
+   "cold_weak_hits": [],
+   "tech_score": 40,
+   "fund_score": 8,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 39.962,
+    "single_q_loss": false
+   },
+   "total": 64.4,
+   "rating": "中性",
+   "target": 42.69,
+   "stop": 39.44,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=82 超买",
+    "20日区间位置 100% 突破区",
+    "60日涨幅 +7% 健康",
+    "量能比 1.49 正常"
+   ],
+   "fund_notes": [
+    "ROE 11.4% 良好",
+    "净利增速 -20% 负增长",
+    "营收增速 -8%"
+   ],
+   "val_notes": [
+    "PE 9 合理",
+    "PB 1.51 合理"
+   ],
+   "tech_stat": {
+    "rsi": 82.2,
+    "pos20": 100.0,
+    "chg60": 7.3,
+    "vol_ratio_5d": 1.49,
+    "ma5": 39.66,
+    "ma20": 38.49,
+    "ma60": 38.72,
+    "hi20": 40.68,
+    "lo20": 36.01,
+    "chg_1d": 1.27,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 11.43,
+    "ni_growth": -19.511931,
+    "rev_growth": -8.070318
+   },
+   "chg_pct": 1.27,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "家电-空调白电龙头 (空调主业+工业装备+再生资源)",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "sector_near": null,
+   "sector_cold_warn": "冷启动预期: 家电/白色家电类键不在板块胜率库",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 8
+  },
+  {
+   "code": "600483",
+   "name": "福能股份",
+   "rank": 6,
+   "price": 11.97,
+   "pe_ttm": 12.52,
+   "pb": 1.19,
+   "mcap_yi": 332.78,
+   "float_mcap_yi": 332.78,
+   "turnover_pct": 1.08,
+   "vol_ratio": 1.57,
+   "v24_score": 65,
+   "report_tech": 78,
+   "ind_sina": "火电",
+   "ind_em": "电力",
+   "cold_weak_hits": [],
+   "tech_score": 40,
+   "fund_score": 7,
+   "val_score": 15,
+   "val_score_raw": 15,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 3.625,
+    "single_q_loss": false
+   },
+   "total": 63.4,
+   "rating": "中性",
+   "target": 12.57,
+   "stop": 11.61,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=76 超买",
+    "20日区间位置 95% 突破区",
+    "60日涨幅 +16% 健康",
+    "量能比 1.57 正常"
+   ],
+   "fund_notes": [
+    "ROE 6.0% 一般",
+    "净利增速 -15% 负增长",
+    "营收增速 +2%"
+   ],
+   "val_notes": [
+    "PE 13 合理",
+    "PB 1.19 合理"
+   ],
+   "tech_stat": {
+    "rsi": 76.2,
+    "pos20": 95.0,
+    "chg60": 15.8,
+    "vol_ratio_5d": 1.57,
+    "ma5": 11.35,
+    "ma20": 10.83,
+    "ma60": 10.86,
+    "hi20": 12.07,
+    "lo20": 9.98,
+    "chg_1d": 1.87,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 6.05,
+    "ni_growth": -14.99411,
+    "rev_growth": 1.892919
+   },
+   "chg_pct": 1.87,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "电力-福建风电+火电+热电联产 (新能源运营商)",
+   "sector_stat_key": "火电",
+   "sector_win_rate": "66.7% (2/3)",
+   "sector_near": "邻键-热电(1/1 薄样本): 100% (1/1)",
+   "sector_cold_warn": null,
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 2
+  },
+  {
+   "code": "000066",
+   "name": "中国长城",
+   "rank": 8,
+   "price": 11.7,
+   "pe_ttm": 220.87,
+   "pb": 3.35,
+   "mcap_yi": 377.39,
+   "float_mcap_yi": 377.42,
+   "turnover_pct": 2.57,
+   "vol_ratio": 0.91,
+   "v24_score": 64,
+   "report_tech": 78,
+   "ind_sina": "计算机设备",
+   "ind_em": "计算机设备",
+   "cold_weak_hits": [
+    "cold:计算机设备",
+    "cold:计算机设备"
+   ],
+   "tech_score": 33,
+   "fund_score": 18,
+   "val_score": 4,
+   "val_score_raw": 4,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": -0.694,
+    "single_q_loss": true
+   },
+   "total": 53.3,
+   "rating": "中性",
+   "target": 13.55,
+   "stop": 11.35,
+   "tech_notes": [
+    "价>MA20",
+    "RSI=53 健康",
+    "20日区间位置 31% 偏低",
+    "60日涨幅 -23% 弱势",
+    "量能比 0.91 正常"
+   ],
+   "fund_notes": [
+    "ROE 2.2% 弱",
+    "净利增速 +1410%",
+    "营收增速 +32%"
+   ],
+   "val_notes": [
+    "PE 221 过高/异常",
+    "PB 3.35 中等"
+   ],
+   "tech_stat": {
+    "rsi": 52.9,
+    "pos20": 31.0,
+    "chg60": -23.0,
+    "vol_ratio_5d": 0.91,
+    "ma5": 11.84,
+    "ma20": 11.59,
+    "ma60": 13.32,
+    "hi20": 13.55,
+    "lo20": 10.88,
+    "chg_1d": 1.3,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 2.18,
+    "ni_growth": 1410.394456,
+    "rev_growth": 31.709528
+   },
+   "chg_pct": 1.3,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "计算机设备-信创 PC/服务器+飞腾 CPU 参股 (党政信创主力)",
+   "sector_stat_key": "计算机设备",
+   "sector_win_rate": "100.0% (1/1)",
+   "sector_near": null,
+   "sector_cold_warn": "披露: 东财键「计算机设备」在 cold_sectors (11-11 根因 E 冷启动盲区), 胜率库 100% (1/1) 薄样本不可依赖",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 6
+  },
+  {
+   "code": "002945",
+   "name": "华林证券",
+   "rank": 7,
+   "price": 15.9,
+   "pe_ttm": 92.43,
+   "pb": 5.71,
+   "mcap_yi": 429.3,
+   "float_mcap_yi": 429.3,
+   "turnover_pct": 1.63,
+   "vol_ratio": 1.31,
+   "v24_score": 64,
+   "report_tech": 78,
+   "ind_sina": "证券",
+   "ind_em": "证券Ⅱ",
+   "cold_weak_hits": [],
+   "tech_score": 44,
+   "fund_score": 7,
+   "val_score": 1,
+   "val_score_raw": 1,
+   "distorted": false,
+   "single_quarter": {
+    "period": "20260930",
+    "single_q_yi": 1.404,
+    "single_q_loss": false
+   },
+   "total": 48.3,
+   "rating": "减持",
+   "target": 16.7,
+   "stop": 15.42,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=65 偏热",
+    "20日区间位置 79% 中上",
+    "60日涨幅 +10% 健康",
+    "量能比 1.31 正常"
+   ],
+   "fund_notes": [
+    "ROE 5.4% 一般",
+    "净利增速 -9% 负增长",
+    "营收增速 +9%"
+   ],
+   "val_notes": [
+    "PE 92 过高/异常",
+    "PB 5.71 偏高"
+   ],
+   "tech_stat": {
+    "rsi": 65.4,
+    "pos20": 79.0,
+    "chg60": 9.8,
+    "vol_ratio_5d": 1.31,
+    "ma5": 15.68,
+    "ma20": 15.13,
+    "ma60": 14.66,
+    "hi20": 16.47,
+    "lo20": 13.78,
+    "chg_1d": 1.53,
+    "last_date": "2026-11-17",
+    "kline_len": 120
+   },
+   "fund_stat": {
+    "roe": 5.37,
+    "ni_growth": -9.49497,
+    "rev_growth": 8.667944
+   },
+   "chg_pct": 1.53,
+   "chg_date": "2026-11-17",
+   "beat_mkt": true,
+   "positive": true,
+   "industry": "证券-经纪+自营中小券商 (互联网证券差异化)",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "sector_near": null,
+   "sector_cold_warn": "冷启动预期: 证券/券商类键不在板块胜率库",
+   "hot_sector_overlap": [],
+   "stop_broken": false,
+   "chg_rank": 4
+  }
+ ]
+}
