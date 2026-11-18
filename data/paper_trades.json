@@ -6402,90 +6402,119 @@
       "reason": "AAna v2.4 尾盘评分 97",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "000700",
+      "name": "模塑科技",
+      "action": "sell",
+      "price": 15.14,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 24.0,
+      "pnl_pct": 1.61
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002432",
+      "name": "九安医疗",
+      "action": "sell",
+      "price": 54.08,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 5.0,
+      "pnl_pct": 0.09
+    },
+    {
+      "date": "2026-11-18",
+      "code": "000066",
+      "name": "中国长城",
+      "action": "sell",
+      "price": 11.79,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 11.0,
+      "pnl_pct": 0.94
+    },
+    {
+      "date": "2026-11-18",
+      "code": "003015",
+      "name": "日久光电",
+      "action": "sell",
+      "price": 11.89,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 7.0,
+      "pnl_pct": 0.59
+    },
+    {
+      "date": "2026-11-18",
+      "code": "600096",
+      "name": "云天化",
+      "action": "sell",
+      "price": 26.76,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 7.0,
+      "pnl_pct": 0.26
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002392",
+      "name": "北京利尔",
+      "action": "sell",
+      "price": 6.67,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 4.0,
+      "pnl_pct": 0.6
+    },
+    {
+      "date": "2026-11-18",
+      "code": "000938",
+      "name": "紫光股份",
+      "action": "sell",
+      "price": 24.79,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 14.0,
+      "pnl_pct": 0.57
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002947",
+      "name": "恒铭达",
+      "action": "sell",
+      "price": 46.28,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 81.0,
+      "pnl_pct": 1.78
+    },
+    {
+      "date": "2026-11-18",
+      "code": "603283",
+      "name": "赛腾股份",
+      "action": "sell",
+      "price": 40.0,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 68.0,
+      "pnl_pct": 1.73
+    },
+    {
+      "date": "2026-11-18",
+      "code": "600629",
+      "name": "华建集团",
+      "action": "sell",
+      "price": 15.45,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 7.0,
+      "pnl_pct": 0.46
     }
   ],
-  "positions": {
-    "000700": {
-      "date": "2026-11-17",
-      "name": "模塑科技",
-      "shares": 100,
-      "entry_price": 14.9,
-      "highest_price": 14.9,
-      "entry_date": "2026-11-17"
-    },
-    "002432": {
-      "date": "2026-11-17",
-      "name": "九安医疗",
-      "shares": 100,
-      "entry_price": 54.03,
-      "highest_price": 54.03,
-      "entry_date": "2026-11-17"
-    },
-    "000066": {
-      "date": "2026-11-17",
-      "name": "中国长城",
-      "shares": 100,
-      "entry_price": 11.68,
-      "highest_price": 11.68,
-      "entry_date": "2026-11-17"
-    },
-    "003015": {
-      "date": "2026-11-17",
-      "name": "日久光电",
-      "shares": 100,
-      "entry_price": 11.82,
-      "highest_price": 11.82,
-      "entry_date": "2026-11-17"
-    },
-    "600096": {
-      "date": "2026-11-17",
-      "name": "云天化",
-      "shares": 100,
-      "entry_price": 26.69,
-      "highest_price": 26.69,
-      "entry_date": "2026-11-17"
-    },
-    "002392": {
-      "date": "2026-11-17",
-      "name": "北京利尔",
-      "shares": 100,
-      "entry_price": 6.63,
-      "highest_price": 6.63,
-      "entry_date": "2026-11-17"
-    },
-    "000938": {
-      "date": "2026-11-17",
-      "name": "紫光股份",
-      "shares": 100,
-      "entry_price": 24.65,
-      "highest_price": 24.7,
-      "entry_date": "2026-11-17"
-    },
-    "002947": {
-      "date": "2026-11-17",
-      "name": "恒铭达",
-      "shares": 100,
-      "entry_price": 45.47,
-      "highest_price": 45.47,
-      "entry_date": "2026-11-17"
-    },
-    "603283": {
-      "date": "2026-11-17",
-      "name": "赛腾股份",
-      "shares": 100,
-      "entry_price": 39.32,
-      "highest_price": 39.32,
-      "entry_date": "2026-11-17"
-    },
-    "600629": {
-      "date": "2026-11-17",
-      "name": "华建集团",
-      "shares": 100,
-      "entry_price": 15.38,
-      "highest_price": 15.38,
-      "entry_date": "2026-11-17"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -7593,6 +7622,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-18",
+      "cash": 96971.0,
+      "position_value": 0.0,
+      "total_value": 96971.0,
+      "daily_pnl": 223.0,
+      "total_pnl": -3029.0,
+      "total_pnl_pct": -3.03,
+      "realized_pnl": -3029.0,
+      "positions": []
     }
   ]
 }
