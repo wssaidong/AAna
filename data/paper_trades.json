@@ -6512,9 +6512,200 @@
       "reason": "止损/止盈/到期",
       "pnl": 7.0,
       "pnl_pct": 0.46
+    },
+    {
+      "date": "2026-11-18",
+      "code": "601689",
+      "name": "拓普集团",
+      "action": "buy",
+      "price": 47.77,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "603928",
+      "name": "兴业股份",
+      "action": "buy",
+      "price": 11.2,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002664",
+      "name": "信质集团",
+      "action": "buy",
+      "price": 12.47,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "001228",
+      "name": "永泰运",
+      "action": "buy",
+      "price": 32.11,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "600295",
+      "name": "鄂尔多斯",
+      "action": "buy",
+      "price": 15.08,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "601918",
+      "name": "新集能源",
+      "action": "buy",
+      "price": 9.79,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "003030",
+      "name": "祖名股份",
+      "action": "buy",
+      "price": 22.62,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "603082",
+      "name": "北自科技",
+      "action": "buy",
+      "price": 40.99,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002406",
+      "name": "远东传动",
+      "action": "buy",
+      "price": 6.28,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-18",
+      "code": "002289",
+      "name": "宇顺电子",
+      "action": "buy",
+      "price": 31.67,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 97",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "601689": {
+      "date": "2026-11-18",
+      "name": "拓普集团",
+      "shares": 100,
+      "entry_price": 47.77,
+      "highest_price": 48.11,
+      "entry_date": "2026-11-18"
+    },
+    "603928": {
+      "date": "2026-11-18",
+      "name": "兴业股份",
+      "shares": 100,
+      "entry_price": 11.2,
+      "highest_price": 11.25,
+      "entry_date": "2026-11-18"
+    },
+    "002664": {
+      "date": "2026-11-18",
+      "name": "信质集团",
+      "shares": 100,
+      "entry_price": 12.47,
+      "highest_price": 12.5,
+      "entry_date": "2026-11-18"
+    },
+    "001228": {
+      "date": "2026-11-18",
+      "name": "永泰运",
+      "shares": 100,
+      "entry_price": 32.11,
+      "highest_price": 32.11,
+      "entry_date": "2026-11-18"
+    },
+    "600295": {
+      "date": "2026-11-18",
+      "name": "鄂尔多斯",
+      "shares": 100,
+      "entry_price": 15.08,
+      "highest_price": 15.08,
+      "entry_date": "2026-11-18"
+    },
+    "601918": {
+      "date": "2026-11-18",
+      "name": "新集能源",
+      "shares": 100,
+      "entry_price": 9.79,
+      "highest_price": 9.79,
+      "entry_date": "2026-11-18"
+    },
+    "003030": {
+      "date": "2026-11-18",
+      "name": "祖名股份",
+      "shares": 100,
+      "entry_price": 22.62,
+      "highest_price": 22.62,
+      "entry_date": "2026-11-18"
+    },
+    "603082": {
+      "date": "2026-11-18",
+      "name": "北自科技",
+      "shares": 100,
+      "entry_price": 40.99,
+      "highest_price": 40.99,
+      "entry_date": "2026-11-18"
+    },
+    "002406": {
+      "date": "2026-11-18",
+      "name": "远东传动",
+      "shares": 100,
+      "entry_price": 6.28,
+      "highest_price": 6.28,
+      "entry_date": "2026-11-18"
+    },
+    "002289": {
+      "date": "2026-11-18",
+      "name": "宇顺电子",
+      "shares": 100,
+      "entry_price": 31.67,
+      "highest_price": 31.67,
+      "entry_date": "2026-11-18"
+    }
+  },
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -7633,6 +7824,128 @@
       "total_pnl_pct": -3.03,
       "realized_pnl": -3029.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-18",
+      "cash": 73973.0,
+      "position_value": 23040.0,
+      "total_value": 97013.0,
+      "daily_pnl": 42.0,
+      "total_pnl": -2987.0,
+      "total_pnl_pct": -2.99,
+      "realized_pnl": -3029.0,
+      "positions": [
+        {
+          "code": "601689",
+          "name": "拓普集团",
+          "shares": 100,
+          "entry_price": 47.77,
+          "current_price": 48.11,
+          "highest_price": 48.11,
+          "unreal_pnl": 34.0,
+          "unreal_pct": 0.71,
+          "days_held": 0
+        },
+        {
+          "code": "603928",
+          "name": "兴业股份",
+          "shares": 100,
+          "entry_price": 11.2,
+          "current_price": 11.25,
+          "highest_price": 11.25,
+          "unreal_pnl": 5.0,
+          "unreal_pct": 0.45,
+          "days_held": 0
+        },
+        {
+          "code": "002664",
+          "name": "信质集团",
+          "shares": 100,
+          "entry_price": 12.47,
+          "current_price": 12.5,
+          "highest_price": 12.5,
+          "unreal_pnl": 3.0,
+          "unreal_pct": 0.24,
+          "days_held": 0
+        },
+        {
+          "code": "001228",
+          "name": "永泰运",
+          "shares": 100,
+          "entry_price": 32.11,
+          "current_price": 32.11,
+          "highest_price": 32.11,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600295",
+          "name": "鄂尔多斯",
+          "shares": 100,
+          "entry_price": 15.08,
+          "current_price": 15.08,
+          "highest_price": 15.08,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "601918",
+          "name": "新集能源",
+          "shares": 100,
+          "entry_price": 9.79,
+          "current_price": 9.79,
+          "highest_price": 9.79,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "003030",
+          "name": "祖名股份",
+          "shares": 100,
+          "entry_price": 22.62,
+          "current_price": 22.62,
+          "highest_price": 22.62,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603082",
+          "name": "北自科技",
+          "shares": 100,
+          "entry_price": 40.99,
+          "current_price": 40.99,
+          "highest_price": 40.99,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002406",
+          "name": "远东传动",
+          "shares": 100,
+          "entry_price": 6.28,
+          "current_price": 6.28,
+          "highest_price": 6.28,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002289",
+          "name": "宇顺电子",
+          "shares": 100,
+          "entry_price": 31.67,
+          "current_price": 31.67,
+          "highest_price": 31.67,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
