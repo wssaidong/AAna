@@ -127,6 +127,60 @@ def is_trading_day(date_str=None):
 def get_report_filename(report_type='选股报告'):
     return f"{REPORT_DIR}/{get_today_str()}-{report_type}.md"
 
+
+def get_premarket_filename():
+    """盘前口径选股报告的**留档**文件名（不会被后续重跑覆盖）。"""
+    return f"{REPORT_DIR}/{get_today_str()}-选股报告-盘前版.md"
+
+
+def preserve_premarket_version(filename, today):
+    """把**盘前口径**（生成时间 < 09:30）的选股报告另存为盘前版留档。
+
+    ⚠️ 2026-11-17 实战（v1.41）: 盘前版报告此前**从未留档**，被 09:37/09:48
+    的开盘后重跑**原地覆盖**（同一文件名 `reports/{date}-选股报告.md`）。
+    后果: 盘后战报的四源回捞（工作区 / git HEAD / git 历史 / 深度分析 JSON）
+    **全部拿不到昨收口径**（工作区与 git HEAD 都是开盘后重跑版），
+    只能回落到"口径未确认"兜底 → 候选池 baseline 变成**当日盘中实时涨幅**,
+    与当日收盘自指 → 命中率/超额/延续性 Δ 全部失真。
+
+    同时: 08:00 那趟 launchd 跑的是 generate_report.py（**不是** premarket_agent.py），
+    所以盘前版报告确实会生成，只是被覆盖。本函数在**覆盖之前**把它留档。
+
+    留档条件（三个都要满足）:
+      1. 目标文件已存在（旧内容 = 即将被覆盖的盘前版）
+      2. 旧内容的"生成时间"在 **09:30 之前**（盘前口径）
+      3. 旧内容的日期与今天一致
+    已存在留档文件时**不覆盖**（08:00 那趟是第一个写盘前版的，留档就是它）。
+
+    返回留档路径（未留档则 None）。
+    """
+    import re as _re
+    if not filename or not os.path.exists(filename):
+        return None
+    try:
+        with open(filename, encoding='utf-8') as f:
+            old = f.read()
+    except OSError:
+        return None
+    m = _re.search(r"\*\*生成时间：\*\*\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2})", old)
+    if not m:
+        return None
+    gen_date, hh, mm = m.group(1), int(m.group(2)), int(m.group(3))
+    if gen_date != today:
+        return None
+    if (hh, mm) >= (9, 30):
+        return None  # 开盘后重跑版 —— 不留档（它不是盘前口径）
+    dest = get_premarket_filename()
+    if os.path.exists(dest):
+        return dest
+    try:
+        with open(dest, 'w', encoding='utf-8') as f:
+            f.write(old)
+    except OSError:
+        return None
+    print(f"[AAna] 盘前版选股报告已留档: {dest}")
+    return dest
+
 def cleanup_old_reports(days=7):
     """清理超过 days 天的旧报告（选股报告、尾盘选股、快快照）"""
     import glob, time
@@ -1424,6 +1478,7 @@ def generate_report():
 
     # ========== 保存报告 ==========
     os.makedirs(REPORT_DIR, exist_ok=True)
+    preserve_premarket_version(filename, today)
     with open(filename, 'w', encoding='utf-8') as f:
         f.write(content)
     print(f"[AAna] 选股报告已生成: {filename}")
@@ -1727,8 +1782,8 @@ REC_TUNING = {
     "score_threshold": 60,
     "hold_days": 1,
     "weak_sectors": ['造纸', 'semi', '印制电路板', '其他化学制品', '房地产开发', '其他家用轻工', '影视动漫', '装修装饰'],
-    "overall_win_rate": 50.1,
-    "total_records": 439,
-    "generated_at": "2026-11-16T20:00:34.132115",
+    "overall_win_rate": 50.0,
+    "total_records": 450,
+    "generated_at": "2026-11-18T20:00:37.760071",
 }
 # === REC_OPTIMIZER_TUNING_END ===
