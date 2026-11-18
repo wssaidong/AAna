@@ -1,5 +1,5 @@
 {
-  "date_for": "2026-11-18",
+  "date_for": "2026-11-19",
   "score_threshold": 63,
   "hold_days": 1,
   "weak_sectors": [
@@ -16,14 +16,9 @@
   "position_base": 50,
   "watchlist": [],
   "cold_sectors": [
-    "医疗器械",
-    "计算机设备",
-    "化工",
-    "耐火材料",
-    "IT服务",
-    "其它专用机械",
-    "房屋建设",
-    "铅锌"
+    "其他化学原料",
+    "物流",
+    "其他采掘"
   ],
   "tuning_log": [
     {
@@ -50,21 +45,16 @@
       "weak_sectors_added": [],
       "watchlist": [],
       "cold_sectors": [
-        "医疗器械",
-        "计算机设备",
-        "化工",
-        "耐火材料",
-        "IT服务",
-        "其它专用机械",
-        "房屋建设",
-        "铅锌"
+        "其他化学原料",
+        "物流",
+        "其他采掘"
       ],
       "reasons": [
-        "E. 冷启动盲区: 8 只来自 8 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['医疗器械', '计算机设备', '化工', '耐火材料', 'IT服务']"
+        "E. 冷启动盲区: 4 只来自 3 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['其他化学原料', '物流', '其他采掘']"
       ]
     }
   ],
-  "generated_at": "2026-11-17T16:10:39",
+  "generated_at": "2026-11-18T16:10:35",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
