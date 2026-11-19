@@ -1,6 +1,6 @@
 {
-  "date_for": "2026-11-19",
-  "score_threshold": 63,
+  "date_for": "2026-11-20",
+  "score_threshold": 60,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
@@ -12,14 +12,10 @@
     "装修装饰",
     "造纸"
   ],
-  "position_final": 45,
+  "position_final": 50,
   "position_base": 50,
   "watchlist": [],
-  "cold_sectors": [
-    "其他化学原料",
-    "物流",
-    "其他采掘"
-  ],
+  "cold_sectors": [],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -40,21 +36,15 @@
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 3,
-      "position_delta": -5,
+      "threshold_delta": 0,
+      "position_delta": 0,
       "weak_sectors_added": [],
       "watchlist": [],
-      "cold_sectors": [
-        "其他化学原料",
-        "物流",
-        "其他采掘"
-      ],
-      "reasons": [
-        "E. 冷启动盲区: 4 只来自 3 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['其他化学原料', '物流', '其他采掘']"
-      ]
+      "cold_sectors": [],
+      "reasons": []
     }
   ],
-  "generated_at": "2026-11-18T16:10:35",
+  "generated_at": "2026-11-19T16:10:35",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
