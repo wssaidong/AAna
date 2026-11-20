@@ -1,11 +1,11 @@
 {
-  "date": "2026-11-19",
+  "date": "2026-11-20",
   "total_recs": 0,
   "win_count": 0,
   "fail_count": 0,
   "no_data": 0,
   "win_rate": 0,
-  "baseline": 0.008955186230993895,
+  "baseline": -2.7443813974697697,
   "baseline_source": "腾讯实时快照 close-to-close",
   "causes": {
     "A_板块错配": {
@@ -26,7 +26,7 @@
     "D_大盘错配": {
       "hit": false,
       "items": [],
-      "summary": "大盘 +0.01% 正常, 非大盘错配"
+      "summary": "无当日推荐"
     },
     "E_冷启动盲区": {
       "hit": false,
