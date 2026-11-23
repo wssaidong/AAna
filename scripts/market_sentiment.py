@@ -46,7 +46,7 @@ def get_market_sentiment() -> dict:
 
     # ── 涨跌停数量 ──
     zt_count, dt_count, limit_data_source = get_limit_counts()
-    print(f"[情绪] 涨停:{zt_count} 跌停:{dt_count} 上证:{avg_change:+.2f}% [数据源:{limit_data_source}]")
+    print(f"[情绪] 涨停:{zt_count} 跌停:{dt_count} 指数均值:{avg_change:+.2f}% [数据源:{limit_data_source}]")
 
     # ── 情绪分计算 ──
     score = 50  # 基础分
