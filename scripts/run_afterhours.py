@@ -53,6 +53,66 @@ def tencent_quote(codes):
     return ds.tencent_quote(codes)
 
 
+def _kline_daily_closes(symbol, count=8):
+    """腾讯日K（qfq）→ [(date, close), ...]，按日期升序。
+
+    端点矩阵: fqkline/qfq → WAF 501 时降级 kline/kline 非复权
+    （与 scripts/deep_analysis_20261103.py 同款降级策略）。
+    """
+    for path, var in (("fqkline/get", "qfqday"), ("kline/kline", "day")):
+        try:
+            if path == "fqkline/get":
+                url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+                param = f"{symbol},day,,,{count},qfq"
+            else:
+                url = "https://web.ifzq.gtimg.cn/appstock/app/kline/kline"
+                param = f"{symbol},day,,,{count},"
+            r = requests.get(url, params={"param": param},
+                             headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+            data = (r.json() or {}).get("data") or {}
+            node = data.get(symbol) or {}
+            rows = node.get(var) or node.get("day") or []
+            if rows:
+                return [(row[0], float(row[2])) for row in rows
+                        if len(row) > 2 and row[2]]
+        except Exception:
+            continue
+    return []
+
+
+def rebuild_prev_close_baselines(codes, date_str):
+    """用腾讯日K 重建候选池的**昨收口径** baseline（基准日收盘涨跌幅）。
+
+    ⚠️ 2026-11-17 实战（v1.41）: 当上游只留下**开盘后重跑版**报告时，
+    报告里的"涨跌幅"列是**当日盘中实时涨幅**，与当日收盘自指 —— 拿它当
+    baseline 会算出"Δ = 当日收盘 − 当日盘中"的自指比较（v1.30 已警告过）。
+    四源回捞全落空 → 兜底用 intraday 列 → 命中率/超额/延续性全部失真。
+
+    本函数直接从日K 取**基准日（date_str 前一交易日）的收盘涨跌幅**：
+      baseline = (基准日收盘 / 基准日前一交易日收盘 − 1) × 100
+    这与 skill 定义的"昨收口径 baseline"（报告 08:03 生成时列里写的就是
+    昨日收盘涨跌幅）**同源**，且逐股可独立核对。
+
+    返回 {code: baseline_pct}；取不到的 code 不出现在 dict 中。
+    """
+    out = {}
+    for code in codes:
+        symbol = f"{_code_prefix(code)}{code}"
+        closes = _kline_daily_closes(symbol)
+        if len(closes) < 2:
+            continue
+        # 只用 date_str **之前**的交易日（排除当日），取最后两个收盘
+        prior = [(d, c) for d, c in closes if d < date_str]
+        if len(prior) < 2:
+            continue
+        base_day, base_close = prior[-1]
+        _, prev_close = prior[-2]
+        if not prev_close:
+            continue
+        out[code] = (base_close / prev_close - 1) * 100
+    return out
+
+
 def get_indices():
     """上证/深证/创业板/中小100/沪深300/科创50 — 用 ds.tencent_quote"""
     codes = ["sh000001", "sz399001", "sz399006", "sz399005", "sz399300", "sh000688"]
@@ -367,6 +427,36 @@ def dedupe_industry_hierarchy(rows):
     return out
 
 
+def filter_tiny_industry_boards(rows, min_constituents=3):
+    """剔除**成分股过少**的东财行业板块（伪"行业"）。
+
+    ⚠️ 2026-11-20 新增（v1.43）: 东财 m:90+t:2 的 496 个板块里混着大量
+    **只有 1~2 只成分股的迷你板块**，它们会挤占涨幅/跌幅榜前列，但**根本不构成
+    一个行业**。2026-11-20 实测:
+      - 涨幅 #1「其他数字媒体 +15.00%」→ 实际只有 **2 只**成分股
+        （301313 凡拓数创 +20.00% / 603466 风语筑 +10.00%）—— 这是**两只票**
+        的算术平均，不是行业涨幅；
+      - 跌幅 #1「涂料 -8.84%」→ 同样只有 **2 只**成分股。
+    全量 456 个基名里 **成分股 <3 的有 23 个、<5 的有 74 个** —— 不做过滤，
+    战报会把"两只票的均值"报成"今日最强行业/最弱行业"。
+
+    成分股数由东财 `f104`(上涨家数) + `f105`(下跌家数) 给出（已在
+    data_sources.industry_comparison 的 rows 里），**无需额外请求**。
+
+    注意: 只做**展示层**过滤，不改源数据（与 v1.14 ST板块 / v1.36 伪题材
+    同族纪律）。被剔除的板块数通过返回值如实披露，不静默丢弃。
+    """
+    kept, dropped = [], []
+    for r in rows or []:
+        n = int(r.get("up_count") or 0) + int(r.get("down_count") or 0)
+        # 拿不到成分股数（字段缺失）→ 保守保留，避免误杀真实板块
+        if n >= min_constituents or n == 0:
+            kept.append(r)
+        else:
+            dropped.append(r)
+    return kept, dropped
+
+
 def get_industry_ranking(top_n=10):
     """东财行业涨跌 — 用 ds.industry_comparison（已内置 fid=f3 排序 + 全量分页）
 
@@ -394,6 +484,11 @@ def get_industry_ranking(top_n=10):
     bottom = dedupe_industry_hierarchy(raw.get("bottom", []) or [])
     source = raw.get("source", "scripts.data_sources.industry_comparison")
     error = raw.get("error", "")
+    # ⚠️ 2026-11-20 新增（v1.43）: 剔除成分股 <3 的迷你"伪行业"板块，
+    # 避免把"两只票的算术平均"报成"今日最强/最弱行业"。剔除数如实披露。
+    top, top_dropped = filter_tiny_industry_boards(top)
+    bottom, bottom_dropped = filter_tiny_industry_boards(bottom)
+    tiny_dropped = len(top_dropped) + len(bottom_dropped)
 
     if not top:
         # 东财不可用 → 同花顺行业板块兜底
@@ -423,6 +518,7 @@ def get_industry_ranking(top_n=10):
         "universe": raw.get("universe", raw.get("total", 0)),
         "source": source,
         "error": error,
+        "tiny_dropped": tiny_dropped,
     }
 
 
@@ -785,11 +881,23 @@ def resolve_candidate_pool(date_str):
     """解析候选池, 返回 (rows, source_label, note, semantics)。
 
     来源优先级（全部要求 **昨收口径**, 否则 baseline 与当日收盘自指）:
+      0. 工作区 {date}-选股报告-盘前版.md（**盘前版留档**, v1.41 新增）
       1. 工作区 {date}-选股报告.md（若为盘前口径）
       2. git HEAD 的同名文件（若为盘前口径）
       3. git 历史中最新的盘前口径版本（HEAD 已被开盘后重跑覆盖时）
       4. {date}-深度分析.md 的"二、候选池"表格（列名即基准日涨跌）
     兜底: 任意版本 + 明确的口径警示
+
+    ⚠️ 2026-11-17 实战（v1.41）: 盘前版报告此前**从未留档**，被 09:37/09:48
+    的开盘后重跑**原地覆盖**（同一文件名）→ 工作区与 git HEAD 都是开盘后
+    重跑版 → 四源回捞全落空 → 只能回落到"口径未确认"兜底 → baseline 变成
+    **当日盘中实时涨幅**（与当日收盘自指）→ 命中率/超额/延续性 Δ 全部失真
+    （2026-11-17 实测兜底算出的命中率为 5/7=71.4%、超额 +2.71pp，
+    而真实昨收口径下是 5/7=71.4%、baseline 均值 -0.35%，
+    **命中集合完全不同** —— 002889 东方嘉盛昨收 -4.55%（当日 +9.98% 涨停）
+    在真实口径下是"低吸反转"而非"延续"，归因结论也随之改变）。
+    修复: 上游 generate_report.py 在覆盖前把盘前版另存为
+    `{date}-选股报告-盘前版.md`，本函数把它作为**最高优先级**回捞源。
 
     ⚠️ 2026-10-26 实战: 工作区文件 09:39 被重跑覆盖成 Top10 空表
     (情绪 25 冰点/停止交易), 直接读会把**真实存在并已同步东财**的
@@ -816,6 +924,19 @@ def resolve_candidate_pool(date_str):
     并标注"上游冰点守卫短路, 0 推荐属设计行为", 绝不回落到开盘后重跑版。
     """
     notes = []
+
+    # 0) 盘前版留档（v1.41 新增，最高优先级）
+    #    上游 generate_report.py 在被开盘后重跑覆盖前把盘前口径版本另存为
+    #    `{date}-选股报告-盘前版.md` —— 该文件**永远**是昨收口径。
+    try:
+        with open(f"{REPORT_DIR}/{date_str}-选股报告-盘前版.md") as f:
+            content = f.read()
+        rows = parse_top10_content(content)
+        sem = detect_baseline_semantics(content, date_str)
+        if rows and sem == "prev_close":
+            return rows, "选股报告(盘前版留档·昨收口径)", "", sem
+    except FileNotFoundError:
+        pass
 
     # 1) 工作区
     try:
@@ -927,11 +1048,27 @@ def resolve_candidate_pool(date_str):
         return [], f"深度分析报告确认空池（{date_str}·冰点守卫）", "".join(notes), "prev_close"
 
     # 兜底: 工作区任意版本（口径异常时显式警示）
+    # ⚠️ 2026-11-17 实战（v1.41）: 兜底拿到的若是**开盘后重跑版**，它的
+    # "涨跌幅"列是当日盘中实时涨幅 → 与当日收盘自指。这里用**腾讯日K**
+    # 逐股重建**昨收口径 baseline**（基准日收盘涨跌幅），让命中率/超额/
+    # 延续性 Δ 恢复可比口径，而不是拿自指值糊弄过去。
     try:
         with open(f"{REPORT_DIR}/{date_str}-选股报告.md") as f:
             content = f.read()
         rows = parse_top10_content(content)
         if rows:
+            sem_fallback = detect_baseline_semantics(content, date_str)
+            rebuilt = {}
+            if sem_fallback != "prev_close":
+                rebuilt = rebuild_prev_close_baselines([c for c, _, _ in rows], date_str)
+            if rebuilt and len(rebuilt) >= max(1, len(rows) // 2):
+                rows = [(c, n, rebuilt.get(c, b)) for c, n, b in rows]
+                notes.append(
+                    f"⚠️ 未回捞到盘前口径版本（工作区为{'开盘后重跑版' if sem_fallback == 'intraday' else '口径未确认'}），"
+                    f"已用**腾讯日K重建昨收口径 baseline**（{len(rebuilt)}/{len(rows)} 只，基准日=前一交易日收盘涨跌幅）"
+                )
+                return (rows, f"选股报告(工作区·日K重建昨收baseline)",
+                        "".join(notes), "prev_close")
             notes.append("⚠️ 未能回捞到盘前口径版本，'涨跌幅'列口径未确认")
             return rows, "选股报告(工作区·口径未确认)", "".join(notes), "unknown"
     except FileNotFoundError:
@@ -1297,20 +1434,44 @@ def _gap_source_warning(gap_source, date_str):
     """
     if not gap_source:
         return ""
+    src_name = (gap_source or "").rsplit("/", 1)[-1]
+    # ⚠️ 2026-11-19 实战（v1.42）: **可信度提示必须指名实际文件**，不能写死
+    # "（尾盘选股.md）"。2026-11-19 实战: 实际数据源是
+    # `reports/2026-11-19/盘中/2026-11-19_1445_尾盘分析.md`（**首选源**），
+    # 但旧代码的"无生成时间字段"分支写死了 "（尾盘选股.md）…历史已连续确认失真，
+    # 优先级应低于盘中报告，此处为兜底" → 战报同一行里既说数据源是盘中报告，
+    # 又说该源是"优先级应低于盘中报告的失真兜底"，**自相矛盾**且完全说反了。
+    is_intraday = ("/盘中/" in gap_source) or ("盘中" in src_name)
     try:
         with open(gap_source) as f:
             content = f.read()
     except (FileNotFoundError, OSError):
         return "⚠️ 该源生成时间不可读，可能为陈旧快照；"
+    gen_date = hh = mm = None
+    # 格式①（尾盘选股.md 等）: "> **生成时间：** 2026-11-19 14:45:39"
     m = re.search(r"\*\*生成时间：\*\*\s*(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2})", content)
-    if not m:
+    if m:
+        gen_date, hh, mm = m.group(1), int(m.group(2)), int(m.group(3))
+    else:
+        # 格式②（盘中子Agent 报告）: "> 📊 盘中子Agent | 生成时间: 14:45:01"
+        # ⚠️ 该格式**没有日期**，只有时间 —— 旧正则要求"日期+时间"，因此盘中报告
+        # 永远匹配不上 → 被误判成"无生成时间字段"的失真文件。
+        m2 = re.search(r"生成时间[:：]\s*(\d{1,2}):(\d{2})(?::\d{2})?", content)
+        if m2:
+            hh, mm = int(m2.group(1)), int(m2.group(2))
+            md = (re.search(r"(\d{4}-\d{2}-\d{2})", content)
+                  or re.search(r"(\d{4}-\d{2}-\d{2})", gap_source))
+            gen_date = md.group(1) if md else date_str
+    if gen_date is None:
+        if is_intraday:
+            return (f"⚠️ 该源（{src_name}）为盘中报告但未找到可解析的生成时间字段，"
+                    "无法确认其快照时点，谨慎参考；")
         # 2026-06-16/23、07-02、07-13 这批失真文件**根本没有**生成时间字段
-        return ("⚠️ 该源（尾盘选股.md）无生成时间字段，历史已连续确认失真，"
+        return (f"⚠️ 该源（{src_name}）无生成时间字段，历史已连续确认失真，"
                 "优先级应低于盘中报告，此处为兜底；")
-    gen_date, hh, mm = m.group(1), int(m.group(2)), int(m.group(3))
     if gen_date == date_str and (14, 0) <= (hh, mm) <= (15, 5):
         return f"（{gen_date} {hh:02d}:{mm:02d} 真实盘中快照）"
-    return (f"⚠️ 该源生成时间为 {gen_date} {hh:02d}:{mm:02d}，"
+    return (f"⚠️ 该源（{src_name}）生成时间为 {gen_date} {hh:02d}:{mm:02d}，"
             f"与目标交易日 {date_str} 的尾盘窗口不符，疑为陈旧快照；")
 
 
@@ -1320,12 +1481,24 @@ def _growth_top_industries(industry):
     ⚠️ v1.31 旧代码在建议里写死"今日涨幅榜集中在半导体/自动化设备/电子化学品"
     —— 那是 2026-10-28 当天的真实板块名，写死在代码里会在别的日子**说错**。
     改为从当次 industry 数据里取涨幅榜前 3 名。
+
+    ⚠️ 2026-11-19 修订（v1.42）: **"领涨方向"必须真的在涨**。普跌日（89/90
+    板块下跌）时涨幅榜前几名本身可能是负数（2026-11-19 实测：证券 -0.05% /
+    电子化学品 -0.06% / 银行 -0.62% / 保险 -0.74%），旧代码照抄成
+    "今日涨幅榜领涨方向为 机场航运 +0.72% / 证券 -0.05% / 电子化学品 -0.06%"
+    → 把**下跌**板块称作"领涨方向"，标签与数字打架。
     """
     ind = industry or {}
     top = ind.get("top") or []
     if not top:
         return "今日涨幅榜领涨方向未知"
-    names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in top[:3])
+    up = [r for r in top if float(r.get("change_pct", 0)) > 0]
+    if not up:
+        names = " / ".join(
+            f"{r['name']} {r['change_pct']:+.2f}%" for r in top[:3])
+        return (f"今日全市场普跌（涨幅榜首位亦仅 {top[0]['change_pct']:+.2f}%："
+                f"{names}），无普涨领涨方向")
+    names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in up[:3])
     return f"今日涨幅榜领涨方向为 {names}"
 
 
@@ -1374,9 +1547,20 @@ def _defensive_strong_industries(industry):
                   # 焦炭板块（战报"行业全貌"里排 #1 的板块在建议里消失）。
                   "焦炭", "动力煤")
     hits = [r for r in top if any(k in str(r.get("name", "")) for k in defense_kw)]
+    # ⚠️ 2026-11-19 修订（v1.42）: **"领涨"必须真的在涨**。
+    # 旧代码只按关键词命中 `top` 榜，**不看涨跌幅正负** → 在普跌日（涨幅榜
+    # 前几名本身都是负数）会输出「红利防御今日领涨（证券 -0.05% / 银行 -0.62%）」，
+    # 把**下跌**的板块说成领涨 —— 与 v1.31/v1.33/v1.35 连续记录的"防御建议
+    # 买在当日最弱板块"同族，且这次是**标签与它自己打印的数字直接打架**。
+    # 修复: 只有 change_pct > 0 才算"领涨"；命中的防御板块全为负时如实说明。
+    up_hits = [r for r in hits if float(r.get("change_pct", 0)) > 0]
+    if up_hits:
+        names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in up_hits[:3])
+        return f"红利防御今日领涨（{names}）"
     if hits:
         names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in hits[:3])
-        return f"红利防御今日领涨（{names}）"
+        return (f"红利防御板块今日未领涨（{names} 均为下跌）—— "
+                "防御方向当日无强势红利支撑，别硬凑对冲盘")
     if top:
         names = " / ".join(f"{r['name']} {r['change_pct']:+.2f}%" for r in top[:3])
         return f"涨幅榜以 {names} 为主，未见红利防御领涨"
@@ -1412,8 +1596,35 @@ def _growth_top_branch_names(industry, n=3):
     top = ind.get("top") or []
     if not top:
         return "当日涨幅榜数据缺失，无法确认该跟哪条主线"
-    names = " / ".join(str(r.get("name", "")) for r in top[:n])
+    # ⚠️ 2026-11-19 修订（v1.42）: 只列**真正上涨**的板块。普跌日涨幅榜前几名
+    # 可能全是负数，把它们当作"该跟哪条主线"会指向下跌板块。
+    up = [r for r in top if float(r.get("change_pct", 0)) > 0]
+    if not up:
+        return "当日普跌，无普涨分支可跟随（仅看科创/主线题材内部强势个股）"
+    names = " / ".join(str(r.get("name", "")) for r in up[:n])
     return names
+
+
+def _kc50_lead_themes(themes, n=4):
+    """科创50 单点独涨日：当日**科创/半导体链**强势题材（数据驱动）。
+
+    ⚠️ 2026-11-19 新增（v1.42）: "科创50 单点独涨型"分支的建议若用
+    `_growth_top_branch_names()`（涨幅榜前列）来点名"该跟哪条线"，在
+    普跌日会指向**与科创无关**的板块 —— 2026-11-19 实测涨幅榜唯一上涨的
+    是"机场航运 +0.72%"，于是建议写成「仓位应集中在**跟随科创主线**的
+    高景气分支（当日涨幅榜前列：机场航运）」→ **自相矛盾**（科创主线 ≠
+    机场航运）。
+
+    改为从当日题材热度榜里筛**科创/半导体链**相关题材（存储芯片/先进封装/
+    光刻胶/半导体/芯片/电子化学品…），这才是与"科创50 独强"对应的主线；
+    筛不到时如实说明，不硬凑板块名。
+    """
+    kw = ("半导体", "芯片", "存储", "光刻", "封装", "晶圆", "电子化学品",
+          "算力", "液冷", "国产替代", "电子", "元件", "PCB", "封测")
+    hits = [t for t in (themes or []) if any(k in str(t) for k in kw)]
+    if hits:
+        return " / ".join(hits[:n])
+    return "（当日题材热度榜未识别到明确的科创链题材，需人工确认强势方向）"
 
 
 def _defensive_weak_industries(industry):
@@ -1480,6 +1691,120 @@ def _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
     return (kc50_pct - sh_pct) >= 1.5     # 科创50 相对主板明显领先
 
 
+def _find_v_flip(gap_rows, market_avg):
+    """**单点V型反转**的唯一判定入口（v1.44 新增，单一真源）。
+
+    ⚠️ 2026-11-23 实战（v1.44）: 旧代码在"明日观察要点"里用
+    `any(该行跨零点) and max_delta >= 2.0` 判定"单点V型反转" ——
+    **两个条件可以来自不同指数**：
+      - 科创50 +0.30% → -0.26%（跨零点，但 Δ 仅 **-0.56pp**）
+      - 创业板 +0.76% → +3.08%（Δ **+2.32pp**，但**不**跨零点）
+    两个条件各自都被满足 → 判定为"V型反转"，却**没有任何一行同时满足**，
+    于是走兜底元组 `("某指数", 0.0, 0.0, max_delta)` → 战报打印
+    「某指数 14:45 **+0.00%** → 收盘 **+0.00%**（Δ=**+2.32pp**）」
+    —— **自相矛盾的假数据**，且与同屏"市场特征：➡️ 震荡"直接打架
+    （classify_market_feature 那边要求 `market_avg < 0`，当日 +1.23% 不满足，
+      所以市场特征判"震荡"、建议段判"V型反转"，**同屏两套定性**）。
+
+    修复: 必须是**同一行**同时满足（跨越零点 + |Δ| >= 2.0pp + 大盘整体为负），
+    且**市场特征**与**建议段**共用本函数 → 同一真源，不可能再打架。
+
+    返回 (name, v1445, v1500, delta) 或 None。
+    """
+    if market_avg >= 0:                  # 大盘整体为正 → 不是"V型反转"场景
+        return None
+    for name, v1445, v1500, delta in (gap_rows or []):
+        if (v1445 < 0 < v1500) or (v1500 < 0 < v1445):
+            if abs(delta) >= 2.0:
+                return (name, v1445, v1500, delta)
+    return None
+
+
+def _cyb_single_surge(cyb_pct, kc50_pct, other_idx_pcts):
+    """**创业板单点独涨型**判定（v1.44 新增）。
+
+    ⚠️ 2026-11-23 实战: v1.42 只加了"**科创50** 单点独涨型"（科创50 强、创业板弱），
+    但**镜像场景（创业板强、科创50 弱）没有对应检测层** → 当日落空：
+      创业板 **+3.08%** / 深证 +1.93% / 中小100 +1.04% / 上证 **+0.15%** /
+      沪深300 **+0.09%** / 科创50 **-0.26%**
+    v1.31/v1.33/v1.35 的成长领涨检测（窄口径 + `_growth_lead_spread` 价差口径）
+    **全部要求科创50 参与**（`kc50 >= 1.5` / `kc50_pct > 0`）→ 科创50 翻绿即落空
+    → 战报标"➡️ 震荡"，丢掉"创业板主线单边走强、科创50/主板滞涨"这一当天
+    最重要的结构（当日 151 只涨停、人形机器人 41 只、涨幅榜 影视院线 +7.41% /
+    自动化设备 +6.65% / 电机 +6.22%）。
+
+    判定（绝对强度 + 价差口径并用，遵 v1.34 纪律）:
+      1. 创业板 ≥ +2.0%（绝对强度）
+      2. 科创50 ≤ 0（**未同步** → 排除"成长整体走强"的普涨日）
+      3. 创业板 相对**其余指数**（剔除创业板本身）均值领先 ≥ 1.5pp（价差口径）
+
+    `other_idx_pcts`: 非创业板、非科创50 的指数涨跌幅（上证/深证/中小100/沪深300）。
+    """
+    if cyb_pct < 2.0:
+        return False
+    if kc50_pct > 0.0:                   # 科创50 已同步上涨 → 不是"单点"
+        return False
+    if not other_idx_pcts:
+        return False
+    other_ex_cyb_avg = (sum(other_idx_pcts) + kc50_pct) / (len(other_idx_pcts) + 1)
+    return (cyb_pct - other_ex_cyb_avg) >= 1.5
+
+
+def _pool_advice_line(hit_rows, positives, avg, sh_pct, t1=None):
+    """明日观察要点第 3 条的"候选池修正"文案（数据驱动，v1.44 新增）。
+
+    ⚠️ 2026-11-23 实战（v1.44）: 旧代码在"单点V型反转"分支里写死
+    「上游仅 {len(hit_rows)} 只样本（⚠️ 完整度不足，命中率不可外推），
+    整体均值 **{avg:+.2f}%** vs 上证 {sh_pct:+.2f}%」—— 当日候选池为**空**
+    （冰点守卫短路·设计行为），`avg` 是**空集的 0.0** → 战报打印
+    「整体均值 **+0.00%** vs 上证 +0.15%」—— **给用户一个不存在的平均值**，
+    且完全无视同一屏已经算出的 **T+1 闭环复核**（2/10 = 20.0% / 均值 -0.87% /
+    超额 -1.02pp）—— 这正是策略有效性最该出现的地方。
+
+    修复:
+      - 有当日池 → 打印真实命中率/均值/超额；
+      - 当日池为空但有 T+1 闭环 → **改用 T+1 数据**（并在文案里注明它是
+        「上一交易日盘前池」口径，不冒充当日推荐）；
+      - 两者都无 → 如实说"无可用样本"，**绝不编造 0.00% 均值**。
+    """
+    if hit_rows:
+        n = len(hit_rows)
+        neg_cont = sum(1 for r in hit_rows if r[4] < 0)
+        warn = "（⚠️ 完整度不足，命中率不可外推）" if n < 7 else ""
+        return (f"候选池 {len(positives)}/{n} 命中{warn}，整体均值 {avg:+.2f}% vs 上证 "
+                f"{sh_pct:+.2f}%（超额 {avg - sh_pct:+.2f}pp）、{neg_cont}/{n} 负延续")
+    if t1 and t1.get("n"):
+        return (f"今日盘前池为空（冰点守卫·设计行为）→ 以**上一交易日"
+                f"（{t1.get('prev_date', '?')}）盘前池**复核：命中 {t1.get('hits', 0)}/"
+                f"{t1.get('n', 0)} = {t1.get('hit_rate', 0):.1f}%，均值 {t1.get('avg', 0):+.2f}% vs "
+                f"上证 {sh_pct:+.2f}%（超额 **{t1.get('alpha_sh', 0):+.2f}pp**）、"
+                f"{t1.get('neg_continuation', 0)}/{t1.get('n', 0)} 负延续 —— "
+                f"**该池为上一交易日口径，不代表今日新推荐**")
+    return "今日盘前池与 T+1 闭环均无可用样本，不据此调仓"
+
+
+def _cyb_lead_themes(themes, n=4):
+    """创业板 单点独涨日：当日**创业板成长链**强势题材（数据驱动）。
+
+    ⚠️ 2026-11-23 新增（v1.44）: "科创50 单点独涨型"用 `_kc50_lead_themes()`
+    筛科创/半导体链题材（v1.42），但**创业板单点独涨的镜像场景**需要自己的
+    筛法 —— 2026-11-23 实测当日主线是**人形机器人 39 次 / 41 只涨停**
+    （机器人链属创业板/中小盘，不是半导体链），若沿用科创链关键词
+    （半导体/芯片/光刻/封测…）会**筛不到任何题材** → 建议里出现
+    "需人工确认强势方向"，等于把当天最明确的主线丢掉。
+
+    改为筛**创业板成长链**关键词（机器人/智能/装备/材料/影视/短剧/传媒…），
+    筛不到时如实说明，不硬凑。
+    """
+    kw = ("机器人", "智能", "装备", "材料", "影视", "短剧", "传媒", "元件",
+          "汽车", "零部件", "减速器", "传感", "算力", "电子", "消费电子",
+          "光伏", "储能", "锂电", "创新药", "医疗", "军工")
+    hits = [t for t in (themes or []) if any(k in str(t) for k in kw)]
+    if hits:
+        return " / ".join(hits[:n])
+    return "（当日题材热度榜未识别到明确的创业板成长链题材，需人工确认强势方向）"
+
+
 def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
                             other_5_avg=None, other_idx_pcts=None):
     """按方向区分尾盘急涨/急跌，并覆盖极端情绪及科创单点分化。
@@ -1522,12 +1847,7 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
         # 与 v1.24 第六层（科创50 单点跳水）是**镜像场景**: 那次是 kc50 独跌，
         # 这次是 kc50 独涨/翻红，v1.14/v1.22/v1.24 六层检测全部落空 →
         # 战报会写"震荡"，掩盖"盘中冰点读数被收盘推翻"的关键信息。
-        v_flip = None
-        for name, v1445, v1500, delta in (gap_rows or []):
-            if (v1445 < 0 < v1500) or (v1500 < 0 < v1445):
-                if abs(delta) >= 2.0 and market_avg < 0:
-                    v_flip = (name, v1445, v1500, delta)
-                    break
+        v_flip = _find_v_flip(gap_rows, market_avg)
         if v_flip:
             direction = "翻红" if v_flip[2] > 0 else "翻绿"
             return (f"🔄 单点V型反转型（{v_flip[0]} 尾盘{direction} {v_flip[3]:+.2f}pp，"
@@ -1546,6 +1866,30 @@ def classify_market_feature(market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows,
             base = "📊 主板稳态 + 科创50单点跳水型"
         elif (cyb_pct >= 2.0 and kc50_pct >= 1.5 and sh_pct < 1.0) or _growth_lead_spread(cyb_pct, kc50_pct, sh_pct):
             base = "📈 成长领涨型（主板滞涨，结构性走强）"
+        elif (kc50_pct >= 1.5 and cyb_pct <= 0.0 and other_5_avg is not None
+              and (kc50_pct - other_5_avg) >= 1.5):
+            # ⚠️ 2026-11-19 新增（v1.42）: **科创50 单点独涨型** —— v1.24
+            # 「科创50 单点跳水型」的**镜像场景**，此前**没有对应检测层**。
+            # 2026-11-19 实战: 科创50 **+1.83%** / 深证 -0.71% / 创业板 **-0.79%**
+            # / 上证 -0.28% / 沪深300 +0.03% —— 四大核心均值仅 +0.01%，
+            # v1.14/v1.22/v1.24/v1.28/v1.34 全部检测层落空 → 战报标"➡️ 震荡"，
+            # 且建议段写"红利防御领涨"（当日红利实际全线下跌）→ **双重说错话**。
+            # 当日题材热度也印证：存储芯片/先进封装/光刻胶/湿电子化学品（半导体链）
+            # 霸榜 → 真实结构是"**科创/半导体链单点走强、其余板块普跌**"。
+            # 判定（绝对阈值 + 价差口径并用，遵 v1.34 纪律）:
+            #   1. 科创50 ≥ +1.5%（绝对强度）
+            #   2. 创业板 ≤ 0（未跟上 → 排除"成长整体走强"的普涨日）
+            #   3. 科创50 相对其余 5 指数均值领先 ≥ 1.5pp（价差口径）
+            base = "📈 科创50 单点独涨型（其余指数普跌，结构性分化）"
+        elif _cyb_single_surge(cyb_pct, kc50_pct, other_idx_pcts):
+            # ⚠️ 2026-11-23 新增（v1.44）: **创业板 单点独涨型** —— v1.42
+            # 「科创50 单点独涨型」的**镜像场景**，此前没有对应检测层。
+            # 2026-11-23 实战: 创业板 **+3.08%** / 深证 +1.93% / 中小100 +1.04%
+            # / 上证 **+0.15%** / 沪深300 **+0.09%** / 科创50 **-0.26%**
+            # —— 创业板单边走强、科创50 翻绿、主板滞涨，属**单一方向（创业板主线）
+            # 资金抱团**；v1.31/v1.33/v1.35 的成长领涨检测**全部要求科创50 参与**
+            # → 科创50 一翻绿即落空 → 战报标"➡️ 震荡"，丢掉当天最重要的结构。
+            base = "📈 创业板 单点独涨型（科创50未同步，主板滞涨，结构性分化）"
         elif sh_pct > 1.5:
             base = "📈 强势行情"
         elif sh_pct < -1.0:
@@ -1608,6 +1952,34 @@ def _theme_group_split(hit_rows, theme_overlap_detail):
         "n_miss": len(miss_group), "avg_miss": avg_miss,
         "spread": avg_hit - avg_miss,
     }
+
+
+def _single_stock_drag(hit_rows, threshold_pct=-7.0, min_pp=1.0):
+    """找出"**单只标的独力拖累**"的证据（若有）。
+
+    ⚠️ 2026-11-20 新增（v1.43）: 当日实战出现一种旧速查表覆盖不到的结构 ——
+    候选池整体均值被**一只跌停股**单点拉低，把"池子整体抗跌"讲成了
+    "高Beta分化 + 题材错配"。2026-11-20 实测: 10 只整体均值 -0.79%，
+    但剔除张江高科（-10.01%）后其余 9 只均值 **+0.23%**（差 +1.02pp）
+    → 真正的结构是"**单只跌停拖累**，其余标的相对抗跌"，不是题材错配。
+
+    返回 (code, name, pct, avg_without, avg_with) 或 None:
+      code/name/pct  —— 独力拖累的那只
+      avg_without   —— 剔除它之后的池子均值
+      avg_with      —— 原始池子均值
+    """
+    if not hit_rows or len(hit_rows) < 5:
+        return None
+    total = sum(r[3] for r in hit_rows)
+    n = len(hit_rows)
+    worst = min(hit_rows, key=lambda r: r[3])
+    if float(worst[3]) > threshold_pct:
+        return None
+    avg_with = total / n
+    avg_without = (total - worst[3]) / (n - 1)
+    if (avg_without - avg_with) < min_pp:
+        return None
+    return (worst[0], worst[1], float(worst[3]), avg_without, avg_with)
 
 
 def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg_neg,
@@ -1771,15 +2143,78 @@ def classify_pool_failure_mode(hit_rows, avg, positives, negatives, avg_pos, avg
                     f"正负差距 {gap:.2f}pp（高Beta分化）、baseline 均值 {baseline_avg:+.2f}%"
                     f"（昨日+5% 强势股）—— 内部分化 + 追高延续性失败")
         else:
-            mode, label = "①/⑥", "模式①/⑥ 风格切换或高Beta+题材错配混合"
-            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
-                    f"Alpha {alpha:+.2f}pp、正负差距 {gap:.2f}pp")
+            # ⚠️ 2026-11-20 修订（v1.43）: 本兜底分支此前**无条件写死**
+            # "题材错配混合"，而尾部 in_hot 分支会按 _theme_group_split 的
+            # 组间收益差追加"属题材对但未涨停，非题材错配" → **同屏自相矛盾**
+            # （标签说错配、正文说非错配）。这与 v1.38（模式①）/ v1.42（模式⑥）
+            # 已修的分支是**同一个纪律**，只是本分支被漏掉了。
+            # 2026-11-20 实战: 4/10 命中、均值 -0.79%、Alpha +0.44pp、
+            # 正负差距 3.98pp（低分化）、baseline 均值 +0.89%（无追高），
+            # 概念级拆分显示命中主线题材的 2 只均值 -0.68% vs 未命中 8 只
+            # -0.82%（差 **+0.15pp** → 题材选择有效）→ **不是题材错配**；
+            # 真正结构是**单只跌停股独力拖累**（张江高科 -10.01%，剔除后
+            # 其余 9 只均值 +0.23%）。
+            _split_c = _theme_group_split(hit_rows, theme_overlap_detail)
+            _drag = _single_stock_drag(hit_rows)
+            if _split_c and _split_c["spread"] > 0:
+                # 题材命中组跑赢 → 题材选择有效，不得断言"题材错配"。
+                if _drag:
+                    mode, label = "①/⑥*", ("模式①/⑥* 防御属性抗跌 + 单只跌停独力拖累"
+                                           "（题材选择有效，非题材错配）")
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                            f"Alpha {alpha:+.2f}pp、正负差距 {gap:.2f}pp（低分化）、"
+                            f"baseline 均值 {baseline_avg:+.2f}%（无追高）—— "
+                            f"**题材选择有效**：命中当日主线题材的 {_split_c['n_hit']} 只均值 "
+                            f"{_split_c['avg_hit']:+.2f}%，未命中的 {_split_c['n_miss']} 只均值 "
+                            f"{_split_c['avg_miss']:+.2f}%（差 {_split_c['spread']:+.2f}pp），"
+                            f"**主因不是题材错配**；真正拖累是**单只标的独力杀跌** —— "
+                            f"{_drag[0]} {_drag[1]} {_drag[2]:+.2f}%，"
+                            f"剔除后其余 {n - 1} 只均值 {_drag[3]:+.2f}%"
+                            f"（原 {_drag[4]:+.2f}%，差 {_drag[3] - _drag[4]:+.2f}pp）")
+                else:
+                    mode, label = "①/⑥*", ("模式①/⑥* 风格切换或低Beta分化"
+                                           "（题材选择有效，非题材错配）")
+                    attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                            f"Alpha {alpha:+.2f}pp、正负差距 {gap:.2f}pp —— "
+                            f"**题材选择有效**：命中当日主线题材的 {_split_c['n_hit']} 只均值 "
+                            f"{_split_c['avg_hit']:+.2f}%，未命中的 {_split_c['n_miss']} 只均值 "
+                            f"{_split_c['avg_miss']:+.2f}%（差 {_split_c['spread']:+.2f}pp），"
+                            f"**主因不是题材错配**")
+            else:
+                mode, label = "①/⑥", "模式①/⑥ 风格切换或高Beta+题材错配混合"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                        f"Alpha {alpha:+.2f}pp、正负差距 {gap:.2f}pp")
+                if _drag:
+                    attr += (f"；同时存在**单只标的独力拖累**（{_drag[0]} {_drag[1]} "
+                             f"{_drag[2]:+.2f}%，剔除后其余 {n - 1} 只均值 "
+                             f"{_drag[3]:+.2f}%）")
     elif hit_rate <= 0.60:
         if alpha <= -1.0:
-            mode, label = "⑥", "模式⑥ 高Beta个股分化 + 题材错配混合"
-            attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
-                    f"Alpha {alpha:+.2f}pp（显著负）、正负差距 {gap:.2f}pp —— "
-                    f"高Beta分化 + 题材错配双层")
+            # ⚠️ 2026-11-19 修订（v1.42）: 与 v1.38/v1.39/v1.41 **同一纪律** ——
+            # "题材错配"必须**先验证据再断言**。旧代码在此分支无条件写死
+            # "模式⑥ 高Beta个股分化 + 题材错配混合"，而尾部的 in_hot 分支会按
+            # _theme_group_split 的组间收益差追加"属题材对但未涨停，非题材错配"
+            # → 同一段归因**同屏自相矛盾**（标签说错配、正文说非错配）。
+            # 2026-11-19 实战: 2/4 命中、均值 -1.77%、Alpha -1.49pp、正负差距
+            # 8.16pp（典型高Beta分化），但概念级拆分显示命中当日主线题材的
+            # 002983 均值 +2.18% vs 未命中 3 只均值 -3.09%（差 **+5.27pp**）
+            # → **题材选择有效**，真正拖累是高Beta个股分化 + 昨日强势股延续性
+            # 失败，**不是题材错配**。标签必须随证据走。
+            _split6 = _theme_group_split(hit_rows, theme_overlap_detail)
+            if _split6 and _split6["spread"] > 0:
+                mode, label = "⑥", "模式⑥ 高Beta个股分化（题材选择有效，非题材错配）"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                        f"Alpha {alpha:+.2f}pp（显著负）、正负差距 {gap:.2f}pp —— "
+                        f"**题材选择有效**：命中当日主线题材的 {_split6['n_hit']} 只均值 "
+                        f"{_split6['avg_hit']:+.2f}%，未命中的 {_split6['n_miss']} 只均值 "
+                        f"{_split6['avg_miss']:+.2f}%（差 {_split6['spread']:+.2f}pp），"
+                        f"**主因不是题材错配**；实际拖累是高Beta个股分化"
+                        f"（正负差距 {gap:.2f}pp）")
+            else:
+                mode, label = "⑥", "模式⑥ 高Beta个股分化 + 题材错配混合"
+                attr = (f"候选池 {len(positives)}/{n} 命中、整体均值 {avg:+.2f}%、"
+                        f"Alpha {alpha:+.2f}pp（显著负）、正负差距 {gap:.2f}pp —— "
+                        f"高Beta分化 + 题材错配双层")
         else:
             # ⚠️ 2026-11-11 修订（v1.38）: "题材错配"必须**先验证据**再断言。
             # 旧代码在 40-60% 命中率 + 中性 Alpha 时无条件写"模式① 风格切换
@@ -2309,7 +2744,14 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                    f"{industry.get('universe', 0)} 个）。\n")
         else:
             md += (f"> 口径：已分页拉取 {industry.get('returned', 0)}/{industry.get('universe', 0)} "
-                   f"个行业板块（m:90+t:2 全量）。\n")
+                   f"个行业板块（m:90+t:2 全量）。")
+            # ⚠️ 2026-11-20 新增（v1.43）: 剔除迷你"伪行业"板块的数目须**如实披露**，
+            # 否则用户无法判断榜单是否被 1~2 只成分股的板块占位。
+            _tiny = int(industry.get("tiny_dropped") or 0)
+            if _tiny:
+                md += (f" 已剔除 **{_tiny}** 个成分股 <3 的迷你板块"
+                       f"（避免把\"两只票的均值\"当作行业涨幅/跌幅）。")
+            md += "\n"
         if "push2delay" in ind_source:
             md += "> 数据源降级：东财 push2 主域断连，已切换官方 push2delay 域。\n\n"
         else:
@@ -2324,6 +2766,20 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
         diff = cnt - yest
         arrow = "↑" if diff > 0 else ("↓" if diff < 0 else "→")
         md += f"{i}️⃣ {theme} — {cnt}次（较{comparison_label} {arrow}{abs(diff)}）\n"
+    # ⚠️ 2026-11-20 新增（v1.43）: **题材热度是"涨停股题材出现次数"的频次**，
+    # 涨停家数少的冰点日会产出**频次极低但排位靠前**的伪主线。
+    # 2026-11-20 实测: 全天仅 30 只涨停（正常 60~150），题材最高频次仅 **2 次**
+    # （AI漫剧/光刻胶/电子化学品 各 2 次，其余 7 个题材各 1 次，题材总数 88）
+    # → 把"AI漫剧 2次"写成"今日最强题材"会**严重高估**主线强度，
+    # 且"明日观察要点"会据此建议"关注 AI漫剧/光刻胶 龙头"（等于建议用户
+    # 去追一个当日只有 2 只涨停票支撑的伪主线）。
+    # 披露规则: 最高频次 < 4 → 如实说明"无绝对主线"，不把低频次当主线推。
+    _max_theme_cnt = max((ct.get(t, 0) for t in themes), default=0)
+    if _max_theme_cnt and _max_theme_cnt < 4:
+        md += (f"> ⚠️ **今日无绝对主线**：全天涨停仅 {hot_count} 只，题材最高频次仅 "
+               f"**{_max_theme_cnt} 次**（题材总数 {len(ct)}）—— 涨停高度分散，"
+               f"上述题材**不构成可跟随的主线**，追高胜率低；"
+               f"「明日观察要点」中的主线建议请按**低置信度**对待。\n")
 
     core_pcts = [indices.get(k, {}).get("change_pct", 0)
                  for k in ("sh000001", "sz399001", "sz399006", "sh000688")]
@@ -2331,10 +2787,16 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
     other_5 = [indices.get(k, {}).get("change_pct", 0)
                for k in ("sh000001", "sz399001", "sz399006", "sz399005", "sz399300")]
     other_5_avg = sum(other_5) / len(other_5)
+    # ⚠️ 2026-11-23 新增（v1.44）: 抽出**排除创业板与科创50**的其余指数，
+    # 供 `_cyb_single_surge()` 的价差口径与建议文案共用 —— 避免同一组
+    # 数字在"市场特征"与"明日观察要点"两处各算一遍而漂移。
+    other_idx_pcts = [indices.get(k, {}).get("change_pct", 0)
+                      for k in ("sh000001", "sz399001", "sz399005", "sz399300")]
+    sz_pct = indices.get("sz399001", {}).get("change_pct", 0)
+    hs300_pct = indices.get("sz399300", {}).get("change_pct", 0)
     market_feature = classify_market_feature(
         market_avg, sh_pct, cyb_pct, kc50_pct, gap_rows or [], other_5_avg,
-        other_idx_pcts=[indices.get(k, {}).get("change_pct", 0)
-                        for k in ("sh000001", "sz399001", "sz399005", "sz399300")],
+        other_idx_pcts=other_idx_pcts,
     )
     md += f"\n⚠️ **市场特征：** {market_feature}\n"
     md += f"- 四大核心指数平均 {market_avg:+.2f}%｜上证 {sh_pct:+.2f}% / 创业板 {cyb_pct:+.2f}% / 科创50 {kc50_pct:+.2f}%\n\n"
@@ -2504,22 +2966,36 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
     elif min_delta <= -3.5:
         md += f"1️⃣ **大盘性质：** ⚠️ 假突破后尾盘跳水型！最深时点差 {min_delta:+.2f}pp，盘中建议已被收盘推翻\n"
         md += "2️⃣ **回避：** 追高强势股与高Beta小盘股，先看次日开盘量能\n"
-        md += f"3️⃣ **主线：** 关注{', '.join(themes[:3])}龙头能否扛住杀跌\n"
-    elif any((r[1] < 0 < r[2]) or (r[2] < 0 < r[1]) for r in (gap_rows or [])) and max_delta >= 2.0:
+        # ⚠️ 2026-11-20 新增（v1.43）: 本分支原先只给"回避 + 主线"两点，
+        # **缺"防御方向"** —— 而 skill 的推送格式明确要求第 3 条是防御方向
+        # （弱势市场下的抗跌板块）。今天恰是防御板块独涨的一天
+        # （国有大型银行Ⅲ +2.39% / 股份制银行Ⅲ +1.05% / 电信运营商 +1.46%，
+        # 而全市场 89/90 板块下跌），不给防御方向等于把当日唯一有效的
+        # 结构信息丢掉。且必须**数据驱动**（v1.31/v1.33/v1.35 三次踩坑纪律）。
+        md += (f"3️⃣ **防御方向：** {_defensive_strong_industries(industry)} —— "
+               f"今日是**跌多涨少**的结构，防御板块相对抗跌即为当日有效方向；"
+               f"同时 {_growth_bottom_industries(industry)} 属杀跌重灾区，勿抄底\n")
+        md += (f"　　**主线（低置信度）：** 关注{', '.join(themes[:3])}能否扛住杀跌 —— "
+               f"今日涨停仅 {hot_count} 只、题材最高频次 {max((ct.get(t, 0) for t in themes), default=0)} 次，"
+               f"**无绝对主线**，不建议据此追高\n")
+    elif (flip := _find_v_flip(gap_rows, market_avg)) is not None:
         # ⚠️ 2026-10-21 新增（v1.28）: 单点 V 型反转 → 盘中读数被收盘推翻
-        flip = next((r for r in (gap_rows or [])
-                     if ((r[1] < 0 < r[2]) or (r[2] < 0 < r[1])) and abs(r[3]) >= 2.0),
-                    None) or ("某指数", 0.0, 0.0, max_delta)
-        flip_name = flip[0]
-        md += (f"1️⃣ **大盘性质：** 🔄 单点V型反转！{flip_name} 14:45 {flip[1]:+.2f}% → 收盘 {flip[2]:+.2f}%"
-               f"（Δ={flip[3]:+.2f}pp），四大核心指数均值 {market_avg:+.2f}% —— 盘中\"冰点\"读数已被收盘推翻，"
+        # ⚠️ 2026-11-23 修订（v1.44）: 改用 `_find_v_flip()` **单一真源**。
+        # 旧代码在这里用 `any(跨零点) and max_delta >= 2.0` 判定 —— 两个条件
+        # **可以来自不同指数**：2026-11-23 实测 科创50 +0.30%→-0.26%（跨零点，
+        # Δ 仅 -0.56pp）+ 创业板 +0.76%→+3.08%（Δ +2.32pp，不跨零点）→ 两个条件
+        # 各自满足却**没有任何一行同时满足** → 走兜底元组打印
+        # 「某指数 14:45 **+0.00%** → 收盘 **+0.00%**（Δ=**+2.32pp**）」
+        # —— **自相矛盾的假数据**，且与同屏"市场特征：➡️ 震荡"直接打架
+        # （市场特征那边要求大盘整体为负，当日 +1.23% 不满足 → 判"震荡"）。
+        # 现在两处共用 `_find_v_flip()` → 同一真源，不可能再打架。
+        flip_name, flip_v1445, flip_v1500, flip_delta = flip
+        md += (f"1️⃣ **大盘性质：** 🔄 单点V型反转！{flip_name} 14:45 {flip_v1445:+.2f}% → 收盘 {flip_v1500:+.2f}%"
+               f"（Δ={flip_delta:+.2f}pp），四大核心指数均值 {market_avg:+.2f}% —— 盘中\"冰点\"读数已被收盘推翻，"
                f"明日{flip_name}能否延续是首要验证点\n")
         md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} 龙头若高开不回落且成交不萎缩50%则结构延续；"
                f"若{flip_name}再度翻绿则今日翻红属尾盘脉冲而非趋势反转\n")
-        md += (f"3️⃣ **候选池修正：** 上游仅 {len(hit_rows)} 只样本"
-               f"{'（⚠️ 完整度不足，命中率不可外推）' if len(hit_rows) < 7 else ''}，"
-               f"整体均值 {avg:+.2f}% vs 上证 {sh_pct:+.2f}%，"
-               f"{'暂不据此调仓' if len(hit_rows) < 7 else '关注延续性'}\n")
+        md += f"3️⃣ **候选池修正：** {_pool_advice_line(hit_rows, positives, avg, sh_pct, t1)}\n"
     elif sh_pct < -1.5 and kc50_pct < -5:
         md += f"1️⃣ **大盘性质：** ⚠️ 平稳转急跌型！创业板/科创50收盘 {cyb_pct:+.2f}%/{kc50_pct:+.2f}%\n"
         md += "2️⃣ **回避：** 追高强势股 + 小盘题材投机\n"
@@ -2576,6 +3052,44 @@ def format_feishu(date_str, indices, themes, ct, cy, hit_rows,
                "「央企/红利对冲」在成长领涨日恰好买在弱势侧 —— 明日防御应转向"
                f"**跟随主线的高景气分支**（当日涨幅榜前列："
                f"{_growth_top_branch_names(industry)}），红利仅作低位观察而非对冲盘\n")
+    elif (kc50_pct >= 1.5 and cyb_pct <= 0.0 and other_5_avg is not None
+          and (kc50_pct - other_5_avg) >= 1.5):
+        # ⚠️ 2026-11-19 新增（v1.42）: 科创50 单点独涨型 —— 建议必须指向
+        # "**科创/半导体链单点走强、其余板块普跌**"这一真实结构，**不能**给
+        # "红利防御对冲"（当日红利实际全线下跌，见 _defensive_strong_industries）。
+        md += (f"1️⃣ **大盘性质：** 📈 科创50 单点独涨型（结构性分化）—— 科创50 "
+               f"{kc50_pct:+.2f}% 独强，而创业板 {cyb_pct:+.2f}% / 上证 {sh_pct:+.2f}% "
+               f"普跌（其余 5 指数均值 {other_5_avg:+.2f}%），四大核心均值仅 "
+               f"{market_avg:+.2f}%；属**单一方向（科创/半导体链）资金抱团**，"
+               f"非普涨，明日看点是科创50 能否延续、其余板块能否止跌\n")
+        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、"
+               f"成交不萎缩50%；当日强势方向为 {_kc50_lead_themes(themes)}，"
+               f"明日若科创50 高开回落而主板补涨，说明是单日资金切换而非趋势\n")
+        md += (f"3️⃣ **防御方向：** ⚠️ 今日{_defensive_weak_industries(industry)} —— "
+               "红利/防御在普跌日**没有对冲价值**，勿作底仓；仓位应集中在"
+               f"**跟随科创主线的高景气分支**（当日科创链强势题材："
+               f"{_kc50_lead_themes(themes)}），其余板块观望\n")
+    elif _cyb_single_surge(cyb_pct, kc50_pct, other_idx_pcts):
+        # ⚠️ 2026-11-23 新增（v1.44）: **创业板 单点独涨型** —— 与上面
+        # "科创50 单点独涨型"是**镜像场景**，此前没有对应建议分支。
+        # 2026-11-23 实战: 创业板 **+3.08%** / 深证 +1.93% / 中小100 +1.04%
+        # / 上证 **+0.15%** / 沪深300 **+0.09%** / 科创50 **-0.26%**
+        # —— 成长单边走强、科创50 翻绿、主板权重滞涨；151 只涨停、人形机器人
+        # 41 只涨停、题材最高频次 39 次 → **有绝对主线**，属结构性行情。
+        # 建议必须指向"跟随创业板成长主线"，**不能**给"红利防御对冲"
+        # （当日保险 -1.72% / 银行 -0.21% / 煤炭 -0.13% 全部走弱）。
+        md += (f"1️⃣ **大盘性质：** 📈 创业板 单点独涨型（结构性分化）—— 创业板 "
+               f"{cyb_pct:+.2f}% 独强（深证 {sz_pct:+.2f}% 跟上），而科创50 "
+               f"{kc50_pct:+.2f}% 翻绿、上证 {sh_pct:+.2f}% / 沪深300 {hs300_pct:+.2f}% "
+               f"滞涨，四大核心均值 {market_avg:+.2f}%；属**单一方向（创业板成长主线）"
+               f"资金抱团**，非普涨，明日看点是创业板能否延续、科创50/主板能否跟上\n")
+        md += (f"2️⃣ **主线持续性：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、"
+               f"成交不萎缩50%；当日强势方向为 {_cyb_lead_themes(themes)}，"
+               f"明日若创业板高开回落而主板补涨，说明是单日资金切换而非趋势\n")
+        md += (f"3️⃣ **防御方向：** ⚠️ 今日{_defensive_weak_industries(industry)} —— "
+               "红利/防御在成长单边走强日**没有对冲价值**，勿作底仓；仓位应集中在"
+               f"**跟随创业板主线的成长分支**（当日涨幅榜前列："
+               f"{_growth_top_branch_names(industry)}）；{_pool_advice_line(hit_rows, positives, avg, sh_pct, t1)}\n")
     else:
         md += f"1️⃣ **大盘：** 上证 {sh_pct:+.2f}%，{'强势' if sh_pct > 1.5 else ('震荡偏弱' if sh_pct < -1 else '震荡')}；关注明日开盘30分钟量能\n"
         md += f"2️⃣ **主线：** {', '.join(themes[:3])} — 延续条件：龙头不跌停、成交不萎缩50%\n"

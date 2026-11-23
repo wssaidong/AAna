@@ -11,6 +11,14 @@ spec.loader.exec_module(run_afterhours)
 
 
 def test_parse_top10_stops_at_next_h3_and_deduplicates(tmp_path, monkeypatch):
+    """Top10 解析边界（### 小节遇到同级标题即停 + 按代码去重）。
+
+    ⚠️ v1.42 修订: 该测试原调用 `parse_top10_with_baseline()`，但 v1.41 起
+    该函数已变成 `resolve_candidate_pool()` 的**兼容包装**（走 git 历史回捞
+    + 腾讯日K 重建 baseline）→ 测试会真的打网络，且拿回的 baseline 是日K
+    重建值而非报告列里的值 → 断言必然失败，且**测的不再是解析逻辑**。
+    解析语义属于纯函数 `parse_top10_content()`，本测试改为直接测它。
+    """
     report = tmp_path / "2026-08-04-选股报告.md"
     report.write_text(
         """### 🏆 重点关注 Top 10
@@ -26,7 +34,9 @@ def test_parse_top10_stops_at_next_h3_and_deduplicates(tmp_path, monkeypatch):
     )
     monkeypatch.setattr(run_afterhours, "REPORT_DIR", str(tmp_path))
 
-    assert run_afterhours.parse_top10_with_baseline("2026-08-04") == [
+    assert run_afterhours.parse_top10_content(
+        report.read_text(encoding="utf-8")
+    ) == [
         ("600001", "甲", 4.0),
         ("600002", "乙", 3.0),
     ]
@@ -1662,3 +1672,464 @@ def test_phase12_labels_strategy_by_date_for_relative_to_report_date():
     stale = run_afterhours.phase12_section("2026-11-13", rc,
                                            {**nd, "date_for": "2026-11-12"})
     assert "过期策略参数" in stale, stale
+
+def test_gap_source_warning_names_actual_intraday_file_not_hardcoded(tmp_path):
+    """v1.42: 时点差可信度提示必须**指名实际文件**，不得写死"（尾盘选股.md）"。
+
+    2026-11-19 实战: 数据源是 `reports/2026-11-19/盘中/2026-11-19_1445_尾盘分析.md`
+    （**首选源**），但旧代码的"无生成时间字段"分支写死了 "（尾盘选股.md）…历史已
+    连续确认失真，优先级应低于盘中报告，此处为兜底" → 战报同一行里既说数据源是
+    盘中报告，又说该源是"优先级应低于盘中报告的失真兜底"，**自相矛盾**。
+    """
+    intraday = tmp_path / "2026-11-19_1445_尾盘分析.md"
+    intraday.write_text(
+        "# A股尾盘推荐 — 2026-11-19 14:45\n\n"
+        "> 📊 盘中子Agent | 生成时间: 14:45:01\n",
+        encoding="utf-8",
+    )
+    warn = run_afterhours._gap_source_warning(str(intraday), "2026-11-19")
+    # 盘中报告格式（只有时间、无日期）必须被识别为真实快照
+    assert "真实盘中快照" in warn, warn
+    assert "尾盘选股.md" not in warn, warn
+    assert "失真" not in warn, warn
+
+
+def test_gap_source_warning_detects_intraday_time_only_format(tmp_path):
+    """v1.42: 盘中报告的"生成时间: HH:MM:SS"（无日期）格式必须被解析。"""
+    intraday = tmp_path / "2026-11-19_1445_尾盘分析.md"
+    intraday.write_text(
+        "# A股尾盘推荐 — 2026-11-19 14:45\n\n"
+        "> 📊 盘中子Agent | 生成时间: 14:45:01\n",
+        encoding="utf-8",
+    )
+    warn = run_afterhours._gap_source_warning(str(intraday), "2026-11-19")
+    assert "2026-11-19 14:45" in warn, warn
+    assert "真实盘中快照" in warn, warn
+
+
+def test_gap_source_warning_still_flags_real_stale_tail_file(tmp_path):
+    """v1.42: 真正的陈旧兜底文件（无生成时间字段）仍须保留失真警示。"""
+    tail = tmp_path / "2026-07-13-尾盘选股.md"
+    tail.write_text("# A股尾盘选股建议 — 2026-07-13\n\n无生成时间字段\n",
+                     encoding="utf-8")
+    warn = run_afterhours._gap_source_warning(str(tail), "2026-07-13")
+    assert "失真" in warn, warn
+    assert "2026-07-13-尾盘选股.md" in warn, warn
+
+
+def test_pool_mode6_label_follows_theme_evidence_not_hardcoded_mismatch():
+    """v1.42: 模式⑥ 的"题材错配"字样必须**随证据走**，不得写死。
+
+    2026-11-19 实战: 候选池 2/4 命中、均值 -1.77%、Alpha -1.49pp、正负差距
+    8.16pp —— 旧代码无条件写"模式⑥ 高Beta个股分化 + 题材错配混合"，而同屏
+    的尾部段落却按 _theme_group_split 追加"属题材对但未涨停，非题材错配"
+    （命中组 +2.18% vs 未命中组 -3.09%，差 +5.27pp → 题材选择有效）。
+    标签说错配、正文说非错配 = 同屏自相矛盾。
+    """
+    hit_rows = [
+        ("600690", "海尔智家", 1.35, 2.43, 1.08),
+        ("600483", "福能股份", 1.92, -1.72, -3.64),
+        ("001379", "腾达科技", 1.76, -9.99, -11.75),
+        ("002983", "芯瑞达", 1.71, 2.18, 0.47),
+    ]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "002983", "themes": ["湿电子化学品"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives,
+        sum(r[3] for r in positives) / len(positives),
+        sum(r[3] for r in negatives) / len(negatives),
+        sh_pct=-0.28, market_avg=0.01,
+        tail_dive=False, in_hot_count=0, hot_count=26,
+        theme_overlap_count=1, theme_overlap_detail=detail,
+    )
+    assert mode == "⑥", (mode, label)
+    # 题材选择有效 → 标签不得断言"题材错配"
+    assert "题材错配" not in label.replace("非题材错配", ""), label
+    assert "题材选择有效" in label, label
+    assert "题材选择有效" in attr, attr
+    assert "主因不是题材错配" in attr, attr
+    # 组间收益差数字必须出现在归因里
+    assert "+2.18%" in attr, attr
+    assert "-3.09%" in attr, attr
+
+
+def test_pool_mode6_keeps_mismatch_label_when_theme_selection_failed():
+    """v1.42: 题材命中组**跑输**时，模式⑥ 仍应断言题材错配。"""
+    hit_rows = [
+        ("600690", "甲", 1.35, 2.43, 1.08),
+        ("002983", "乙", 1.71, -9.99, -11.70),
+    ]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "002983", "themes": ["存储芯片"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives,
+        sum(r[3] for r in positives) / len(positives),
+        sum(r[3] for r in negatives) / len(negatives),
+        sh_pct=-0.28, market_avg=0.01,
+        tail_dive=False, in_hot_count=0, hot_count=26,
+        theme_overlap_count=1, theme_overlap_detail=detail,
+    )
+    assert mode == "⑥", (mode, label)
+    assert "题材错配" in label, label
+
+
+def test_defensive_advice_does_not_call_falling_sectors_leading():
+    """v1.42: "红利防御今日领涨"必须真的在涨。
+
+    2026-11-19 实战: 涨幅榜前 5 全为负（机场航运 +0.72% 之外的证券 -0.05% /
+    电子化学品 -0.06% / 银行 -0.62% / 保险 -0.74%），旧代码只按关键词命中
+    涨幅榜、不看涨跌幅正负 → 输出"红利防御今日领涨（证券 -0.05% / 银行 -0.62%）"，
+    把**下跌**的板块说成领涨，标签与自己打印的数字直接打架。
+    """
+    industry = {"top": [
+        {"name": "机场航运", "change_pct": 0.72},
+        {"name": "证券", "change_pct": -0.05},
+        {"name": "电子化学品", "change_pct": -0.06},
+        {"name": "银行", "change_pct": -0.62},
+        {"name": "保险", "change_pct": -0.74},
+    ]}
+    out = run_afterhours._defensive_strong_industries(industry)
+    # 下跌的防御板块不得出现在"领涨"名单里
+    assert "证券" not in out, out
+    assert "银行" not in out, out
+    assert "保险" not in out, out
+    # 唯一真正上涨的防御板块可以列
+    assert "机场航运 +0.72%" in out, out
+
+
+def test_defensive_advice_reports_leading_when_actually_positive():
+    """v1.42: 防御板块真的上涨时，仍应正常输出"领涨"。"""
+    industry = {"top": [
+        {"name": "银行", "change_pct": 1.23},
+        {"name": "保险", "change_pct": 0.94},
+    ]}
+    out = run_afterhours._defensive_strong_industries(industry)
+    assert "领涨" in out, out
+    assert "银行 +1.23%" in out, out
+
+
+def test_market_feature_detects_kc50_single_point_surge():
+    """v1.42: 科创50 单点独涨型（v1.24「科创50 单点跳水型」的镜像）需有检测层。
+
+    2026-11-19 实战: 科创50 +1.83% / 创业板 -0.79% / 上证 -0.28% / 深证 -0.71%
+    / 沪深300 +0.03% —— 四大核心均值仅 +0.01%，v1.14/v1.22/v1.24/v1.28/v1.34
+    全部检测层落空 → 战报标"➡️ 震荡"，丢掉"科创/半导体链单点走强"这一结构。
+    """
+    feat = run_afterhours.classify_market_feature(
+        0.01, -0.28, -0.79, 1.83, [],
+        other_5_avg=(-0.28 + -0.71 + -0.79 + -0.15 + 0.03) / 5,
+        other_idx_pcts=[-0.28, -0.71, -0.15, 0.03],
+    )
+    assert "科创50 单点独涨" in feat, feat
+    assert "震荡" not in feat, feat
+
+
+def test_market_feature_does_not_fire_kc50_surge_on_broad_rally():
+    """v1.42: 普涨日（创业板同步上涨）不得被标成"科创50 单点独涨"。"""
+    feat = run_afterhours.classify_market_feature(
+        1.92, 0.46, 2.80, 3.10, [],
+        other_5_avg=1.5,
+        other_idx_pcts=[0.46, 1.9, 1.2, 1.8],
+    )
+    assert "科创50 单点独涨" not in feat, feat
+
+
+def test_defensive_advice_says_not_leading_when_all_defensive_sectors_fall():
+    """v1.42: 防御板块全线下跌时，必须如实说"未领涨"，不得凑一个领涨名单。"""
+    industry = {"top": [
+        {"name": "证券", "change_pct": -0.05},
+        {"name": "电子化学品", "change_pct": -0.06},
+        {"name": "银行", "change_pct": -0.62},
+        {"name": "保险", "change_pct": -0.74},
+    ]}
+    out = run_afterhours._defensive_strong_industries(industry)
+    assert "未领涨" in out, out
+    assert "今日领涨" not in out, out
+
+
+def test_growth_top_industries_excludes_falling_boards_from_leading():
+    """v1.42: "领涨方向"不得包含下跌板块。
+
+    2026-11-19 普跌日实测: 涨幅榜前 5 为 机场航运 +0.72% / 证券 -0.05% /
+    电子化学品 -0.06% / 银行 -0.62% / 保险 -0.74%。
+    """
+    industry = {"top": [
+        {"name": "机场航运", "change_pct": 0.72},
+        {"name": "证券", "change_pct": -0.05},
+        {"name": "电子化学品", "change_pct": -0.06},
+        {"name": "银行", "change_pct": -0.62},
+        {"name": "保险", "change_pct": -0.74},
+    ]}
+    out = run_afterhours._growth_top_industries(industry)
+    assert "证券" not in out, out
+    assert "银行" not in out, out
+    assert "保险" not in out, out
+    assert "机场航运 +0.72%" in out, out
+
+
+def test_growth_top_industries_reports_no_leader_on_full_down_day():
+    """v1.42: 全市场普跌（涨幅榜首位也为负）时如实说明，不得硬凑领涨方向。"""
+    industry = {"top": [
+        {"name": "证券", "change_pct": -0.05},
+        {"name": "银行", "change_pct": -0.62},
+    ]}
+    out = run_afterhours._growth_top_industries(industry)
+    assert "普跌" in out, out
+    assert "领涨方向为" not in out, out
+
+
+def test_growth_top_branch_names_excludes_falling_boards():
+    """v1.42: "该跟哪条主线"只列上涨板块；普跌日如实说明无可跟分支。"""
+    industry = {"top": [
+        {"name": "证券", "change_pct": -0.05},
+        {"name": "银行", "change_pct": -0.62},
+    ]}
+    out = run_afterhours._growth_top_branch_names(industry)
+    assert "证券" not in out, out
+    assert "普跌" in out, out
+
+    up = {"top": [{"name": "半导体", "change_pct": 3.2},
+                  {"name": "证券", "change_pct": -0.05}]}
+    out2 = run_afterhours._growth_top_branch_names(up)
+    assert "半导体" in out2, out2
+    assert "证券" not in out2, out2
+
+
+def test_kc50_lead_themes_picks_semiconductor_chain_from_theme_heat():
+    """v1.42: 科创50 独涨日建议要点名**科创链题材**，不得指向无关板块。
+
+    2026-11-19 实测: 涨幅榜唯一上涨板块是"机场航运"，若用它点名"该跟哪条
+    科创主线"就自相矛盾。改为从题材热度榜筛科创/半导体链题材。
+    """
+    themes = ["预重整", "股份回购", "三季报增长", "湿电子化学品",
+              "存储芯片", "上海国资", "算力", "先进封装", "光刻胶"]
+    out = run_afterhours._kc50_lead_themes(themes)
+    assert "存储芯片" in out, out
+    assert "先进封装" in out, out
+    assert "湿电子化学品" in out, out
+    assert "机场航运" not in out, out
+    assert "预重整" not in out, out
+    # 默认只列 n=4 个（保持段落可读）
+    assert len(out.split(" / ")) <= 4, out
+
+
+def test_kc50_lead_themes_reports_honestly_when_no_kc50_theme():
+    """v1.42: 筛不到科创链题材时如实说明，不硬凑。"""
+    out = run_afterhours._kc50_lead_themes(["预重整", "股份回购"])
+    assert "未识别到" in out, out
+
+
+def test_pool_failure_mode_1_6_catchall_label_follows_evidence_2026_11_20():
+    """2026-11-20 实战形态: 候选池 4/10 命中、整体均值 -0.79%、Alpha +0.44pp、
+    正负差距 3.98pp（**低分化**）、baseline 均值 +0.89%（无追高）→ 落进
+    `hit_rate <= 0.40` 的**兜底分支**。该分支此前无条件写死
+    "模式①/⑥ 风格切换或高Beta+**题材错配**混合"，而尾部 in_hot 分支按
+    _theme_group_split 追加"属题材对但未涨停，**非题材错配**"
+    → **同屏自相矛盾**（标签说错配、正文说非错配）。
+
+    概念级拆分实测: 命中当日主线题材(数据中心液冷)的 2 只均值 -0.68% vs
+    未命中的 8 只均值 -0.82%（差 **+0.15pp** → 题材选择有效）。
+    且真正的结构是**单只跌停股独力拖累**（张江高科 -10.01%，剔除后
+    其余 9 只均值 +0.23%）。
+
+    必须: 标签随证据走（不得断言"题材错配"）+ 披露单只拖累。"""
+    hit_rows = [("603288", "海天味业", 1.25, -0.52, -1.77),
+                ("600406", "国电南瑞", 0.98, 0.40, -0.58),
+                ("600312", "平高电气", 0.81, -1.75, -2.56),
+                ("601166", "兴业银行", 0.60, 1.05, 0.45),
+                ("600066", "宇通客车", 0.51, 3.47, 2.96),
+                ("601318", "中国平安", 0.48, 1.46, 0.98),
+                ("002415", "海康威视", 1.19, -1.29, -2.48),
+                ("000651", "格力电器", 0.56, -0.29, -0.85),
+                ("002142", "宁波银行", 0.48, -0.45, -0.93),
+                ("600895", "张江高科", 1.99, -10.01, -12.00)]
+    positives = [r for r in hit_rows if r[3] > 0]
+    negatives = [r for r in hit_rows if r[3] <= 0]
+    avg = sum(r[3] for r in hit_rows) / len(hit_rows)
+    detail = [{"code": "600406", "themes": ["数据中心液冷"]},
+              {"code": "600312", "themes": ["数据中心液冷"]}]
+    mode, label, attr = run_afterhours.classify_pool_failure_mode(
+        hit_rows, avg, positives, negatives, 1.59, -2.38,
+        sh_pct=-1.23, market_avg=-2.75,
+        tail_dive=True, in_hot_count=0, hot_count=30,
+        theme_overlap_count=2, theme_overlap_detail=detail,
+    )
+    # 标签不得预判"题材错配"（概念级 spread>0 → 题材选择有效）
+    assert "题材错配混合" not in label, label
+    assert "非题材错配" in label, label
+    assert "题材选择有效" in label, label
+    # 必须披露单只跌停独力拖累
+    assert "600895" in attr and "张江高科" in attr, attr
+    assert "-10.01%" in attr, attr
+    # 剔除后均值必须出现
+    assert "+0.23%" in attr, attr
+    # 组间收益差数字必须在归因里
+    assert "-0.68%" in attr and "-0.82%" in attr, attr
+
+
+def test_single_stock_drag_detects_limit_down_laggard():
+    """v1.43: 单只跌停独力拖累的识别纯函数。"""
+    rows = [("603288", "海天味业", 1.25, -0.52, -1.77),
+            ("600406", "国电南瑞", 0.98, 0.40, -0.58),
+            ("600312", "平高电气", 0.81, -1.75, -2.56),
+            ("601166", "兴业银行", 0.60, 1.05, 0.45),
+            ("600066", "宇通客车", 0.51, 3.47, 2.96),
+            ("601318", "中国平安", 0.48, 1.46, 0.98),
+            ("002415", "海康威视", 1.19, -1.29, -2.48),
+            ("000651", "格力电器", 0.56, -0.29, -0.85),
+            ("002142", "宁波银行", 0.48, -0.45, -0.93),
+            ("600895", "张江高科", 1.99, -10.01, -12.00)]
+    d = run_afterhours._single_stock_drag(rows)
+    assert d is not None
+    assert d[0] == "600895" and d[1] == "张江高科", d
+    assert abs(d[2] - (-10.01)) < 1e-6, d
+    assert abs(d[3] - 0.23) < 0.02, d     # 剔除后 9 只均值
+    assert abs(d[4] - (-0.79)) < 0.02, d  # 原均值
+    # 无极端跌停时不得误报
+    assert run_afterhours._single_stock_drag(rows[:5]) is None
+    # 小样本不得误报
+    assert run_afterhours._single_stock_drag(rows[:4]) is None
+
+
+def test_filter_tiny_industry_boards_drops_mini_pseudo_boards():
+    """v1.43: 成分股 <3 的迷你板块不是"行业"，必须从涨跌榜剔除。
+
+    2026-11-20 实战: 涨幅 #1「其他数字媒体 +15.00%」只有 2 只成分股
+    (凡拓数创 +20% / 风语筑 +10%)，跌幅 #1「涂料 -8.84%」同样只有 2 只。
+    不做过滤 → 战报把"两只票的算术平均"报成"今日最强/最弱行业"。"""
+    rows = [
+        {"name": "其他数字媒体", "change_pct": 15.0, "up_count": 2, "down_count": 0},
+        {"name": "视频媒体", "change_pct": 3.19, "up_count": 1, "down_count": 0},
+        {"name": "国有大型银行Ⅲ", "change_pct": 2.39, "up_count": 6, "down_count": 0},
+        {"name": "涂料", "change_pct": -8.84, "up_count": 0, "down_count": 2},
+        {"name": "银行", "change_pct": 0.22, "up_count": 42, "down_count": 0},
+    ]
+    kept, dropped = run_afterhours.filter_tiny_industry_boards(rows)
+    kept_names = {r["name"] for r in kept}
+    dropped_names = {r["name"] for r in dropped}
+    assert "其他数字媒体" in dropped_names, kept_names
+    assert "视频媒体" in dropped_names, kept_names
+    assert "涂料" in dropped_names, kept_names
+    assert "国有大型银行Ⅲ" in kept_names, kept_names
+    assert "银行" in kept_names, kept_names
+    assert len(dropped) == 3, dropped
+    # 字段缺失（拿不到成分股数）→ 保守保留，不误杀
+    kept2, dropped2 = run_afterhours.filter_tiny_industry_boards(
+        [{"name": "未知板块", "change_pct": 1.0}])
+    assert len(kept2) == 1 and not dropped2, (kept2, dropped2)
+
+
+def test_defensive_strong_industries_requires_positive_change():
+    """v1.42 已有纪律: "领涨"必须真的在涨。今日防御板块独涨,
+    故必须报出真实领涨板块; 若命中的防御板块全为负, 不得说"领涨"。"""
+    up = {"top": [{"name": "国有大型银行Ⅲ", "change_pct": 2.39},
+                  {"name": "股份制银行Ⅲ", "change_pct": 1.05},
+                  {"name": "保险Ⅲ", "change_pct": 0.39}]}
+    out = run_afterhours._defensive_strong_industries(up)
+    assert "领涨" in out, out
+    assert "国有大型银行Ⅲ" in out, out
+    assert "保险Ⅲ" in out, out
+    # 全负 → 不得说领涨
+    down = {"top": [{"name": "证券", "change_pct": -0.05},
+                    {"name": "银行", "change_pct": -0.62}]}
+    out2 = run_afterhours._defensive_strong_industries(down)
+    assert "今日领涨（" not in out2, out2
+    assert "未领涨" in out2, out2
+
+
+def test_growth_bottom_industries_reports_real_bottom_names():
+    """数据驱动: 跌幅榜板块名必须来自当日数据, 不得写死。"""
+    ind = {"bottom": [{"name": "其他黑色家电", "change_pct": -8.31},
+                      {"name": "集成电路封测", "change_pct": -7.96},
+                      {"name": "光学元件", "change_pct": -7.60}]}
+    out = run_afterhours._growth_bottom_industries(ind)
+    assert "其他黑色家电" in out and "-8.31%" in out, out
+    assert "集成电路封测" in out, out
+
+
+# ══════════════════════════════════════════════════════════════════════
+# v1.44 (2026-11-23 实战) — 三处"说错话但不报错"的展示层修复
+# ══════════════════════════════════════════════════════════════════════
+
+# 2026-11-23 实测收盘数据（已用独立腾讯行情接口逐项复核）
+_20261123_GAP = [("上证指数", 0.16, 0.15, -0.01),
+                 ("深证成指", 0.99, 1.93, 0.94),
+                 ("创业板指", 0.76, 3.08, 2.32),
+                 ("科创50", 0.30, -0.26, -0.56)]
+_20261123_OTHER = [0.15, 1.93, 1.04, 0.09]   # 上证/深证/中小100/沪深300
+
+
+def test_v_flip_requires_same_row_to_satisfy_both_conditions():
+    """v1.44 纪律①: "单点V型反转"必须是**同一行**同时满足
+    (跨越零点 + |Δ|>=2pp + 大盘整体为负)。
+
+    2026-11-23 实测反例: 科创50 +0.30%→-0.26%（跨零点，Δ 仅 -0.56pp）
+    + 创业板 +0.76%→+3.08%（Δ +2.32pp，但不跨零点）—— 两个条件**各自**
+    都被满足，却**没有任何一行同时满足** → 旧代码走兜底元组打印
+    「某指数 14:45 +0.00% → 收盘 +0.00%（Δ=+2.32pp）」的假数据。
+    """
+    market_avg = (0.15 + 1.93 + 3.08 - 0.26) / 4     # +1.23% → 大盘整体为正
+    assert run_afterhours._find_v_flip(_20261123_GAP, market_avg) is None
+    # 大盘整体为负 + 同一行同时满足 → 正常命中
+    ok_gap = [("科创50", -0.30, 2.10, 2.40)]
+    hit = run_afterhours._find_v_flip(ok_gap, -1.0)
+    assert hit is not None and hit[0] == "科创50" and hit[3] == 2.40, hit
+    # 大盘整体为负但无一行同时满足 → 仍不命中（跨零点但 Δ 不足）
+    assert run_afterhours._find_v_flip(
+        [("科创50", 0.30, -0.26, -0.56)], -1.0) is None
+
+
+def test_market_feature_detects_cyb_single_point_surge():
+    """v1.44 纪律②: v1.42 加了「科创50 单点独涨型」但**镜像场景**
+    （创业板强、科创50 弱）没有检测层 → 2026-11-23 落空标"震荡"。
+    创业板 +3.08% / 科创50 -0.26% / 上证 +0.15% 属"创业板单点独涨"。"""
+    feature = run_afterhours.classify_market_feature(
+        1.23, 0.15, 3.08, -0.26, _20261123_GAP, 1.258, _20261123_OTHER)
+    assert "创业板" in feature and "独涨" in feature, feature
+    assert "震荡" not in feature, feature
+    # 镜像场景（科创50 强、创业板弱）不得误判为创业板独涨
+    assert not run_afterhours._cyb_single_surge(
+        1.83, -0.79, [0.0, -0.71, 0.0, 0.03])
+    # 科创50 已同步上涨 → 不是"单点"
+    assert not run_afterhours._cyb_single_surge(
+        3.08, 2.10, _20261123_OTHER)
+    # 创业板强度不足 → 不命中
+    assert not run_afterhours._cyb_single_surge(
+        1.50, -0.26, _20261123_OTHER)
+
+
+def test_pool_advice_line_uses_t1_when_pool_empty():
+    """v1.44 纪律③: 当日池为空（冰点守卫·设计行为）时，旧代码打印
+    「整体均值 +0.00% vs 上证」—— 这是**空集的 0.0**，是编造的数字，
+    且无视同屏已算出的 T+1 闭环复核。必须改用 T+1 数据。"""
+    t1 = {"prev_date": "2026-11-20", "n": 10, "hits": 2, "hit_rate": 20.0,
+          "avg": -0.87, "alpha_sh": -1.02, "neg_continuation": 10}
+    out = run_afterhours._pool_advice_line([], [], 0.0, 0.15, t1)
+    assert "20.0%" in out, out
+    assert "-1.02pp" in out, out
+    assert "上一交易日" in out and "不代表今日新推荐" in out, out
+    assert "+0.00%" not in out, out
+    # 无 T+1 → 如实说无可用样本, 绝不编造均值
+    out2 = run_afterhours._pool_advice_line([], [], 0.0, 0.15, None)
+    assert "无可用样本" in out2, out2
+    assert "+0.00%" not in out2, out2
+    # 有当日池 → 打印真实命中率/超额
+    rows = [("600000", "浦发", 1.0, 2.0, 1.0), ("600001", "乙", 1.0, -1.0, -2.0)]
+    out3 = run_afterhours._pool_advice_line(rows, [1], 0.5, 0.15, t1)
+    assert "1/2" in out3 and "超额" in out3, out3
+
+
+def test_cyb_lead_themes_picks_robot_chain_not_semiconductor():
+    """v1.44: 创业板单点独涨日的主线筛法不能沿用科创链关键词
+    （当日主线是人形机器人 39 次 / 41 只涨停，不是半导体链）。"""
+    themes = ["人形机器人", "汽车零部件", "AI短剧", "商业航天", "机器人零部件"]
+    out = run_afterhours._cyb_lead_themes(themes)
+    assert "人形机器人" in out, out
+    assert "需人工确认" not in out, out
+    # 无匹配 → 如实说明, 不硬凑
+    out2 = run_afterhours._cyb_lead_themes(["某冷门题材"])
+    assert "需人工确认" in out2, out2
