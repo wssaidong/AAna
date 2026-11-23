@@ -6732,9 +6732,200 @@
       "reason": "止损/止盈/到期",
       "pnl": -49.0,
       "pnl_pct": -1.55
+    },
+    {
+      "date": "2026-11-23",
+      "code": "000410",
+      "name": "沈阳机床",
+      "action": "buy",
+      "price": 6.27,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 90",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "000888",
+      "name": "峨眉山Ａ",
+      "action": "buy",
+      "price": 10.43,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 85",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "002138",
+      "name": "顺络电子",
+      "action": "buy",
+      "price": 36.15,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "000603",
+      "name": "盛达资源",
+      "action": "buy",
+      "price": 24.3,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "600330",
+      "name": "天通股份",
+      "action": "buy",
+      "price": 13.94,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "000657",
+      "name": "中钨高新",
+      "action": "buy",
+      "price": 34.8,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "003036",
+      "name": "泰坦股份",
+      "action": "buy",
+      "price": 26.42,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "002903",
+      "name": "宇环数控",
+      "action": "buy",
+      "price": 20.1,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "603767",
+      "name": "中马传动",
+      "action": "buy",
+      "price": 12.79,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-23",
+      "code": "603082",
+      "name": "北自科技",
+      "action": "buy",
+      "price": 38.52,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 83",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "000410": {
+      "date": "2026-11-23",
+      "name": "沈阳机床",
+      "shares": 100,
+      "entry_price": 6.27,
+      "highest_price": 6.27,
+      "entry_date": "2026-11-23"
+    },
+    "000888": {
+      "date": "2026-11-23",
+      "name": "峨眉山Ａ",
+      "shares": 100,
+      "entry_price": 10.43,
+      "highest_price": 10.43,
+      "entry_date": "2026-11-23"
+    },
+    "002138": {
+      "date": "2026-11-23",
+      "name": "顺络电子",
+      "shares": 100,
+      "entry_price": 36.15,
+      "highest_price": 36.15,
+      "entry_date": "2026-11-23"
+    },
+    "000603": {
+      "date": "2026-11-23",
+      "name": "盛达资源",
+      "shares": 100,
+      "entry_price": 24.3,
+      "highest_price": 24.4,
+      "entry_date": "2026-11-23"
+    },
+    "600330": {
+      "date": "2026-11-23",
+      "name": "天通股份",
+      "shares": 100,
+      "entry_price": 13.94,
+      "highest_price": 13.94,
+      "entry_date": "2026-11-23"
+    },
+    "000657": {
+      "date": "2026-11-23",
+      "name": "中钨高新",
+      "shares": 100,
+      "entry_price": 34.8,
+      "highest_price": 34.93,
+      "entry_date": "2026-11-23"
+    },
+    "003036": {
+      "date": "2026-11-23",
+      "name": "泰坦股份",
+      "shares": 100,
+      "entry_price": 26.42,
+      "highest_price": 26.42,
+      "entry_date": "2026-11-23"
+    },
+    "002903": {
+      "date": "2026-11-23",
+      "name": "宇环数控",
+      "shares": 100,
+      "entry_price": 20.1,
+      "highest_price": 20.1,
+      "entry_date": "2026-11-23"
+    },
+    "603767": {
+      "date": "2026-11-23",
+      "name": "中马传动",
+      "shares": 100,
+      "entry_price": 12.79,
+      "highest_price": 12.79,
+      "entry_date": "2026-11-23"
+    },
+    "603082": {
+      "date": "2026-11-23",
+      "name": "北自科技",
+      "shares": 100,
+      "entry_price": 38.52,
+      "highest_price": 38.52,
+      "entry_date": "2026-11-23"
+    }
+  },
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -8030,6 +8221,128 @@
       "total_pnl_pct": -2.99,
       "realized_pnl": -2989.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-23",
+      "cash": 74639.0,
+      "position_value": 22395.0,
+      "total_value": 97034.0,
+      "daily_pnl": 23.0,
+      "total_pnl": -2966.0,
+      "total_pnl_pct": -2.97,
+      "realized_pnl": -2989.0,
+      "positions": [
+        {
+          "code": "000410",
+          "name": "沈阳机床",
+          "shares": 100,
+          "entry_price": 6.27,
+          "current_price": 6.27,
+          "highest_price": 6.27,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000888",
+          "name": "峨眉山Ａ",
+          "shares": 100,
+          "entry_price": 10.43,
+          "current_price": 10.43,
+          "highest_price": 10.43,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002138",
+          "name": "顺络电子",
+          "shares": 100,
+          "entry_price": 36.15,
+          "current_price": 36.15,
+          "highest_price": 36.15,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000603",
+          "name": "盛达资源",
+          "shares": 100,
+          "entry_price": 24.3,
+          "current_price": 24.4,
+          "highest_price": 24.4,
+          "unreal_pnl": 10.0,
+          "unreal_pct": 0.41,
+          "days_held": 0
+        },
+        {
+          "code": "600330",
+          "name": "天通股份",
+          "shares": 100,
+          "entry_price": 13.94,
+          "current_price": 13.94,
+          "highest_price": 13.94,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000657",
+          "name": "中钨高新",
+          "shares": 100,
+          "entry_price": 34.8,
+          "current_price": 34.93,
+          "highest_price": 34.93,
+          "unreal_pnl": 13.0,
+          "unreal_pct": 0.37,
+          "days_held": 0
+        },
+        {
+          "code": "003036",
+          "name": "泰坦股份",
+          "shares": 100,
+          "entry_price": 26.42,
+          "current_price": 26.42,
+          "highest_price": 26.42,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002903",
+          "name": "宇环数控",
+          "shares": 100,
+          "entry_price": 20.1,
+          "current_price": 20.1,
+          "highest_price": 20.1,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603767",
+          "name": "中马传动",
+          "shares": 100,
+          "entry_price": 12.79,
+          "current_price": 12.79,
+          "highest_price": 12.79,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603082",
+          "name": "北自科技",
+          "shares": 100,
+          "entry_price": 38.52,
+          "current_price": 38.52,
+          "highest_price": 38.52,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
