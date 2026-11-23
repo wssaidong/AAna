@@ -4,12 +4,6 @@
       "name": "三安光电",
       "records": [
         {
-          "date": "2026-06-12",
-          "change": 5.39,
-          "hit": false,
-          "sector": "semi"
-        },
-        {
           "date": "2026-06-15",
           "change": -0.36,
           "hit": false,
@@ -182,6 +176,12 @@
           "change": -0.45,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 3.23,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -189,12 +189,6 @@
     "002049": {
       "name": "紫光国微",
       "records": [
-        {
-          "date": "2026-07-02",
-          "change": 2.75,
-          "hit": false,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-07-03",
           "change": 0.0,
@@ -368,6 +362,12 @@
           "change": 1.74,
           "hit": true,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 1.81,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -375,12 +375,6 @@
     "600584": {
       "name": "长电科技",
       "records": [
-        {
-          "date": "2026-06-12",
-          "change": -4.07,
-          "hit": false,
-          "sector": "semi"
-        },
         {
           "date": "2026-06-15",
           "change": -1.96,
@@ -554,6 +548,12 @@
           "change": -1.05,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 2.89,
+          "hit": true,
+          "sector": "semi"
         }
       ],
       "consecutive_bad": 0
@@ -561,12 +561,6 @@
     "603667": {
       "name": "五洲新春",
       "records": [
-        {
-          "date": "2026-06-30",
-          "change": -2.03,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-07-02",
           "change": 0.0,
@@ -740,6 +734,12 @@
           "change": 1.82,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 1.84,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -777,12 +777,6 @@
     "002836": {
       "name": "新宏泽",
       "records": [
-        {
-          "date": "2026-06-30",
-          "change": -0.94,
-          "hit": false,
-          "sector": "robot"
-        },
         {
           "date": "2026-07-02",
           "change": 0.21,
@@ -956,6 +950,12 @@
           "change": 2.43,
           "hit": true,
           "sector": "robot"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 0.26,
+          "hit": false,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -993,12 +993,6 @@
     "002230": {
       "name": "科大讯飞",
       "records": [
-        {
-          "date": "2026-07-17",
-          "change": 0.86,
-          "hit": false,
-          "sector": "ai_chip"
-        },
         {
           "date": "2026-07-20",
           "change": 1.28,
@@ -1172,6 +1166,12 @@
           "change": 1.47,
           "hit": true,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 1.29,
+          "hit": true,
+          "sector": "robot"
         }
       ],
       "consecutive_bad": 0
@@ -1648,12 +1648,6 @@
       "name": "海康威视",
       "records": [
         {
-          "date": "2026-07-13",
-          "change": 0.73,
-          "hit": false,
-          "sector": "ai_app"
-        },
-        {
           "date": "2026-07-14",
           "change": 0.36,
           "hit": false,
@@ -1824,6 +1818,12 @@
         {
           "date": "2026-11-20",
           "change": 1.08,
+          "hit": true,
+          "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 1.15,
           "hit": true,
           "sector": "ai_chip"
         }
@@ -2020,12 +2020,6 @@
       "name": "*ST闻泰",
       "records": [
         {
-          "date": "2026-06-30",
-          "change": 0.06,
-          "hit": false,
-          "sector": "robot"
-        },
-        {
           "date": "2026-07-02",
           "change": 0.12,
           "hit": false,
@@ -2196,6 +2190,12 @@
         {
           "date": "2026-11-20",
           "change": 3.48,
+          "hit": true,
+          "sector": "robot"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 2.27,
           "hit": true,
           "sector": "robot"
         }
@@ -2392,12 +2392,6 @@
       "name": "XD兆易创",
       "records": [
         {
-          "date": "2026-06-11",
-          "change": 0.07,
-          "hit": false,
-          "sector": "ai_chip"
-        },
-        {
           "date": "2026-06-17",
           "change": 2.26,
           "hit": false,
@@ -2570,6 +2564,12 @@
           "change": 4.2,
           "hit": true,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-23",
+          "change": 2.94,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -2579,11 +2579,6 @@
     "semi": {
       "name": "半导体设备",
       "records": [
-        {
-          "date": "2026-06-12",
-          "avg_change": -0.3866666666666669,
-          "hit_rate": 0.0
-        },
         {
           "date": "2026-06-15",
           "avg_change": -1.0366666666666666,
@@ -2728,6 +2723,11 @@
           "date": "2026-11-18",
           "avg_change": -0.75,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-11-23",
+          "avg_change": 2.643333333333333,
+          "hit_rate": 100.0
         }
       ]
     },
@@ -2890,11 +2890,6 @@
       "name": "人形机器人",
       "records": [
         {
-          "date": "2026-06-30",
-          "avg_change": -1.07,
-          "hit_rate": 25.0
-        },
-        {
           "date": "2026-07-02",
           "avg_change": -0.135,
           "hit_rate": 25.0
@@ -3038,6 +3033,11 @@
           "date": "2026-11-20",
           "avg_change": 2.5766666666666667,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-11-23",
+          "avg_change": 1.415,
+          "hit_rate": 75.0
         }
       ]
     },
@@ -3200,11 +3200,6 @@
       "name": "AI算力/芯片",
       "records": [
         {
-          "date": "2026-06-17",
-          "avg_change": 0.7599999999999999,
-          "hit_rate": 33.33333333333333
-        },
-        {
           "date": "2026-06-18",
           "avg_change": 0.07999999999999999,
           "hit_rate": 0.0
@@ -3348,6 +3343,11 @@
           "date": "2026-11-20",
           "avg_change": 2.1225,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-11-23",
+          "avg_change": 2.045,
+          "hit_rate": 100.0
         }
       ]
     }
@@ -3355,6 +3355,7 @@
   "updated": [
     "2026-11-18",
     "2026-11-19",
-    "2026-11-20"
+    "2026-11-20",
+    "2026-11-23"
   ]
 }
