@@ -1,0 +1,300 @@
+{
+ "date": "2026-11-24",
+ "base_date": "2026-11-23",
+ "report": "/Users/cai/code/AAna/reports/2026-11-24-选股报告.md",
+ "report_note": "08:02:03 盘前版, Top10 表 1 只 (菜百股份), 涨跌幅=昨收(11-23)口径",
+ "report_size": 6907,
+ "report_mtime": "2026-11-24T08:03:26",
+ "trading_day": true,
+ "session": "trading_day_premarket",
+ "generated": "08:36:27",
+ "run_id": "01a20af6-44f4-79ec-9728-aaea8beb354e",
+ "trading_legs": {
+  "weekday": "周二",
+  "report_today": true,
+  "cron_generated": true,
+  "cron_pool_line": "[AAna] 动态股票池: 81 只 (涨停警示 0 只)",
+  "cron_moneyflow_fallback": true
+ },
+ "trading_legs_ok": true,
+ "sentiment_snap": {
+  "score": 75,
+  "label": "亢奋",
+  "position": 0.85,
+  "zt_count": 150,
+  "dt_count": 15
+ },
+ "sentiment_v_recovery": "11-23 情绪 20 冰点 → 11-24 快照 75 亢奋 (V 型修复兑现, 10-28 同型)",
+ "mk_four_avg_close": 1.225,
+ "sh_close_pct": 0.15,
+ "mk_avg_all": 1.31,
+ "idx_close_pct": {
+  "sh000001": 0.15,
+  "sz399001": 1.93,
+  "sz399006": 3.08,
+  "sh000688": -0.26
+ },
+ "pool_size": 1,
+ "guard_ice": false,
+ "guard_pass": true,
+ "guard_live": {
+  "score": 75,
+  "label": "亢奋",
+  "is_ice_point": false,
+  "data_source_fallback": false
+ },
+ "briefing_anomaly": {
+  "brief": "/Users/cai/code/AAna/reports/2026-11-24/盘前/2026-11-24_0830_早盘简报.md",
+  "exists": true,
+  "sh_price_claimed": 12.22,
+  "sh_change_claimed": "+0.16%",
+  "recommend_rows": 16,
+  "verdict": "简报记上证 ¥12.22 +0.16% (真值 3538.95 +0.15% 周一收盘, 价格字段失真) + 深成/创业板以昨收冒充现价 + 盘前 09:30 开盘前列 16 行伪实时涨幅 → 不采信, 候选池只认主链报告"
+ },
+ "overall_win_rate": 49.67462039045553,
+ "total_records": 461,
+ "sector_count": 122,
+ "results": [
+  {
+   "code": "605599",
+   "name": "菜百股份",
+   "price": 14.96,
+   "pe_ttm": 11.64,
+   "pb": 2.58,
+   "mcap_yi": 116.36,
+   "float_mcap_yi": 116.36,
+   "turnover_pct": 2.09,
+   "vol_ratio": 2.78,
+   "v24_score": "**69**",
+   "report_stop": 14.51,
+   "tech_score": 40,
+   "fund_score": 14,
+   "val_score_raw": 15,
+   "val_score": 15,
+   "total": 70.4,
+   "rating": "增持",
+   "target": 15.71,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=66 偏热",
+    "20日区间位置 91% 突破区",
+    "60日涨幅 -11% 弱势",
+    "量能比 2.78"
+   ],
+   "fund_notes": [
+    "ROE 11.1% 良好",
+    "净利增速 -21% 负增长",
+    "营收增速 +29%",
+    "无修正触发 (gap<15pp 或 OCF>0, 归母口径有效)"
+   ],
+   "val_notes": [
+    "PE 12 合理",
+    "PB 2.58 合理"
+   ],
+   "tech_stat": {
+    "rsi": 66.2,
+    "pos20": 91.0,
+    "chg60": -11.3,
+    "vol_ratio_5d": 2.78,
+    "ma5": 14.49,
+    "ma20": 14.04,
+    "ma60": 14.24,
+    "hi20": 15.2,
+    "lo20": 12.61,
+    "chg_1d": 6.33,
+    "last_date": "2026-11-23",
+    "kline_len": 120
+   },
+   "quality": {
+    "kf_yoy": -1.909,
+    "q_gm": 76275562.55,
+    "q_kf": 92566055.61,
+    "q_rev": 5406141639.7,
+    "q_gm_yoy": -59.4426,
+    "q_kf_yoy": -51.1846,
+    "q_rev_yoy": 3.4854,
+    "gm_ttm": 999365535.19,
+    "rev_ttm": 34796032689.27,
+    "ttm_ratio": 0.0287,
+    "gap": -18.7636,
+    "ocf_ratio": 1.9829,
+    "ocf_cum": 1017353298.36,
+    "q_triggered": false,
+    "lb_triggered": false,
+    "distorted": false,
+    "pe_trap": false,
+    "triggered": false,
+    "trigger_reason": null
+   },
+   "chg_pct": 6.33,
+   "chg_date": "2026-11-23",
+   "industry_sina": "珠宝首饰",
+   "industry_cninfo": "零售业",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "neighbor_sectors": {
+    "黄金": "100.0% (1/1)",
+    "百货": "100.0% (3/3)",
+    "专业连锁": "0.0% (0/1)",
+    "超市": "0.0% (0/1)"
+   },
+   "beat_four": true,
+   "beat_sh": true,
+   "beat_mkt_avg": true,
+   "pos": true,
+   "stop_broken": false,
+   "rating_ok": true,
+   "law_pass": true
+  }
+ ],
+ "eligible_pool": [
+  "605599"
+ ],
+ "recommend": {
+  "code": "605599",
+  "name": "菜百股份",
+  "total": 70.4,
+  "rating": "增持",
+  "price": 14.96,
+  "chg_pct": 6.33,
+  "target": 15.71,
+  "stop": 14.51,
+  "sector_stat_key": null,
+  "sector_win_rate": "无记录(冷启动)",
+  "neighbor_sectors": {
+   "黄金": "100.0% (1/1)",
+   "百货": "100.0% (3/3)",
+   "专业连锁": "0.0% (0/1)",
+   "超市": "0.0% (0/1)"
+  }
+ },
+ "prev_pool_precheck": [
+  {
+   "code": "002415",
+   "close": 35.15,
+   "chg_pct": -0.28,
+   "quote_ts": "20261123161442",
+   "stop": 34.64,
+   "stop_broken": false,
+   "held_group": "20261120ZZ",
+   "pnl": null,
+   "pnl_ctx": -0.65
+  },
+  {
+   "code": "002142",
+   "close": 35.1,
+   "chg_pct": -0.4,
+   "quote_ts": "20261123161439",
+   "stop": 34.34,
+   "stop_broken": false,
+   "held_group": "20261118ZZ",
+   "pnl": -1.21,
+   "pnl_ctx": null
+  },
+  {
+   "code": "000410",
+   "close": 6.26,
+   "chg_pct": 6.64,
+   "quote_ts": "20261123161448",
+   "stop": 5.84,
+   "stop_broken": false,
+   "held_group": "20261123PP",
+   "pnl": null,
+   "pnl_ctx": null
+  },
+  {
+   "code": "002048",
+   "close": 17.7,
+   "chg_pct": 7.08,
+   "quote_ts": "20261123161430",
+   "stop": null,
+   "stop_broken": null,
+   "held_group": null,
+   "pnl": null,
+   "pnl_ctx": null
+  },
+  {
+   "code": "002674",
+   "close": 15.66,
+   "chg_pct": 6.17,
+   "quote_ts": "20261123161451",
+   "stop": null,
+   "stop_broken": null,
+   "held_group": null,
+   "pnl": null,
+   "pnl_ctx": null
+  },
+  {
+   "code": "603270",
+   "close": 22.64,
+   "chg_pct": 6.14,
+   "quote_ts": "20261123161449",
+   "stop": null,
+   "stop_broken": null,
+   "held_group": null,
+   "pnl": null,
+   "pnl_ctx": null
+  },
+  {
+   "code": "603767",
+   "close": 12.83,
+   "chg_pct": 6.3,
+   "quote_ts": "20261123161459",
+   "stop": null,
+   "stop_broken": null,
+   "held_group": null,
+   "pnl": null,
+   "pnl_ctx": null
+  }
+ ],
+ "held_zz": [
+  {
+   "group": "20261120ZZ",
+   "gid": 2051,
+   "code": "002415",
+   "name": "海康威视",
+   "close": 35.15,
+   "chg_pct": -0.28,
+   "stop": 34.64,
+   "stop_broken": false,
+   "entry_ctx": "11-20 早盘关注价 35.38",
+   "pnl_vs_entry_ctx": -0.65
+  },
+  {
+   "group": "20261118ZZ",
+   "gid": 2016,
+   "code": "002142",
+   "name": "宁波银行",
+   "entry": 35.53,
+   "close": 35.1,
+   "chg_pct": -0.4,
+   "stop": 34.34,
+   "stop_broken": false,
+   "pnl_vs_entry": -1.21
+  },
+  {
+   "group": "20261123PP",
+   "gid": 2061,
+   "code": "000410",
+   "name": "沈阳机床",
+   "close": 6.26,
+   "chg_pct": 6.64,
+   "stop": 5.84,
+   "stop_broken": false,
+   "note": "11-23 尾盘推荐 T+1 开盘执行: 回落 5.9-6.1 分批, 高开>2% (>6.39) 放弃"
+  }
+ ],
+ "eastmoney_sync": {
+  "action": "done",
+  "result": {
+   "gid": "2076",
+   "stocks": [
+    "605599"
+   ]
+  },
+  "groups_20261124_occupied": {
+   "20261124": "2071"
+  },
+  "forbidden_bare_gid": "2071"
+ }
+}
