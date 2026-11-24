@@ -6952,9 +6952,200 @@
       "reason": "止损/止盈/到期",
       "pnl": 120.0,
       "pnl_pct": 3.12
+    },
+    {
+      "date": "2026-11-24",
+      "code": "001328",
+      "name": "登康口腔",
+      "action": "buy",
+      "price": 36.25,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "002960",
+      "name": "青鸟智控",
+      "action": "buy",
+      "price": 8.73,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 92",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "002273",
+      "name": "水晶光电",
+      "action": "buy",
+      "price": 22.84,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "603118",
+      "name": "共进股份",
+      "action": "buy",
+      "price": 13.19,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "600201",
+      "name": "生物股份",
+      "action": "buy",
+      "price": 12.26,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "002351",
+      "name": "漫步者",
+      "action": "buy",
+      "price": 12.02,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "002026",
+      "name": "山东威达",
+      "action": "buy",
+      "price": 10.82,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "002270",
+      "name": "华明装备",
+      "action": "buy",
+      "price": 18.92,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "603665",
+      "name": "康隆达",
+      "action": "buy",
+      "price": 19.11,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-24",
+      "code": "601601",
+      "name": "中国太保",
+      "action": "buy",
+      "price": 32.59,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 87",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "001328": {
+      "date": "2026-11-24",
+      "name": "登康口腔",
+      "shares": 100,
+      "entry_price": 36.25,
+      "highest_price": 36.25,
+      "entry_date": "2026-11-24"
+    },
+    "002960": {
+      "date": "2026-11-24",
+      "name": "青鸟智控",
+      "shares": 100,
+      "entry_price": 8.73,
+      "highest_price": 8.73,
+      "entry_date": "2026-11-24"
+    },
+    "002273": {
+      "date": "2026-11-24",
+      "name": "水晶光电",
+      "shares": 100,
+      "entry_price": 22.84,
+      "highest_price": 22.84,
+      "entry_date": "2026-11-24"
+    },
+    "603118": {
+      "date": "2026-11-24",
+      "name": "共进股份",
+      "shares": 100,
+      "entry_price": 13.19,
+      "highest_price": 13.19,
+      "entry_date": "2026-11-24"
+    },
+    "600201": {
+      "date": "2026-11-24",
+      "name": "生物股份",
+      "shares": 100,
+      "entry_price": 12.26,
+      "highest_price": 12.26,
+      "entry_date": "2026-11-24"
+    },
+    "002351": {
+      "date": "2026-11-24",
+      "name": "漫步者",
+      "shares": 100,
+      "entry_price": 12.02,
+      "highest_price": 12.02,
+      "entry_date": "2026-11-24"
+    },
+    "002026": {
+      "date": "2026-11-24",
+      "name": "山东威达",
+      "shares": 100,
+      "entry_price": 10.82,
+      "highest_price": 10.82,
+      "entry_date": "2026-11-24"
+    },
+    "002270": {
+      "date": "2026-11-24",
+      "name": "华明装备",
+      "shares": 100,
+      "entry_price": 18.92,
+      "highest_price": 18.92,
+      "entry_date": "2026-11-24"
+    },
+    "603665": {
+      "date": "2026-11-24",
+      "name": "康隆达",
+      "shares": 100,
+      "entry_price": 19.11,
+      "highest_price": 19.11,
+      "entry_date": "2026-11-24"
+    },
+    "601601": {
+      "date": "2026-11-24",
+      "name": "中国太保",
+      "shares": 100,
+      "entry_price": 32.59,
+      "highest_price": 32.59,
+      "entry_date": "2026-11-24"
+    }
+  },
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -8383,6 +8574,128 @@
       "total_pnl_pct": -2.07,
       "realized_pnl": -2067.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-24",
+      "cash": 79260.0,
+      "position_value": 18673.0,
+      "total_value": 97933.0,
+      "daily_pnl": 0.0,
+      "total_pnl": -2067.0,
+      "total_pnl_pct": -2.07,
+      "realized_pnl": -2067.0,
+      "positions": [
+        {
+          "code": "001328",
+          "name": "登康口腔",
+          "shares": 100,
+          "entry_price": 36.25,
+          "current_price": 36.25,
+          "highest_price": 36.25,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002960",
+          "name": "青鸟智控",
+          "shares": 100,
+          "entry_price": 8.73,
+          "current_price": 8.73,
+          "highest_price": 8.73,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002273",
+          "name": "水晶光电",
+          "shares": 100,
+          "entry_price": 22.84,
+          "current_price": 22.84,
+          "highest_price": 22.84,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603118",
+          "name": "共进股份",
+          "shares": 100,
+          "entry_price": 13.19,
+          "current_price": 13.19,
+          "highest_price": 13.19,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600201",
+          "name": "生物股份",
+          "shares": 100,
+          "entry_price": 12.26,
+          "current_price": 12.26,
+          "highest_price": 12.26,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002351",
+          "name": "漫步者",
+          "shares": 100,
+          "entry_price": 12.02,
+          "current_price": 12.02,
+          "highest_price": 12.02,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002026",
+          "name": "山东威达",
+          "shares": 100,
+          "entry_price": 10.82,
+          "current_price": 10.82,
+          "highest_price": 10.82,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002270",
+          "name": "华明装备",
+          "shares": 100,
+          "entry_price": 18.92,
+          "current_price": 18.92,
+          "highest_price": 18.92,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "603665",
+          "name": "康隆达",
+          "shares": 100,
+          "entry_price": 19.11,
+          "current_price": 19.11,
+          "highest_price": 19.11,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "601601",
+          "name": "中国太保",
+          "shares": 100,
+          "entry_price": 32.59,
+          "current_price": 32.59,
+          "highest_price": 32.59,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
