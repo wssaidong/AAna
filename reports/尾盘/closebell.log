@@ -6300,3 +6300,218 @@ AttributeError: 'list' object has no attribute 'get'
 [2026-11-23 14:46:16] [daily_v24_recommend] ============================================================
 [2026-11-24 14:45:00] [daily_v24_recommend] ============================================================
 [2026-11-24 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
+[情绪] 涨停:57 跌停:6 指数均值:+0.17% [数据源:ths]
+[情绪] 回暖 | 涨停57 跌停6 | 建议仓位70%
+[2026-11-24 14:45:02] [daily_v24_recommend] ✅ 守卫通过: 情绪=回暖/仓位=70%
+[2026-11-24 14:45:02] [daily_v24_recommend] [1/4] 调用 aana_afternoon_screen.screen_afternoon_stocks()...
+[strategy_policy] source=rec_tuning threshold=63 top_n=10 hold=1d blacklist=[semi,其他化学制品,其他家用轻工,印制电路板,影视动漫,房地产开发,装修装饰,造纸] tuning_age=0.8d
+  [strategy_policy] 阈值 65→63 (next_day_strategy, 含昨日根因调参)
+  [strategy_policy] 板块黑名单 8 个: semi,其他化学制品,其他家用轻工,印制电路板,影视动漫,房地产开发,装修装饰,造纸 (生产者判定 8 个 + 自动发现 0 个, 自动发现门槛 n≥10 且胜率<35%)
+  [next_day_strategy] 加载 cold_sectors: ['机床工具', '自然景点', '被动元件', '铅锌', '磁性材料'] (+5 more)
+  [next_day_strategy] 加载 weak_sectors: ['semi', '其他化学制品', '其他家用轻工', '印制电路板', '影视动漫'] (+3 more)
+[AAna 尾盘] 14:45:02 开始尾盘选股...
+[Eastmoney] 报告 Top10: ['000819']
+  [源1] 今日 Top10: 1 只
+[Source] sina OK (800 只, 12.1s)
+  [源3] 全市场涨幅榜 (sina, 原始800→过滤255): 新增 251 只
+[AAna 尾盘] 候选股票总数: 252 只
+  [cold_sector] 拦截 603931 格林达: 板块 '其他电子' 在 cold_sectors 中
+[K线] 002265 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002943 宇晶股份: 板块 '机床工具' 在 cold_sectors 中
+[K线] 002876 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002965 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001283 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603131 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002963 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603319 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002881 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603160 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001314 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002351 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003009 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002205 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603883 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605060 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603976 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002338 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600785 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603270 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603219 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603381 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603602 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002925 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603037 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002026 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002947 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600933 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600501 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002792 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600737 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603031 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002272 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001328 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002553 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605287 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603915 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603211 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603859 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002518 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001221 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002955 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603203 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002922 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003018 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002993 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001246 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000048 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600184 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002919 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603276 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002806 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001306 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002409 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603311 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603257 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603178 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605555 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001380 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603217 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603556 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600962 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002981 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603348 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603898 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603109 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001386 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002848 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600838 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002921 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000988 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 000988 华工科技: 板块 '其他电子' 在 cold_sectors 中
+[K线] 603530 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002899 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002194 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001400 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 001400 江顺科技: 板块 '通用机械' 在 cold_sectors 中
+[K线] 605288 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002465 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002403 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603223 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002045 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001270 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002139 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003032 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603730 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600865 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002855 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002779 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603997 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600236 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002960 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002165 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002520 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+  [cold_sector] 拦截 002520 日发精机: 板块 '机床工具' 在 cold_sectors 中
+[K线] 002172 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603236 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605080 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603677 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603313 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603519 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002420 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002871 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603105 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002029 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001268 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600234 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002298 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002088 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603320 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600698 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002799 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001300 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603297 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002583 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603275 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002324 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600398 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002340 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600215 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000691 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603222 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002571 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603006 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600579 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600834 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601606 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601138 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603667 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002077 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603009 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603366 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603078 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603799 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000678 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002241 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603598 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603215 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605398 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003023 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603515 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603948 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002838 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603051 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002452 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003028 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601177 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002831 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002785 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603355 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001215 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002989 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003010 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603777 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603838 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603296 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002196 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002826 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603886 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 001368 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603809 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601566 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 605255 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 601118 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 003021 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 000608 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 002291 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 603722 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[K线] 600510 东财push2his失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[AAna 尾盘] 已记录 10 条推荐到 rec_feedback.csv (优化 #3)
+[AAna 尾盘] 筛选后候选: 186 只 (板块黑名单拦截 27 只)
+[2026-11-24 14:46:53] [daily_v24_recommend]   找到 10 只推荐
+[2026-11-24 14:46:53] [daily_v24_recommend]     001328 登康口腔 score=100
+[2026-11-24 14:46:53] [daily_v24_recommend]     002960 青鸟智控 score=92
+[2026-11-24 14:46:53] [daily_v24_recommend]     002273 水晶光电 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     603118 共进股份 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     600201 生物股份 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     002351 漫步者 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     002026 山东威达 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     002270 华明装备 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     603665 康隆达 score=88
+[2026-11-24 14:46:53] [daily_v24_recommend]     601601 中国太保 score=87
+[2026-11-24 14:46:53] [daily_v24_recommend] [2/4] 调用 paper_trading.record_buy() 建仓...
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 001328 登康口腔 @36.25 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 002960 青鸟智控 @8.73 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 002273 水晶光电 @22.84 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 603118 共进股份 @13.19 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 600201 生物股份 @12.26 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 002351 漫步者 @12.02 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 002026 山东威达 @10.82 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 002270 华明装备 @18.92 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 603665 康隆达 @19.11 100股
+[2026-11-24 14:46:53] [daily_v24_recommend]     建仓 601601 中国太保 @32.59 100股
+[2026-11-24 14:46:53] [daily_v24_recommend] [3/4] 生成 Markdown 报告...
+[2026-11-24 14:46:53] [daily_v24_recommend]   报告已存: /Users/cai/code/AAna/reports/2026-11-24-v24-尾盘推荐.md
+[2026-11-24 14:46:53] [daily_v24_recommend] [4/4] 推送飞书...
+[2026-11-24 14:46:56] [daily_v24_recommend] ✅ 飞书推送成功
+[2026-11-24 14:46:56] [daily_v24_recommend] ✅ 完成
+[2026-11-24 14:46:56] [daily_v24_recommend] ============================================================
