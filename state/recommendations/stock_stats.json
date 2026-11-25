@@ -190,12 +190,6 @@
       "name": "紫光国微",
       "records": [
         {
-          "date": "2026-07-06",
-          "change": -1.49,
-          "hit": false,
-          "sector": "ai_chip"
-        },
-        {
           "date": "2026-07-08",
           "change": -0.93,
           "hit": false,
@@ -368,6 +362,12 @@
           "change": -2.24,
           "hit": false,
           "sector": "semi"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 1.17,
+          "hit": false,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -994,12 +994,6 @@
       "name": "科大讯飞",
       "records": [
         {
-          "date": "2026-07-21",
-          "change": 0.91,
-          "hit": false,
-          "sector": "robot"
-        },
-        {
           "date": "2026-07-22",
           "change": 0.82,
           "hit": false,
@@ -1172,6 +1166,12 @@
           "change": -1.22,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 0.88,
+          "hit": true,
+          "sector": "ai_chip"
         }
       ],
       "consecutive_bad": 0
@@ -1209,12 +1209,6 @@
     "002594": {
       "name": "比亚迪",
       "records": [
-        {
-          "date": "2026-06-22",
-          "change": 1.3,
-          "hit": true,
-          "sector": "energy"
-        },
         {
           "date": "2026-06-23",
           "change": 0.78,
@@ -1388,6 +1382,12 @@
           "change": 1.11,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 0.61,
+          "hit": true,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1395,12 +1395,6 @@
     "002459": {
       "name": "晶澳科技",
       "records": [
-        {
-          "date": "2026-06-22",
-          "change": 0.97,
-          "hit": true,
-          "sector": "energy"
-        },
         {
           "date": "2026-06-23",
           "change": 1.08,
@@ -1574,6 +1568,12 @@
           "change": 2.32,
           "hit": true,
           "sector": "energy"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 1.69,
+          "hit": false,
+          "sector": "energy"
         }
       ],
       "consecutive_bad": 0
@@ -1647,12 +1647,6 @@
     "002415": {
       "name": "海康威视",
       "records": [
-        {
-          "date": "2026-07-15",
-          "change": 0.69,
-          "hit": false,
-          "sector": "ai_app"
-        },
         {
           "date": "2026-07-16",
           "change": 0.98,
@@ -1826,6 +1820,12 @@
           "change": -0.42,
           "hit": false,
           "sector": "ai_chip"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 0.26,
+          "hit": true,
+          "sector": "ai_app"
         }
       ],
       "consecutive_bad": 0
@@ -1833,12 +1833,6 @@
     "600570": {
       "name": "恒生电子",
       "records": [
-        {
-          "date": "2026-06-17",
-          "change": 0.04,
-          "hit": false,
-          "sector": "ai_app"
-        },
         {
           "date": "2026-06-18",
           "change": 0.09,
@@ -2011,6 +2005,12 @@
           "date": "2026-11-19",
           "change": -0.44,
           "hit": false,
+          "sector": "ai_app"
+        },
+        {
+          "date": "2026-11-25",
+          "change": 0.99,
+          "hit": true,
           "sector": "ai_app"
         }
       ],
@@ -2206,12 +2206,6 @@
       "name": "长江电力",
       "records": [
         {
-          "date": "2026-06-22",
-          "change": 0.0,
-          "hit": false,
-          "sector": "energy"
-        },
-        {
           "date": "2026-06-23",
           "change": 0.04,
           "hit": false,
@@ -2383,6 +2377,12 @@
           "date": "2026-11-20",
           "change": 0.32,
           "hit": true,
+          "sector": "energy"
+        },
+        {
+          "date": "2026-11-25",
+          "change": -0.13,
+          "hit": false,
           "sector": "energy"
         }
       ],
@@ -2735,11 +2735,6 @@
       "name": "储能/绿电",
       "records": [
         {
-          "date": "2026-06-22",
-          "avg_change": 0.7566666666666667,
-          "hit_rate": 66.66666666666666
-        },
-        {
           "date": "2026-06-23",
           "avg_change": 0.6333333333333334,
           "hit_rate": 33.33333333333333
@@ -2883,6 +2878,11 @@
           "date": "2026-11-20",
           "avg_change": 1.2499999999999998,
           "hit_rate": 100.0
+        },
+        {
+          "date": "2026-11-25",
+          "avg_change": 0.7233333333333333,
+          "hit_rate": 33.33333333333333
         }
       ]
     },
@@ -3045,11 +3045,6 @@
       "name": "AI应用",
       "records": [
         {
-          "date": "2026-06-17",
-          "avg_change": 0.5700000000000001,
-          "hit_rate": 0.0
-        },
-        {
           "date": "2026-06-18",
           "avg_change": 0.09,
           "hit_rate": 0.0
@@ -3193,17 +3188,17 @@
           "date": "2026-11-19",
           "avg_change": -0.09,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-11-25",
+          "avg_change": 0.625,
+          "hit_rate": 100.0
         }
       ]
     },
     "ai_chip": {
       "name": "AI算力/芯片",
       "records": [
-        {
-          "date": "2026-06-24",
-          "avg_change": 0.3766666666666667,
-          "hit_rate": 33.33333333333333
-        },
         {
           "date": "2026-06-29",
           "avg_change": -0.45,
@@ -3348,6 +3343,11 @@
           "date": "2026-11-24",
           "avg_change": -2.64,
           "hit_rate": 0.0
+        },
+        {
+          "date": "2026-11-25",
+          "avg_change": 1.025,
+          "hit_rate": 50.0
         }
       ]
     }
@@ -3357,6 +3357,7 @@
     "2026-11-19",
     "2026-11-20",
     "2026-11-23",
-    "2026-11-24"
+    "2026-11-24",
+    "2026-11-25"
   ]
 }

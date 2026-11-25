@@ -1,6 +1,6 @@
 {
-  "date_for": "2026-11-25",
-  "score_threshold": 63,
+  "date_for": "2026-11-26",
+  "score_threshold": 60,
   "hold_days": 1,
   "weak_sectors": [
     "semi",
@@ -13,17 +13,10 @@
     "造纸",
     "铅锌"
   ],
-  "position_final": 45,
+  "position_final": 50,
   "position_base": 50,
   "watchlist": [],
-  "cold_sectors": [
-    "楼宇设备",
-    "终端设备",
-    "动物保健",
-    "电子系统组装",
-    "纺织服装",
-    "保险"
-  ],
+  "cold_sectors": [],
   "tuning_log": [
     {
       "source": "rec_tuning",
@@ -45,24 +38,15 @@
     {
       "source": "daily_root_cause",
       "action": "applied",
-      "threshold_delta": 3,
-      "position_delta": -5,
+      "threshold_delta": 0,
+      "position_delta": 0,
       "weak_sectors_added": [],
       "watchlist": [],
-      "cold_sectors": [
-        "楼宇设备",
-        "终端设备",
-        "动物保健",
-        "电子系统组装",
-        "纺织服装",
-        "保险"
-      ],
-      "reasons": [
-        "E. 冷启动盲区: 7 只来自 6 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['楼宇设备', '终端设备', '动物保健', '电子系统组装', '纺织服装']"
-      ]
+      "cold_sectors": [],
+      "reasons": []
     }
   ],
-  "generated_at": "2026-11-24T16:11:46",
+  "generated_at": "2026-11-25T16:10:44",
   "source_files": {
     "rec_tuning": "rec_tuning.json",
     "daily_root_cause": "daily_root_cause.json"
