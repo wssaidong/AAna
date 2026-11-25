@@ -1782,8 +1782,8 @@ REC_TUNING = {
     "score_threshold": 60,
     "hold_days": 1,
     "weak_sectors": ['造纸', '铅锌', 'semi', '印制电路板', '其他化学制品', '房地产开发', '其他家用轻工', '影视动漫', '装修装饰'],
-    "overall_win_rate": 49.7,
-    "total_records": 477,
-    "generated_at": "2026-11-24T20:00:44.644962",
+    "overall_win_rate": 48.9,
+    "total_records": 489,
+    "generated_at": "2026-11-25T20:00:46.655313",
 }
 # === REC_OPTIMIZER_TUNING_END ===

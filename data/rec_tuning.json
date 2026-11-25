@@ -12,10 +12,10 @@
     "影视动漫",
     "装修装饰"
   ],
-  "total_records": 477,
-  "overall_win_rate": 49.685534591194966,
+  "total_records": 489,
+  "overall_win_rate": 48.875255623721884,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-25T15:01:29.451213",
+  "generated_at": "2026-11-25T20:00:46.655313",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -27,20 +27,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 276,
-      "win_count": 152,
-      "win_rate": 55.072463768115945,
-      "avg_change": 1.1415217391304349,
+      "count": 288,
+      "win_count": 154,
+      "win_rate": 53.47222222222222,
+      "avg_change": 0.9464930555555556,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 477,
-      "win_count": 237,
-      "win_rate": 49.685534591194966,
-      "avg_change": 0.3372536687631035
+      "count": 489,
+      "win_count": 239,
+      "win_rate": 48.875255623721884,
+      "avg_change": 0.2421267893660539
     }
   },
   "sector_stats": {
@@ -167,10 +167,10 @@
     "纺织服装": {
       "sector": "纺织服装",
       "sector_name": "",
-      "count": 1,
+      "count": 2,
       "win_count": 0,
       "win_rate": 0.0,
-      "avg_change": -3.6
+      "avg_change": -6.205
     },
     "包装印刷": {
       "sector": "包装印刷",
@@ -271,10 +271,10 @@
     "光学元件": {
       "sector": "光学元件",
       "sector_name": "",
-      "count": 4,
+      "count": 5,
       "win_count": 2,
-      "win_rate": 50.0,
-      "avg_change": 5.22
+      "win_rate": 40.0,
+      "avg_change": 3.1119999999999997
     },
     "计算机设备": {
       "sector": "计算机设备",
@@ -311,10 +311,10 @@
     "线缆部件及其他": {
       "sector": "线缆部件及其他",
       "sector_name": "",
-      "count": 3,
+      "count": 4,
       "win_count": 2,
-      "win_rate": 66.66666666666666,
-      "avg_change": 1.4100000000000001
+      "win_rate": 50.0,
+      "avg_change": -0.2124999999999999
     },
     "水电": {
       "sector": "水电",
@@ -511,10 +511,10 @@
     "物流": {
       "sector": "物流",
       "sector_name": "",
-      "count": 5,
-      "win_count": 3,
-      "win_rate": 60.0,
-      "avg_change": 0.4539999999999999
+      "count": 6,
+      "win_count": 4,
+      "win_rate": 66.66666666666666,
+      "avg_change": 0.39833333333333326
     },
     "地面兵装": {
       "sector": "地面兵装",
@@ -591,10 +591,10 @@
     "机械基础件": {
       "sector": "机械基础件",
       "sector_name": "",
-      "count": 6,
+      "count": 7,
       "win_count": 6,
-      "win_rate": 100.0,
-      "avg_change": 7.833333333333333
+      "win_rate": 85.71428571428571,
+      "avg_change": 6.661428571428572
     },
     "轻工制造": {
       "sector": "轻工制造",
@@ -1035,6 +1035,46 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": -2.66
+    },
+    "楼宇设备": {
+      "sector": "楼宇设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -2.64
+    },
+    "终端设备": {
+      "sector": "终端设备",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -8.16
+    },
+    "动物保健": {
+      "sector": "动物保健",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -5.65
+    },
+    "电子系统组装": {
+      "sector": "电子系统组装",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -5.84
+    },
+    "保险": {
+      "sector": "保险",
+      "sector_name": "",
+      "count": 2,
+      "win_count": 0,
+      "win_rate": 0.0,
+      "avg_change": -0.675
     }
   }
 }
