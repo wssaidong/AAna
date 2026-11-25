@@ -6515,3 +6515,5 @@ AttributeError: 'list' object has no attribute 'get'
 [2026-11-24 14:46:56] [daily_v24_recommend] ✅ 飞书推送成功
 [2026-11-24 14:46:56] [daily_v24_recommend] ✅ 完成
 [2026-11-24 14:46:56] [daily_v24_recommend] ============================================================
+[2026-11-25 14:45:00] [daily_v24_recommend] ============================================================
+[2026-11-25 14:45:00] [daily_v24_recommend] AAna v2.4 尾盘推荐启动 (dry_run=False)
