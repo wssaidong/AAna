@@ -1,0 +1,282 @@
+{
+ "date": "2026-11-25",
+ "base_date": "2026-11-24",
+ "report": "/Users/cai/code/AAna/reports/2026-11-25-选股报告.md",
+ "report_note": "08:02:07 盘前版, Top10 表 2 只, 涨跌幅=昨收(11-24)口径",
+ "report_size": 7773,
+ "report_mtime": "2026-11-25T08:03:33",
+ "trading_day": true,
+ "session": "trading_day_premarket",
+ "generated": "08:40:50",
+ "run_id": "01a2101c-51ef-72cc-b2c3-7143e221c77c",
+ "trading_legs": {
+  "weekday": "周三",
+  "report_today": true,
+  "cron_generated": true,
+  "cron_pool_line": "[AAna] 动态股票池: 263 只 (涨停警示 0 只)",
+  "cron_moneyflow_fallback": true
+ },
+ "trading_legs_ok": true,
+ "sentiment_snap": {
+  "score": 63,
+  "label": "回暖",
+  "position": 0.7,
+  "zt_count": 64,
+  "dt_count": 6
+ },
+ "mk_four_avg_close": 0.435,
+ "sh_close_pct": 0.27,
+ "mk_avg_all": 0.02,
+ "idx_close_pct": {
+  "sh000001": 0.27,
+  "sz399001": -0.29,
+  "sz399006": -0.05,
+  "sh000688": 1.81
+ },
+ "pool_size": 2,
+ "guard_ice": false,
+ "guard_pass": true,
+ "guard_live": {
+  "score": 63,
+  "label": "回暖",
+  "is_ice_point": false,
+  "data_source_fallback": false
+ },
+ "briefing_anomaly": {
+  "brief": "/Users/cai/code/AAna/reports/2026-11-25/盘前/2026-11-25_0830_早盘简报.md",
+  "exists": true,
+  "sh_price_claimed": 12.34,
+  "sh_change_claimed": "+0.49%",
+  "kc50_price_claimed": 17.1,
+  "sentiment_claimed": "❄️",
+  "recommend_rows": 17,
+  "verdict": "简报记上证 ¥12.34 +0.49% (真值 3548.37 +0.27% 周二收盘, 价格字段失真第 3 天) + 科创50 ¥17.1 (真值 1250.09) + 四值族 +0.49/-2.37/-3.74/-2.29 与昨日 11:28/14:45 腿逐字相同 (跨日冻结缓存) + 情绪「❄️」与主链快照 63 回暖矛盾 → 不采信, 候选池只认主链报告"
+ },
+ "overall_win_rate": 49.685534591194966,
+ "total_records": 477,
+ "sector_count": 124,
+ "results": [
+  {
+   "code": "000400",
+   "name": "许继电气",
+   "rank": 1,
+   "price": 26.22,
+   "pe_ttm": 30.82,
+   "pb": 2.15,
+   "mcap_yi": 266.15,
+   "float_mcap_yi": 267.07,
+   "turnover_pct": 2.99,
+   "vol_ratio": 1.12,
+   "v24_score": "**64**",
+   "report_stop": 25.43,
+   "tech_score": 48,
+   "fund_score": 7,
+   "val_score_raw": 12,
+   "val_score": 12,
+   "total": 66.6,
+   "rating": "增持",
+   "target": 27.53,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=65 偏热",
+    "20日区间位置 88% 突破区",
+    "60日涨幅 +21% 健康",
+    "量能比 1.12 正常"
+   ],
+   "fund_notes": [
+    "ROE 4.8% 一般",
+    "净利增速 -33% 负增长",
+    "营收增速 +6%",
+    "无修正触发 (gap<15pp 或 OCF>0, 归母口径有效)"
+   ],
+   "val_notes": [
+    "PE 31 偏高",
+    "PB 2.15 合理"
+   ],
+   "tech_stat": {
+    "rsi": 65.4,
+    "pos20": 88.0,
+    "chg60": 20.8,
+    "vol_ratio_5d": 1.12,
+    "ma5": 25.84,
+    "ma20": 24.68,
+    "ma60": 22.49,
+    "hi20": 26.96,
+    "lo20": 20.65,
+    "chg_1d": 1.94,
+    "last_date": "2026-11-24",
+    "kline_len": 120
+   },
+   "quality_verdict": "🟢 无修正触发 (归母-扣非增速差 +0.9pp <15pp, OCF 缺失/非负), 归母口径有效; ⚠️ Q3 单季归母 -30.9% 增速需跟踪",
+   "risk_lines": [
+    "🟡 **利润承压剪刀差**: 前三季营收 +6.10% 但归母 -33.36% / 扣非 -34.25%, Q3 单季营收 +16.6% 而归母 -30.9% — 行业竞价格压毛利率, 营收加速未转化为利润",
+    "🟡 **估值中性偏上**: PE_TTM 30.8 处合理上沿 (0<PE≤30 满分档外), 上行空间需盈利修复配合, 而盈利趋势向下",
+    "🟡 **板块冷启动**: 电网自动化无回测记录, 邻近 工控自动化 100% (5/5) / 电机 75% (3/4) 样本合计 10 笔, 统计意义有限",
+    "🟢 缓释项: PB 2.15 合理 / 负债率 47.7% / 央企 (中国电气装备) 背景 / 国网投资+特高压直流景气托底营收"
+   ],
+   "sector_verdict": "本键冷启动无记录; 邻近 工控自动化 100% (5/5) + 电机 75% (3/4) 方向偏正, 电气设备 0% (0/1) 样本极薄 — 邻近键不构成负向排除, 亦不构成买入保险; 胜率库整体 49.7% (477 笔) 中性",
+   "chg_pct": 1.94,
+   "chg_date": "2026-11-24",
+   "industry_sina": "电网自动化",
+   "sector_stat_key": null,
+   "sector_win_rate": "无记录(冷启动)",
+   "neighbor_sectors": {
+    "工控自动化": "100.0% (5/5)",
+    "电机": "75.0% (3/4)",
+    "电气设备": "0.0% (0/1)"
+   },
+   "beat_four": true,
+   "beat_sh": true,
+   "beat_mkt_avg": true,
+   "pos": true,
+   "stop_broken": false,
+   "rating_ok": true,
+   "law_pass": true,
+   "law_detail": [
+    "✅ 胜四均: +1.94% vs +0.435%",
+    "✅ 胜上证: vs +0.27%",
+    "✅ 胜大盘均: vs +0.02%",
+    "✅ 正盈利",
+    "✅ 深度评级 ≥增持: 66.6 增持",
+    "✅ 未破止损 25.43",
+    "✅ 守卫放行 (情绪 63 回暖)"
+   ]
+  },
+  {
+   "code": "000158",
+   "name": "常山北明",
+   "rank": 2,
+   "price": 13.86,
+   "pe_ttm": 650.49,
+   "pb": 4.26,
+   "mcap_yi": 220.46,
+   "float_mcap_yi": 221.57,
+   "turnover_pct": 12.53,
+   "vol_ratio": 1.57,
+   "v24_score": "**64**",
+   "report_stop": 13.44,
+   "tech_score": 40,
+   "fund_score": 3,
+   "val_score_raw": 4,
+   "val_score": 4,
+   "total": 44.7,
+   "rating": "减持",
+   "target": 14.55,
+   "tech_notes": [
+    "均线多头(MA5>MA20, 价>MA5)",
+    "RSI=82 超买",
+    "20日区间位置 87% 突破区",
+    "60日涨幅 +12% 健康",
+    "量能比 1.57 正常"
+   ],
+   "fund_notes": [
+    "ROE -3.0% 弱",
+    "累计亏损: 归母 -1.55 亿 / 扣非 -1.67 亿 双负 (增速% 失真, 记 0)",
+    "营收增速 +4%"
+   ],
+   "val_notes": [
+    "PE 650 过高/异常",
+    "PB 4.26 中等"
+   ],
+   "tech_stat": {
+    "rsi": 82.1,
+    "pos20": 87.0,
+    "chg60": 11.9,
+    "vol_ratio_5d": 1.57,
+    "ma5": 13.24,
+    "ma20": 11.58,
+    "ma60": 12.33,
+    "hi20": 14.41,
+    "lo20": 10.26,
+    "chg_1d": 3.82,
+    "last_date": "2026-11-24",
+    "kline_len": 120
+   },
+   "quality_verdict": "🔴 **累计亏损** (归母 -1.55 亿 亏损收窄 0.4% / 扣非 -1.67 亿 亏损收窄 20.9% 双负): Q3 单季归母 亏损收窄 33.7%, 修正规则形式上未触发但亏损事实已由 累计亏损硬约束 v1 处理; TTM 归母 0.34 亿 (FY25 靠非经常项扭亏, 扣非口径仍弱)",
+   "risk_lines": [
+    "🔴 **累计亏损**: 前三季归母 -1.55 亿 / 扣非 -1.67 亿双负, FY25 全年扭亏系非经常项 (扣非 -0.84 亿) — 基本面不支持现价",
+    "🔴 **估值完全脱离基本面**: PE_TTM 650 / PB 4.26, 纯题材定价; 11-24 换手 12.53% 高换手博弈属性, 次日波动放大",
+    "🔴 **追高风险**: +3.82% 已属温和上涨上档, 高换手 + 高 PB 组合下回落风险大于突破概率",
+    "🟡 **板块胜率样本薄**: IT服务 100% 仅 1/1, 邻近 软件开发 3/4 / 计算机设备 2/2 — 合计 8 笔无统计保险",
+    "🟢 缓释项: 亏损收窄 (Q3 单季扣非亏损收窄 46.4%) / 河北国资背景 / 华为鸿蒙鲲鹏生态题材催化仍在"
+   ],
+   "sector_verdict": "本键 IT服务 100% (1/1) + 邻近 计算机设备 100% (2/2) / 互联网信息服务 100% (1/1) / 软件开发 75% (3/4) 方向偏正, 计算机应用 0% (0/1) — 合计仅 8 笔样本极薄, 方向中性偏正; 关联板块胜率对该股今日表现无统计约束力",
+   "chg_pct": 3.82,
+   "chg_date": "2026-11-24",
+   "industry_sina": "IT服务",
+   "sector_stat_key": "IT服务",
+   "sector_win_rate": "100.0% (1/1)",
+   "neighbor_sectors": {
+    "软件开发": "75.0% (3/4)",
+    "计算机设备": "100.0% (2/2)",
+    "互联网信息服务": "100.0% (1/1)",
+    "计算机应用": "0.0% (0/1)"
+   },
+   "beat_four": true,
+   "beat_sh": true,
+   "beat_mkt_avg": true,
+   "pos": true,
+   "stop_broken": false,
+   "rating_ok": false,
+   "law_pass": false,
+   "law_detail": [
+    "✅ 胜四均: +3.82% vs +0.435%",
+    "✅ 胜上证: vs +0.27%",
+    "✅ 胜大盘均: vs +0.02%",
+    "✅ 正盈利",
+    "❌ 深度评级 ≥增持: 44.7 减持",
+    "✅ 未破止损 13.44",
+    "✅ 守卫放行 (情绪 63 回暖)"
+   ]
+  }
+ ],
+ "eligible_pool": [
+  "000400"
+ ],
+ "law_detail": {
+  "000400": [
+   "✅ 胜四均: +1.94% vs +0.435%",
+   "✅ 胜上证: vs +0.27%",
+   "✅ 胜大盘均: vs +0.02%",
+   "✅ 正盈利",
+   "✅ 深度评级 ≥增持: 66.6 增持",
+   "✅ 未破止损 25.43",
+   "✅ 守卫放行 (情绪 63 回暖)"
+  ],
+  "000158": [
+   "✅ 胜四均: +3.82% vs +0.435%",
+   "✅ 胜上证: vs +0.27%",
+   "✅ 胜大盘均: vs +0.02%",
+   "✅ 正盈利",
+   "❌ 深度评级 ≥增持: 44.7 减持",
+   "✅ 未破止损 13.44",
+   "✅ 守卫放行 (情绪 63 回暖)"
+  ]
+ },
+ "recommend": {
+  "code": "000400",
+  "name": "许继电气",
+  "total": 66.6,
+  "rating": "增持",
+  "price": 26.22,
+  "chg_pct": 1.94,
+  "target": 27.53,
+  "stop": 25.43,
+  "sector_stat_key": null,
+  "sector_win_rate": "无记录(冷启动)",
+  "neighbor_sectors": {
+   "工控自动化": "100.0% (5/5)",
+   "电机": "75.0% (3/4)",
+   "电气设备": "0.0% (0/1)"
+  }
+ },
+ "eastmoney_sync": {
+  "action": "skip",
+  "result": "already_in_cache",
+  "groups_20261125_occupied": {
+   "20261125": "2096",
+   "20261125ZZ": "2101"
+  },
+  "forbidden_bare_gid": "2096"
+ }
+}
