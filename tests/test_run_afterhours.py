@@ -2133,3 +2133,80 @@ def test_cyb_lead_themes_picks_robot_chain_not_semiconductor():
     # 无匹配 → 如实说明, 不硬凑
     out2 = run_afterhours._cyb_lead_themes(["某冷门题材"])
     assert "需人工确认" in out2, out2
+
+
+# ── v1.45（2026-11-25 实战）: 极端杀跌日的"防御方向"缺失 + 追高区间写死 ──
+
+def test_crash_day_defensive_direction_lists_actually_rising_boards():
+    """v1.45: 极端杀跌日必须给出**当日真正收涨**的板块。
+
+    2026-11-25 实测: 全市场仅 4/90 板块收涨，且全是消费医药链
+    （医药商业/旅游及酒店/中药/零售）—— **红利防御关键词一个都没命中**，
+    红利 helper 会说"未见红利防御领涨"，把当日唯一逆势方向整段丢掉。
+    """
+    industry = {"top": [
+        {"name": "医药商业", "change_pct": 0.87},
+        {"name": "旅游及酒店", "change_pct": 0.58},
+        {"name": "中药", "change_pct": 0.44},
+        {"name": "零售", "change_pct": 0.32},
+        {"name": "银行", "change_pct": -0.02},
+    ], "total": 90}
+    out = run_afterhours._defensive_direction_crash_day(industry)
+    assert "4/90" in out, out
+    assert "医药商业" in out and "零售" in out, out
+    assert "不构成有效防御" in out, out
+    # 全市场无板块收涨 → 如实说无抗跌方向, 不硬凑
+    out2 = run_afterhours._defensive_direction_crash_day(
+        {"top": [{"name": "半导体", "change_pct": -7.89}], "total": 90})
+    assert "无板块收涨" in out2, out2
+
+
+def test_crash_day_advice_has_defensive_bullet_not_hardcoded_chase_band():
+    """v1.45: 模式⑤+尾盘跳水分支的第 3 条必须是**防御方向**（数据驱动），
+    且"回避追高"的涨幅区间必须来自**当日候选池真实 baseline**，
+    而不是写死的 "3%-5%"（当日池 baseline 实为 +1.94%/+3.82%）。"""
+    indices = {
+        "sh000001": {"current": 3476.47, "change_pct": -2.03},
+        "sz399001": {"current": 10086.36, "change_pct": -3.24},
+        "sz399006": {"current": 2183.58, "change_pct": -4.19},
+        "sz399005": {"current": 6453.99, "change_pct": -3.44},
+        "sz399300": {"current": 3898.24, "change_pct": -1.65},
+        "sh000688": {"current": 1186.14, "change_pct": -5.12},
+    }
+    hit_rows = [
+        ("000400", "许继电气", 1.94, -2.36, -4.30),
+        ("000158", "常山北明", 3.82, -8.95, -12.77),
+    ]
+    industry = {"top": [
+        {"name": "医药商业", "change_pct": 0.87},
+        {"name": "旅游及酒店", "change_pct": 0.58},
+        {"name": "中药", "change_pct": 0.44},
+        {"name": "零售", "change_pct": 0.32},
+    ], "bottom": [
+        {"name": "电子化学品", "change_pct": -8.24},
+        {"name": "半导体", "change_pct": -7.89},
+    ], "total": 90}
+    gap_rows = [("科创50", 2.00, -5.12, -7.12)]
+    md = run_afterhours.format_feishu(
+        "2026-11-25", indices, ["流感", "零售", "回购", "AI应用"],
+        {"流感": 6, "零售": 4, "回购": 3, "AI应用": 3}, {},
+        hit_rows, [], hit_rows, -5.65, 0.0, -5.65,
+        -2.03, -4.19, -5.12, [], 57,
+        gap_md="", gap_rows=gap_rows, industry=industry,
+    )
+    assert "3️⃣ **防御方向：**" in md, md
+    assert "医药商业" in md, md
+    # 追高区间必须是当日真实 baseline, 不是写死的 3%-5%
+    assert "昨日涨幅 +1.94%~+3.82% 一线" in md, md
+    assert "昨日涨幅3%-5%" not in md, md
+    # 极端日主线必须标低置信度
+    assert "主线（低置信度）" in md, md
+
+
+def test_chase_band_hint_handles_empty_and_narrow_pool():
+    """v1.45: 追高区间 helper 的边界 —— 空池如实说明, 窄区间不硬凑范围。"""
+    out = run_afterhours._chase_band_hint([])
+    assert "无具体区间可参照" in out, out
+    narrow = run_afterhours._chase_band_hint(
+        [("600001", "甲", 4.00, 1.0, -3.0), ("600002", "乙", 4.10, -1.0, -5.1)])
+    assert "约 +4.10% 一线" in narrow, narrow
