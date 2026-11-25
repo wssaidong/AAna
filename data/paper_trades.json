@@ -7062,90 +7062,119 @@
       "reason": "AAna v2.4 尾盘评分 87",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-25",
+      "code": "001328",
+      "name": "登康口腔",
+      "action": "sell",
+      "price": 36.13,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -12.0,
+      "pnl_pct": -0.33
+    },
+    {
+      "date": "2026-11-25",
+      "code": "002960",
+      "name": "青鸟智控",
+      "action": "sell",
+      "price": 8.64,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -9.0,
+      "pnl_pct": -1.03
+    },
+    {
+      "date": "2026-11-25",
+      "code": "002273",
+      "name": "水晶光电",
+      "action": "sell",
+      "price": 22.38,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -46.0,
+      "pnl_pct": -2.01
+    },
+    {
+      "date": "2026-11-25",
+      "code": "603118",
+      "name": "共进股份",
+      "action": "sell",
+      "price": 12.95,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -24.0,
+      "pnl_pct": -1.82
+    },
+    {
+      "date": "2026-11-25",
+      "code": "600201",
+      "name": "生物股份",
+      "action": "sell",
+      "price": 12.18,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -8.0,
+      "pnl_pct": -0.65
+    },
+    {
+      "date": "2026-11-25",
+      "code": "002351",
+      "name": "漫步者",
+      "action": "sell",
+      "price": 11.82,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -20.0,
+      "pnl_pct": -1.66
+    },
+    {
+      "date": "2026-11-25",
+      "code": "002026",
+      "name": "山东威达",
+      "action": "sell",
+      "price": 10.76,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.55
+    },
+    {
+      "date": "2026-11-25",
+      "code": "002270",
+      "name": "华明装备",
+      "action": "sell",
+      "price": 18.65,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -27.0,
+      "pnl_pct": -1.43
+    },
+    {
+      "date": "2026-11-25",
+      "code": "603665",
+      "name": "康隆达",
+      "action": "sell",
+      "price": 19.38,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 27.0,
+      "pnl_pct": 1.41
+    },
+    {
+      "date": "2026-11-25",
+      "code": "601601",
+      "name": "中国太保",
+      "action": "sell",
+      "price": 32.5,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -9.0,
+      "pnl_pct": -0.28
     }
   ],
-  "positions": {
-    "001328": {
-      "date": "2026-11-24",
-      "name": "登康口腔",
-      "shares": 100,
-      "entry_price": 36.25,
-      "highest_price": 36.25,
-      "entry_date": "2026-11-24"
-    },
-    "002960": {
-      "date": "2026-11-24",
-      "name": "青鸟智控",
-      "shares": 100,
-      "entry_price": 8.73,
-      "highest_price": 8.73,
-      "entry_date": "2026-11-24"
-    },
-    "002273": {
-      "date": "2026-11-24",
-      "name": "水晶光电",
-      "shares": 100,
-      "entry_price": 22.84,
-      "highest_price": 22.84,
-      "entry_date": "2026-11-24"
-    },
-    "603118": {
-      "date": "2026-11-24",
-      "name": "共进股份",
-      "shares": 100,
-      "entry_price": 13.19,
-      "highest_price": 13.19,
-      "entry_date": "2026-11-24"
-    },
-    "600201": {
-      "date": "2026-11-24",
-      "name": "生物股份",
-      "shares": 100,
-      "entry_price": 12.26,
-      "highest_price": 12.26,
-      "entry_date": "2026-11-24"
-    },
-    "002351": {
-      "date": "2026-11-24",
-      "name": "漫步者",
-      "shares": 100,
-      "entry_price": 12.02,
-      "highest_price": 12.02,
-      "entry_date": "2026-11-24"
-    },
-    "002026": {
-      "date": "2026-11-24",
-      "name": "山东威达",
-      "shares": 100,
-      "entry_price": 10.82,
-      "highest_price": 10.82,
-      "entry_date": "2026-11-24"
-    },
-    "002270": {
-      "date": "2026-11-24",
-      "name": "华明装备",
-      "shares": 100,
-      "entry_price": 18.92,
-      "highest_price": 18.92,
-      "entry_date": "2026-11-24"
-    },
-    "603665": {
-      "date": "2026-11-24",
-      "name": "康隆达",
-      "shares": 100,
-      "entry_price": 19.11,
-      "highest_price": 19.11,
-      "entry_date": "2026-11-24"
-    },
-    "601601": {
-      "date": "2026-11-24",
-      "name": "中国太保",
-      "shares": 100,
-      "entry_price": 32.59,
-      "highest_price": 32.59,
-      "entry_date": "2026-11-24"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -8696,6 +8725,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-25",
+      "cash": 97799.0,
+      "position_value": 0.0,
+      "total_value": 97799.0,
+      "daily_pnl": -134.0,
+      "total_pnl": -2201.0,
+      "total_pnl_pct": -2.2,
+      "realized_pnl": -2201.0,
+      "positions": []
     }
   ]
 }
