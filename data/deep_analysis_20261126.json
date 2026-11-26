@@ -1,0 +1,169 @@
+{
+ "date": "2026-11-26",
+ "base_date": "2026-11-25",
+ "report": "/Users/cai/code/AAna/reports/2026-11-26-选股报告.md",
+ "report_note": "08:01:54 生成/08:03:34 落盘 盘前版, Top10 表 0 只 (空表四链条设计行为)",
+ "report_size": 5438,
+ "report_mtime": "2026-11-26T08:03:34",
+ "trading_day": true,
+ "session": "trading_day_premarket",
+ "generated": "08:34:36",
+ "run_id": "01a21542-d6be-7b68-b861-87a264bbd0e0",
+ "trading_legs": {
+  "weekday": "周四",
+  "report_today": true,
+  "cron_generated": true,
+  "cron_pool_line": "[AAna] 动态股票池: 230 只 (涨停警示 0 只)",
+  "cron_moneyflow_fallback": true,
+  "cron_sector_fail": true,
+  "cron_north_fail": true
+ },
+ "trading_legs_ok": "[AAna] 动态股票池: 230 只 (涨停警示 0 只)",
+ "sentiment_snap": {
+  "score": 25,
+  "label": "冰点",
+  "position": 0.1,
+  "zt_count": 57,
+  "dt_count": 6
+ },
+ "mk_four_avg_close": -3.645,
+ "sh_close_pct": -2.03,
+ "mk_avg_all": -2.78,
+ "idx_close_pct": {
+  "sh000001": -2.03,
+  "sz399001": -3.24,
+  "sz399006": -4.19,
+  "sh000688": -5.12
+ },
+ "pool_size": 0,
+ "raw_rows": 0,
+ "guard_ice": true,
+ "guard_pass": false,
+ "empty_table_root_cause": [
+  "情绪修正 -10 (score 25 ≤30, risk_rules.apply_sentiment_adjustment)",
+  "资金流接口全挂: 东财 3 连试 RemoteDisconnected, 30/30 fallback, money_score 恒 50",
+  "涨停池不加入: include_zt=(score>40)=False",
+  "阈值 60 (昨晚回落基线 63→60) + 黑名单 9 弱势板块 → 230 只全池不过线"
+ ],
+ "baseline_check": {
+  "sh_snapshot_price": 3476.47,
+  "sh_snapshot_chg": -2.03,
+  "consistent_with_report": true
+ },
+ "guard_live": {
+  "score": 25,
+  "label": "冰点",
+  "position_ratio": 0.1,
+  "is_ice_point": true,
+  "data_source_fallback": false
+ },
+ "premarket_brief_anomaly": {
+  "brief": "/Users/cai/code/AAna/reports/2026-11-26/盘前/2026-11-26_0830_早盘简报.md",
+  "exists": true,
+  "sh_price_claimed": 12.3,
+  "sh_change_claimed": "+0.08%",
+  "kc50_price_claimed": 16.83,
+  "sentiment_claimed": "🔥",
+  "pseudo_gain_rows": 17,
+  "verdict": "简报记上证 ¥12.3 +0.08% (¥12.30=000001.SZ 平安银行昨收, 真值 3476.47 -2.03% 周三收盘, 第 4 天代码碰撞) + 科创50 ¥16.83 (=000688.SZ 国城矿业昨收, 真值 1186.14 -5.12%) + 深成/创业板 = 11-24 前日收盘陈旧链路 + 四值族虚构 + 情绪「🔥」与主链 25 冰点矛盾 + 盘前 17 行伪「今日涨幅」 → 不采信, 候选池只认主链报告"
+ },
+ "overall_win_rate": 48.875255623721884,
+ "total_records": 489,
+ "sector_count": 129,
+ "rec_tuning_generated_at": "2026-11-25T20:00:46.655313",
+ "weak_sectors": [
+  "造纸",
+  "铅锌",
+  "semi",
+  "印制电路板",
+  "其他化学制品",
+  "房地产开发",
+  "其他家用轻工",
+  "影视动漫",
+  "装修装饰"
+ ],
+ "deep_pool_watch": {
+  "source": "11-24/11-25 两日 deep 链产物 (data/deep_analysis_20261124/25.json)",
+  "judged_on": "2026-11-25",
+  "note": "盘前信息冻结口径; 实时破位判定待今日盘中, 卖出腿归 daily_v24_sell",
+  "held_near_stop_count": 2,
+  "results": [
+   {
+    "code": "000400",
+    "name": "许继电气",
+    "role": "11-25 deep Top1 推荐 (增持 66.6)",
+    "group": "20261125ZZ",
+    "gid": 2101,
+    "stop": 25.43,
+    "close": 25.6,
+    "prev_close": 26.22,
+    "chg_pct": -2.36,
+    "quote_ts": "20261125161445",
+    "gap_to_stop_pct": 0.67,
+    "stop_broken": false
+   },
+   {
+    "code": "000158",
+    "name": "常山北明",
+    "role": "11-25 deep 淘汰票对照 (减持 44.7)",
+    "group": null,
+    "gid": null,
+    "stop": null,
+    "close": 12.62,
+    "prev_close": 13.86,
+    "chg_pct": -8.95,
+    "quote_ts": "20261125161415",
+    "gap_to_stop_pct": null,
+    "stop_broken": false
+   },
+   {
+    "code": "605599",
+    "name": "菜百股份",
+    "role": "11-24 deep Top1 推荐 (增持 70.4)",
+    "group": "20261124ZZ",
+    "gid": 2076,
+    "stop": 14.51,
+    "close": 14.66,
+    "prev_close": 14.99,
+    "chg_pct": -2.2,
+    "quote_ts": "20261125161454",
+    "gap_to_stop_pct": 1.03,
+    "stop_broken": false
+   }
+  ]
+ },
+ "held_zz": [
+  {
+   "group": "20261125ZZ",
+   "gid": 2101,
+   "code": "000400",
+   "name": "许继电气",
+   "close": 25.6,
+   "chg_pct": -2.36,
+   "stop": 25.43,
+   "gap_to_stop_pct": 0.67,
+   "stop_broken": false,
+   "judged_on": "2026-11-25"
+  },
+  {
+   "group": "20261124ZZ",
+   "gid": 2076,
+   "code": "605599",
+   "name": "菜百股份",
+   "close": 14.66,
+   "chg_pct": -2.2,
+   "stop": 14.51,
+   "gap_to_stop_pct": 1.03,
+   "stop_broken": false,
+   "judged_on": "2026-11-25"
+  }
+ ],
+ "recommend": null,
+ "eligible_pool": [],
+ "results": [],
+ "eastmoney_sync": {
+  "action": "skip",
+  "reason": "0 推荐 (报告池 0 + 冰点守卫双口径 + 停止交易) → 不创建 20261126ZZ",
+  "groups_20261126_occupied": {}
+ }
+}
