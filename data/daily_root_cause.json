@@ -1,47 +1,167 @@
 {
-  "date": "2026-11-25",
-  "total_recs": 0,
+  "date": "2026-11-26",
+  "total_recs": 13,
   "win_count": 0,
   "fail_count": 0,
-  "no_data": 0,
+  "no_data": 13,
   "win_rate": 0,
-  "baseline": -3.6409420964871684,
+  "baseline": -0.2717494726133529,
   "baseline_source": "腾讯实时快照 close-to-close",
   "causes": {
     "A_板块错配": {
       "hit": false,
       "items": [],
-      "summary": "无 weak_sectors 或无当日推荐"
+      "summary": "无弱板块命中"
     },
     "B_题材错配": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "C_技术面虚高": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "无"
     },
     "D_大盘错配": {
       "hit": false,
       "items": [],
-      "summary": "无当日推荐"
+      "summary": "大盘 -0.27% 正常, 非大盘错配"
     },
     "E_冷启动盲区": {
-      "hit": false,
-      "items": [],
-      "summary": "无冷启动命中"
+      "hit": true,
+      "items": [
+        {
+          "code": "600360",
+          "name": "华微电子",
+          "sector_cn": "分立器件",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 分立器件 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "002414",
+          "name": "高德红外",
+          "sector_cn": "其他电子",
+          "sector_enum": "elec",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "002138",
+          "name": "顺络电子",
+          "sector_cn": "被动元件",
+          "sector_enum": "unknown",
+          "n": 2,
+          "ret_1d": null,
+          "note": "板块样本 2 < 3"
+        },
+        {
+          "code": "601138",
+          "name": "工业富联",
+          "sector_cn": "电子系统组装",
+          "sector_enum": "elec",
+          "n": 1,
+          "ret_1d": null,
+          "note": "板块样本 1 < 3"
+        },
+        {
+          "code": "002984",
+          "name": "森麒麟",
+          "sector_cn": "轮胎",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 轮胎 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "600189",
+          "name": "泉阳泉",
+          "sector_cn": "软饮料",
+          "sector_enum": "unknown",
+          "n": 1,
+          "ret_1d": null,
+          "note": "板块样本 1 < 3"
+        },
+        {
+          "code": "000683",
+          "name": "博源化工",
+          "sector_cn": "纯碱",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 纯碱 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "003041",
+          "name": "真爱美家",
+          "sector_cn": "家纺",
+          "sector_enum": "unknown",
+          "n": 0,
+          "ret_1d": null,
+          "note": "板块 家纺 (enum=unknown) 未在 sec_stats 里, cold sector risk"
+        },
+        {
+          "code": "600846",
+          "name": "同济科技",
+          "sector_cn": "房屋建设",
+          "sector_enum": "unknown",
+          "n": 1,
+          "ret_1d": null,
+          "note": "板块样本 1 < 3"
+        },
+        {
+          "code": "000902",
+          "name": "新洋丰",
+          "sector_cn": "复合肥",
+          "sector_enum": "unknown",
+          "n": 1,
+          "ret_1d": null,
+          "note": "板块样本 1 < 3"
+        }
+      ],
+      "watchlist": [],
+      "cold_sectors": [
+        "分立器件",
+        "其他电子",
+        "被动元件",
+        "电子系统组装",
+        "轮胎",
+        "软饮料",
+        "纯碱",
+        "家纺",
+        "房屋建设",
+        "复合肥"
+      ],
+      "summary": "10 只命中冷启动板块 (10 个不同板块), 单次冷板块: ['分立器件', '其他电子', '被动元件', '电子系统组装', '轮胎']"
     }
   },
-  "hit_causes": [],
+  "hit_causes": [
+    "E_冷启动盲区"
+  ],
   "tuning_suggestion": {
-    "score_threshold_delta": 0,
+    "score_threshold_delta": 3,
     "hold_days_delta": 0,
     "weak_sectors_add": [],
     "weak_sectors_remove": [],
     "watchlist": [],
-    "position_delta": 0,
-    "reasons": []
+    "position_delta": -5,
+    "reasons": [
+      "E. 冷启动盲区: 10 只来自 10 个未验证板块, 阈值+3pp + 仓位-5pp, watchlist=[], cold=['分立器件', '其他电子', '被动元件', '电子系统组装', '轮胎']"
+    ],
+    "cold_sectors": [
+      "分立器件",
+      "其他电子",
+      "被动元件",
+      "电子系统组装",
+      "轮胎",
+      "软饮料",
+      "纯碱",
+      "家纺",
+      "房屋建设",
+      "复合肥"
+    ]
   }
 }
