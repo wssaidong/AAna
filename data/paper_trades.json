@@ -7172,9 +7172,200 @@
       "reason": "止损/止盈/到期",
       "pnl": -9.0,
       "pnl_pct": -0.28
+    },
+    {
+      "date": "2026-11-26",
+      "code": "600360",
+      "name": "华微电子",
+      "action": "buy",
+      "price": 8.64,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 100",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "002414",
+      "name": "高德红外",
+      "action": "buy",
+      "price": 10.37,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 97",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "002138",
+      "name": "顺络电子",
+      "action": "buy",
+      "price": 36.52,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "601138",
+      "name": "工业富联",
+      "action": "buy",
+      "price": 40.89,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "002984",
+      "name": "森麒麟",
+      "action": "buy",
+      "price": 12.77,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "600189",
+      "name": "泉阳泉",
+      "action": "buy",
+      "price": 8.96,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 93",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "000683",
+      "name": "博源化工",
+      "action": "buy",
+      "price": 6.0,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 92",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "003041",
+      "name": "真爱美家",
+      "action": "buy",
+      "price": 32.06,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 92",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "600985",
+      "name": "淮北矿业",
+      "action": "buy",
+      "price": 14.16,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-26",
+      "code": "601083",
+      "name": "锦江航运",
+      "action": "buy",
+      "price": 13.45,
+      "shares": 100,
+      "reason": "AAna v2.4 尾盘评分 88",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {},
+  "positions": {
+    "600360": {
+      "date": "2026-11-26",
+      "name": "华微电子",
+      "shares": 100,
+      "entry_price": 8.64,
+      "highest_price": 8.64,
+      "entry_date": "2026-11-26"
+    },
+    "002414": {
+      "date": "2026-11-26",
+      "name": "高德红外",
+      "shares": 100,
+      "entry_price": 10.37,
+      "highest_price": 10.37,
+      "entry_date": "2026-11-26"
+    },
+    "002138": {
+      "date": "2026-11-26",
+      "name": "顺络电子",
+      "shares": 100,
+      "entry_price": 36.52,
+      "highest_price": 36.52,
+      "entry_date": "2026-11-26"
+    },
+    "601138": {
+      "date": "2026-11-26",
+      "name": "工业富联",
+      "shares": 100,
+      "entry_price": 40.89,
+      "highest_price": 40.89,
+      "entry_date": "2026-11-26"
+    },
+    "002984": {
+      "date": "2026-11-26",
+      "name": "森麒麟",
+      "shares": 100,
+      "entry_price": 12.77,
+      "highest_price": 12.77,
+      "entry_date": "2026-11-26"
+    },
+    "600189": {
+      "date": "2026-11-26",
+      "name": "泉阳泉",
+      "shares": 100,
+      "entry_price": 8.96,
+      "highest_price": 8.96,
+      "entry_date": "2026-11-26"
+    },
+    "000683": {
+      "date": "2026-11-26",
+      "name": "博源化工",
+      "shares": 100,
+      "entry_price": 6.0,
+      "highest_price": 6.0,
+      "entry_date": "2026-11-26"
+    },
+    "003041": {
+      "date": "2026-11-26",
+      "name": "真爱美家",
+      "shares": 100,
+      "entry_price": 32.06,
+      "highest_price": 32.06,
+      "entry_date": "2026-11-26"
+    },
+    "600985": {
+      "date": "2026-11-26",
+      "name": "淮北矿业",
+      "shares": 100,
+      "entry_price": 14.16,
+      "highest_price": 14.16,
+      "entry_date": "2026-11-26"
+    },
+    "601083": {
+      "date": "2026-11-26",
+      "name": "锦江航运",
+      "shares": 100,
+      "entry_price": 13.45,
+      "highest_price": 13.45,
+      "entry_date": "2026-11-26"
+    }
+  },
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -8758,6 +8949,128 @@
       "total_pnl_pct": -2.2,
       "realized_pnl": -2201.0,
       "positions": []
+    },
+    {
+      "date": "2026-11-26",
+      "cash": 79417.0,
+      "position_value": 18382.0,
+      "total_value": 97799.0,
+      "daily_pnl": 0.0,
+      "total_pnl": -2201.0,
+      "total_pnl_pct": -2.2,
+      "realized_pnl": -2201.0,
+      "positions": [
+        {
+          "code": "600360",
+          "name": "华微电子",
+          "shares": 100,
+          "entry_price": 8.64,
+          "current_price": 8.64,
+          "highest_price": 8.64,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002414",
+          "name": "高德红外",
+          "shares": 100,
+          "entry_price": 10.37,
+          "current_price": 10.37,
+          "highest_price": 10.37,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002138",
+          "name": "顺络电子",
+          "shares": 100,
+          "entry_price": 36.52,
+          "current_price": 36.52,
+          "highest_price": 36.52,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "601138",
+          "name": "工业富联",
+          "shares": 100,
+          "entry_price": 40.89,
+          "current_price": 40.89,
+          "highest_price": 40.89,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "002984",
+          "name": "森麒麟",
+          "shares": 100,
+          "entry_price": 12.77,
+          "current_price": 12.77,
+          "highest_price": 12.77,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600189",
+          "name": "泉阳泉",
+          "shares": 100,
+          "entry_price": 8.96,
+          "current_price": 8.96,
+          "highest_price": 8.96,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "000683",
+          "name": "博源化工",
+          "shares": 100,
+          "entry_price": 6.0,
+          "current_price": 6.0,
+          "highest_price": 6.0,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "003041",
+          "name": "真爱美家",
+          "shares": 100,
+          "entry_price": 32.06,
+          "current_price": 32.06,
+          "highest_price": 32.06,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "600985",
+          "name": "淮北矿业",
+          "shares": 100,
+          "entry_price": 14.16,
+          "current_price": 14.16,
+          "highest_price": 14.16,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        },
+        {
+          "code": "601083",
+          "name": "锦江航运",
+          "shares": 100,
+          "entry_price": 13.45,
+          "current_price": 13.45,
+          "highest_price": 13.45,
+          "unreal_pnl": 0.0,
+          "unreal_pct": 0.0,
+          "days_held": 0
+        }
+      ]
     }
   ]
 }
