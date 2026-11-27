@@ -7282,90 +7282,119 @@
       "reason": "AAna v2.4 尾盘评分 88",
       "pnl": 0.0,
       "pnl_pct": 0.0
+    },
+    {
+      "date": "2026-11-27",
+      "code": "600360",
+      "name": "华微电子",
+      "action": "sell",
+      "price": 8.58,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -6.0,
+      "pnl_pct": -0.69
+    },
+    {
+      "date": "2026-11-27",
+      "code": "002414",
+      "name": "高德红外",
+      "action": "sell",
+      "price": 10.39,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 2.0,
+      "pnl_pct": 0.19
+    },
+    {
+      "date": "2026-11-27",
+      "code": "002138",
+      "name": "顺络电子",
+      "action": "sell",
+      "price": 36.5,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -2.0,
+      "pnl_pct": -0.05
+    },
+    {
+      "date": "2026-11-27",
+      "code": "601138",
+      "name": "工业富联",
+      "action": "sell",
+      "price": 41.2,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 31.0,
+      "pnl_pct": 0.76
+    },
+    {
+      "date": "2026-11-27",
+      "code": "002984",
+      "name": "森麒麟",
+      "action": "sell",
+      "price": 12.79,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 2.0,
+      "pnl_pct": 0.16
+    },
+    {
+      "date": "2026-11-27",
+      "code": "600189",
+      "name": "泉阳泉",
+      "action": "sell",
+      "price": 9.11,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 15.0,
+      "pnl_pct": 1.67
+    },
+    {
+      "date": "2026-11-27",
+      "code": "000683",
+      "name": "博源化工",
+      "action": "sell",
+      "price": 5.99,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -1.0,
+      "pnl_pct": -0.17
+    },
+    {
+      "date": "2026-11-27",
+      "code": "003041",
+      "name": "真爱美家",
+      "action": "sell",
+      "price": 32.27,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 21.0,
+      "pnl_pct": 0.66
+    },
+    {
+      "date": "2026-11-27",
+      "code": "600985",
+      "name": "淮北矿业",
+      "action": "sell",
+      "price": 14.14,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": -2.0,
+      "pnl_pct": -0.14
+    },
+    {
+      "date": "2026-11-27",
+      "code": "601083",
+      "name": "锦江航运",
+      "action": "sell",
+      "price": 13.45,
+      "shares": 100,
+      "reason": "止损/止盈/到期",
+      "pnl": 0.0,
+      "pnl_pct": 0.0
     }
   ],
-  "positions": {
-    "600360": {
-      "date": "2026-11-26",
-      "name": "华微电子",
-      "shares": 100,
-      "entry_price": 8.64,
-      "highest_price": 8.64,
-      "entry_date": "2026-11-26"
-    },
-    "002414": {
-      "date": "2026-11-26",
-      "name": "高德红外",
-      "shares": 100,
-      "entry_price": 10.37,
-      "highest_price": 10.37,
-      "entry_date": "2026-11-26"
-    },
-    "002138": {
-      "date": "2026-11-26",
-      "name": "顺络电子",
-      "shares": 100,
-      "entry_price": 36.52,
-      "highest_price": 36.52,
-      "entry_date": "2026-11-26"
-    },
-    "601138": {
-      "date": "2026-11-26",
-      "name": "工业富联",
-      "shares": 100,
-      "entry_price": 40.89,
-      "highest_price": 40.89,
-      "entry_date": "2026-11-26"
-    },
-    "002984": {
-      "date": "2026-11-26",
-      "name": "森麒麟",
-      "shares": 100,
-      "entry_price": 12.77,
-      "highest_price": 12.77,
-      "entry_date": "2026-11-26"
-    },
-    "600189": {
-      "date": "2026-11-26",
-      "name": "泉阳泉",
-      "shares": 100,
-      "entry_price": 8.96,
-      "highest_price": 8.96,
-      "entry_date": "2026-11-26"
-    },
-    "000683": {
-      "date": "2026-11-26",
-      "name": "博源化工",
-      "shares": 100,
-      "entry_price": 6.0,
-      "highest_price": 6.0,
-      "entry_date": "2026-11-26"
-    },
-    "003041": {
-      "date": "2026-11-26",
-      "name": "真爱美家",
-      "shares": 100,
-      "entry_price": 32.06,
-      "highest_price": 32.06,
-      "entry_date": "2026-11-26"
-    },
-    "600985": {
-      "date": "2026-11-26",
-      "name": "淮北矿业",
-      "shares": 100,
-      "entry_price": 14.16,
-      "highest_price": 14.16,
-      "entry_date": "2026-11-26"
-    },
-    "601083": {
-      "date": "2026-11-26",
-      "name": "锦江航运",
-      "shares": 100,
-      "entry_price": 13.45,
-      "highest_price": 13.45,
-      "entry_date": "2026-11-26"
-    }
-  },
+  "positions": {},
   "daily_snapshots": [
     {
       "date": "2026-11-04",
@@ -9071,6 +9100,17 @@
           "days_held": 0
         }
       ]
+    },
+    {
+      "date": "2026-11-27",
+      "cash": 97859.0,
+      "position_value": 0.0,
+      "total_value": 97859.0,
+      "daily_pnl": 60.0,
+      "total_pnl": -2141.0,
+      "total_pnl_pct": -2.14,
+      "realized_pnl": -2141.0,
+      "positions": []
     }
   ]
 }
