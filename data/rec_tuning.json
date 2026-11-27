@@ -12,10 +12,10 @@
     "影视动漫",
     "装修装饰"
   ],
-  "total_records": 489,
-  "overall_win_rate": 48.875255623721884,
+  "total_records": 502,
+  "overall_win_rate": 49.800796812749006,
   "_win_rate_threshold": 40.0,
-  "generated_at": "2026-11-26T20:00:47.560363",
+  "generated_at": "2026-11-27T20:00:48.424552",
   "score_band_stats": {
     "60-70": {
       "band": "60-70",
@@ -27,20 +27,20 @@
     },
     "70+": {
       "band": "70+",
-      "count": 288,
-      "win_count": 154,
-      "win_rate": 53.47222222222222,
-      "avg_change": 0.9464930555555556,
+      "count": 301,
+      "win_count": 165,
+      "win_rate": 54.81727574750831,
+      "avg_change": 1.0960797342192696,
       "avg_hold_days": 1.0
     }
   },
   "hold_days_stats": {
     "1": {
       "hold_days": 1,
-      "count": 489,
-      "win_count": 239,
-      "win_rate": 48.875255623721884,
-      "avg_change": 0.2421267893660539
+      "count": 502,
+      "win_count": 250,
+      "win_rate": 49.800796812749006,
+      "avg_change": 0.350059760956176
     }
   },
   "sector_stats": {
@@ -103,10 +103,10 @@
     "被动元件": {
       "sector": "被动元件",
       "sector_name": "",
-      "count": 2,
-      "win_count": 1,
-      "win_rate": 50.0,
-      "avg_change": -1.3250000000000002
+      "count": 3,
+      "win_count": 2,
+      "win_rate": 66.66666666666666,
+      "avg_change": 2.3866666666666667
     },
     "磁性材料": {
       "sector": "磁性材料",
@@ -143,10 +143,10 @@
     "煤炭开采": {
       "sector": "煤炭开采",
       "sector_name": "",
-      "count": 6,
+      "count": 7,
       "win_count": 3,
-      "win_rate": 50.0,
-      "avg_change": 0.15500000000000003
+      "win_rate": 42.857142857142854,
+      "avg_change": 0.11285714285714288
     },
     "男装": {
       "sector": "男装",
@@ -511,10 +511,10 @@
     "物流": {
       "sector": "物流",
       "sector_name": "",
-      "count": 6,
+      "count": 7,
       "win_count": 4,
-      "win_rate": 66.66666666666666,
-      "avg_change": 0.39833333333333326
+      "win_rate": 57.14285714285714,
+      "avg_change": 0.2571428571428571
     },
     "地面兵装": {
       "sector": "地面兵装",
@@ -527,10 +527,10 @@
     "仪器仪表": {
       "sector": "仪器仪表",
       "sector_name": "",
-      "count": 5,
-      "win_count": 5,
+      "count": 6,
+      "win_count": 6,
       "win_rate": 100.0,
-      "avg_change": 6.784000000000001
+      "avg_change": 7.32
     },
     "移动互联网服务": {
       "sector": "移动互联网服务",
@@ -543,10 +543,10 @@
     "软饮料": {
       "sector": "软饮料",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -2.47
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": -0.685
     },
     "医疗器械": {
       "sector": "医疗器械",
@@ -935,10 +935,10 @@
     "复合肥": {
       "sector": "复合肥",
       "sector_name": "",
-      "count": 1,
-      "win_count": 1,
+      "count": 2,
+      "win_count": 2,
       "win_rate": 100.0,
-      "avg_change": 2.5
+      "avg_change": 1.72
     },
     "计算机应用": {
       "sector": "计算机应用",
@@ -959,10 +959,10 @@
     "其他电子": {
       "sector": "其他电子",
       "sector_name": "",
-      "count": 2,
-      "win_count": 1,
-      "win_rate": 50.0,
-      "avg_change": -1.035
+      "count": 3,
+      "win_count": 2,
+      "win_rate": 66.66666666666666,
+      "avg_change": 0.9466666666666668
     },
     "其他塑料制品": {
       "sector": "其他塑料制品",
@@ -1007,10 +1007,10 @@
     "房屋建设": {
       "sector": "房屋建设",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -10.0
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": -2.835
     },
     "其他化学原料": {
       "sector": "其他化学原料",
@@ -1063,10 +1063,10 @@
     "电子系统组装": {
       "sector": "电子系统组装",
       "sector_name": "",
-      "count": 1,
-      "win_count": 0,
-      "win_rate": 0.0,
-      "avg_change": -5.84
+      "count": 2,
+      "win_count": 1,
+      "win_rate": 50.0,
+      "avg_change": 1.6399999999999997
     },
     "保险": {
       "sector": "保险",
@@ -1075,6 +1075,38 @@
       "win_count": 0,
       "win_rate": 0.0,
       "avg_change": -0.675
+    },
+    "分立器件": {
+      "sector": "分立器件",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 7.69
+    },
+    "轮胎": {
+      "sector": "轮胎",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 2.18
+    },
+    "纯碱": {
+      "sector": "纯碱",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 1.5
+    },
+    "家纺": {
+      "sector": "家纺",
+      "sector_name": "",
+      "count": 1,
+      "win_count": 1,
+      "win_rate": 100.0,
+      "avg_change": 6.48
     }
   }
 }
