@@ -1061,7 +1061,28 @@ def screen_afternoon_stocks(
         raw_stocks, src = get_top_gainers_with_fallback(800)
         if raw_stocks:
             pool = filter_stocks(raw_stocks)
+            used_scan = False
+            # v2026-11-27 P0 修复 (假空仓): 涨幅榜 800 行在普涨熔断日被 300/688/920 板
+            # 占满 → 主板 0 只 → 候选池空 → 0 推荐。改用东财主板全量分页扫描补池。
+            if len(pool) < 20:
+                print(f"  [源3b] 涨幅榜 {src} 主板合格仅 {len(pool)} 只 → 触发主板全量扫描")
+                from dynamic_stocks import get_eastmoney_mainboard_scan
+                mb_raw = get_eastmoney_mainboard_scan()
+                if mb_raw:
+                    mb_pool = filter_stocks(mb_raw)
+                    have = {x.get('code') for x in pool}
+                    added = [x for x in mb_pool if x.get('code') not in have]
+                    pool = pool + added
+                    used_scan = True
+                    print(f"  [源3b] 东财主板扫描 {len(mb_raw)} 只 → 区间过滤 {len(mb_pool)} 只, 新增 {len(added)} 只")
             before = len(candidate_codes)
+            # v2026-11-27: 主板全量扫描后区间内可达 2000+ 只, 必须截断,
+            # 否则逐只 K 线评分会超时。pool 已按 composite_score 倒序
+            # (-3~0% 与 0~2% 回调区 +25, 量能/价格加分, 追高区 -10/-30),
+            # 取前 60 只 = 策略最贴合且流动性最好的候选。
+            if used_scan:
+                pool = pool[:60]
+                print(f"  [源3b] 候选池截断至 {len(pool)} 只 (composite_score 倒序)")
             for item in pool:
                 c = item.get('code', '')
                 if c and c not in candidate_codes:

@@ -104,6 +104,71 @@ def get_eastmoney_top_gainers(num=200):
         return []
 
 
+def get_eastmoney_mainboard_scan(page_size=100, max_pages=60):
+    """
+    v2026-11-27 P0 修复 (假空仓): 全市场**主板**分页扫描, 不依赖涨幅榜排名。
+
+    背景 (2026-11-27 实测): 普涨熔断日 (上证 +3.79% / 深成 +7.07% / 创业板 +11.30% /
+    科创50 +14.89%), get_sina_top_gainers(800) 返回的前 800 名**全部**是
+    300/301/688/920 板 (涨幅 ≥ +11.36%), filter_stocks 的 CHANGE_MIN/MAX=-3/+7
+    窗口 + 主板过滤 → **0 只**, 候选池空 → 0 推荐 (假空仓)。
+    实测主板 3488 只, 策略区间 (-3%~+7%) 内有 885 只, 但排名在 1400~4000 名,
+    800 行截断根本够不到。
+
+    修复: 改用东财 clist 接口 + fs 只取沪深主板 (m:0+t:6 深主板 / m:1+t:2 沪主板),
+    按 f3 涨跌幅分页全量扫描 (每页 100, 0.15s/页, 35 页 ≈ 5s), 本地做区间过滤。
+    返回字段与 get_sina_top_gainers 对齐 (code/name/trade/changepercent/amount/volume)。
+
+    数据源健康度: push2.eastmoney.com clist/get — 2026-11-27 实测 3488 只主板 5s 内拉全,
+    比 sina 逐页 (5580 行 74s) 快一个数量级。
+    """
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    headers = {'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/'}
+    fs = 'm:0+t:6,m:1+t:2'  # 深主板 + 沪主板 (不含创业板/科创板/北交所)
+    rows = []
+    seen = set()
+    for pn in range(1, max_pages + 1):
+        params = {
+            'pn': pn, 'pz': page_size, 'po': 1, 'np': 1,
+            'fltt': 2, 'invt': 2, 'fid': 'f3',
+            'fs': fs, 'fields': 'f12,f14,f2,f3,f6,f5',
+        }
+        try:
+            resp = requests.get(url, params=params, headers=headers, timeout=10)
+            data = resp.json()
+            diff = (data.get('data') or {}).get('diff') or []
+        except Exception as e:
+            print(f"[Eastmoney主板扫描] Page {pn} failed: {e}")
+            break
+        if not diff:
+            break
+        for r in diff:
+            code = str(r.get('f12', ''))
+            if not code or code in seen:
+                continue
+            seen.add(code)
+
+            def _num(v):
+                # 东财对停牌/无成交标的返回 '-' 或 None, 直接 float() 会抛
+                # ValueError: could not convert string to float: '-'
+                try:
+                    return float(v)
+                except (TypeError, ValueError):
+                    return 0.0
+
+            rows.append({
+                'code': code,
+                'name': r.get('f14', ''),
+                'trade': _num(r.get('f2', 0)),
+                'changepercent': _num(r.get('f3', 0)),
+                'amount': _num(r.get('f6', 0)),
+                'volume': _num(r.get('f5', 0)),
+            })
+        if len(rows) >= 3000:
+            break
+    return rows
+
+
 def get_top_gainers_with_fallback(num=200):
     """
     多数据源 fallback：sina → eastmoney → tencent
