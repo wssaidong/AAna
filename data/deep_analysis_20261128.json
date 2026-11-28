@@ -1,0 +1,258 @@
+{
+ "date": "2026-11-28",
+ "base_date": "2026-11-27",
+ "report": null,
+ "report_note": "11-28 周六无报告, 基准 = 11-27 正式版 (17:01 盘后版)",
+ "base_report": "/Users/cai/code/AAna/reports/2026-11-27-选股报告.md",
+ "report_size": 5344,
+ "report_mtime": "2026-11-27T17:01:54",
+ "base_report_top10": 0,
+ "base_report_empty_reason": "熔断日极端日守卫缺陷 (创业板 +11.61% 被守卫丢弃 / 17:01 真源评分 1/43)",
+ "working_pool_source": "/Users/cai/code/AAna/data/deep_analysis_pm_20261127.json",
+ "trading_day": false,
+ "session": "weekend_day1",
+ "generated": "2026-11-28T08:39:09",
+ "weekend_legs": {
+  "weekday": "周六",
+  "report_today": false,
+  "cron_skip_line": "[AAna] 2026-11-28 非交易日 (周末 (周六))，跳过报告生成",
+  "premarket_exit_lines": 3,
+  "last_trading_day": "2026-11-27"
+ },
+ "weekend_legs_ok": true,
+ "sentiment_snap": {
+  "score": 80,
+  "label": "极端",
+  "position": 0.85,
+  "zt_count": 378,
+  "dt_count": 38
+ },
+ "mk_four_avg_close": 9.41,
+ "sh_close_pct": 3.73,
+ "sh_close_px": 3606.49,
+ "mk_avg_all": 5.05,
+ "guard_ice": false,
+ "guard_live": {
+  "score": 80,
+  "label": "极端",
+  "is_ice_point": false
+ },
+ "run_id": "01a21f8f-ad59-7de6-9874-42af3c1ea7d8",
+ "overall_win_rate": 49.800796812749006,
+ "total_records": 502,
+ "sector_count": 133,
+ "rec_tuning_generated_at": "2026-11-27T20:00:48.424552",
+ "pool_pm_1127_freeze_review": {
+  "source": "data/deep_analysis_pm_20261127.json 尾盘真源深度池 ×5 (14:55 rerun e2bf8ed 后)",
+  "judged_on": "2026-11-27",
+  "review_type": "数据冻结一致性复核 (周六无新行情, T+1 判决顺延 11-30)",
+  "consistency": "0 一致 / 5 尾盘→收盘微调 (无真实漂移)",
+  "drift": [],
+  "baseline_four_avg": 9.41,
+  "baseline_sh": 3.73,
+  "baseline_mkt_avg": 5.05,
+  "n_beat_four": 0,
+  "n_beat_sh": 0,
+  "n_beat_mkt_avg": 0,
+  "n_positive": 5,
+  "n_stop_broken": 0,
+  "mean_chg": 1.68,
+  "excess_vs_mkt_avg": -3.37,
+  "excess_vs_four": -7.73,
+  "dual_qualified": [],
+  "top1_law_verdict": "pending_t1_1130",
+  "top1_base_day_note": "菜百 +1.86% 正盈利但熔断日跑输指数, 铁律判决顺延 11-30 T+1",
+  "results": [
+   {
+    "code": "002422",
+    "name": "科伦药业",
+    "total": 78.0,
+    "rating": "买入",
+    "stop": 41.84,
+    "target": 47.29,
+    "sector_stat_key": "化学制药",
+    "sector_win_rate_pool": "100% (2/2",
+    "sector_win_rate_live": "100.0% (2/2)",
+    "ind_em": "化学制药",
+    "ind_sina": "化学制剂",
+    "close": 45.05,
+    "chg_pct": 2.04,
+    "quote_ts": "20261127161445",
+    "pool_recorded": {
+     "price": 45.04,
+     "chg_pct": 2.02
+    },
+    "consistent": false,
+    "minor_close_adj": true,
+    "adjustment_type": "尾盘14:55快照→15:00收盘微调 (≤0.10元/≤0.5pp)",
+    "beat_four": false,
+    "beat_sh": false,
+    "beat_mkt_avg": false,
+    "pos": true,
+    "stop_broken": false,
+    "held": false
+   },
+   {
+    "code": "605599",
+    "name": "菜百股份",
+    "total": 82.2,
+    "rating": "买入",
+    "stop": 13.77,
+    "target": 15.56,
+    "sector_stat_key": "百货",
+    "sector_win_rate_pool": "100% (3/3",
+    "sector_win_rate_live": "100.0% (3/3)",
+    "ind_em": "饰品",
+    "ind_sina": "珠宝首饰",
+    "close": 14.81,
+    "chg_pct": 1.79,
+    "quote_ts": "20261127161500",
+    "pool_recorded": {
+     "price": 14.82,
+     "chg_pct": 1.86
+    },
+    "consistent": false,
+    "minor_close_adj": true,
+    "adjustment_type": "尾盘14:55快照→15:00收盘微调 (≤0.10元/≤0.5pp)",
+    "beat_four": false,
+    "beat_sh": false,
+    "beat_mkt_avg": false,
+    "pos": true,
+    "stop_broken": false,
+    "held": true
+   },
+   {
+    "code": "000513",
+    "name": "丽珠集团",
+    "total": 51.6,
+    "rating": "中性",
+    "stop": 27.52,
+    "target": 31.02,
+    "sector_stat_key": "化学制药",
+    "sector_win_rate_pool": "100% (2/2",
+    "sector_win_rate_live": "100.0% (2/2)",
+    "ind_em": "化学制药",
+    "ind_sina": "化学制剂",
+    "close": 29.52,
+    "chg_pct": 1.69,
+    "quote_ts": "20261127161445",
+    "pool_recorded": {
+     "price": 29.54,
+     "chg_pct": 1.76
+    },
+    "consistent": false,
+    "minor_close_adj": true,
+    "adjustment_type": "尾盘14:55快照→15:00收盘微调 (≤0.10元/≤0.5pp)",
+    "beat_four": false,
+    "beat_sh": false,
+    "beat_mkt_avg": false,
+    "pos": true,
+    "stop_broken": false,
+    "held": false
+   },
+   {
+    "code": "600012",
+    "name": "皖通高速",
+    "total": 71.5,
+    "rating": "增持",
+    "stop": 16.51,
+    "target": 18.66,
+    "sector_stat_key": "交通运输",
+    "sector_win_rate_pool": "0% (0/1",
+    "sector_win_rate_live": "0.0% (0/1)",
+    "ind_em": "铁路公路",
+    "ind_sina": "高速公路",
+    "close": 17.83,
+    "chg_pct": 1.54,
+    "quote_ts": "20261127161456",
+    "pool_recorded": {
+     "price": 17.77,
+     "chg_pct": 1.2
+    },
+    "consistent": false,
+    "minor_close_adj": true,
+    "adjustment_type": "尾盘14:55快照→15:00收盘微调 (≤0.10元/≤0.5pp)",
+    "beat_four": false,
+    "beat_sh": false,
+    "beat_mkt_avg": false,
+    "pos": true,
+    "stop_broken": false,
+    "held": false
+   },
+   {
+    "code": "002223",
+    "name": "鱼跃医疗",
+    "total": 71.0,
+    "rating": "增持",
+    "stop": 26.67,
+    "target": 30.12,
+    "sector_stat_key": "医疗器械",
+    "sector_win_rate_pool": "50% (1/2",
+    "sector_win_rate_live": "50.0% (1/2)",
+    "ind_em": "医疗器械",
+    "ind_sina": "医疗器械",
+    "close": 28.68,
+    "chg_pct": 1.34,
+    "quote_ts": "20261127161424",
+    "pool_recorded": {
+     "price": 28.69,
+     "chg_pct": 1.38
+    },
+    "consistent": false,
+    "minor_close_adj": true,
+    "adjustment_type": "尾盘14:55快照→15:00收盘微调 (≤0.10元/≤0.5pp)",
+    "beat_four": false,
+    "beat_sh": false,
+    "beat_mkt_avg": false,
+    "pos": true,
+    "stop_broken": false,
+    "held": false
+   }
+  ]
+ },
+ "held_exposure": [
+  {
+   "code": "605599",
+   "name": "菜百股份",
+   "channels": [
+    {
+     "group": "20261124ZZ",
+     "gid": 2076,
+     "leg": "11-24 早盘腿",
+     "stop": 14.51
+    },
+    {
+     "group": "20261127PP",
+     "gid": 2131,
+     "leg": "11-27 尾盘腿",
+     "stop": 13.77
+    }
+   ],
+   "close": 14.81,
+   "chg_pct": 1.79,
+   "stops": {
+    "new_leg": 13.77,
+    "zz_1124": 14.51
+   },
+   "stop_broken": false,
+   "note": "双通道敞口, 11-30 建仓窗注意同票重复"
+  }
+ ],
+ "eastmoney_groups_check": {
+  "latest_gid": 2131,
+  "n_groups": 8,
+  "held_note": {
+   "20261124ZZ": "2076",
+   "20261127PP": "2131"
+  }
+ },
+ "next_trading_day": "2026-11-30 (周一, paper 第 13 批建仓窗 14:45)",
+ "recommend": null,
+ "eligible_pool": [],
+ "results": [],
+ "eastmoney_sync": {
+  "action": "skip",
+  "reason": "0 推荐 (非交易日 + 无当日报告/正式版空表 + PM 池已建 PP 组) → 不创建 20261128ZZ",
+  "groups_20261128_occupied": {}
+ }
+}
